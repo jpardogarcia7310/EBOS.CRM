@@ -53,12 +53,14 @@ services.Configure<ApiBehaviorOptions>(ApiBehaviorConfig.Configure);
 // Swagger / OpenAPI
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(SwaggerConfig.Configure);
+SwaggerConfig.DefaultVersion(services);
 
 // Global JSON options
 services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
+
 
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
@@ -69,7 +71,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBOS.CRM API v1"));
+    app.UseSwaggerUI(c => 
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBOS.CRM API v1");
+        c.SwaggerEndpoint("/swagger/v2/swagger.json", "EBOS.CRM API v2");
+    });
 
     await db.Database.MigrateAsync(cancellationToken);
 }
@@ -84,3 +90,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+

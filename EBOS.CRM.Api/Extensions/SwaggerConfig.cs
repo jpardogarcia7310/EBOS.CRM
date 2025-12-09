@@ -1,4 +1,5 @@
 ﻿using EBOS.CRM.Api.Swagger;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
@@ -13,6 +14,11 @@ public static class SwaggerConfig
         {
             Title = "EBOS.CRM API",
             Version = "v1"
+        });
+        options.SwaggerDoc("v2", new OpenApiInfo
+        {
+            Title = "EBOS.CRM API",
+            Version = "v2"
         });
 
         // Incluir comentarios XML si existen
@@ -29,5 +35,15 @@ public static class SwaggerConfig
 
         // Respuestas de error comunes
         options.AddErrorResponses();
+    }
+
+    public static void DefaultVersion(IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        });
     }
 }
