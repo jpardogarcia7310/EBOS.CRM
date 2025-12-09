@@ -1,0 +1,54 @@
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+namespace EBOS.CRM.Api.Swagger;
+
+public class ValidationProblemDetailsOperationFilter : IOperationFilter
+{
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
+        if (operation == null) return;
+
+        if (operation.Responses.TryGetValue("400", out var response))
+        {
+            var example = new OpenApiObject
+            {
+                ["type"] = new OpenApiString("https://tools.ietf.org/html/rfc7231#section-6.5.1"),
+                ["title"] = new OpenApiString("One or more validation errors occurred."),
+                ["status"] = new OpenApiInteger(400),
+                ["errors"] = new OpenApiObject
+                {
+                    ["name"] = new OpenApiArray { new OpenApiString("El campo Name es obligatorio.") },
+                    ["iso31661A2Code"] = new OpenApiArray { new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres.") }
+                },
+                ["errorsDetailed"] = new OpenApiObject
+                {
+                    ["name"] = new OpenApiArray
+                    {
+                        new OpenApiObject
+                        {
+                            ["message"] = new OpenApiString("El campo Name es obligatorio."),
+                            ["code"] = new OpenApiString("VAL_NAME_REQUIRED")
+                        }
+                    },
+                    ["iso31661A2Code"] = new OpenApiArray
+                    {
+                        new OpenApiObject
+                        {
+                            ["message"] = new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres."),
+                            ["code"] = new OpenApiString("VAL_ISOA2_LENGTH")
+                        }
+                    }
+                }
+            };
+
+            response.Content ??= new Dictionary<string, OpenApiMediaType>();
+            response.Content["application/problem+json"] = new OpenApiMediaType
+            {
+                Example = example
+            };
+        }
+    }
+
+}

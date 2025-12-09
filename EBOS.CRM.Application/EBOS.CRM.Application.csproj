@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Countries\Commands\DeleteCountry\" />
+    <Folder Include="Features\Countries\Commands\UpdateCountry\" />
+    <Folder Include="Features\Countries\Dtos\" />
+    <Folder Include="Features\Countries\Queries\GetAllCountries\" />
+    <Folder Include="Features\Countries\Queries\GetCountryById\" />
+    <Folder Include="Features\Entities\Commands\AddEntity\" />
+    <Folder Include="Features\Entities\Commands\DeleteEntity\" />
+    <Folder Include="Features\Entities\Commands\UpdateEntity\" />
+    <Folder Include="Features\Entities\Dtos\" />
+    <Folder Include="Features\Entities\Queries\GetAllEntities\" />
+    <Folder Include="Features\Entities\Queries\GetEntityById\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EBOS.CRM.Domain\EBOS.CRM.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
