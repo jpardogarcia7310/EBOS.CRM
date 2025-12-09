@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|c:\\sitec\\ebos\\back\\ebos.crm\\ebos.crm.api\\controllers\\v1\\countries\\countriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|solutionrelative:ebos.crm.api\\controllers\\v1\\countries\\countriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 66,
           "Children": [
             {
               "$type": "Bookmark",
@@ -270,6 +275,23 @@
             {
               "$type": "Bookmark",
               "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CountriesController.cs",
+              "DocumentMoniker": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
+              "RelativeDocumentMoniker": "EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
+              "ToolTip": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
+              "RelativeToolTip": "EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAYwEcAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-09T00:00:24.399Z",
+              "EditorCaption": ""
             }
           ]
         },

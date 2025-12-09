@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Domain\\EBOS.CRM.Domain.csproj": {
-      "version": "1.0.0",
+      "version": "0.0.1",
       "restore": {
         "projectUniqueName": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Domain\\EBOS.CRM.Domain.csproj",
         "projectName": "EBOS.CRM.Domain",
@@ -78,7 +78,7 @@
       }
     },
     "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Infrastructure\\EBOS.CRM.Infrastructure.csproj": {
-      "version": "1.0.0",
+      "version": "0.0.1",
       "restore": {
         "projectUniqueName": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Infrastructure\\EBOS.CRM.Infrastructure.csproj",
         "projectName": "EBOS.CRM.Infrastructure",

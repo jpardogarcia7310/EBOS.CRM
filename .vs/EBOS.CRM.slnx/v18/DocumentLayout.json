@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|c:\\sitec\\ebos\\back\\ebos.crm\\ebos.crm.api\\controllers\\v1\\countries\\countriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|solutionrelative:ebos.crm.api\\controllers\\v1\\countries\\countriescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|c:\\sitec\\ebos\\back\\ebos.crm\\ebos.crm.api\\ebos.crm.api.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{B94674DE-A33B-4841-B1AF-7CFBD17E3871}|EBOS.CRM.Api\\EBOS.CRM.Api.csproj|solutionrelative:ebos.crm.api\\ebos.crm.api.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -283,14 +283,13 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CountriesController.cs",
-              "DocumentMoniker": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
-              "RelativeDocumentMoniker": "EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
-              "ToolTip": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
-              "RelativeToolTip": "EBOS.CRM.Api\\Controllers\\v1\\Countries\\CountriesController.cs",
-              "ViewState": "AgIAADYAAAAAAAAAAAAYwEcAAABMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T00:00:24.399Z",
+              "Title": "EBOS.CRM.Api",
+              "DocumentMoniker": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\EBOS.CRM.Api.csproj",
+              "RelativeDocumentMoniker": "EBOS.CRM.Api\\EBOS.CRM.Api.csproj",
+              "ToolTip": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Api\\EBOS.CRM.Api.csproj",
+              "RelativeToolTip": "EBOS.CRM.Api\\EBOS.CRM.Api.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-09T00:09:59.849Z",
               "EditorCaption": ""
             }
           ]

@@ -4,6 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>API EBOS.CRM</Title>
+    <Authors>SITECAV</Authors>
+    <Copyright>All rights reserved by SITECAV 2025</Copyright>
+    <RepositoryUrl>https://github.com/SITECAV/EBOS.CRM</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageOutputPath>$(SolutionDir)NuGet</PackageOutputPath>
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <FileVersion>$(VersionPrefix)</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

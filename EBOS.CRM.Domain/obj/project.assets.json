@@ -524,7 +524,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "0.0.1",
     "restore": {
       "projectUniqueName": "C:\\SITEC\\EBOS\\back\\EBOS.CRM\\EBOS.CRM.Domain\\EBOS.CRM.Domain.csproj",
       "projectName": "EBOS.CRM.Domain",
