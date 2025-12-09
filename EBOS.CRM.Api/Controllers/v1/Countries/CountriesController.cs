@@ -1,6 +1,6 @@
 ﻿using EBOS.CRM.Api.Controllers.v1.Countries.Requests;
 using EBOS.CRM.Application.Features.Countries.Commands.AddCountry;
-using EBOS.CRM.Application.Features.Countries.Dto;
+using EBOS.CRM.Application.Features.Countries.Dtos;
 using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 using MediatR;

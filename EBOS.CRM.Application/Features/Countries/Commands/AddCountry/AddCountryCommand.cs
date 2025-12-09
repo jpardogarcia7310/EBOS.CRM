@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dto;
+﻿using EBOS.CRM.Application.Features.Countries.Dtos;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Commands.AddCountry;

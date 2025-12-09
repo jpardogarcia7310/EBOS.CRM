@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using EBOS.CRM.Application.Features.Countries.Dto;
+using EBOS.CRM.Application.Features.Countries.Dtos;
 using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Application.Mappings;

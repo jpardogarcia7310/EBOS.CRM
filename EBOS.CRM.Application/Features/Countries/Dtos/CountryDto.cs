@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.Application.Features.Countries.Dto;
+﻿namespace EBOS.CRM.Application.Features.Countries.Dtos;
 
 public record CountryDto(
     long Id,
