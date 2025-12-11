@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EBOS.CRM.Api.Controllers.v1.Countries.Requests;
+namespace EBOS.CRM.Api.Controllers.Countries.Requests;
 
 public record AddCountryRQ(
     [property: JsonPropertyName("name"), JsonRequired] string Name,

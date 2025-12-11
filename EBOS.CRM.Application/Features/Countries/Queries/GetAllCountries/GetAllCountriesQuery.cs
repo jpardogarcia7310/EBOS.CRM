@@ -3,4 +3,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
 
-public record GetAllCountriesQuery() : IRequest<IEnumerable<CountryDto>>;
+public record GetAllCountriesQuery() : IRequest<IEnumerable<CountryResponseDto>>;

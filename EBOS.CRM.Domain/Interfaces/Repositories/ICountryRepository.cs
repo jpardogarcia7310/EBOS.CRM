@@ -7,6 +7,8 @@ public interface ICountryRepository : IUnitOfWork
 {
     #region Commands
     Task<Country> AddAsync(Country country, CancellationToken cancellationToken = default);
+    Task UpdateAsync(Country country, CancellationToken cancellationToken = default);
+    Task DeleteAsync(long id, CancellationToken cancellationToken = default);
     #endregion
 
     #region Queries

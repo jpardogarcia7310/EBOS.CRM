@@ -12,4 +12,4 @@ public record AddCountryCommand(
     string Currency,
     string CurrencyCode,
     string InternationalPhoneCode
-) : IRequest<CountryDto>;
+) : IRequest<CountryResponseDto>;

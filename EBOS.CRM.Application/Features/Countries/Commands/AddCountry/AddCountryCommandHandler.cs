@@ -6,9 +6,9 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Commands.AddCountry;
 
-public class AddCountryCommandHandler(ICountryRepository repository, IMapper mapper) : IRequestHandler<AddCountryCommand, CountryDto>
+public class AddCountryCommandHandler(ICountryRepository repository, IMapper mapper) : IRequestHandler<AddCountryCommand, CountryResponseDto>
 {
-    public async Task<CountryDto> Handle(AddCountryCommand request, CancellationToken cancellationToken)
+    public async Task<CountryResponseDto> Handle(AddCountryCommand request, CancellationToken cancellationToken)
     {
         var entity = new Country
         {
@@ -24,6 +24,6 @@ public class AddCountryCommandHandler(ICountryRepository repository, IMapper map
 
         var created = await repository.AddAsync(entity, cancellationToken);
         created.Id = await repository.SaveChangesAsync(cancellationToken);
-        return mapper.Map<CountryDto>(created);
+        return mapper.Map<CountryResponseDto>(created);
     }
 }

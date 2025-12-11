@@ -5,10 +5,10 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
 
-public class GetAllCountriesQueryHandler(ICountryRepository repository, IMapper mapper) : IRequestHandler<GetAllCountriesQuery, IEnumerable<CountryDto>>
+public class GetAllCountriesQueryHandler(ICountryRepository repository, IMapper mapper) : IRequestHandler<GetAllCountriesQuery, IEnumerable<CountryResponseDto>>
 {
-    public async Task<IEnumerable<CountryDto>> Handle(GetAllCountriesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CountryResponseDto>> Handle(GetAllCountriesQuery request, CancellationToken cancellationToken)
     {
-        return mapper.Map<IEnumerable<CountryDto>>(await repository.GetAllAsync(cancellationToken));
+        return mapper.Map<IEnumerable<CountryResponseDto>>(await repository.GetAllAsync(cancellationToken));
     }
 }

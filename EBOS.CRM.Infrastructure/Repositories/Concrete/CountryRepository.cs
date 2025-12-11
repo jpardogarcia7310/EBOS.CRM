@@ -18,6 +18,21 @@ public class CountryRepository(CrmDbContext context) : ICountryRepository
         var entry = await _dbSet.AddAsync(country, cancellationToken);
         return entry.Entity;
     }
+    public async Task UpdateAsync(Country country, CancellationToken cancellationToken = default)
+    {
+        // Si usas AsNoTracking en GetByIdAsync, necesitas Attach o Update
+        _dbSet.Update(country);
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _dbSet.FindAsync(new object[] { id }, cancellationToken);
+        if (entity is null)
+        {
+            return; 
+        }
+        _dbSet.Remove(entity);
+    }    
     #endregion
 
     #region Queries

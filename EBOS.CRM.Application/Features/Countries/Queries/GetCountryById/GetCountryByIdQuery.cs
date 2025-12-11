@@ -3,4 +3,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
-public record GetCountryByIdQuery(long Id) : IRequest<CountryDto?>;
+public record GetCountryByIdQuery(long Id) : IRequest<CountryResponseDto?>;

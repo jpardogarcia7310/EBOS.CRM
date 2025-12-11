@@ -8,6 +8,6 @@ public class CountryMapping : Profile
 {
     public CountryMapping()
     {
-        CreateMap<Country, CountryDto>().ReverseMap();
+        CreateMap<Country, CountryResponseDto>().ReverseMap();
     }
 }

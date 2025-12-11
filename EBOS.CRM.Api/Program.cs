@@ -1,4 +1,4 @@
-using EBOS.CRM.Api.Extensions;
+﻿using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Validation;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Features.Countries.Commands.AddCountry;
@@ -9,7 +9,10 @@ using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,10 +53,14 @@ services
 // Configure consistent ModelState -> ValidationProblemDetails mapping
 services.Configure<ApiBehaviorOptions>(ApiBehaviorConfig.Configure);
 
+// 🔧 ApiVersioning
+SwaggerConfig.ApiVersioning(services);
+
 // Swagger / OpenAPI
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen(SwaggerConfig.Configure);
-SwaggerConfig.DefaultVersion(services);
+services.AddSwaggerGen();
+// Configuración de Swagger vía DI (evita BuildServiceProvider)
+services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 // Global JSON options
 services.Configure<JsonOptions>(options =>
@@ -71,10 +78,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI(c => 
+    app.UseSwaggerUI(options => 
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBOS.CRM API v1");
-        c.SwaggerEndpoint("/swagger/v2/swagger.json", "EBOS.CRM API v2");
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        // Simplificación del loop con Select (SonarQube)
+        foreach (var group in provider.ApiVersionDescriptions.Select(d => d.GroupName))
+        {
+            options.SwaggerEndpoint($"/swagger/{group}/swagger.json",
+                                    $"EBOS.CRM API {group.ToUpperInvariant()}");
+        }
+        // 🔧 Mostrar tags separados por versión
+        options.DefaultModelsExpandDepth(-1); // opcional: oculta modelos por defecto
+        options.DisplayOperationId();         // opcional: muestra operationId
     });
 
     await db.Database.MigrateAsync(cancellationToken);
@@ -91,3 +106,8 @@ app.MapControllers();
 
 await app.RunAsync();
 
+public partial class Program
+{
+    // Evita que el analizador sugiera instanciación; mantiene la clase usable por WebApplicationFactory
+    protected Program() { }
+}

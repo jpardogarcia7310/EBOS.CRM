@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>API EBOS.CRM</Title>
     <Authors>SITECAV</Authors>
     <Copyright>All rights reserved by SITECAV 2025</Copyright>
@@ -30,10 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\EBOS.CRM.Application\EBOS.CRM.Application.csproj" />
     <ProjectReference Include="..\EBOS.CRM.Infrastructure\EBOS.CRM.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\v2\Customers\Requests\" />
   </ItemGroup>
 
 </Project>

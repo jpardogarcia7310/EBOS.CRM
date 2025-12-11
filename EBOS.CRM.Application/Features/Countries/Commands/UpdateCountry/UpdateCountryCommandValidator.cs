@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
 
-namespace EBOS.CRM.Application.Features.Countries.Commands.AddCountry;
+namespace EBOS.CRM.Application.Features.Countries.Commands.UpdateCountry;
 
-public class AddCountryCommandValidator : AbstractValidator<AddCountryCommand>
+public sealed class UpdateCountryCommandValidator : AbstractValidator<UpdateCountryCommand>
 {
-    public AddCountryCommandValidator()
+    public UpdateCountryCommandValidator()
     {
+        RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("El campo Name es obligatorio.").WithErrorCode("VAL_NAME_REQUIRED")
             .MaximumLength(200).WithMessage("El campo Name no puede superar 200 caracteres.").WithErrorCode("VAL_NAME_MAXLEN");

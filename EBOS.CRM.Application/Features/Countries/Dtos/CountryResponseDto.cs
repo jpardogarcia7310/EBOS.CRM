@@ -1,6 +1,6 @@
 ﻿namespace EBOS.CRM.Application.Features.Countries.Dtos;
 
-public record CountryDto(
+public record CountryResponseDto(
     long Id,
     string Name,
     string Iso31661A2Code,
