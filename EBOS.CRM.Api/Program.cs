@@ -16,10 +16,15 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Short aliases
 var services = builder.Services;
 var configuration = builder.Configuration;
+
+// --- BLOQUE DE DIAGNÓSTICO ---
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+// --- FIN BLOQUE DE DIAGNÓSTICO ---
 
 // DbContext
 services.AddDbContext<CrmDbContext>(options =>
@@ -53,13 +58,14 @@ services
 // Configure consistent ModelState -> ValidationProblemDetails mapping
 services.Configure<ApiBehaviorOptions>(ApiBehaviorConfig.Configure);
 
-// 🔧 ApiVersioning
+// ApiVersioning
 SwaggerConfig.ApiVersioning(services);
 
 // Swagger / OpenAPI
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
-// Configuración de Swagger vía DI (evita BuildServiceProvider)
+
+// Registrar la configuración que crea un SwaggerDoc por versión y filtra por GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 // Global JSON options
@@ -70,6 +76,26 @@ services.Configure<JsonOptions>(options =>
 
 
 var app = builder.Build();
+
+// --- BLOQUE DE DIAGNÓSTICO: listar versiones y ApiDescriptions en consola ---
+var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+Console.WriteLine("=== ApiVersionDescriptions ===");
+foreach (var desc in provider.ApiVersionDescriptions)
+{
+    Console.WriteLine($"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
+}
+
+var apiExplorer = app.Services.GetRequiredService<Microsoft.AspNetCore.Mvc.ApiExplorer.IApiDescriptionGroupCollectionProvider>();
+Console.WriteLine("=== ApiDescriptions ===");
+foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
+{
+    foreach (var api in group.Items)
+    {
+        Console.WriteLine($"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: {api.ActionDescriptor.RouteValues["controller"]} | Action: {api.ActionDescriptor.RouteValues["action"]}");
+    }
+}
+// --- FIN BLOQUE DE DIAGNÓSTICO ---
+
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
 var cancellationToken = app.Lifetime.ApplicationStopping;
@@ -78,16 +104,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI(options => 
+    app.UseSwaggerUI(options =>
     {
         var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        // Simplificación del loop con Select (SonarQube)
         foreach (var group in provider.ApiVersionDescriptions.Select(d => d.GroupName))
         {
             options.SwaggerEndpoint($"/swagger/{group}/swagger.json",
                                     $"EBOS.CRM API {group.ToUpperInvariant()}");
         }
-        // 🔧 Mostrar tags separados por versión
+        // Mostrar tags separados por versión
         options.DefaultModelsExpandDepth(-1); // opcional: oculta modelos por defecto
         options.DisplayOperationId();         // opcional: muestra operationId
     });

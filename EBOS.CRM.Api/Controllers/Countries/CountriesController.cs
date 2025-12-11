@@ -20,7 +20,6 @@ public class CountriesController(IMediator mediator) : ControllerBase
     #region Commands
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(CountryResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -37,7 +36,6 @@ public class CountriesController(IMediator mediator) : ControllerBase
 
     [HttpPut("{id:long}")]
     [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -65,7 +63,6 @@ public class CountriesController(IMediator mediator) : ControllerBase
 
     [HttpDelete("{id:long}")]
     [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
