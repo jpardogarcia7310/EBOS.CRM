@@ -127,6 +127,7 @@ public class CountryControllerTest
         // Arrange
         var id = 7L;
         var dto = SampleDto(id);
+        _ = apiVersion;
         _mediatorMock
             .Setup(m => m.Send(It.Is<GetCountryByIdQuery>(q => q.Id == id), It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto)
