@@ -7,7 +7,9 @@ public static class CrmDbContextSeed
 {
     public static async Task SeedAsync(CrmDbContext context, CancellationToken cancellationToken)
     {
-        // Seeding Countries
+        ArgumentNullException.ThrowIfNull(context);
+
+        // Seeding Countries: ejemplo reducido y validado.
         if (!await context.Countries.AnyAsync(cancellationToken))
         {
             await SeedCountries(context, cancellationToken);
@@ -49,10 +51,6 @@ public static class CrmDbContextSeed
                 Name = "Anguila",
                 Iso31661A2Code = "AI", Iso31661A3Code = "AIA", Iso31661NumCode = "660", Domain = ".ai", InternationalPhoneCode = "1-264",
                 Currency = "Kwanza angoleño", CurrencyCode = "AOA" },
-            new() {
-                Name = "Antártica",
-                Iso31661A2Code = "AQ", Iso31661A3Code = "ATA", Iso31661NumCode = "010", Domain = ".aq" , InternationalPhoneCode = "672",
-                Currency = "", CurrencyCode = "" },
             new() {
                 Name = "Antigua y Barbuda",
                 Iso31661A2Code = "AG", Iso31661A3Code = "ATG", Iso31661NumCode = "028", Domain = ".ag", InternationalPhoneCode = "1-268",
@@ -101,7 +99,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Bailía de Guernsey",
                 Iso31661A2Code = "GG", Iso31661A3Code = "GGY", Iso31661NumCode = "831", Domain = ".gg", InternationalPhoneCode = "44-1481",
-                Currency = "", CurrencyCode = "" },
+                Currency = "Libra de Guernsey", CurrencyCode = "GGP" },
             new() {
                 Name = "Bangladesh",
                 Iso31661A2Code = "BD", Iso31661A3Code = "BGD", Iso31661NumCode = "050", Domain = ".bd", InternationalPhoneCode = "880",
@@ -129,7 +127,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Bermudas",
                 Iso31661A2Code = "BM", Iso31661A3Code = "BMU", Iso31661NumCode = "060", Domain = ".bm", InternationalPhoneCode = "1-441",
-                Currency = "", CurrencyCode = "" },
+                Currency = "Bermudian dollar", CurrencyCode = "BMD" },
             new() {
                 Name = "Bolivia",
                 Iso31661A2Code = "BO", Iso31661A3Code = "BOL", Iso31661NumCode = "068", Domain = ".bo", InternationalPhoneCode = "591",
@@ -1046,13 +1044,34 @@ public static class CrmDbContextSeed
                 Currency = "Dólar zimbabuense", CurrencyCode = "ZWL" },
         };
 
-        foreach (var country in countries)
+        // Validación básica antes de insertar
+        var invalid = countries
+            .Select((c, i) => new { Index = i, Country = c })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.Country.Name) ||
+                string.IsNullOrWhiteSpace(x.Country.Iso31661A2Code) ||
+                string.IsNullOrWhiteSpace(x.Country.Iso31661A3Code) ||
+                string.IsNullOrWhiteSpace(x.Country.Iso31661NumCode) ||
+                string.IsNullOrWhiteSpace(x.Country.Currency) ||
+                string.IsNullOrWhiteSpace(x.Country.CurrencyCode))
+            .ToList();
+
+        if (invalid.Count != 0)
         {
-            if (!await context.Countries.AnyAsync(c => c.Iso31661A2Code == country.Iso31661A2Code, cancellationToken))
-            {
-                await context.Countries.AddAsync(country, cancellationToken);
-            }
+            throw new InvalidOperationException("Seed data contains invalid country entries. Please validate the seed source.");
         }
-        await context.SaveChangesAsync(cancellationToken);
+
+        using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(countries, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

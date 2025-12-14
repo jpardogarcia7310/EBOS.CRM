@@ -12,11 +12,11 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configuración básica para Country
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CrmDbContext).Assembly);
 
-        AplySoftDeleteQueryFilter(modelBuilder);
-        //// SAFETY NET: fuerza DeleteBehavior.Restrict en cualquier FK no configurada
+        ApplySoftDeleteQueryFilter(modelBuilder);
+
+        // SAFETY NET: fuerza DeleteBehavior.Restrict en cualquier FK no configurada
         _ = modelBuilder.Model
             .GetEntityTypes()
             .SelectMany(t => t.GetForeignKeys())
@@ -25,12 +25,19 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
 
         base.OnModelCreating(modelBuilder);
     }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-        optionsBuilder.EnableSensitiveDataLogging();
+        // No sobrescribimos opciones si ya están configuradas por el host/DI
+        if (!optionsBuilder.IsConfigured)
+        {
+#if DEBUG
+            optionsBuilder.EnableSensitiveDataLogging();
+#endif
+        }
     }
-    private static void AplySoftDeleteQueryFilter(ModelBuilder modelBuilder)
+
+    private static void ApplySoftDeleteQueryFilter(ModelBuilder modelBuilder)
     {
         var softErasableInterface = typeof(ISoftDeletable);
         var erasedPropertyMethod = typeof(EF)
@@ -39,15 +46,23 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
 
         if (erasedPropertyMethod == null)
             return;
-        foreach (var clrType in modelBuilder.Model.GetEntityTypes().Select(e => e.ClrType).Where(clrType => softErasableInterface.IsAssignableFrom(clrType)))
+
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
+            .Select(e => e.ClrType)
+            .Where(clrType => clrType != null && softErasableInterface.IsAssignableFrom(clrType!))
+            .ToList();
+
+        foreach (var clrType in entityTypes!)
         {
-            var parameter = Expression.Parameter(clrType, "e");
-            var erasedProperty = Expression.Call(erasedPropertyMethod, parameter, Expression.Constant(nameof(ISoftDeletable.Erased))
-            );
+            var parameter = Expression.Parameter(clrType!, "e");
+
+            // EF.Property<bool>((object)e, "Erased")
+            var convertedParam = Expression.Convert(parameter, typeof(object));
+            var erasedProperty = Expression.Call(erasedPropertyMethod, convertedParam, Expression.Constant(nameof(ISoftDeletable.Erased)));
             var compare = Expression.Equal(erasedProperty, Expression.Constant(false));
             var lambda = Expression.Lambda(compare, parameter);
 
-            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+            modelBuilder.Entity(clrType!).HasQueryFilter(lambda);
         }
     }
 }

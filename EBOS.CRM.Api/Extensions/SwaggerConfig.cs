@@ -8,8 +8,8 @@ public static class SwaggerConfig
     {
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(1, 0);
             options.AssumeDefaultVersionWhenUnspecified = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
             options.ReportApiVersions = true;
         });
         services.AddVersionedApiExplorer(options =>

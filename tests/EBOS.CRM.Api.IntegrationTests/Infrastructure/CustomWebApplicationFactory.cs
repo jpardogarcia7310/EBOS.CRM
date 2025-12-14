@@ -9,16 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace EBOS.CRM.Api.IntegrationTests;
+namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncDisposable
 {
     private readonly IContainer _sqlContainer;
     private readonly string _connectionString;
-    private ILogger<CustomWebApplicationFactory>? _logger;
+    private readonly ILogger<CustomWebApplicationFactory> _logger;
     private bool _isStarted;
 
-    // Centraliza la contraseña para evitar desincronizaciones
     private const string saPassword = "StrongP@ssw0rd2025!";
 
     public CustomWebApplicationFactory()
@@ -33,15 +32,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
             .Build();
 
-        // Arrancar el contenedor y marcar estado
         _sqlContainer.StartAsync().GetAwaiter().GetResult();
         _isStarted = true;
 
-        // Obtener host/puerto mapeado
         var mappedPort = _sqlContainer.GetMappedPublicPort(1433);
         var host = _sqlContainer.Hostname;
 
-        // 1) Esperar a que el servidor acepte conexiones usando la base 'master'
+        // Cadena de conexión a master para esperar disponibilidad
         var masterSb = new SqlConnectionStringBuilder
         {
             DataSource = $"{host},{mappedPort}",
@@ -52,10 +49,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             Encrypt = false
         };
 
-        // Espera robusta hasta que SQL Server acepte conexiones en 'master'
         WaitForSqlServerAsync(masterSb.ConnectionString).GetAwaiter().GetResult();
 
-        // 2) Construir la connection string que usará el DbContext (apunta a TestCrmDb)
+        // Cadena de conexión a la base de pruebas
         var sb = new SqlConnectionStringBuilder
         {
             DataSource = $"{host},{mappedPort}",
@@ -67,9 +63,15 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         };
 
         _connectionString = sb.ConnectionString;
+
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
+
+        _logger = loggerFactory.CreateLogger<CustomWebApplicationFactory>();
     }
 
-    // Exponer la connection string para depuración si lo necesitas
     public string ConnectionString => _connectionString;
 
     protected override IHost CreateHost(IHostBuilder builder)
@@ -78,16 +80,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         return base.CreateHost(builder);
     }
 
-    /// <summary>
-    /// Forzar creación del host y aplicar migraciones/EnsureCreated.
-    /// Útil para llamar desde tests antes de seedear.
-    /// </summary>
     public void EnsureDatabaseCreated()
     {
-        // Forzar creación del host
-        _ = this.CreateClient();
+        _ = CreateClient();
 
-        using var scope = this.Services.CreateScope();
+        using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
 
         try
@@ -102,73 +99,30 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Aquí usamos correctamente el lambda con 'services' en su scope
         builder.ConfigureServices(services =>
         {
-            // Intentar resolver un logger si existe
-            try
-            {
-                var tempProvider = services.BuildServiceProvider();
-                _logger = tempProvider.GetService<ILogger<CustomWebApplicationFactory>>();
-            }
-            catch
-            {
-                // no crítico
-            }
-
-            // --- CREAR LA BASE TestCrmDb SI NO EXISTE (conectando a master) ---
-            // Construir cadena para master (usar DataSource del _connectionString)
-            var masterSb = new SqlConnectionStringBuilder
-            {
-                DataSource = new SqlConnectionStringBuilder(_connectionString).DataSource,
-                UserID = "sa",
-                Password = saPassword,
-                InitialCatalog = "master",
-                TrustServerCertificate = true,
-                Encrypt = false
-            };
-
-            try
-            {
-                using var conn = new SqlConnection(masterSb.ConnectionString);
-                conn.Open();
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = @"
-                    IF DB_ID(N'TestCrmDb') IS NULL
-                    BEGIN
-                        CREATE DATABASE [TestCrmDb];
-                    END";
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error creating TestCrmDb database.");
-                throw;
-            }
-
-            // --- REEMPLAZAR/REGISTRAR DbContext apuntando a TestCrmDb ---
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
+            // Elimina el DbContext original
+            var descriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
             if (descriptor != null)
             {
                 services.Remove(descriptor);
             }
 
+            // Registra el DbContext apuntando a la base de pruebas
             services.AddDbContext<CrmDbContext>(options =>
-                options.UseSqlServer(_connectionString, sql => sql.EnableRetryOnFailure()));
+                options.UseSqlServer(_connectionString));
 
-            // Construir provider y aplicar migraciones/EnsureCreated
+            // Aplica migraciones o EnsureCreated
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
-
-            // Preferible: aplicar migraciones si las tienes; si no, EnsureCreated()
             try
             {
                 db.Database.Migrate();
             }
-            catch (Exception migrateEx)
+            catch
             {
-                _logger?.LogWarning(migrateEx, "Migrate failed, trying EnsureCreated.");
                 db.Database.EnsureCreated();
             }
         });
