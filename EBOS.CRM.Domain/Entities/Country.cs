@@ -1,8 +1,10 @@
 ﻿using EBOS.Core.Primitives;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 
+[Table("Countries, EBOS")]
 public class Country : BaseEntity
 {
     [Required]
@@ -18,7 +20,7 @@ public class Country : BaseEntity
     [MaxLength(10)]
     public string Iso31661NumCode { get; set; } = default!;
     [Required]
-    [MaxLength(50)]
+    [MaxLength(5)]
     public string Domain { get; set; } = default!;
     [Required]
     [MaxLength(100)]
@@ -29,4 +31,7 @@ public class Country : BaseEntity
     [Required]
     [MaxLength(20)]
     public string InternationalPhoneCode { get; set; } = default!;
+
+    public ICollection<TaxAddress> TaxAddresses { get; set; } = [];
+    public ICollection<ShippingAddress> ShippingAddresses { get; set; } = [];
 }
