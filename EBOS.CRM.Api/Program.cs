@@ -1,11 +1,9 @@
 ﻿using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Validation;
+using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
-using EBOS.CRM.Application.Features.Countries.Commands.AddCountry;
-using EBOS.CRM.Application.Mappings;
-using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
-using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,28 +16,28 @@ using System.Text.Json;
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
 var services = builder.Services;
-var configuration = builder.Configuration;
 
+#if DEBUG
 // --- BLOQUE DE DIAGNÓSTICO ---
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 // --- FIN BLOQUE DE DIAGNÓSTICO ---
-
-// DbContext
-services.AddDbContext<CrmDbContext>(options =>
-    options.UseSqlServer(configuration.GetConnectionString("CrmDb")));
+#endif
 
 // Application layer registrations
-services.AddAutoMapper(typeof(CountryMapping).Assembly);
-services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddCountryCommand).Assembly));
+services.AddApplication();
+builder.Services.AddApplicattionMappings();
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Infrastructure
-services.AddScoped<ICountryRepository, CountryRepository>();
+services.AddInfrastructure(builder.Configuration);
 
 // Register FluentValidation validators (from Application assembly)
-services.AddValidatorsFromAssembly(typeof(AddCountryCommand).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+// Si quieres escanear TODOS los ensamblados cargados:
+builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()); 
 
 // Register the action filter that runs FluentValidation for MVC model binding
 services.AddScoped<FluentValidationActionFilter>();
@@ -77,6 +75,7 @@ services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
+#if DEBUG
 // --- BLOQUE DE DIAGNÓSTICO: listar versiones y ApiDescriptions en consola ---
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 Console.WriteLine("=== ApiVersionDescriptions ===");
@@ -95,6 +94,7 @@ foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
     }
 }
 // --- FIN BLOQUE DE DIAGNÓSTICO ---
+#endif
 
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
