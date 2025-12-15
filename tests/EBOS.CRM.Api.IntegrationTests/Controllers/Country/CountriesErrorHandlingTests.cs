@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Country;
 
 public class CountriesErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

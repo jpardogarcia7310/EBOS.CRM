@@ -9,14 +9,9 @@ namespace EBOS.CRM.Infrastructure.Persistence;
 public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
 {
     // DbSets
-    public DbSet<Customer> Clients { get; set; } = default!;
-    public DbSet<TaxRegime> TaxRegimes { get; set; } = default!;
     public DbSet<Country> Countries { get; set; } = default!;
-    public DbSet<TaxAddress> FiscalAddresses { get; set; } = default!;
-    public DbSet<ShippingAddress> ShippingAddresses { get; set; } = default!;
-    public DbSet<SalesData> SalesConfigurations { get; set; } = default!;
-    public DbSet<CustomerHistory> ClientHistories { get; set; } = default!;
-    public DbSet<DocumentConfiguration> DocumentConfigurations { get; set; } = default!;
+    public DbSet<Status> Statuses { get; set; } = default!;
+    public DbSet<TaxRegime> TaxRegimes { get; set; } = default!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

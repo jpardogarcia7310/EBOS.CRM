@@ -2,7 +2,7 @@
 using FluentAssertions;
 using System.Net;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Country;
 
 public class CountriesConcurrencyTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

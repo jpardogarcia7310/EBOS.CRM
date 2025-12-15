@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations;
 
-public class TaxRegimeConfiguration : IEntityTypeConfiguration<TaxRegime>
+public class StatusConfiguration : IEntityTypeConfiguration<Status>
 {
-    public void Configure(EntityTypeBuilder<TaxRegime> builder)
+    public void Configure(EntityTypeBuilder<Status> builder)
     {
-        builder.ToTable("TaxRegimes", "EBOS");
+        builder.ToTable("Statuses", "EBOS");
         builder.HasKey(tr => tr.Id);
         builder.Property(tr => tr.Id)
             .ValueGeneratedOnAdd()

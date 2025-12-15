@@ -4,7 +4,7 @@ using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Country;
 
 public class CountriesTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
