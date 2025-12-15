@@ -2,9 +2,9 @@
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
-public class GetCountryByIdValidator : AbstractValidator<GetCountryByIdQuery>
+public class GetCountryByIdQueryValidator : AbstractValidator<GetCountryByIdQuery>
 {
-    public GetCountryByIdValidator()
+    public GetCountryByIdQueryValidator()
     {
         RuleFor(x => x.Id)
             .GreaterThan(0)

@@ -1,22 +1,23 @@
 ﻿using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
+using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using FluentValidation.TestHelper;
 
-namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetCountryById;
+namespace EBOS.CRM.ApiTests.Application.Features.Statuses.Queries.GetStatusById;
 
-public class GetCountryByIdValidatorTests
+public class GetStatusByIdQueryValidatorTest
 {
-    private readonly GetCountryByIdQueryValidator _validator;
+    private readonly GetStatusByIdQueryValidator _validator;
 
-    public GetCountryByIdValidatorTests()
+    public GetStatusByIdQueryValidatorTest()
     {
-        _validator = new GetCountryByIdQueryValidator();
+        _validator = new GetStatusByIdQueryValidator();
     }
 
     [Fact]
     public void Validate_PositiveId_Passes()
     {
         // Arrange
-        var query = new GetCountryByIdQuery(1);
+        var query = new GetStatusByIdQuery(1);
 
         // Act
         var result = _validator.TestValidate(query);
@@ -29,7 +30,7 @@ public class GetCountryByIdValidatorTests
     public void Validate_ZeroId_FailsWithCodeAndMessage()
     {
         // Arrange
-        var query = new GetCountryByIdQuery(0);
+        var query = new GetStatusByIdQuery(0);
 
         // Act
         var result = _validator.TestValidate(query);
@@ -44,7 +45,7 @@ public class GetCountryByIdValidatorTests
     public void Validate_NegativeId_FailsWithCodeAndMessage()
     {
         // Arrange
-        var query = new GetCountryByIdQuery(-5);
+        var query = new GetStatusByIdQuery(-5);
 
         // Act
         var result = _validator.TestValidate(query);
@@ -59,8 +60,8 @@ public class GetCountryByIdValidatorTests
     public void Validate_MultipleCalls_AreStateless()
     {
         // Arrange
-        var queryValid = new GetCountryByIdQuery(10);
-        var queryInvalid = new GetCountryByIdQuery(0);
+        var queryValid = new GetStatusByIdQuery(10);
+        var queryInvalid = new GetStatusByIdQuery(0);
 
         // Act
         var resultValid = _validator.TestValidate(queryValid);
@@ -77,10 +78,10 @@ public class GetCountryByIdValidatorTests
         // Arrange
         var queries = new[]
         {
-                new GetCountryByIdQuery(1),
-                new GetCountryByIdQuery(0),
-                new GetCountryByIdQuery(-1),
-                new GetCountryByIdQuery(5)
+                new GetStatusByIdQuery(1),
+                new GetStatusByIdQuery(0),
+                new GetStatusByIdQuery(-1),
+                new GetStatusByIdQuery(5)
             };
 
         // Act

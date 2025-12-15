@@ -3,7 +3,7 @@ using EBOS.CRM.Infrastructure.Persistence;
 
 namespace EBOS.CRM.ApiTests.Fixtures;
 
-public static class IntegrationTestDataSeeder
+public static class IntegrationTestCountriesDataSeeder
 {
     public static void Seed(CrmDbContext context)
     {

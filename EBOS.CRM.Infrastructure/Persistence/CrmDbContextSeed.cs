@@ -14,6 +14,45 @@ public static class CrmDbContextSeed
         {
             await SeedCountries(context, cancellationToken);
         }
+        if (!await context.Statuses.AnyAsync(cancellationToken))
+        {
+            await SeedStatuses(context, cancellationToken);
+        }
+    }
+
+    private static async Task SeedStatuses(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var statuses = new List<Status>
+        {
+            new() {
+                Description = "Activo" },
+            new() {
+                Description = "Moroso" },
+            new() {
+                Description = "Suspendido" }
+        };
+        // Validación básica antes de insertar
+        var invalid = statuses
+            .Select((s, i) => new { Index = i, Status = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.Status.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid status entries. Please validate the seed source.");
+        }
+        using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(statuses, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     private static async Task SeedCountries(CrmDbContext context, CancellationToken cancellationToken)
@@ -1055,12 +1094,10 @@ public static class CrmDbContextSeed
                 string.IsNullOrWhiteSpace(x.Country.Currency) ||
                 string.IsNullOrWhiteSpace(x.Country.CurrencyCode))
             .ToList();
-
         if (invalid.Count != 0)
         {
             throw new InvalidOperationException("Seed data contains invalid country entries. Please validate the seed source.");
         }
-
         using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {

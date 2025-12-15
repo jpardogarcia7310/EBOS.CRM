@@ -14,7 +14,7 @@ public class MapsterValidationTest
             RequireDestinationMemberSource = true
         };
 
-        // Escanea todas las clases que implementan IRegister (incluye MappingCountry)
+        // Escanea todas las clases que implementan IRegister
         config.Scan(AppDomain.CurrentDomain.GetAssemblies());
 
         // Compila en modo fail-fast: si algo está mal, lanza excepción

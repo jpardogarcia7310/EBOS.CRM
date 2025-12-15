@@ -27,7 +27,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
-            IntegrationTestDataSeeder.Seed(db);
+            IntegrationTestCountriesDataSeeder.Seed(db);
         });
     }
 }

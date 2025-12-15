@@ -21,12 +21,14 @@ public class StatusRepository : IStatusRepository
     #region Queries
     public async Task<Status?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+        var result = await _dbSet.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+        return result;
     }
 
     public async Task<ICollection<Status>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
+        return result;
     }
     #endregion
 
