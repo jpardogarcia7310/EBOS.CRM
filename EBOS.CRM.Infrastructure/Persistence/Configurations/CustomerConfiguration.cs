@@ -6,12 +6,15 @@ namespace EBOS.CRM.Infrastructure.Persistence.Configurations;
 
 public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
+    private const string sBigint = "bigint";
+
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
         builder.ToTable("Customers", "CRM");
         builder.HasKey(c => c.Id);
-
-        builder.Property(c => c.Id).ValueGeneratedOnAdd();
+        builder.Property(c => c.Id)
+            .ValueGeneratedOnAdd()
+            .HasColumnType(sBigint);
 
         builder.Property(c => c.Name)
             .IsRequired()
@@ -19,8 +22,8 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnType("nvarchar(255)");
         builder.Property(c => c.Balance)
             .IsRequired()
-            .HasMaxLength(50)
-            .HasColumnType("mnoney(18,2)");
+            .HasColumnType("money")
+            .HasDefaultValue(0.00);
         builder.Property(c => c.IsCompany)
             .IsRequired()
             .HasDefaultValue(false)
@@ -42,22 +45,23 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnType("bit");
         builder.Property(c => c.StatusId)
             .IsRequired()
-            .HasColumnType("long");
+            .HasColumnType(sBigint);
         builder.Property(c => c.TaxRegimeId)
             .IsRequired();
         builder.Property(c => c.TaxAddressId)
             .IsRequired()
-            .HasColumnType("long");
+            .HasColumnType(sBigint);
+        builder.Property(c => c.CreditLimit)
+            .IsRequired()
+            .HasColumnType("money")
+            .HasDefaultValue(0.00);
         builder.Property(c => c.ShippingAddressId)
-            .HasColumnType("long");
+            .HasColumnType(sBigint);
         builder.Property(c => c.SalesConfigurationId)
             .IsRequired()
-            .HasColumnType("long");
-        builder.Property(c => c.CustomerHistoryId)
-            .IsRequired()
-            .HasColumnType("long");
+            .HasColumnType(sBigint);
 
-        builder.Property(s => s.Erased)
+        builder.Property(c => c.Erased)
             .HasDefaultValue(false)    // asegura false en nuevas filas
             .IsRequired();
 
@@ -77,8 +81,5 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasOne(c => c.SalesConfiguration)
                .WithOne(s => s.Customer)
                .HasForeignKey<SalesData>(s => s.CustomerId);
-        builder.HasOne(c => c.CustomerHistory)
-               .WithOne(ch => ch.Customer)
-               .HasForeignKey<CustomerHistory>(ch => ch.CustomerId);
     }
 }

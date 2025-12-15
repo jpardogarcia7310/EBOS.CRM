@@ -12,8 +12,6 @@ public class Customer : ErasableEntity
     [MaxLength(255)]
     public string Name { get; set; } = string.Empty;
     [Required]
-    [RegularExpression(@"^\d+(\.\d{1,2})?$")]
-    [Range(0, 9999999999999999.99)]
     public decimal Balance { get; set; }
     [Required]
     [DefaultValue(false)]
@@ -28,6 +26,8 @@ public class Customer : ErasableEntity
     [Required]
     [DefaultValue(false)]
     public bool TaxDuplicateShippingAddress { get; set; }
+    [Required]
+    public decimal CreditLimit { get; set; }
 
     [Required]
     public long StatusId { get; set; }
@@ -43,7 +43,4 @@ public class Customer : ErasableEntity
     [Required]
     public long SalesConfigurationId { get; set; }
     public SalesData SalesConfiguration { get; set; } = default!;
-    [Required]
-    public long CustomerHistoryId { get; set; }
-    public CustomerHistory CustomerHistory { get; set; } = default!;
 }
