@@ -21,7 +21,7 @@ var services = builder.Services;
 // --- BLOQUE DE DIAGNÓSTICO ---
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 // --- FIN BLOQUE DE DIAGNÓSTICO ---
 #endif
 

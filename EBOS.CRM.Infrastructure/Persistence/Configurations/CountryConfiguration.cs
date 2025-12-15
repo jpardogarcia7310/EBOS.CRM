@@ -10,7 +10,9 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
     {
         builder.ToTable("Countries", "EBOS");
         builder.HasKey(c => c.Id);
-        builder.Property(c => c.Id).ValueGeneratedOnAdd();
+        builder.Property(c => c.Id)
+            .ValueGeneratedOnAdd()
+            .HasColumnType("bigint");
 
         // Propiedades
         builder.Property(c => c.Name)
@@ -49,7 +51,7 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
         // Declaración de la tabla con sus restricciones adicionales (ejemplo: comprobar formato si se desea)
         // Nota: EF no valida expresiones complejas en DB; si quieres constraints a nivel BD,
         // puedes añadir CHECK constraints con HasCheckConstraint:
-        builder.ToTable("Countries", tb =>
+        builder.ToTable("Countries", "EBOS", tb =>
         {
             tb.HasCheckConstraint("CK_Countries_IsoA2_Length", "LEN([Iso31661A2Code]) = 2");
             tb.HasCheckConstraint("CK_Countries_IsoA3_Length", "LEN([Iso31661A3Code]) = 3");
