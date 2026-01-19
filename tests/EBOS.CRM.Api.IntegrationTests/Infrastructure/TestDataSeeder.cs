@@ -22,29 +22,27 @@ public static class TestDataSeeder
 
         foreach (var c in baseCountries)
         {
-            var exists = await db.Countries.AnyAsync(x => x.Iso31661A2Code == c.A2);
-            if (!exists)
+            var exists = await db.Paises.AnyAsync(x => x.Iso31661A2Code == c.A2);
+            if (exists) continue;
+            // Validación previa para evitar SaveChanges fallidos y dar mensajes claros
+            var validation = ValidateSeedRow(c.Name, c.A2, c.A3, c.Num, c.Domain, c.CurrencyCode);
+            if (validation.Any())
             {
-                // Validación previa para evitar SaveChanges fallidos y dar mensajes claros
-                var validation = ValidateSeedRow(c.Name, c.A2, c.A3, c.Num, c.Domain, c.CurrencyCode);
-                if (validation.Any())
-                {
-                    throw new InvalidOperationException(
-                        $"Seed data contains invalid country entries. Errors: {string.Join("; ", validation)}");
-                }
-
-                db.Countries.Add(new Country
-                {
-                    Name = c.Name,
-                    Iso31661A2Code = c.A2,
-                    Iso31661A3Code = c.A3,
-                    Iso31661NumCode = c.Num,
-                    Domain = c.Domain,
-                    Currency = c.Currency,
-                    CurrencyCode = c.CurrencyCode,
-                    InternationalPhoneCode = c.Phone
-                });
+                throw new InvalidOperationException(
+                    $"Seed data contains invalid country entries. Errors: {string.Join("; ", validation)}");
             }
+
+            db.Paises.Add(new Pais
+            {
+                Name = c.Name,
+                Iso31661A2Code = c.A2,
+                Iso31661A3Code = c.A3,
+                Iso31661NumCode = c.Num,
+                Domain = c.Domain,
+                Currency = c.Currency,
+                CurrencyCode = c.CurrencyCode,
+                InternationalPhoneCode = c.Phone
+            });
         }
 
         try

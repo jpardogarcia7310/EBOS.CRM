@@ -7,10 +7,10 @@ public static class IntegrationTestStatusesDataSeeder
 {
     public static void Seed(CrmDbContext context)
     {
-        if (context.Statuses.Any())
+        if (context.Estados.Any())
             return;
 
-        var statuses = new List<Status>
+        var statuses = new List<Estado>
             {
                 new() {
                     Description  = "Activo"
@@ -23,7 +23,7 @@ public static class IntegrationTestStatusesDataSeeder
                 }
             };
 
-        context.Statuses.AddRange(statuses);
+        context.Estados.AddRange(statuses);
         context.SaveChanges();
     }
 }

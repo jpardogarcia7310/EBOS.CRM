@@ -10,19 +10,19 @@ public static class CrmDbContextSeed
         ArgumentNullException.ThrowIfNull(context);
 
         // Seeding Countries: ejemplo reducido y validado.
-        if (!await context.Countries.AnyAsync(cancellationToken))
+        if (!await context.Paises.AnyAsync(cancellationToken))
         {
-            await SeedCountries(context, cancellationToken);
+            await SeedPaises(context, cancellationToken);
         }
-        if (!await context.Statuses.AnyAsync(cancellationToken))
+        if (!await context.Estados.AnyAsync(cancellationToken))
         {
-            await SeedStatuses(context, cancellationToken);
+            await SeedEstados(context, cancellationToken);
         }
     }
 
-    private static async Task SeedStatuses(CrmDbContext context, CancellationToken cancellationToken)
+    private static async Task SeedEstados(CrmDbContext context, CancellationToken cancellationToken)
     {
-        var statuses = new List<Status>
+        var statuses = new List<Estado>
         {
             new() {
                 Description = "Activo" },
@@ -55,7 +55,7 @@ public static class CrmDbContextSeed
         }
     }
 
-    private static async Task SeedCountries(CrmDbContext context, CancellationToken cancellationToken)
+    private static async Task SeedPaises(CrmDbContext context, CancellationToken cancellationToken)
     {
         const string DolarCaribeOriental = "Dólar del Caribe Oriental";
         const string DolarAustraliano = "Dólar australiano";
@@ -64,7 +64,7 @@ public static class CrmDbContextSeed
         const string DolarEstadounidense = "Dólar estadounidense";
         const string DolarNeozelandes = "Dólar neozelandés";
 
-        var countries = new List<Country>
+        var countries = new List<Pais>
         {
             new() {
                 Name = "Afganistan",

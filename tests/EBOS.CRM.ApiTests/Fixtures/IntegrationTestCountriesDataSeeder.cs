@@ -7,10 +7,10 @@ public static class IntegrationTestCountriesDataSeeder
 {
     public static void Seed(CrmDbContext context)
     {
-        if (context.Countries.Any())
+        if (context.Paises.Any())
             return;
 
-        var countries = new List<Country>
+        var countries = new List<Pais>
             {
                 new() {
                     Name = "España",
@@ -44,7 +44,7 @@ public static class IntegrationTestCountriesDataSeeder
                 }
             };
 
-        context.Countries.AddRange(countries);
+        context.Paises.AddRange(countries);
         context.SaveChanges();
     }
 }

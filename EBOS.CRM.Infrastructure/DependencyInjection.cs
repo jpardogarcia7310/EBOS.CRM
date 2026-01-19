@@ -16,9 +16,8 @@ public static partial class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("CrmConnection")));
 
         // Repositories base (AddScoped for per-request lifetime)
-        services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<IStatusRepository, StatusRepository>();
-        services.AddScoped<ITaxRegimeRepository, TaxRegimeRepository>();
+        services.AddScoped<IPaisRepository, PaisRepository>();
+        services.AddScoped<IEstadoRepository, EstadoRepository>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>
