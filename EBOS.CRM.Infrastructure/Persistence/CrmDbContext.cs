@@ -60,17 +60,19 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
             return;
 
         var entityTypes = modelBuilder.Model.GetEntityTypes() 
-            .Select(e => e.ClrType) 
-            .Where(clrType => softErasableInterface.IsAssignableFrom(clrType)) 
+            .Where(e => softErasableInterface.IsAssignableFrom(e.ClrType))
+            .Where(e => e.BaseType == null)
             .ToList();
         
-        foreach (var clrType in entityTypes)
+        foreach (var entityType in entityTypes)
         {
+            var clrType = entityType.ClrType;
             var parameter = Expression.Parameter(clrType, "e");
 
-            // EF.Property<bool>((object)e, "Erased")
             var convertedParam = Expression.Convert(parameter, typeof(object));
-            var erasedProperty = Expression.Call(erasedPropertyMethod, convertedParam, 
+            var erasedProperty = Expression.Call(
+                erasedPropertyMethod, 
+                convertedParam, 
                 Expression.Constant(nameof(ISoftDeletable.Erased)));
             var compare = Expression.Equal(erasedProperty, Expression.Constant(false));
             var lambda = Expression.Lambda(compare, parameter);

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("Customers, CRM")]
 public class CorporateCustomer : Customer
 {
     [Required]

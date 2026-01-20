@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("Statuses, CRM")]
 public class Status : BaseEntity
 {
     [Required]

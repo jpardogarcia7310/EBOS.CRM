@@ -3,7 +3,6 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("CreditAccounts, CRM")]
 public class CreditAccount : ErasableEntity
 {
     public decimal MaxAmount { get; set; }      // Límite concedido

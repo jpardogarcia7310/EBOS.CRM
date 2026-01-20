@@ -4,7 +4,6 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("BankInformation, CRM")]
 public class BankInformation : ErasableEntity
 {
     [Required]

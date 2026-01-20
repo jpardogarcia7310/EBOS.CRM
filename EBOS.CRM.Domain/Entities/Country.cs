@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("Countries, EBOS")]
 public class Country : BaseEntity
 {
     [Required]
@@ -30,5 +29,5 @@ public class Country : BaseEntity
     public string CurrencyCode { get; set; } = null!;
     [Required]
     [MaxLength(20)]
-    public string InternationalPhoneCode { get; set; } = null!;
+    public string InternationalPhoneCode { get; set; } = null!; 
 }

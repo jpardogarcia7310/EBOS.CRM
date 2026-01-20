@@ -4,7 +4,6 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("CreditTransactions, CRM")]
 public class CreditTransaction : ErasableEntity
 {
     public DateTime Date { get; set; }

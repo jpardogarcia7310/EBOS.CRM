@@ -4,7 +4,6 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-[Table("BranchOffices, CRM")]
 public class BranchOffice : ErasableEntity
 {
     public long CorporateCustomerId { get; set; }
