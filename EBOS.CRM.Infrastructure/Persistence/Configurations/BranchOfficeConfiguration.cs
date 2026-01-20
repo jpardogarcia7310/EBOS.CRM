@@ -19,15 +19,6 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
         builder.Property(bo => bo.Name)
             .IsRequired()
             .HasMaxLength(200);
-        builder.Property(bo => bo.AddressLine)
-            .IsRequired()
-            .HasMaxLength(300);
-        builder.Property(bo => bo.City)
-            .IsRequired()
-            .HasMaxLength(150);
-        builder.Property(bo => bo.PostalCode)
-            .IsRequired()
-            .HasMaxLength(20);
         builder.Property(bo => bo.PhoneNumber)
             .HasMaxLength(20);
         builder.Property(bo => bo.Erased)
@@ -47,15 +38,15 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
             .HasDatabaseName("IX_BranchOffice_CorporateCustomerId");
 
         // ------------------------------------------------------------
-        // One-to-Many: Country (principal) → BranchOffice (dependent)
-        // FK: BranchOffice.CountryId
+        // One-to-Many: Address (principal) → BranchOffice (dependent)
+        // FK: BranchOffice.AddressId
         // ------------------------------------------------------------
-        builder.HasOne(bo => bo.Country)
-            .WithMany()
-            .HasForeignKey(bo => bo.CountryId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(bo => bo.CountryId)
-            .HasDatabaseName("IX_BranchOffice_CountryId");
+        builder.HasOne(d => d.Address) 
+            .WithMany() 
+            .HasForeignKey(d => d.AddressId) 
+            .OnDelete(DeleteBehavior.Restrict); 
+        
+        builder.HasIndex(d => d.AddressId) 
+            .HasDatabaseName("IX_BranchOffice_AddressId"); 
     }
 }

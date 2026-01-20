@@ -16,8 +16,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .ValueGeneratedOnAdd();
 
         // Basic properties
-        builder.Property(d => d.Type)
-               .IsRequired()
+        builder.Property(d => d.AddressType)
                .HasMaxLength(50);
         builder.Property(d => d.Street)
                .IsRequired()

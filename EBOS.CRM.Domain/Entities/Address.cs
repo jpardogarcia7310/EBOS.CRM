@@ -8,7 +8,7 @@ public class Address : ErasableEntity
 {
     [Required]
     [MaxLength(50)]
-    public string Type { get; set; } = "Principal"; // Fiscal, Comercial, Envío, etc.
+    public string? AddressType { get; set; } = "Principal"; // Billing, Shipping, Fiscal, Main, etc.
     [Required]
     [MaxLength(200)]
     public string Street { get; set; } = null!;

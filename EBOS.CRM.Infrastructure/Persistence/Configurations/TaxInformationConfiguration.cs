@@ -22,15 +22,6 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         builder.Property(df => df.TaxIdentificationNumber)
             .IsRequired()
             .HasMaxLength(20);
-        builder.Property(df => df.FiscalAddress)
-            .IsRequired()
-            .HasMaxLength(300);
-        builder.Property(df => df.City)
-            .IsRequired()
-            .HasMaxLength(150);
-        builder.Property(df => df.PostalCode)
-            .IsRequired()
-            .HasMaxLength(20);
         builder.Property(c => c.Erased)
             .IsRequired();
 
@@ -46,13 +37,13 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
             .HasForeignKey<Customer>(c => c.TaxInformationId)
             .OnDelete(DeleteBehavior.SetNull);
         
-        builder.HasOne(df => df.Country) 
+        builder.HasOne(df => df.Address) 
             .WithMany() 
-            .HasForeignKey(df => df.CountryId) 
+            .HasForeignKey(df => df.AddressId) 
             .OnDelete(DeleteBehavior.Restrict); 
         
-        builder.HasIndex(df => df.CountryId) 
-            .HasDatabaseName("IX_TaxInformation_CountryId");
+        builder.HasIndex(df => df.AddressId) 
+            .HasDatabaseName("IX_TaxInformation_AddressId");
 
         // No index here because the FK belongs to Cliente.
         // The index is created in ClienteConfiguration.

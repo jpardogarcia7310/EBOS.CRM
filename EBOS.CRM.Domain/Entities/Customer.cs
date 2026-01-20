@@ -18,6 +18,9 @@ public abstract class Customer : ErasableEntity
     public DateTime CreatedAt { get; set; }
 
     // Foreign Keys
+    public long AddressId { get; set; }
+    public Address Address { get; set; } = null!;
+    
     public long? TaxInformationId { get; set; }
     public TaxInformation? TaxInformation { get; set; }
 

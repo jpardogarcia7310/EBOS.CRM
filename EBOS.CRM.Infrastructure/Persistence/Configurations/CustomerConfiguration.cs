@@ -43,6 +43,18 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasIndex(c => c.StatusId);
 
         // ------------------------------------------------------------
+        // One-to-Many: Cliente (principal) → Direccion (dependent)
+        // FK: Direccion.ClienteId
+        // ------------------------------------------------------------
+        builder.HasOne(c => c.Address)
+               .WithMany()
+               .HasForeignKey(c => c.AddressId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(c => c.AddressId)
+               .HasDatabaseName("IX_Customers_AddressId");
+
+        // ------------------------------------------------------------
         // One-to-Many: Estado (principal) → Cliente (dependent)
         // FK: Cliente.EstadoId
         // ------------------------------------------------------------

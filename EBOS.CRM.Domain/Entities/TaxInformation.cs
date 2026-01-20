@@ -12,19 +12,10 @@ public class TaxInformation : ErasableEntity
     [Required]
     [MaxLength(20)]
     public string TaxIdentificationNumber { get; set; } = null!;
-    [Required]
-    [MaxLength(300)]
-    public string FiscalAddress { get; set; } = null!;
-    [Required]
-    [MaxLength(150)]
-    public string City { get; set; } = null!;
-    [Required]
-    [MaxLength(20)]
-    public string PostalCode { get; set; } = null!;
-    
+     
     // Foreign Keys
-    public long CountryId { get; set; }
-    public Country Country { get; set; } = null!;
+    public long AddressId { get; set; }
+    public Address Address { get; set; } = null!;
 
     public Customer Customer { get; set; } = null!;
 }
