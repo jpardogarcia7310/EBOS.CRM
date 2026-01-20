@@ -20,6 +20,8 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>(); 
     public DbSet<Status> Statuses => Set<Status>(); 
     public DbSet<Country> Countries => Set<Country>();
+    public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
+    public DbSet<AddressType> AddressTypes => Set<AddressType>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

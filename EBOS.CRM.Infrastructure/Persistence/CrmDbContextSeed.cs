@@ -18,6 +18,14 @@ public static class CrmDbContextSeed
         {
             await SeedEstados(context, cancellationToken);
         }
+        if (!await context.AddressTypes.AnyAsync(cancellationToken))
+        {
+            await SeedAddressTypes(context, cancellationToken);
+        }
+        if (!await context.IdentificationTypes.AnyAsync(cancellationToken))
+        {
+            await SeedIdentificationTypes(context, cancellationToken);
+        }
     }
 
     private static async Task SeedEstados(CrmDbContext context, CancellationToken cancellationToken)
@@ -46,6 +54,93 @@ public static class CrmDbContextSeed
         try
         {
             await context.AddRangeAsync(statuses, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    private static async Task SeedAddressTypes(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var addressTypes = new List<AddressType>
+        {
+            new() {
+                Code = "DNI",
+                Description = "Documento Nacional de Identidad" },
+            new() {
+                Code = "NIE",
+                Description = "Numero de Identificación de Extranjeros" },
+            new() {
+                Code = "NIF",
+                Description = "Numero de Identificación Fiscal" },
+            new() {
+                Code = "PASS",
+                Description = "Pasaporte"
+            }
+        };
+        // Basic validation before insertion
+        var invalid = addressTypes
+            .Select((s, i) => new { Index = i, AddressType = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.AddressType.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid AddressTypes entries. " +
+                                                "Please validate the seed source.");
+        }
+
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(addressTypes, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+    private static async Task SeedIdentificationTypes(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var identificationTypes = new List<IdentificationType>
+        {
+            new() {
+                Code = "DNI",
+                Description = "Documento Nacional de Identidad" },
+            new() {
+                Code = "NIE",
+                Description = "Numero de Identificación de Extranjeros" },
+            new() {
+                Code = "NIF",
+                Description = "Numero de Identificación Fiscal" },
+            new() {
+                Code = "PASS",
+                Description = "Pasaporte"
+            }
+        };
+        // Basic validation before insertion
+        var invalid = identificationTypes
+            .Select((s, i) => new { Index = i, IdentificationType = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.IdentificationType.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid IdentificationTypes entries. " +
+                                                "Please validate the seed source.");
+        }
+
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(identificationTypes, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
             await tx.CommitAsync(cancellationToken);
         }
