@@ -43,8 +43,8 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasIndex(c => c.StatusId);
 
         // ------------------------------------------------------------
-        // One-to-Many: Cliente (principal) → Direccion (dependent)
-        // FK: Direccion.ClienteId
+        // One-to-Many: Customer (principal) → Address (dependent)
+        // FK: Address.CustomerId
         // ------------------------------------------------------------
         builder.HasOne(c => c.Address)
                .WithMany()
@@ -55,48 +55,48 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                .HasDatabaseName("IX_Customers_AddressId");
 
         // ------------------------------------------------------------
-        // One-to-Many: Estado (principal) → Cliente (dependent)
-        // FK: Cliente.EstadoId
+        // One-to-Many: Status (principal) → Customer (dependent)
+        // FK: Customer.StatusId
         // ------------------------------------------------------------
         builder.HasOne(c => c.Status)
                .WithMany(e => e.Customers)
                .HasForeignKey(c => c.StatusId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        // Index for FK: Cliente.EstadoId
+        // Index for FK: Customer.StatusId
         builder.HasIndex(c => c.StatusId);
 
         // ------------------------------------------------------------
-        // One-to-One: DatosFiscales (principal) → Cliente (dependent)
-        // FK: Cliente.DatosFiscalesId
+        // One-to-One: TaxInformation (principal) → Customer (dependent)
+        // FK: Customer.TaxInformationId
         // ------------------------------------------------------------
         builder.HasOne(c => c.TaxInformation)
                .WithOne(df => df.Customer)
                .HasForeignKey<Customer>(c => c.TaxInformationId)
                .OnDelete(DeleteBehavior.SetNull);
 
-        // Index for FK: Cliente.DatosFiscalesId
+        // Index for FK: Customer.TaxInformationId
         builder.HasIndex(c => c.TaxInformationId);
 
         // ------------------------------------------------------------
-        // One-to-One: DatosBancarios (principal) → Cliente (dependent)
-        // FK: Cliente.DatosBancariosId
+        // One-to-One: BankInformation (principal) → Customer (dependent)
+        // FK: Customer.BankInformationId
         // ------------------------------------------------------------
         builder.HasOne(c => c.BankInformation)
                .WithOne(db => db.Customer)
                .HasForeignKey<Customer>(c => c.BankInformationId)
                .OnDelete(DeleteBehavior.SetNull);
 
-        // Index for FK: Cliente.DatosBancariosId
+        // Index for FK: Customer.BankInformationId
         builder.HasIndex(c => c.BankInformationId);
 
         // ------------------------------------------------------------
-        // One-to-One: Cliente (principal) → Credito (dependent)
-        // FK: Credito.ClienteId
+        // One-to-One: Customer (principal) → CreditAccount (dependent)
+        // FK: CreditAccount.CustomerId
         // ------------------------------------------------------------
         builder.HasOne(c => c.CreditAccount)
                .WithOne(cr => cr.Customer)
-               .HasForeignKey<CreditAccount>(cr => cr.ClienteId)
+               .HasForeignKey<CreditAccount>(cr => cr.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
 
         // TPH inheritance discriminator

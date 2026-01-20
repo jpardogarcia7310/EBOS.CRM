@@ -19,18 +19,22 @@ public abstract class Customer : ErasableEntity
 
     // Foreign Keys
     public long AddressId { get; set; }
-    public Address Address { get; set; } = null!;
+    [ForeignKey(nameof(AddressId))]
+    public virtual Address Address { get; set; } = null!;
     
     public long? TaxInformationId { get; set; }
-    public TaxInformation? TaxInformation { get; set; }
+    [ForeignKey(nameof(TaxInformationId))]
+    public virtual TaxInformation? TaxInformation { get; set; }
 
     public long? BankInformationId { get; set; }
-    public BankInformation? BankInformation { get; set; }
+    [ForeignKey(nameof(BankInformationId))]
+    public virtual BankInformation? BankInformation { get; set; }
 
     public CreditAccount? CreditAccount { get; set; }
     
     public long StatusId { get; set; }
-    public Status Status { get; set; } = null!;
+    [ForeignKey(nameof(StatusId))]
+    public virtual Status Status { get; set; } = null!;
 
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
 }

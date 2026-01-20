@@ -12,21 +12,31 @@ public class IndividualCustomerConfiguration : IEntityTypeConfiguration<Individu
         // Table is defined in ClienteConfiguration.
 
         // Basic properties
-        builder.Property(p => p.FirstName)
+        builder.Property(c => c.FirstName)
             .IsRequired()
             .HasMaxLength(50);
-        builder.Property(p => p.LastName)
+        builder.Property(c => c.LastName)
             .IsRequired()
             .HasMaxLength(100);
-        builder.Property(p => p.IdentityDocument)
+        builder.Property(c => c.IdentificationNumber)
             .IsRequired()
             .HasMaxLength(10);
-        builder.Property(p => p.BirthDate)
+        builder.Property(c => c.BirthDate)
             .IsRequired();
         builder.Property(c => c.Erased)
             .IsRequired();
 
-        // No additional relationships here.
-        // All relationships are inherited from Cliente.
+        // ------------------------------------------------------------
+        // One-to-One: IndividualCustomer (principal) → IdentificationType (dependent)
+        // FK: IndividualCustomer.IdentificationTypeId
+        // ------------------------------------------------------------
+        builder.HasOne(c => c.IdentificationType)
+            .WithMany()
+            .HasForeignKey(c => c.IdentificationTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+        // Index for FK: IndividualCustomer.IdentificationTypeId
+        builder.HasIndex(c => c.IdentificationTypeId)
+            .HasDatabaseName("IX_IndividualCustomer_IdentificationTypeId");
+
     }
 }

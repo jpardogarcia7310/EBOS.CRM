@@ -4,7 +4,7 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class TaxInformation : ErasableEntity
+public sealed class TaxInformation : ErasableEntity
 {
     [Required]
     [MaxLength(200)]
@@ -15,6 +15,7 @@ public class TaxInformation : ErasableEntity
      
     // Foreign Keys
     public long AddressId { get; set; }
+    [ForeignKey(nameof(AddressId))]
     public Address Address { get; set; } = null!;
 
     public Customer Customer { get; set; } = null!;

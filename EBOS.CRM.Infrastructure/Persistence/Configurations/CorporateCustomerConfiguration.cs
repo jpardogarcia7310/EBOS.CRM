@@ -22,15 +22,15 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .IsRequired();
 
         // ------------------------------------------------------------
-        // One-to-Many: Empresa (principal) → Delegacion (dependent)
-        // FK: Delegacion.EmpresaId
+        // One-to-Many: CorporateCustomer (principal) → BranchOffices (dependent)
+        // FK: BranchOffices.CorporateCustomerId
         // ------------------------------------------------------------
         builder.HasMany(e => e.BranchOffices)
             .WithOne(d => d.CorporateCustomer)
             .HasForeignKey(d => d.CorporateCustomerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Index for FK: Delegacion.EmpresaId
-        // (Created in DelegacionConfiguration, because FK belongs to Delegacion)
+        // Index for FK: BranchOffices.CorporateCustomerId
+        // (Created in BranchOfficesConfiguration, because FK belongs to BranchOffices)
     }
 }

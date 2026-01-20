@@ -1,6 +1,5 @@
 ﻿using EBOS.Core.Primitives;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 

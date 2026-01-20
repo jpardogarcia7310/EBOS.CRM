@@ -4,7 +4,7 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class BranchOffice : ErasableEntity
+public sealed class BranchOffice : ErasableEntity
 {
     public long CorporateCustomerId { get; set; }
     public CorporateCustomer CorporateCustomer { get; set; } = null!;
@@ -18,5 +18,6 @@ public class BranchOffice : ErasableEntity
     
     // Foreign Keys
     public long AddressId { get; set; }
+    [ForeignKey(nameof(AddressId))]
     public Address Address { get; set; } = null!;
 }

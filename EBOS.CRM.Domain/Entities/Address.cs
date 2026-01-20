@@ -4,11 +4,8 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class Address : ErasableEntity
+public sealed class Address : ErasableEntity
 {
-    [Required]
-    [MaxLength(50)]
-    public string? AddressType { get; set; } = "Principal"; // Billing, Shipping, Fiscal, Main, etc.
     [Required]
     [MaxLength(200)]
     public string Street { get; set; } = null!;
@@ -44,8 +41,14 @@ public class Address : ErasableEntity
 
     // Foreign Keys
     public long CustomerId { get; set; }
+    [ForeignKey(nameof(CustomerId))]
     public Customer Customer { get; set; } = null!;
 
     public long CountryId { get; set; }
+    [ForeignKey(nameof(CountryId))]
     public Country Country { get; set; } = null!;
+
+    public long AddressTypeId { get; set; } // Billing, Shipping, Fiscal, Main, etc.
+    [ForeignKey(nameof(AddressTypeId))]
+    public AddressType AddressType { get; set; } = null!;
 }

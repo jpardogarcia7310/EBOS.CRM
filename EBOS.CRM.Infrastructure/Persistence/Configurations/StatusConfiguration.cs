@@ -19,14 +19,7 @@ public class StatusConfiguration : IEntityTypeConfiguration<Status>
         builder.Property(e => e.Description)
             .IsRequired()
             .HasMaxLength(100);
-
-        // ------------------------------------------------------------
-        // One-to-Many: Estado (principal) → Cliente (dependent)
-        // FK: Cliente.EstadoId
-        //
-        // The relationship is configured in ClienteConfiguration.
-        // ------------------------------------------------------------
-
+        
         // No index here because the FK belongs to Cliente.
         // The index is created in ClienteConfiguration.
     }

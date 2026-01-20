@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class IndividualCustomer : Customer
+public sealed class IndividualCustomer : Customer
 {
     [Required]
     [MaxLength(50)]
@@ -15,5 +15,9 @@ public class IndividualCustomer : Customer
     public DateTime? BirthDate { get; set; }
     [Required]
     [MaxLength(10)]
-    public string? IdentityDocument { get; set; } // DNI/NIE
+    public string? IdentificationNumber { get; set; } // DNI/NIE
+    
+    public long IdentificationTypeId { get; set; }
+    [ForeignKey(nameof(IdentificationTypeId))]
+    public IdentificationType IdentificationType { get; set; } = null!;
 }

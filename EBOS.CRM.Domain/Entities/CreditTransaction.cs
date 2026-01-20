@@ -4,7 +4,7 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class CreditTransaction : ErasableEntity
+public sealed class CreditTransaction : ErasableEntity
 {
     public DateTime Date { get; set; }
     public decimal Amount { get; set; } // Positivo: consumo, Negativo: devolución/ajuste
@@ -17,6 +17,7 @@ public class CreditTransaction : ErasableEntity
     public string? Comments { get; set; }
 
     // Foreign Keys
-    public long CreditoId { get; set; }
+    public long CreditAccountId { get; set; }
+    [ForeignKey(nameof(CreditAccountId))]
     public CreditAccount CreditAccount { get; set; } = null!;
 }

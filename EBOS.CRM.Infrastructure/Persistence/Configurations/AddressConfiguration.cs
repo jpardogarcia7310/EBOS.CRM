@@ -16,8 +16,6 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .ValueGeneratedOnAdd();
 
         // Basic properties
-        builder.Property(d => d.AddressType)
-               .HasMaxLength(50);
         builder.Property(d => d.Street)
                .IsRequired()
                .HasMaxLength(200);
@@ -52,8 +50,8 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .IsRequired();
 
         // ------------------------------------------------------------
-        // One-to-Many: Cliente (principal) → Direccion (dependent)
-        // FK: Direccion.ClienteId
+        // One-to-Many: Customer (principal) → Address (dependent)
+        // FK: Address.CustomerId
         // ------------------------------------------------------------
         builder.HasOne(d => d.Customer)
                .WithMany(c => c.Addresses)
@@ -64,8 +62,8 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .HasDatabaseName("IX_Address_CustomerId");
 
         // ------------------------------------------------------------
-        // One-to-Many: Pais (principal) → Direccion (dependent)
-        // FK: Direccion.PaisId
+        // One-to-Many: Country (principal) → Address (dependent)
+        // FK: Address.CountryId
         // ------------------------------------------------------------
         builder.HasOne(d => d.Country)
                .WithMany()
@@ -74,5 +72,18 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         // Index for FK: Direccion.PaisId
         builder.HasIndex(d => d.CountryId)
                .HasDatabaseName("IX_Address_CountryId");
+        
+        // ------------------------------------------------------------
+        // One-to-Many: AddressType (principal) → Address (dependent)
+        // FK: Address.AddressTypeId
+        // ------------------------------------------------------------
+        builder.HasOne(a => a.AddressType)
+               .WithMany()
+               .HasForeignKey(a => a.AddressTypeId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(a => a.AddressTypeId)
+               .HasDatabaseName("IX_Addresses_AddressTypeId");
+   
     }
 }

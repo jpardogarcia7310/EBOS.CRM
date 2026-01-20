@@ -37,11 +37,11 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
         // ------------------------------------------------------------
         builder.HasOne(m => m.CreditAccount)
             .WithMany(c => c.CreditTransactions)
-            .HasForeignKey(m => m.CreditoId)
+            .HasForeignKey(m => m.CreditAccountId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Index for FK: MovimientoCredito.CreditoId
-        builder.HasIndex(m => m.CreditoId)
+        builder.HasIndex(m => m.CreditAccountId)
             .HasDatabaseName("IX_CreditTransactions_CreditAccountId");
     }
 }

@@ -11,38 +11,45 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         builder.ToTable("TaxInformation", "CRM");
 
         // Primary Key (BIGINT IDENTITY)
-        builder.HasKey(df => df.Id);
-        builder.Property(df => df.Id)
+        builder.HasKey(ti => ti.Id);
+        builder.Property(ti => ti.Id)
             .ValueGeneratedOnAdd();
 
         // Basic properties
-        builder.Property(df => df.TaxName)
+        builder.Property(ti => ti.TaxName)
             .IsRequired()
             .HasMaxLength(200);
-        builder.Property(df => df.TaxIdentificationNumber)
+        builder.Property(ti => ti.TaxIdentificationNumber)
             .IsRequired()
             .HasMaxLength(20);
-        builder.Property(c => c.Erased)
+        builder.Property(ti => ti.Erased)
             .IsRequired();
 
         // ------------------------------------------------------------
-        // One-to-One: DatosFiscales (principal) → Cliente (dependent)
-        // FK: Cliente.DatosFiscalesId
+        // One-to-One: TaxInformation (principal) → Customer (dependent)
+        // FK: Customer.TaxInformationId
         //
-        // Cliente owns the FK, so the relationship is configured
-        // primarily in ClienteConfiguration.
+        // Customer owns the FK, so the relationship is configured
+        // primarily in CustomerConfiguration.
         // ------------------------------------------------------------
-        builder.HasOne(df => df.Customer)
+        builder.HasOne(ti => ti.Customer)
             .WithOne(c => c.TaxInformation)
             .HasForeignKey<Customer>(c => c.TaxInformationId)
             .OnDelete(DeleteBehavior.SetNull);
-        
-        builder.HasOne(df => df.Address) 
+    
+        // ------------------------------------------------------------
+        // One-to-One: Address (principal) → TaxInformation (dependent)
+        // FK: TaxInformation.AddressId
+        //
+        // Customer owns the FK, so the relationship is configured
+        // primarily in CustomerConfiguration.
+        // ------------------------------------------------------------
+        builder.HasOne(ti => ti.Address) 
             .WithMany() 
-            .HasForeignKey(df => df.AddressId) 
+            .HasForeignKey(ti => ti.AddressId) 
             .OnDelete(DeleteBehavior.Restrict); 
         
-        builder.HasIndex(df => df.AddressId) 
+        builder.HasIndex(ti => ti.AddressId) 
             .HasDatabaseName("IX_TaxInformation_AddressId");
 
         // No index here because the FK belongs to Cliente.

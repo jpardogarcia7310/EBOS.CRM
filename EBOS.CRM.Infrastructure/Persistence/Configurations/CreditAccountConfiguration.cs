@@ -26,28 +26,28 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
                .IsRequired();
 
         // ------------------------------------------------------------
-        // One-to-One: Cliente (principal) → Credito (dependent)
-        // FK: Credito.ClienteId
+        // One-to-One: Customer (principal) → CreditAccount (dependent)
+        // FK: CreditAccount.CustomerId
         //
-        // Cliente has a navigation property "Credito"
-        // Credito has a navigation property "Cliente"
+        // Customer has a navigation property "CreditAccount"
+        // CreditAccount has a navigation property "Customer"
         // ------------------------------------------------------------
         builder.HasOne(c => c.Customer)
                .WithOne(cl => cl.CreditAccount)
-               .HasForeignKey<CreditAccount>(c => c.ClienteId)
+               .HasForeignKey<CreditAccount>(c => c.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
         // Index for FK: Credito.ClienteId
-        builder.HasIndex(c => c.ClienteId)
+        builder.HasIndex(c => c.CustomerId)
                .HasDatabaseName("IX_CreditAccount_CustomerId");
         // ------------------------------------------------------------
-        // One-to-Many: Credito (principal) → MovimientoCredito (dependent)
-        // FK: MovimientoCredito.CreditoId
+        // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
+        // FK: CreditTransactions.CreditAccountId
         // ------------------------------------------------------------
         builder.HasMany(c => c.CreditTransactions)
                .WithOne(m => m.CreditAccount)
-               .HasForeignKey(m => m.CreditoId)
+               .HasForeignKey(m => m.CreditAccountId)
                .OnDelete(DeleteBehavior.Cascade);
-        // No index here because FK belongs to MovimientoCredito.
-        // The index is created in MovimientoCreditoConfiguration.
+        // No index here because FK belongs to CreditTransactions.
+        // The index is created in CreditTransactionsConfiguration.
     }
 }
