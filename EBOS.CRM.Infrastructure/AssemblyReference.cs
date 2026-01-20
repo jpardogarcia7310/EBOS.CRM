@@ -1,8 +1,8 @@
 ﻿namespace EBOS.CRM.Infrastructure;
 
 /// <summary>
-/// Clase marcador utilizada para el registro automático de servicios y repositorios
-/// pertenecientes al ensamblado de Infrastructure.
+/// Marker class used for automatic registration of services and repositories
+/// belonging to the Infrastructure assembly.
 /// </summary>
 public static class AssemblyReference
 { }

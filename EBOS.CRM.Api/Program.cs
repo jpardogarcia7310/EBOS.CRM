@@ -1,4 +1,5 @@
-﻿using EBOS.CRM.Api.Extensions;
+﻿using System.Text.Json;
+using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Validation;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -27,7 +27,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 // Application layer registrations
 services.AddApplication();
-builder.Services.AddApplicattionMappings();
+builder.Services.AddApplicationMappings();
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Infrastructure
@@ -108,8 +108,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        foreach (var group in provider.ApiVersionDescriptions.Select(d => d.GroupName))
+        var descriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var group in descriptionProvider.ApiVersionDescriptions.Select(d => d.GroupName))
         {
             options.SwaggerEndpoint($"/swagger/{group}/swagger.json",
                                     $"EBOS.CRM API {group.ToUpperInvariant()}");

@@ -1,6 +1,0 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
-using MediatR;
-
-namespace EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
-
-public record GetEstadoByIdQuery(long Id) : IRequest<EstadoResponseDto?>;

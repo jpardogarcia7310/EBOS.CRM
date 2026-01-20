@@ -22,7 +22,7 @@ public static class TestDataSeeder
 
         foreach (var c in baseCountries)
         {
-            var exists = await db.Paises.AnyAsync(x => x.Iso31661A2Code == c.A2);
+            var exists = await db.Countries.AnyAsync(x => x.Iso31661A2Code == c.A2);
             if (exists) continue;
             // Validación previa para evitar SaveChanges fallidos y dar mensajes claros
             var validation = ValidateSeedRow(c.Name, c.A2, c.A3, c.Num, c.Domain, c.CurrencyCode);
@@ -32,7 +32,7 @@ public static class TestDataSeeder
                     $"Seed data contains invalid country entries. Errors: {string.Join("; ", validation)}");
             }
 
-            db.Paises.Add(new Pais
+            db.Countries.Add(new Country
             {
                 Name = c.Name,
                 Iso31661A2Code = c.A2,

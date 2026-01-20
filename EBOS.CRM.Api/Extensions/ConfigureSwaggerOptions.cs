@@ -1,9 +1,9 @@
-﻿using EBOS.CRM.Api.Swagger;
+﻿using System.Reflection;
+using EBOS.CRM.Api.Swagger;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -46,12 +46,7 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
 
         // INCLUSION: usar GroupName proporcionado por VersionedApiExplorer
         // Esto asegura que cada SwaggerDoc solo incluya las operaciones asignadas a esa versión
-        options.DocInclusionPredicate((docName, apiDesc) =>
-        {
-            // apiDesc.GroupName es establecido por VersionedApiExplorer y coincide con docName
-            // Si GroupName es null, excluimos la operación
-            return string.Equals(apiDesc.GroupName, docName, StringComparison.OrdinalIgnoreCase);
-        });
+        options.DocInclusionPredicate((docName, apiDesc) => string.Equals(apiDesc.GroupName, docName, StringComparison.OrdinalIgnoreCase));
 
         // TAGS por versión y controlador (opcional)
         options.TagActionsBy(apiDesc =>

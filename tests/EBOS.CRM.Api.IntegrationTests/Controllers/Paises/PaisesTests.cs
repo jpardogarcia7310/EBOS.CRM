@@ -16,7 +16,7 @@ public class PaisesTests(CustomWebApplicationFactory factory) : IClassFixture<Cu
         var response = await _client.GetAsync("/api/v1/Countries");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var countries = await response.Content.ReadFromJsonAsync<List<PaisResponseDto>>();
+        var countries = await response.Content.ReadFromJsonAsync<List<CountryResponseDto>>();
         countries.Should().NotBeNull();
         countries.Should().NotBeEmpty();
     }
@@ -27,7 +27,7 @@ public class PaisesTests(CustomWebApplicationFactory factory) : IClassFixture<Cu
         var response = await _client.GetAsync("/api/v1/Countries/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var country = await response.Content.ReadFromJsonAsync<PaisResponseDto>();
+        var country = await response.Content.ReadFromJsonAsync<CountryResponseDto>();
         country.Should().NotBeNull();
         country!.Name.Should().NotBeNullOrEmpty();
     }

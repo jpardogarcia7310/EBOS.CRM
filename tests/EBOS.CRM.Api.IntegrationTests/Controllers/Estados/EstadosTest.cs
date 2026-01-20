@@ -16,7 +16,7 @@ public class EstadosTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
         var response = await _client.GetAsync("/api/v1/Statuses");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var statuses = await response.Content.ReadFromJsonAsync<List<EstadoResponseDto>>();
+        var statuses = await response.Content.ReadFromJsonAsync<List<StatusResponseDto>>();
         statuses.Should().NotBeNull();
         statuses.Should().NotBeEmpty();
     }
@@ -27,7 +27,7 @@ public class EstadosTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
         var response = await _client.GetAsync("/api/v1/Statuses/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var status = await response.Content.ReadFromJsonAsync<EstadoResponseDto>();
+        var status = await response.Content.ReadFromJsonAsync<StatusResponseDto>();
         status.Should().NotBeNull();
         status!.Description.Should().NotBeNullOrEmpty();
     }

@@ -9,25 +9,26 @@ namespace EBOS.CRM.Infrastructure.Persistence;
 public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
 {
     // DbSets
-    public DbSet<Cliente> Clientes { get; set; } = null!; 
-    public DbSet<PersonaFisica> PersonasFisicas { get; set; } = null!; 
-    public DbSet<Empresa> Empresas { get; set; } = null!; 
-    public DbSet<Delegacion> Delegaciones { get; set; } = null!; 
-    public DbSet<DatosFiscales> DatosFiscales { get; set; } = null!; 
-    public DbSet<DatosBancarios> DatosBancarios { get; set; } = null!; 
-    public DbSet<Credito> Creditos { get; set; } = null!; 
-    public DbSet<MovimientoCredito> MovimientosCredito { get; set; } = null!;
-    public DbSet<Pais> Paises { get; set; }
-    public DbSet<Estado> Estados { get; set; }
-
+    public DbSet<Customer> Customers => Set<Customer>(); 
+    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>(); 
+    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>(); 
+    public DbSet<Address> Addresses => Set<Address>(); 
+    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>(); 
+    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>(); 
+    public DbSet<BankInformation> BankInformation => Set<BankInformation>();
+    public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>(); 
+    public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>(); 
+    public DbSet<Status> Statuses => Set<Status>(); 
+    public DbSet<Country> Countries => Set<Country>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Carga de todas las Configuraciones de las entidades.
+        // Load all entity configurations.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CrmDbContext).Assembly);
 
         ApplySoftDeleteQueryFilter(modelBuilder);
 
-        // SAFETY NET: fuerza DeleteBehavior.Restrict en cualquier FK no configurada
+        // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
             .GetEntityTypes()
             .SelectMany(t => t.GetForeignKeys())
@@ -39,7 +40,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // No sobrescribimos opciones si ya están configuradas por el host/DI
+        // We do not overwrite options if they are already configured by the host/DI
         if (!optionsBuilder.IsConfigured)
         {
 #if DEBUG
@@ -58,22 +59,23 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
         if (erasedPropertyMethod == null)
             return;
 
-        var entityTypes = modelBuilder.Model.GetEntityTypes()
-            .Select(e => e.ClrType)
-            .Where(clrType => clrType != null && softErasableInterface.IsAssignableFrom(clrType!))
+        var entityTypes = modelBuilder.Model.GetEntityTypes() 
+            .Select(e => e.ClrType) 
+            .Where(clrType => softErasableInterface.IsAssignableFrom(clrType)) 
             .ToList();
-
-        foreach (var clrType in entityTypes!)
+        
+        foreach (var clrType in entityTypes)
         {
-            var parameter = Expression.Parameter(clrType!, "e");
+            var parameter = Expression.Parameter(clrType, "e");
 
             // EF.Property<bool>((object)e, "Erased")
             var convertedParam = Expression.Convert(parameter, typeof(object));
-            var erasedProperty = Expression.Call(erasedPropertyMethod, convertedParam, Expression.Constant(nameof(ISoftDeletable.Erased)));
+            var erasedProperty = Expression.Call(erasedPropertyMethod, convertedParam, 
+                Expression.Constant(nameof(ISoftDeletable.Erased)));
             var compare = Expression.Equal(erasedProperty, Expression.Constant(false));
             var lambda = Expression.Lambda(compare, parameter);
 
-            modelBuilder.Entity(clrType!).HasQueryFilter(lambda);
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
         }
     }
 }

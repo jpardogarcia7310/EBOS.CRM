@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Paises\Queries\GetAllPaises\" />
+    <Folder Include="Features\Countries\Queries\GetAllCountries\" />
     <Folder Include="Features\Entities\Commands\AddEntity\" />
     <Folder Include="Features\Entities\Commands\DeleteEntity\" />
     <Folder Include="Features\Entities\Commands\UpdateEntity\" />

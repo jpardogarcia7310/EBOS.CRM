@@ -7,36 +7,36 @@ using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetAllCountries;
 
-public class GetAllPaisesQueryHandlerTests
+public class GetAllCountriesQueryHandlerTests
 {
-    private readonly Mock<IPaisRepository> _repositoryMock;
+    private readonly Mock<ICountryRepository> _repositoryMock;
     private readonly Mock<IMapper> _mapperMock;
-    private readonly GetAllPaisesQueryHandler _handler;
+    private readonly GetAllCountriesQueryHandler _handler;
 
-    public GetAllPaisesQueryHandlerTests()
+    public GetAllCountriesQueryHandlerTests()
     {
-        _repositoryMock = new Mock<IPaisRepository>();
+        _repositoryMock = new Mock<ICountryRepository>();
         _mapperMock = new Mock<IMapper>();
-        _handler = new GetAllPaisesQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+        _handler = new GetAllCountriesQueryHandler(_repositoryMock.Object, _mapperMock.Object);
     }
 
     [Fact]
     public async Task Handle_CountriesExist_ReturnsMappedDtos()
     {
         // Arrange
-        var countries = new List<Pais>
+        var countries = new List<Country>
         {
             new() { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", InternationalPhoneCode = "34" }
         };
-        var dtos = new List<PaisResponseDto>
+        var dtos = new List<CountryResponseDto>
         {
             new(1, "España", "ES", "ESP", "724", ".es", "Euro", "EUR", "34")
         };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
-        _mapperMock.Setup(m => m.Map<IEnumerable<PaisResponseDto>>(countries)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries)).Returns(dtos);
 
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -46,20 +46,20 @@ public class GetAllPaisesQueryHandlerTests
         Assert.Single(result);
         Assert.Equal("España", result.First().Name);
         _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
-        _mapperMock.Verify(m => m.Map<IEnumerable<PaisResponseDto>>(countries), Times.Once);
+        _mapperMock.Verify(m => m.Map<IEnumerable<CountryResponseDto>>(countries), Times.Once);
     }
 
     [Fact]
     public async Task Handle_NoCountries_ReturnsEmptyEnumerable()
     {
         // Arrange
-        var countries = new List<Pais>();
-        var dtos = new List<PaisResponseDto>();
+        var countries = new List<Country>();
+        var dtos = new List<CountryResponseDto>();
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
-        _mapperMock.Setup(m => m.Map<IEnumerable<PaisResponseDto>>(countries)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries)).Returns(dtos);
 
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -75,7 +75,7 @@ public class GetAllPaisesQueryHandlerTests
         // Arrange
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new System.Exception("DB error"));
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<System.Exception>(() => _handler.Handle(query, CancellationToken.None));
@@ -86,7 +86,7 @@ public class GetAllPaisesQueryHandlerTests
     {
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
             () => _handler.Handle(query, cts.Token));
@@ -96,15 +96,15 @@ public class GetAllPaisesQueryHandlerTests
     public async Task Handle_MapperConfigurationInvalid_ThrowsMappingException()
     {
         // Arrange
-        var countries = new List<Pais> { new() { Id = 1, Name = "España" } };
+        var countries = new List<Country> { new() { Id = 1, Name = "España" } };
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                        .ReturnsAsync(countries);
 
         // Simulamos que el mapper de Mapster falla
-        _mapperMock.Setup(m => m.Map<IEnumerable<PaisResponseDto>>(countries))
+        _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -115,13 +115,13 @@ public class GetAllPaisesQueryHandlerTests
     public async Task Handle_NullEntityProperty_MapsGracefully()
     {
         // Arrange
-        var countries = new List<Pais> { new() { Id = 1, Name = null! } };
-        var dtos = new List<PaisResponseDto> { new(1, null!, "ES", "ESP", "724", ".es", "Euro", "EUR", "34") };
+        var countries = new List<Country> { new() { Id = 1, Name = null! } };
+        var dtos = new List<CountryResponseDto> { new(1, null!, "ES", "ESP", "724", ".es", "Euro", "EUR", "34") };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
-        _mapperMock.Setup(m => m.Map<IEnumerable<PaisResponseDto>>(countries)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries)).Returns(dtos);
 
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -136,23 +136,23 @@ public class GetAllPaisesQueryHandlerTests
     public async Task Handle_MapperCalledWithCorrectSourceType()
     {
         // Arrange
-        var countries = new List<Pais>();
+        var countries = new List<Country>();
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
 
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _mapperMock.Verify(m => m.Map<IEnumerable<PaisResponseDto>>(countries), Times.Once);
+        _mapperMock.Verify(m => m.Map<IEnumerable<CountryResponseDto>>(countries), Times.Once);
     }
 
     [Fact]
     public async Task Handle_RepositoryCalledOnce_WithCancellationToken()
     {
         // Arrange
-        var query = new GetAllPaisesQuery();
+        var query = new GetAllCountriesQuery();
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         // Act

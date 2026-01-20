@@ -5,11 +5,11 @@ using System.Reflection;
 
 namespace EBOS.CRM.Application;
 
-public static partial class DependencyInjection
+public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Registra todos los Handlers (Commands y Queries)
+        // Registers all Handlers (Commands and Queries)
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -18,22 +18,26 @@ public static partial class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddApplicattionMappings(this IServiceCollection services)
+    public static IServiceCollection AddApplicationMappings(this IServiceCollection services)
     {
-        // Crear y registrar la configuracion
+        // Create and register the configuration
         var mapsterConfig = new TypeAdapterConfig();
 
         var asm = Assembly.GetExecutingAssembly();
-        // Registramos los Mapeos (los que ya tenemos en Mapping/*.cs)
+        // We register the mappings (those we already have in Mapping/*.cs)
         var registerTypes = asm.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.StartsWith("Mapping", StringComparison.Ordinal) && typeof(IRegister).IsAssignableFrom(t));
+            .Where(t =>
+                t is { IsClass: true, IsAbstract: false } &&
+                t.Name.StartsWith("Mapping", StringComparison.Ordinal) &&
+                typeof(IRegister).IsAssignableFrom(t));
+
         foreach (var t in registerTypes)
         {
             var reg = (IRegister)Activator.CreateInstance(t)!;
             reg.Register(mapsterConfig);
         }
 
-        // Inyección de dependencias
+        // Dependency Injection
         services.AddSingleton(mapsterConfig);
         services.AddScoped<IMapper, ServiceMapper>();
 

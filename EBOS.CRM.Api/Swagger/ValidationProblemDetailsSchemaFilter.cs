@@ -9,33 +9,29 @@ public class ValidationProblemDetailsSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (schema == null || context == null) return;
+        if (context.Type != typeof(ValidationProblemDetails)) return;
+        schema.Description ??= "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.";
 
-        if (context.Type == typeof(ValidationProblemDetails))
+        var errorsDetailedExample = new OpenApiObject
         {
-            schema.Description ??= "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.";
-
-            var errorsDetailedExample = new OpenApiObject
+            ["name"] = new OpenApiArray
             {
-                ["name"] = new OpenApiArray
+                new OpenApiObject
                 {
-                    new OpenApiObject
-                    {
-                        ["message"] = new OpenApiString("El campo Name es obligatorio."),
-                        ["code"] = new OpenApiString("VAL_NAME_REQUIRED")
-                    }
-                },
-                ["iso31661A2Code"] = new OpenApiArray
-                {
-                    new OpenApiObject
-                    {
-                        ["message"] = new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres."),
-                        ["code"] = new OpenApiString("VAL_ISOA2_LENGTH")
-                    }
+                    ["message"] = new OpenApiString("El campo Name es obligatorio."),
+                    ["code"] = new OpenApiString("VAL_NAME_REQUIRED")
                 }
-            };
+            },
+            ["iso31661A2Code"] = new OpenApiArray
+            {
+                new OpenApiObject
+                {
+                    ["message"] = new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres."),
+                    ["code"] = new OpenApiString("VAL_ISOA2_LENGTH")
+                }
+            }
+        };
 
-            schema.Extensions["x-errors-detailed"] = errorsDetailedExample;
-        }
+        schema.Extensions["x-errors-detailed"] = errorsDetailedExample;
     }
 }

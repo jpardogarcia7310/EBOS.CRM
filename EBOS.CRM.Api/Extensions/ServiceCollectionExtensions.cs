@@ -1,6 +1,5 @@
 ﻿using EBOS.CRM.Api.Middleware;
 using EBOS.CRM.Api.Swagger;
-using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Extensions;

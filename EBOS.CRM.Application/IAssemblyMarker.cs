@@ -1,5 +1,5 @@
 ﻿namespace EBOS.CRM.Application;
 
-// Interfaz vacía intencionalmente - solo se usa para obtener Assembly.GetExecutingAssembly()
+// Intentionally empty interface - only used to get Assembly.GetExecutingAssembly()
 public interface IAssemblyMarker
 { }
