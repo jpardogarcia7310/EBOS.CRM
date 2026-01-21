@@ -37,6 +37,5 @@ public class IndividualCustomerConfiguration : IEntityTypeConfiguration<Individu
         // Index for FK: IndividualCustomer.IdentificationTypeId
         builder.HasIndex(c => c.IdentificationTypeId)
             .HasDatabaseName("IX_IndividualCustomer_IdentificationTypeId");
-
     }
 }

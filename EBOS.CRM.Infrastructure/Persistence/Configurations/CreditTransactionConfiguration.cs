@@ -31,16 +31,34 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
         builder.Property(c => c.Erased)
             .IsRequired();
 
+        builder.ToTable("CreditTransactions", "CRM", ct =>
+        {
+            ct.HasCheckConstraint(
+                "CK_CreditTransaction_Amount_NotZero",
+                "[Amount] <> 0"
+            );
+            ct.HasCheckConstraint(
+                "CK_CreditTransaction_Type_Valid",
+                "[Type] IN ('Consumo', 'Ajuste', 'Devolucion')"
+            );
+
+        });
+        
+        builder.HasIndex(ct => new { ct.Date, ct.CreditAccountId })
+            .HasDatabaseName("IX_CreditTransaction_Date_Account");
+        builder.HasIndex(ct => new { ct.CreditAccountId, ct.Date })
+            .HasDatabaseName("IX_CreditTransaction_Account_Date");
+
         // ------------------------------------------------------------
-        // One-to-Many: Credito (principal) → MovimientoCredito (dependent)
-        // FK: MovimientoCredito.CreditoId
+        // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
+        // FK: CreditTransactions.CreditAccountId
         // ------------------------------------------------------------
         builder.HasOne(m => m.CreditAccount)
             .WithMany(c => c.CreditTransactions)
             .HasForeignKey(m => m.CreditAccountId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Index for FK: MovimientoCredito.CreditoId
+        // Index for FK: CreditTransactions.CreditAccountId
         builder.HasIndex(m => m.CreditAccountId)
             .HasDatabaseName("IX_CreditTransactions_CreditAccountId");
     }

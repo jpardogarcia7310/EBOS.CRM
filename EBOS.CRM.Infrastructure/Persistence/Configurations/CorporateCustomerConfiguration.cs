@@ -20,17 +20,22 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .HasMaxLength(20);
         builder.Property(c => c.Erased)
             .IsRequired();
+        
+        builder.ToTable("Customers", "CRM", c =>
+        {
+            c.HasCheckConstraint(
+                "CK_CorporateCustomer_TaxId_Valid",
+                "[TaxIdentification] NOT LIKE '%[^A-Za-z0-9]%'"
+            );
+        });
 
         // ------------------------------------------------------------
         // One-to-Many: CorporateCustomer (principal) → BranchOffices (dependent)
         // FK: BranchOffices.CorporateCustomerId
         // ------------------------------------------------------------
-        builder.HasMany(e => e.BranchOffices)
-            .WithOne(d => d.CorporateCustomer)
-            .HasForeignKey(d => d.CorporateCustomerId)
+        builder.HasMany(cc => cc.BranchOffices)
+            .WithOne(bo => bo.CorporateCustomer)
+            .HasForeignKey(bo => bo.CorporateCustomerId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Index for FK: BranchOffices.CorporateCustomerId
-        // (Created in BranchOfficesConfiguration, because FK belongs to BranchOffices)
     }
 }

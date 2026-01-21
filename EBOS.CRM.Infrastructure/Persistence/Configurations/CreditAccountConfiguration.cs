@@ -25,6 +25,22 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         builder.Property(c => c.Erased)
                .IsRequired();
 
+        builder.ToTable("CreditAccounts", "CRM", ca =>
+        {
+               ca.HasCheckConstraint(
+                      "CK_CreditAccount_MaxAmount_Positive",
+                      "[MaxAmount] > 0"
+               );
+               ca.HasCheckConstraint(
+                      "CK_CreditAccount_UsedAmount_NonNegative",
+                      "[UsedAmount] >= 0"
+               );
+               ca.HasCheckConstraint(
+                      "CK_CreditAccount_UsedAmount_WithinLimit",
+                      "[UsedAmount] <= [MaxAmount]"
+               );
+        });
+        
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId
@@ -36,7 +52,7 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
                .WithOne(cl => cl.CreditAccount)
                .HasForeignKey<CreditAccount>(c => c.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
-        // Index for FK: Credito.ClienteId
+        // Index for FK: CreditAccount.CustomerId
         builder.HasIndex(c => c.CustomerId)
                .HasDatabaseName("IX_CreditAccount_CustomerId");
         // ------------------------------------------------------------
@@ -47,7 +63,5 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
                .WithOne(m => m.CreditAccount)
                .HasForeignKey(m => m.CreditAccountId)
                .OnDelete(DeleteBehavior.Cascade);
-        // No index here because FK belongs to CreditTransactions.
-        // The index is created in CreditTransactionsConfiguration.
     }
 }

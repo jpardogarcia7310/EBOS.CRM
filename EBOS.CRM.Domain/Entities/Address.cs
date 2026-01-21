@@ -6,6 +6,8 @@ namespace EBOS.CRM.Domain.Entities;
 
 public sealed class Address : ErasableEntity
 {
+    [Required] 
+    public bool IsPrimary { get; set; }
     [Required]
     [MaxLength(200)]
     public string Street { get; set; } = null!;
@@ -15,13 +17,10 @@ public sealed class Address : ErasableEntity
     [Required]
     [MaxLength(20)]
     public string? InternalNumber { get; set; }
-    [Required]
     [MaxLength(200)]
     public string? BetweenStreet1 { get; set; }
-    [Required]
     [MaxLength(200)]
     public string? BetweenStreet2 { get; set; }
-    [Required]
     [MaxLength(200)]
     public string? Neighborhood { get; set; }
     [Required]
@@ -33,7 +32,6 @@ public sealed class Address : ErasableEntity
     [Required]
     [MaxLength(20)]
     public string PostalCode { get; set; } = null!;
-    [Required]
     [MaxLength(500)]
     public string? GoogleMapsUrl { get; set; }
     public double? Latitude { get; set; }

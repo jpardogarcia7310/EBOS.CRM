@@ -19,8 +19,5 @@ public class StatusConfiguration : IEntityTypeConfiguration<Status>
         builder.Property(e => e.Description)
             .IsRequired()
             .HasMaxLength(100);
-        
-        // No index here because the FK belongs to Cliente.
-        // The index is created in ClienteConfiguration.
     }
 }

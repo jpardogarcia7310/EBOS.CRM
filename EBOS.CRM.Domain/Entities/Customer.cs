@@ -18,9 +18,9 @@ public abstract class Customer : ErasableEntity
     public DateTime CreatedAt { get; set; }
 
     // Foreign Keys
-    public long AddressId { get; set; }
-    [ForeignKey(nameof(AddressId))]
-    public virtual Address Address { get; set; } = null!;
+    public long PrimaryAddressId { get; set; }
+    [ForeignKey(nameof(PrimaryAddressId))]
+    public virtual Address PrimaryAddress { get; set; } = null!;
     
     public long? TaxInformationId { get; set; }
     [ForeignKey(nameof(TaxInformationId))]

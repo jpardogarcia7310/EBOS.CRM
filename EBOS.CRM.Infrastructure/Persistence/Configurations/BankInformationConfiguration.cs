@@ -24,21 +24,6 @@ public class BankInformationConfiguration : IEntityTypeConfiguration<BankInforma
         builder.Property(db => db.BankName)
             .HasMaxLength(200);
         builder.Property(c => c.Erased)
-            .IsRequired();
-
-        // ------------------------------------------------------------
-        // One-to-One: BankInformation (principal) → Customer (dependent)
-        // FK: Customer.BankInformationId
-        //
-        // Customer owns the FK, so the relationship is configured
-        // primarily in CustomerConfiguration.
-        // ------------------------------------------------------------
-        builder.HasOne(db => db.Customer)
-            .WithOne(c => c.BankInformation)
-            .HasForeignKey<Customer>(c => c.BankInformationId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        // No index here because the FK belongs to Customer.
-        // The index is created in CustomerConfiguration.
+            .IsRequired(); 
     }
 }

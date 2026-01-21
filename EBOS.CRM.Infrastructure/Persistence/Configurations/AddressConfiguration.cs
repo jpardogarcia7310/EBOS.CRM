@@ -16,6 +16,8 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .ValueGeneratedOnAdd();
 
         // Basic properties
+        builder.Property(a => a.IsPrimary)
+               .IsRequired();
         builder.Property(d => d.Street)
                .IsRequired()
                .HasMaxLength(200);
@@ -23,6 +25,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .IsRequired()
                .HasMaxLength(20);
         builder.Property(d => d.InternalNumber)
+               .IsRequired()
                .HasMaxLength(20);
         builder.Property(d => d.BetweenStreet1)
                .HasMaxLength(200);
@@ -48,7 +51,39 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .HasPrecision(10, 6);
         builder.Property(c => c.Erased)
                .IsRequired();
+        
+        builder.ToTable("Address", "CRM", a => {
+              a.HasCheckConstraint(
+                      "CK_Address_Latitude_Range",
+                      "[Latitude] IS NULL OR ([Latitude] BETWEEN -90 AND 90)"
+              );
+              a.HasCheckConstraint(
+                     "CK_Address_Longitude_Range",
+                     "[Longitude] IS NULL OR ([Longitude] BETWEEN -180 AND 180)"
+              );
+              a.HasCheckConstraint(
+                     "CK_Address_PostalCode_Length",
+                     "LEN([PostalCode]) >= 3"
+              );
+              a.HasCheckConstraint(
+                     "CK_Address_GoogleMapsUrl_Valid",
+                     "[GoogleMapsUrl] IS NULL OR [GoogleMapsUrl] LIKE 'https://maps.%'"
+              );
+              a.HasCheckConstraint(
+                      "CK_Address_IsPrimary_Boolean",
+                      "[IsPrimary] IN (0, 1)"
+              );
+        });
 
+        builder.HasIndex(a => new { a.City, a.StateOrProvince })
+               .HasDatabaseName("IX_Address_City_State"); 
+        builder.HasIndex(a => new { a.CountryId, a.City })
+               .HasDatabaseName("IX_Address_Country_City");
+        builder.HasIndex(a => new { a.CustomerId, a.IsPrimary }) 
+               .IsUnique() 
+               .HasFilter("[IsPrimary] = 1") 
+               .HasDatabaseName("IX_Address_Unique_Primary"); 
+        
         // ------------------------------------------------------------
         // One-to-Many: Customer (principal) → Address (dependent)
         // FK: Address.CustomerId
@@ -57,7 +92,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .WithMany(c => c.Addresses)
                .HasForeignKey(d => d.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
-        // Index for FK: Direccion.ClienteId
+        // Index for FK: Address.CustomerId
         builder.HasIndex(d => d.CustomerId)
                .HasDatabaseName("IX_Address_CustomerId");
 
@@ -69,7 +104,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .WithMany()
                .HasForeignKey(d => d.CountryId)
                .OnDelete(DeleteBehavior.Restrict);
-        // Index for FK: Direccion.PaisId
+        // Index for FK: Address.CountryId
         builder.HasIndex(d => d.CountryId)
                .HasDatabaseName("IX_Address_CountryId");
         
@@ -84,6 +119,5 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
 
         builder.HasIndex(a => a.AddressTypeId)
                .HasDatabaseName("IX_Addresses_AddressTypeId");
-   
     }
 }

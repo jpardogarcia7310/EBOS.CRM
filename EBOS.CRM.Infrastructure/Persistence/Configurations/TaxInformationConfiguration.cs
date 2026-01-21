@@ -24,7 +24,15 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
             .HasMaxLength(20);
         builder.Property(ti => ti.Erased)
             .IsRequired();
-
+        
+        builder.ToTable("TaxInformation", "CRM", ti =>
+        {
+            ti.HasCheckConstraint(
+                "CK_TaxInformation_TIN_Valid",
+                "[TaxIdentificationNumber] NOT LIKE '%[^A-Za-z0-9]%'"
+            );
+        });
+        
         // ------------------------------------------------------------
         // One-to-One: TaxInformation (principal) → Customer (dependent)
         // FK: Customer.TaxInformationId
@@ -51,8 +59,5 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         
         builder.HasIndex(ti => ti.AddressId) 
             .HasDatabaseName("IX_TaxInformation_AddressId");
-
-        // No index here because the FK belongs to Cliente.
-        // The index is created in ClienteConfiguration.
     }
 }

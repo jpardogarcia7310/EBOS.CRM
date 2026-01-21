@@ -29,30 +29,45 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                .IsRequired();
         builder.Property(c => c.Erased)
                .IsRequired();
+        
+        builder.ToTable("Customers", "CRM", c =>
+        {
+               c.HasCheckConstraint(
+                      "CK_Customer_Email_Valid",
+                      "[Email] LIKE '%@%.%'"
+               );
+               c.HasCheckConstraint(
+                      "CK_Customer_Phone_Digits",
+                      "[Phone] NOT LIKE '%[^0-9]%'"
+               );
+        });
+
+        builder.HasIndex(c => new { c.StatusId, c.CreatedAt })
+               .HasDatabaseName("IX_Customer_Status_CreatedAt");
 
         // ------------------------------------------------------------
-        // One-to-Many: Cliente (principal) → Direccion (dependent)
-        // FK: Direccion.ClienteId
+        // One-to-Many: Customer (principal) → Address (dependent)
+        // FK: Address.CustomerId
         // ------------------------------------------------------------
         builder.HasMany(c => c.Addresses)
                .WithOne(d => d.Customer)
                .HasForeignKey(d => d.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        // Index for FK: Direccion.ClienteId
+        // Index for FK: Addresses.CustomerId
         builder.HasIndex(c => c.StatusId);
 
         // ------------------------------------------------------------
         // One-to-Many: Customer (principal) → Address (dependent)
         // FK: Address.CustomerId
         // ------------------------------------------------------------
-        builder.HasOne(c => c.Address)
+        builder.HasOne(c => c.PrimaryAddress)
                .WithMany()
-               .HasForeignKey(c => c.AddressId)
+               .HasForeignKey(c => c.PrimaryAddressId)
                .OnDelete(DeleteBehavior.SetNull);
 
-        builder.HasIndex(c => c.AddressId)
-               .HasDatabaseName("IX_Customers_AddressId");
+        builder.HasIndex(c => c.PrimaryAddressId)
+               .HasDatabaseName("IX_Customers_PrimaryAddressId");
 
         // ------------------------------------------------------------
         // One-to-Many: Status (principal) → Customer (dependent)
@@ -71,9 +86,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         // FK: Customer.TaxInformationId
         // ------------------------------------------------------------
         builder.HasOne(c => c.TaxInformation)
-               .WithOne(df => df.Customer)
+               .WithOne(ti => ti.Customer)
                .HasForeignKey<Customer>(c => c.TaxInformationId)
-               .OnDelete(DeleteBehavior.SetNull);
+               .OnDelete(DeleteBehavior.Restrict);
 
         // Index for FK: Customer.TaxInformationId
         builder.HasIndex(c => c.TaxInformationId);
@@ -85,7 +100,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasOne(c => c.BankInformation)
                .WithOne(db => db.Customer)
                .HasForeignKey<Customer>(c => c.BankInformationId)
-               .OnDelete(DeleteBehavior.SetNull);
+               .OnDelete(DeleteBehavior.Restrict);
 
         // Index for FK: Customer.BankInformationId
         builder.HasIndex(c => c.BankInformationId);
@@ -98,10 +113,10 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                .WithOne(cr => cr.Customer)
                .HasForeignKey<CreditAccount>(cr => cr.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
-
+    
         // TPH inheritance discriminator
-        builder.HasDiscriminator<string>("TipoCliente")
-               .HasValue<CorporateCustomer>("Empresa")
-               .HasValue<IndividualCustomer>("PersonaFisica");
+        builder.HasDiscriminator<string>("CustomerType")
+               .HasValue<CorporateCustomer>("Corporate")
+               .HasValue<IndividualCustomer>("Individual");
     }
 }

@@ -46,8 +46,24 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                 // you can add CHECK constraints with HasCheckConstraint:
                 builder.ToTable("Countries", "EBOS", c =>
                 {
-                    c.HasCheckConstraint("CK_Countries_IsoA2_Length", "LEN([Iso31661A2Code]) = 2");
-                    c.HasCheckConstraint("CK_Countries_IsoA3_Length", "LEN([Iso31661A3Code]) = 3");
+                    c.HasCheckConstraint(
+                            "CK_Countries_IsoA2_Length", 
+                            "LEN([Iso31661A2Code]) = 2");
+                    c.HasCheckConstraint(
+                            "CK_Countries_IsoA3_Length", 
+                            "LEN([Iso31661A3Code]) = 3");
+                    c.HasCheckConstraint(
+                            "CK_Country_IsoA2_Uppercase",
+                            "UPPER([Iso31661A2Code]) = [Iso31661A2Code]"
+                    );
+                    c.HasCheckConstraint(
+                            "CK_Country_IsoA3_Uppercase",
+                            "UPPER([Iso31661A3Code]) = [Iso31661A3Code]"
+                    );
+                    c.HasCheckConstraint(
+                            "CK_Country_IsoNum_Digits",
+                            "[Iso31661NumCode] NOT LIKE '%[^0-9]%'"
+                    );
                 });
 
                 // ------------------------------------------------------------
@@ -87,11 +103,5 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                 // ------------------------------------------------------------
                 builder.HasIndex(c => c.CurrencyCode)
                         .HasDatabaseName("IX_Countries_CurrencyCode");
-
-                // ------------------------------------------------------------
-                // No direct relationships configured here.
-                // Pais is referenced by Direccion (FK: Direccion.PaisId),
-                // so the relationship and FK index are defined in DireccionConfiguration.
-                // ------------------------------------------------------------
         }
 }
