@@ -6,7 +6,7 @@ namespace EBOS.CRM.Domain.Entities;
 public class AddressType : ErasableEntity
 {
     [Required]
-    [MaxLength(10)]
+    [MaxLength(50)]
     public string Code { get; set; } = null!;        // Ej: MAIN, BILLING, SHIPPING
     [Required]
     [MaxLength(50)]

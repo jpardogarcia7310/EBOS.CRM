@@ -12,9 +12,8 @@ public sealed class BranchOffice : ErasableEntity
     [Required]
     [MaxLength(200)]
     public string Name { get; set; } = null!;
-    [Required]
-    [MaxLength(20)]
-    public string? PhoneNumber { get; set; }
+
+    [Required] [MaxLength(20)] public string PhoneNumber { get; set; } = null!;
     
     // Foreign Keys
     public long AddressId { get; set; }

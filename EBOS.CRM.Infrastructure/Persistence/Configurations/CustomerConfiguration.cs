@@ -52,7 +52,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasMany(c => c.Addresses)
                .WithOne(d => d.Customer)
                .HasForeignKey(d => d.CustomerId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
         // Index for FK: Addresses.CustomerId
         builder.HasIndex(c => c.StatusId);
@@ -80,31 +80,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         // Index for FK: Customer.StatusId
         builder.HasIndex(c => c.StatusId);
-
-        // ------------------------------------------------------------
-        // One-to-One: TaxInformation (principal) → Customer (dependent)
-        // FK: Customer.TaxInformationId
-        // ------------------------------------------------------------
-        builder.HasOne(c => c.TaxInformation)
-               .WithOne(ti => ti.Customer)
-               .HasForeignKey<Customer>(c => c.TaxInformationId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        // Index for FK: Customer.TaxInformationId
-        builder.HasIndex(c => c.TaxInformationId);
-
-        // ------------------------------------------------------------
-        // One-to-One: BankInformation (principal) → Customer (dependent)
-        // FK: Customer.BankInformationId
-        // ------------------------------------------------------------
-        builder.HasOne(c => c.BankInformation)
-               .WithOne(db => db.Customer)
-               .HasForeignKey<Customer>(c => c.BankInformationId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        // Index for FK: Customer.BankInformationId
-        builder.HasIndex(c => c.BankInformationId);
-
+        
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId
@@ -114,6 +90,24 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                .HasForeignKey<CreditAccount>(cr => cr.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
     
+        // ------------------------------------------------------------
+        // One-to-One: Customer (principal) → TaxInformation (dependent)
+        // FK: TaxInformation.CustomerId
+        // ------------------------------------------------------------
+        builder.HasOne(c => c.TaxInformation) 
+               .WithOne(t => t.Customer) 
+               .HasForeignKey<TaxInformation>(t => t.CustomerId) 
+               .OnDelete(DeleteBehavior.Restrict); 
+        
+        // ------------------------------------------------------------
+        // One-to-One: Customer (principal) → BankInformation (dependent)
+        // FK: BankInformation.CustomerId
+        // ------------------------------------------------------------
+        builder.HasOne(c => c.BankInformation) 
+               .WithOne(b => b.Customer) 
+               .HasForeignKey<BankInformation>(b => b.CustomerId) 
+               .OnDelete(DeleteBehavior.Restrict);
+        
         // TPH inheritance discriminator
         builder.HasDiscriminator<string>("CustomerType")
                .HasValue<CorporateCustomer>("Corporate")

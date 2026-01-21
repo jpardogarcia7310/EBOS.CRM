@@ -22,12 +22,8 @@ public abstract class Customer : ErasableEntity
     [ForeignKey(nameof(PrimaryAddressId))]
     public virtual Address PrimaryAddress { get; set; } = null!;
     
-    public long? TaxInformationId { get; set; }
-    [ForeignKey(nameof(TaxInformationId))]
     public virtual TaxInformation? TaxInformation { get; set; }
 
-    public long? BankInformationId { get; set; }
-    [ForeignKey(nameof(BankInformationId))]
     public virtual BankInformation? BankInformation { get; set; }
 
     public CreditAccount? CreditAccount { get; set; }

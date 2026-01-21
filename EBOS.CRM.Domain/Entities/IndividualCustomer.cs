@@ -12,7 +12,7 @@ public sealed class IndividualCustomer : Customer
     [MaxLength(100)]
     public string LastName { get; set; } = null!;
     [Required]
-    public DateTime? BirthDate { get; set; }
+    public DateTime BirthDate { get; set; }
     [Required]
     [MaxLength(10)]
     public string? IdentificationNumber { get; set; } // DNI/NIE

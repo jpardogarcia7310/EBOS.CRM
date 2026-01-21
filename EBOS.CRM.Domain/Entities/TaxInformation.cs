@@ -18,5 +18,7 @@ public sealed class TaxInformation : ErasableEntity
     [ForeignKey(nameof(AddressId))]
     public Address Address { get; set; } = null!;
 
+    public long CustomerId { get; set; }
+    [ForeignKey(nameof(CustomerId))]
     public Customer Customer { get; set; } = null!;
 }

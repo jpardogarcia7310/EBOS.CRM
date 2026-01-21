@@ -20,20 +20,21 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
             .IsRequired()
             .HasMaxLength(200);
         builder.Property(bo => bo.PhoneNumber)
+            .IsRequired()
             .HasMaxLength(20);
         builder.Property(bo => bo.Erased)
             .IsRequired();
 
         // ------------------------------------------------------------
         // One-to-Many: CorporateCustomer (principal) → BranchOffice (dependent)
-        // FK: BranchOffice.EmpresaId
+        // FK: BranchOffice.CorporateCustomerId
         // ------------------------------------------------------------
         builder.HasOne(bo => bo.CorporateCustomer)
             .WithMany(cc => cc.BranchOffices)
             .HasForeignKey(bo => bo.CorporateCustomerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
-        // Index for FK: Delegacion.EmpresaId
+        // Index for FK: BranchOffices.CorporateCustomerId
         builder.HasIndex(bo => bo.CorporateCustomerId)
             .HasDatabaseName("IX_BranchOffice_CorporateCustomerId");
 
@@ -41,9 +42,9 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
         // One-to-Many: Address (principal) → BranchOffice (dependent)
         // FK: BranchOffice.AddressId
         // ------------------------------------------------------------
-        builder.HasOne(d => d.Address) 
-            .WithMany() 
-            .HasForeignKey(d => d.AddressId) 
+        builder.HasOne(bo => bo.Address) 
+            .WithOne() 
+            .HasForeignKey<BranchOffice>(bo => bo.AddressId) 
             .OnDelete(DeleteBehavior.Restrict); 
         
         builder.HasIndex(d => d.AddressId) 

@@ -44,9 +44,6 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId
-        //
-        // Customer has a navigation property "CreditAccount"
-        // CreditAccount has a navigation property "Customer"
         // ------------------------------------------------------------
         builder.HasOne(c => c.Customer)
                .WithOne(cl => cl.CreditAccount)
@@ -63,5 +60,13 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
                .WithOne(m => m.CreditAccount)
                .HasForeignKey(m => m.CreditAccountId)
                .OnDelete(DeleteBehavior.Cascade);
+        // ------------------------------------------------------------
+        // One-to-One: CreditAccount (principal) → Customer (dependent)
+        // FK: CreditAccount.CustomerId
+        // ------------------------------------------------------------
+        builder.HasOne(ca => ca.Customer)
+               .WithOne(c => c.CreditAccount)
+               .HasForeignKey<CreditAccount>(ca => ca.CustomerId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -35,22 +35,22 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         
         // ------------------------------------------------------------
         // One-to-One: TaxInformation (principal) → Customer (dependent)
-        // FK: Customer.TaxInformationId
+        // FK: TaxInformation.CustomerId
         //
-        // Customer owns the FK, so the relationship is configured
-        // primarily in CustomerConfiguration.
+        // TaxInformation owns the FK, so the relationship is configured
+        // primarily in TaxInformationConfiguration.
         // ------------------------------------------------------------
         builder.HasOne(ti => ti.Customer)
             .WithOne(c => c.TaxInformation)
-            .HasForeignKey<Customer>(c => c.TaxInformationId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasForeignKey<TaxInformation>(ti => ti.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
     
         // ------------------------------------------------------------
         // One-to-One: Address (principal) → TaxInformation (dependent)
         // FK: TaxInformation.AddressId
         //
-        // Customer owns the FK, so the relationship is configured
-        // primarily in CustomerConfiguration.
+        // Address owns the FK, so the relationship is configured
+        // primarily in AddressConfiguration.
         // ------------------------------------------------------------
         builder.HasOne(ti => ti.Address) 
             .WithMany() 

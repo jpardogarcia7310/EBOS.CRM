@@ -14,7 +14,6 @@ public sealed class Address : ErasableEntity
     [Required]
     [MaxLength(20)]
     public string ExternalNumber { get; set; } = null!;
-    [Required]
     [MaxLength(20)]
     public string? InternalNumber { get; set; }
     [MaxLength(200)]

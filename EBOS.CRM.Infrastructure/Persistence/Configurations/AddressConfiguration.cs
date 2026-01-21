@@ -25,7 +25,6 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .IsRequired()
                .HasMaxLength(20);
         builder.Property(d => d.InternalNumber)
-               .IsRequired()
                .HasMaxLength(20);
         builder.Property(d => d.BetweenStreet1)
                .HasMaxLength(200);
@@ -52,7 +51,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         builder.Property(c => c.Erased)
                .IsRequired();
         
-        builder.ToTable("Address", "CRM", a => {
+        builder.ToTable("Addresses", "CRM", a => {
               a.HasCheckConstraint(
                       "CK_Address_Latitude_Range",
                       "[Latitude] IS NULL OR ([Latitude] BETWEEN -90 AND 90)"
@@ -91,7 +90,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         builder.HasOne(d => d.Customer)
                .WithMany(c => c.Addresses)
                .HasForeignKey(d => d.CustomerId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
         // Index for FK: Address.CustomerId
         builder.HasIndex(d => d.CustomerId)
                .HasDatabaseName("IX_Address_CustomerId");
