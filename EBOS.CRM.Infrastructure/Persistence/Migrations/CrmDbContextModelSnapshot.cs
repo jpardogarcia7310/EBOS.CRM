@@ -65,7 +65,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("InternalNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -118,10 +117,10 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CustomerId", "IsPrimary")
                         .IsUnique()
-                        .HasDatabaseName("IX_Address_Unique_Primary")
+                        .HasDatabaseName("IX_Address_Unique_Primary_Per_Customer")
                         .HasFilter("[IsPrimary] = 1");
 
-                    b.ToTable("Address", "CRM", t =>
+                    b.ToTable("Addresses", "CRM", t =>
                         {
                             t.HasCheckConstraint("CK_Address_GoogleMapsUrl_Valid", "[GoogleMapsUrl] IS NULL OR [GoogleMapsUrl] LIKE 'https://maps.%'");
 
@@ -132,6 +131,8 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_Address_Longitude_Range", "[Longitude] IS NULL OR ([Longitude] BETWEEN -180 AND 180)");
 
                             t.HasCheckConstraint("CK_Address_PostalCode_Length", "LEN([PostalCode]) >= 3");
+
+                            t.HasCheckConstraint("CK_Address_Primary_NotErasable", "NOT ([IsPrimary] = 1 AND [Erased] = 1)");
                         });
                 });
 
@@ -158,7 +159,14 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AddressTypes", "EBOS");
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AddressType_Code_Unique");
+
+                    b.ToTable("AddressTypes", "CRM", t =>
+                        {
+                            t.HasCheckConstraint("CK_AddressType_Code_NotEmpty", "LEN([Code]) > 0");
+                        });
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.BankInformation", b =>
@@ -177,6 +185,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("Erased")
                         .HasColumnType("bit");
 
@@ -186,6 +197,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(34)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
 
                     b.ToTable("BankInformation", "CRM");
                 });
@@ -220,6 +234,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId")
+                        .IsUnique()
                         .HasDatabaseName("IX_BranchOffice_AddressId");
 
                     b.HasIndex("CorporateCustomerId")
@@ -286,24 +301,28 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Iso31661A2Code")
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661A2Code");
+                        .HasDatabaseName("IX_Countries_Iso31661A2Code_Unique");
 
                     b.HasIndex("Iso31661A3Code")
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661A3Code");
+                        .HasDatabaseName("IX_Countries_Iso31661A3Code_Unique");
 
                     b.HasIndex("Iso31661NumCode")
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661NumCode");
+                        .HasDatabaseName("IX_Countries_Iso31661NumCode_Unique");
 
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_Countries_Name");
 
-                    b.ToTable("Countries", "EBOS", t =>
+                    b.ToTable("Countries", "CRM", t =>
                         {
+                            t.HasCheckConstraint("CK_Countries_ISO_Num_Length", "LEN([Iso31661NumCode]) >= 1");
+
                             t.HasCheckConstraint("CK_Countries_IsoA2_Length", "LEN([Iso31661A2Code]) = 2");
 
                             t.HasCheckConstraint("CK_Countries_IsoA3_Length", "LEN([Iso31661A3Code]) = 3");
+
+                            t.HasCheckConstraint("CK_Country_Domain_Valid", "[Domain] LIKE '%.%'");
 
                             t.HasCheckConstraint("CK_Country_IsoA2_Uppercase", "UPPER([Iso31661A2Code]) = [Iso31661A2Code]");
 
@@ -392,11 +411,11 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("CreditAccountId")
                         .HasDatabaseName("IX_CreditTransactions_CreditAccountId");
 
+                    b.HasIndex("Date")
+                        .HasDatabaseName("IX_CreditTransaction_Date");
+
                     b.HasIndex("CreditAccountId", "Date")
                         .HasDatabaseName("IX_CreditTransaction_Account_Date");
-
-                    b.HasIndex("Date", "CreditAccountId")
-                        .HasDatabaseName("IX_CreditTransaction_Date_Account");
 
                     b.ToTable("CreditTransactions", "CRM", t =>
                         {
@@ -413,9 +432,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long?>("BankInformationId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -449,23 +465,15 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Property<long>("StatusId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TaxInformationId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BankInformationId")
+                    b.HasIndex("Code")
                         .IsUnique()
-                        .HasFilter("[BankInformationId] IS NOT NULL");
+                        .HasDatabaseName("IX_Customer_Code_Unique");
 
-                    b.HasIndex("PrimaryAddressId")
-                        .HasDatabaseName("IX_Customers_PrimaryAddressId");
+                    b.HasIndex("PrimaryAddressId");
 
                     b.HasIndex("StatusId");
-
-                    b.HasIndex("TaxInformationId")
-                        .IsUnique()
-                        .HasFilter("[TaxInformationId] IS NOT NULL");
 
                     b.HasIndex("StatusId", "CreatedAt")
                         .HasDatabaseName("IX_Customer_Status_CreatedAt");
@@ -505,6 +513,10 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_IdentificationType_Code_Unique");
+
                     b.ToTable("IdentificationTypes", "EBOS");
                 });
 
@@ -523,6 +535,10 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Description")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Status_Description_Unique");
+
                     b.ToTable("Statuses", "CRM");
                 });
 
@@ -535,6 +551,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<long>("AddressId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CustomerId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Erased")
@@ -554,6 +573,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("AddressId")
                         .HasDatabaseName("IX_TaxInformation_AddressId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
 
                     b.ToTable("TaxInformation", "CRM", t =>
                         {
@@ -591,8 +613,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                 {
                     b.HasBaseType("EBOS.CRM.Domain.Entities.Customer");
 
-                    b.Property<DateTime?>("BirthDate")
-                        .IsRequired()
+                    b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
@@ -629,7 +650,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Address", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.AddressType", "AddressType")
-                        .WithMany()
+                        .WithMany("Addresses")
                         .HasForeignKey("AddressTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -653,11 +674,22 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.BankInformation", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.Customer", "Customer")
+                        .WithOne("BankInformation")
+                        .HasForeignKey("EBOS.CRM.Domain.Entities.BankInformation", "CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.BranchOffice", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId")
+                        .WithOne()
+                        .HasForeignKey("EBOS.CRM.Domain.Entities.BranchOffice", "AddressId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -696,11 +728,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("EBOS.CRM.Domain.Entities.BankInformation", "BankInformation")
-                        .WithOne("Customer")
-                        .HasForeignKey("EBOS.CRM.Domain.Entities.Customer", "BankInformationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("EBOS.CRM.Domain.Entities.Address", "PrimaryAddress")
                         .WithMany()
                         .HasForeignKey("PrimaryAddressId")
@@ -713,18 +740,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EBOS.CRM.Domain.Entities.TaxInformation", "TaxInformation")
-                        .WithOne("Customer")
-                        .HasForeignKey("EBOS.CRM.Domain.Entities.Customer", "TaxInformationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("BankInformation");
-
                     b.Navigation("PrimaryAddress");
 
                     b.Navigation("Status");
-
-                    b.Navigation("TaxInformation");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.TaxInformation", b =>
@@ -735,7 +753,15 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("EBOS.CRM.Domain.Entities.Customer", "Customer")
+                        .WithOne("TaxInformation")
+                        .HasForeignKey("EBOS.CRM.Domain.Entities.TaxInformation", "CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Address");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.IndividualCustomer", b =>
@@ -749,10 +775,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("IdentificationType");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.BankInformation", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.AddressType", b =>
                 {
-                    b.Navigation("Customer")
-                        .IsRequired();
+                    b.Navigation("Addresses");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CreditAccount", b =>
@@ -764,18 +789,16 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("Addresses");
 
+                    b.Navigation("BankInformation");
+
                     b.Navigation("CreditAccount");
+
+                    b.Navigation("TaxInformation");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Status", b =>
                 {
                     b.Navigation("Customers");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.TaxInformation", b =>
-                {
-                    b.Navigation("Customer")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CorporateCustomer", b =>
