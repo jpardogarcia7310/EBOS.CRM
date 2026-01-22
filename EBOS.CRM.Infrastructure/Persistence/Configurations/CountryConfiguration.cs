@@ -8,7 +8,7 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
 {
         public void Configure(EntityTypeBuilder<Country> builder)
         {
-                builder.ToTable("Countries", "CRM");
+                builder.ToTable("Countries", "EBOS");
 
                 // Primary Key (BIGINT IDENTITY)
                 builder.HasKey(c => c.Id);

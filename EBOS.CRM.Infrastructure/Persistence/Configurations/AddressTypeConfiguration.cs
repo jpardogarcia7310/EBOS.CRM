@@ -8,7 +8,7 @@ public class AddressTypeConfiguration : IEntityTypeConfiguration<AddressType>
 {
     public void Configure(EntityTypeBuilder<AddressType> builder)
     {
-        builder.ToTable("AddressTypes", "CRM");
+        builder.ToTable("AddressTypes", "EBOS");
 
         // Primary Key (BIGINT IDENTITY)
         builder.HasKey(t => t.Id);

@@ -8,7 +8,7 @@ public class IdentificationTypeConfiguration : IEntityTypeConfiguration<Identifi
 {
     public void Configure(EntityTypeBuilder<IdentificationType> builder)
     {
-        builder.ToTable("IdentificationTypes", "CRM");
+        builder.ToTable("IdentificationTypes", "EBOS");
 
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id).ValueGeneratedOnAdd();
