@@ -69,17 +69,17 @@ public static class CrmDbContextSeed
         var addressTypes = new List<AddressType>
         {
             new() {
-                Code = "DNI",
-                Description = "Documento Nacional de Identidad" },
+                Code = "MAIN",
+                Description = "Main Address" },
             new() {
-                Code = "NIE",
-                Description = "Numero de Identificación de Extranjeros" },
+                Code = "BILLING",
+                Description = "Billing Address" },
             new() {
-                Code = "NIF",
-                Description = "Numero de Identificación Fiscal" },
+                Code = "SHIPPING",
+                Description = "Shipping Address" },
             new() {
-                Code = "PASS",
-                Description = "Pasaporte"
+                Code = "FISCAL",
+                Description = "Tax Address"
             }
         };
         // Basic validation before insertion

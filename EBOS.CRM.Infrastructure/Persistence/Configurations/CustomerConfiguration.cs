@@ -42,6 +42,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                );
         });
 
+        builder.HasIndex(c => c.Code)
+               .IsUnique()
+               .HasDatabaseName("IX_Customer_Code_Unique");
         builder.HasIndex(c => new { c.StatusId, c.CreatedAt })
                .HasDatabaseName("IX_Customer_Status_CreatedAt");
 
@@ -50,25 +53,20 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         // FK: Address.CustomerId
         // ------------------------------------------------------------
         builder.HasMany(c => c.Addresses)
-               .WithOne(d => d.Customer)
-               .HasForeignKey(d => d.CustomerId)
+               .WithOne(a => a.Customer)
+               .HasForeignKey(a => a.CustomerId)
                .OnDelete(DeleteBehavior.Restrict);
-
-        // Index for FK: Addresses.CustomerId
-        builder.HasIndex(c => c.StatusId);
 
         // ------------------------------------------------------------
         // One-to-Many: Customer (principal) → Address (dependent)
-        // FK: Address.CustomerId
+        // FK: Customer.PrimaryAddressId
         // ------------------------------------------------------------
-        builder.HasOne(c => c.PrimaryAddress)
-               .WithMany()
-               .HasForeignKey(c => c.PrimaryAddressId)
-               .OnDelete(DeleteBehavior.SetNull);
+        builder.HasOne(c => c.PrimaryAddress) 
+               .WithMany() // no reverse navigation
+               .HasForeignKey(c => c.PrimaryAddressId) 
+               .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(c => c.PrimaryAddressId)
-               .HasDatabaseName("IX_Customers_PrimaryAddressId");
-
+        builder.HasIndex(c => c.PrimaryAddressId);
         // ------------------------------------------------------------
         // One-to-Many: Status (principal) → Customer (dependent)
         // FK: Customer.StatusId
@@ -78,9 +76,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                .HasForeignKey(c => c.StatusId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        // Index for FK: Customer.StatusId
         builder.HasIndex(c => c.StatusId);
-        
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId
@@ -88,7 +84,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasOne(c => c.CreditAccount)
                .WithOne(cr => cr.Customer)
                .HasForeignKey<CreditAccount>(cr => cr.CustomerId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
     
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → TaxInformation (dependent)

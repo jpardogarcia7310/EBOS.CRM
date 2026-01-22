@@ -19,5 +19,18 @@ public class StatusConfiguration : IEntityTypeConfiguration<Status>
         builder.Property(e => e.Description)
             .IsRequired()
             .HasMaxLength(100);
+        
+        builder.HasIndex(s => s.Description) 
+            .IsUnique() 
+            .HasDatabaseName("IX_Status_Description_Unique"); 
+        
+        // ------------------------------------------------------------
+        // One-to-N: Status (principal) → Customer (dependent)
+        // FK: Customer.StatusId
+        // ------------------------------------------------------------
+        builder.HasMany(s => s.Customers) 
+            .WithOne(c => c.Status) 
+            .HasForeignKey(c => c.StatusId) 
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

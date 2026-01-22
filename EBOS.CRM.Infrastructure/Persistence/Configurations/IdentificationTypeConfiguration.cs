@@ -8,7 +8,7 @@ public class IdentificationTypeConfiguration : IEntityTypeConfiguration<Identifi
 {
     public void Configure(EntityTypeBuilder<IdentificationType> builder)
     {
-        builder.ToTable("IdentificationTypes", "EBOS");
+        builder.ToTable("IdentificationTypes", "CRM");
 
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id).ValueGeneratedOnAdd();
@@ -21,5 +21,9 @@ public class IdentificationTypeConfiguration : IEntityTypeConfiguration<Identifi
             .HasMaxLength(200);
         builder.Property(t => t.Erased)
             .IsRequired();
+
+        builder.HasIndex(it => it.Code)
+            .IsUnique()
+            .HasDatabaseName("IX_IdentificationType_Code_Unique");
     }
 }

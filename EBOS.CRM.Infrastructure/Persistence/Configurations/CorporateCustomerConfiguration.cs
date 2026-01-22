@@ -36,6 +36,6 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
         builder.HasMany(cc => cc.BranchOffices)
             .WithOne(bo => bo.CorporateCustomer)
             .HasForeignKey(bo => bo.CorporateCustomerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

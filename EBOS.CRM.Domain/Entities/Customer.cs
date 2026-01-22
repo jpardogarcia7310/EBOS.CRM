@@ -18,16 +18,14 @@ public abstract class Customer : ErasableEntity
     public DateTime CreatedAt { get; set; }
 
     // Foreign Keys
-    public long PrimaryAddressId { get; set; }
-    [ForeignKey(nameof(PrimaryAddressId))]
-    public virtual Address PrimaryAddress { get; set; } = null!;
-    
     public virtual TaxInformation? TaxInformation { get; set; }
-
     public virtual BankInformation? BankInformation { get; set; }
-
     public CreditAccount? CreditAccount { get; set; }
     
+    public long PrimaryAddressId { get; set; } 
+    [ForeignKey(nameof(PrimaryAddressId))] 
+    public virtual Address PrimaryAddress { get; set; } = null!;     
+
     public long StatusId { get; set; }
     [ForeignKey(nameof(StatusId))]
     public virtual Status Status { get; set; } = null!;
