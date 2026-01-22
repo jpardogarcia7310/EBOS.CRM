@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
@@ -27,13 +27,13 @@ public class GetCountryByIdQueryHandlerTests
         var country = new Country { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", 
             Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", 
             InternationalPhoneCode = "34" };
-        var dto = new CountryResponseDto(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code, 
+        var dto = new CountryResponse(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code, 
             country.Iso31661NumCode, country.Domain, country.Currency, country.CurrencyCode, 
             country.InternationalPhoneCode);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(country);
-        _mapperMock.Setup(m => m.Map<CountryResponseDto>(country)).Returns(dto);
+        _mapperMock.Setup(m => m.Map<CountryResponse>(country)).Returns(dto);
 
         var query = new GetCountryByIdQuery(1);
 
@@ -46,7 +46,7 @@ public class GetCountryByIdQueryHandlerTests
         Assert.Equal(dto.Name, result.Name);
         _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()), 
             Times.Once);
-        _mapperMock.Verify(m => m.Map<CountryResponseDto>(country), Times.Once);
+        _mapperMock.Verify(m => m.Map<CountryResponse>(country), Times.Once);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class GetCountryByIdQueryHandlerTests
 
         // Assert
         Assert.Null(result);
-        _mapperMock.Verify(m => m.Map<CountryResponseDto>(It.IsAny<Country>()), Times.Never);
+        _mapperMock.Verify(m => m.Map<CountryResponse>(It.IsAny<Country>()), Times.Never);
     }
 
     [Fact]
@@ -70,11 +70,11 @@ public class GetCountryByIdQueryHandlerTests
     {
         // Arrange
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(new System.Exception("DB error"));
+                        .ThrowsAsync(new Exception("DB error"));
         var query = new GetCountryByIdQuery(1);
 
         // Act & Assert
-        await Assert.ThrowsAsync<System.Exception>(() => _handler.Handle(query, CancellationToken.None));
+        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class GetCountryByIdQueryHandlerTests
                        .ReturnsAsync(country);
 
         // Simulamos que el mapper de Mapster falla
-        _mapperMock.Setup(m => m.Map<CountryResponseDto>(country))
+        _mapperMock.Setup(m => m.Map<CountryResponse>(country))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
         var query = new GetCountryByIdQuery(1);
@@ -136,6 +136,6 @@ public class GetCountryByIdQueryHandlerTests
 
         // Assert
         Assert.Null(result);
-        _mapperMock.Verify(m => m.Map<CountryResponseDto>(It.IsAny<Country>()), Times.Never);
+        _mapperMock.Verify(m => m.Map<CountryResponse>(It.IsAny<Country>()), Times.Never);
     }
 }

@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
@@ -28,14 +28,14 @@ public class GetAllStatusesQueryHandlerTest
         {
             new() { Id = 1, Description = "Activo" }
         };
-        var dtos = new List<StatusResponseDto>
+        var dtos = new List<StatusResponse>
         {
             new(1, "Activo")
         };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(statuses);
-        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponse>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
 
@@ -48,7 +48,7 @@ public class GetAllStatusesQueryHandlerTest
         Assert.Equal("Activo", result.First().Description);
         _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
-        _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponseDto>>(statuses), Times.Once);
+        _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponse>>(statuses), Times.Once);
     }
 
     [Fact]
@@ -56,11 +56,11 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var statuses = new List<Status>();
-        var dtos = new List<StatusResponseDto>();
+        var dtos = new List<StatusResponse>();
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(statuses);
-        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponse>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
 
@@ -104,7 +104,7 @@ public class GetAllStatusesQueryHandlerTest
                        .ReturnsAsync(statuses);
 
         // Simulamos que el mapper de Mapster falla
-        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses))
+        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponse>>(statuses))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
         var query = new GetAllStatusesQuery();
@@ -119,11 +119,11 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var statuses = new List<Status> { new() { Id = 1, Description = null! } };
-        var dtos = new List<StatusResponseDto> { new(1, null!) };
+        var dtos = new List<StatusResponse> { new(1, null!) };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(statuses);
-        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponse>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
 
@@ -150,7 +150,7 @@ public class GetAllStatusesQueryHandlerTest
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponseDto>>(statuses), Times.Once);
+        _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponse>>(statuses), Times.Once);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 using MediatR;
@@ -17,11 +17,11 @@ public class CountriesController(IMediator mediator) : ControllerBase
     [HttpGet("{id:long}")]
     [MapToApiVersion("1.0")]
     [MapToApiVersion("2.0")]
-    [ProducesResponseType(typeof(CountryResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CountryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
     {
         var dto = await mediator.Send(new GetCountryByIdQuery(id), cancellationToken);
         if (dto is null)
@@ -40,9 +40,9 @@ public class CountriesController(IMediator mediator) : ControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [MapToApiVersion("2.0")]
-    [ProducesResponseType(typeof(ICollection<CountryResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<CountryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetAllCountriesQuery(), cancellationToken));
     }

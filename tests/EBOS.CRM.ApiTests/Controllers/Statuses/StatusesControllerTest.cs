@@ -1,7 +1,7 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
+using EBOS.CRM.Application.Contracts.Responses;
 
 namespace EBOS.CRM.ApiTests.Controllers.Statuses;
 
@@ -17,7 +17,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) :
         var response = await _client.GetAsync("/api/v1/statuses");
         response.EnsureSuccessStatusCode();
 
-        var statuses = await response.Content.ReadFromJsonAsync<IEnumerable<StatusResponseDto>>();
+        var statuses = await response.Content.ReadFromJsonAsync<IEnumerable<StatusResponse>>();
         Assert.NotNull(statuses);
         Assert.NotEmpty(statuses);
     }
@@ -28,7 +28,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) :
         var response = await _client.GetAsync("/api/v1/statuses/1");
         response.EnsureSuccessStatusCode();
 
-        var status = await response.Content.ReadFromJsonAsync<StatusResponseDto>();
+        var status = await response.Content.ReadFromJsonAsync<StatusResponse>();
         Assert.NotNull(status);
         Assert.Equal(1, status.Id);
     }

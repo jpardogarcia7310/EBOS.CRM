@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Entities;
 using Mapster;
 
@@ -8,11 +8,11 @@ public sealed class MappingStatus : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Status, StatusResponseDto>()
+        config.NewConfig<Status, StatusResponse>()
               .Map(dest => dest.Id, src => src.Id)
               .Map(dest => dest.Description, src => src.Description);
 
-        config.NewConfig<StatusResponseDto, Status>()
+        config.NewConfig<StatusResponse, Status>()
               .Map(dest => dest.Id, src => src.Id)
               .Map(dest => dest.Description, src => src.Description)
               .Ignore(dest => dest.Customers);

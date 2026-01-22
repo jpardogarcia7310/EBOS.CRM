@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
@@ -25,11 +25,11 @@ public class GetStatusByIdQueryHandlerTest
     {
         // Arrange
         var status = new Status() { Id = 1, Description = "Activo" };
-        var dto = new StatusResponseDto(status.Id, status.Description);
+        var dto = new StatusResponse(status.Id, status.Description);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(status);
-        _mapperMock.Setup(m => m.Map<StatusResponseDto>(status)).Returns(dto);
+        _mapperMock.Setup(m => m.Map<StatusResponse>(status)).Returns(dto);
 
         var query = new GetStatusByIdQuery(1);
 
@@ -42,7 +42,7 @@ public class GetStatusByIdQueryHandlerTest
         Assert.Equal(dto.Description, result.Description);
         _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()),
             Times.Once);
-        _mapperMock.Verify(m => m.Map<StatusResponseDto>(status), Times.Once);
+        _mapperMock.Verify(m => m.Map<StatusResponse>(status), Times.Once);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class GetStatusByIdQueryHandlerTest
 
         // Assert
         Assert.Null(result);
-        _mapperMock.Verify(m => m.Map<StatusResponseDto>(It.IsAny<Status>()), Times.Never);
+        _mapperMock.Verify(m => m.Map<StatusResponse>(It.IsAny<Status>()), Times.Never);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class GetStatusByIdQueryHandlerTest
                        .ReturnsAsync(country);
 
         // Simulamos que el mapper de Mapster falla
-        _mapperMock.Setup(m => m.Map<StatusResponseDto>(country))
+        _mapperMock.Setup(m => m.Map<StatusResponse>(country))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
         var query = new GetStatusByIdQuery(1);
@@ -132,6 +132,6 @@ public class GetStatusByIdQueryHandlerTest
 
         // Assert
         Assert.Null(result);
-        _mapperMock.Verify(m => m.Map<StatusResponseDto>(It.IsAny<Status>()), Times.Never);
+        _mapperMock.Verify(m => m.Map<StatusResponse>(It.IsAny<Status>()), Times.Never);
     }
 }

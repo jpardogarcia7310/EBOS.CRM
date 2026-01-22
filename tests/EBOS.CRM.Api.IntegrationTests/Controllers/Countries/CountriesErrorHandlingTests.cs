@@ -18,6 +18,6 @@ public class CountriesErrorHandlingTests(CustomWebApplicationFactory factory) : 
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(404);
+        problem.Status.Should().Be(404);
     }
 }

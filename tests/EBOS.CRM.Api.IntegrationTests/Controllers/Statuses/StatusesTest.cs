@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
-using EBOS.CRM.Application.Features.Statuses.Dtos;
+using EBOS.CRM.Application.Contracts.Responses;
 using FluentAssertions;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.Statuses;
@@ -16,7 +16,7 @@ public class StatusesTest(CustomWebApplicationFactory factory) : IClassFixture<C
         var response = await _client.GetAsync("/api/v1/Statuses");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var statuses = await response.Content.ReadFromJsonAsync<List<StatusResponseDto>>();
+        var statuses = await response.Content.ReadFromJsonAsync<List<StatusResponse>>();
         statuses.Should().NotBeNull();
         statuses.Should().NotBeEmpty();
     }
@@ -27,7 +27,7 @@ public class StatusesTest(CustomWebApplicationFactory factory) : IClassFixture<C
         var response = await _client.GetAsync("/api/v1/Statuses/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var status = await response.Content.ReadFromJsonAsync<StatusResponseDto>();
+        var status = await response.Content.ReadFromJsonAsync<StatusResponse>();
         status.Should().NotBeNull();
         status.Description.Should().NotBeNullOrEmpty();
     }

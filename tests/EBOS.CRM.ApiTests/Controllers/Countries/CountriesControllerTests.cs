@@ -1,7 +1,7 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dtos;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
+using EBOS.CRM.Application.Contracts.Responses;
 
 namespace EBOS.CRM.ApiTests.Controllers.Countries;
 
@@ -17,7 +17,7 @@ public class CountriesControllerTests(WebApplicationFactory<Program> factory) :
         var response = await _client.GetAsync("/api/v1/countries");
         response.EnsureSuccessStatusCode();
 
-        var countries = await response.Content.ReadFromJsonAsync<IEnumerable<CountryResponseDto>>();
+        var countries = await response.Content.ReadFromJsonAsync<IEnumerable<CountryResponse>>();
         Assert.NotNull(countries);
         Assert.NotEmpty(countries);
     }
@@ -28,7 +28,7 @@ public class CountriesControllerTests(WebApplicationFactory<Program> factory) :
         var response = await _client.GetAsync("/api/v1/countries/1");
         response.EnsureSuccessStatusCode();
 
-        var country = await response.Content.ReadFromJsonAsync<CountryResponseDto>();
+        var country = await response.Content.ReadFromJsonAsync<CountryResponse>();
         Assert.NotNull(country);
         Assert.Equal(1, country.Id);
     }

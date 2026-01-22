@@ -18,7 +18,7 @@ public class ErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFix
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(404);
+        problem.Status.Should().Be(404);
         problem.Title.Should().Be("Resource not found");
     }
 
@@ -31,7 +31,7 @@ public class ErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFix
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(400);
+        problem.Status.Should().Be(400);
         problem.Title.Should().Be("One or more validation errors occurred.");
     }
 }

@@ -8,24 +8,24 @@ namespace EBOS.CRM.Infrastructure.Repositories;
 public class BaseRepository<T> : IUnitOfWork where T : class
 {
     private readonly CrmDbContext _context;
-    protected readonly DbSet<T> DbSet;
+    private readonly DbSet<T> _dbSet;
     private IDbContextTransaction? _currentTransaction;
 
     public BaseRepository(CrmDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        DbSet = _context.Set<T>();
+        _dbSet = _context.Set<T>();
     }
 
     #region Commands
     public virtual async Task AddAsync(T entity, CancellationToken cancellationToken = default)
     {
-        await DbSet.AddAsync(entity, cancellationToken);
+        await _dbSet.AddAsync(entity, cancellationToken);
     }
 
     public virtual Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
-        DbSet.Update(entity);
+        _dbSet.Update(entity);
         return Task.CompletedTask;
     }
 
@@ -34,11 +34,11 @@ public class BaseRepository<T> : IUnitOfWork where T : class
         if (entity is ISoftDeletable softDeletable)
         {
             softDeletable.Erased = true;
-            DbSet.Update(entity);
+            _dbSet.Update(entity);
         }
         else
         {
-            DbSet.Remove(entity);
+            _dbSet.Remove(entity);
         }
 
         return Task.CompletedTask;
@@ -48,13 +48,13 @@ public class BaseRepository<T> : IUnitOfWork where T : class
     #region Queries
     public virtual async Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var result = await DbSet.FindAsync([id], cancellationToken);
+        var result = await _dbSet.FindAsync([id], cancellationToken);
         return result;
     }
 
     public virtual async Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await DbSet.AsNoTracking().ToListAsync(cancellationToken);
+        return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
     }
     #endregion
 

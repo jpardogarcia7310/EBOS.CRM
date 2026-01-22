@@ -8,7 +8,7 @@ public class GetStatusByIdQueryValidator : AbstractValidator<GetStatusByIdQuery>
     {
         RuleFor(x => x.Id)
             .GreaterThan(0)
-            .WithMessage("El identificador debe ser un número entero positivo mayor que 0.")
+            .WithMessage("The identifier must be a positive integer greater than 0.")
             .WithErrorCode("VAL_ID_POSITIVE");
     }
 }

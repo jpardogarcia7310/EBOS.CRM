@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using MediatR;
@@ -17,11 +17,11 @@ public class StatusesController(IMediator mediator) : ControllerBase
     [HttpGet("{id:long}")]
     [MapToApiVersion("1.0")]
     [MapToApiVersion("2.0")]
-    [ProducesResponseType(typeof(StatusResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(StatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
     {
         var dto = await mediator.Send(new GetStatusByIdQuery(id), cancellationToken);
         if (dto is null)
@@ -40,9 +40,9 @@ public class StatusesController(IMediator mediator) : ControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [MapToApiVersion("2.0")]
-    [ProducesResponseType(typeof(ICollection<StatusResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ICollection<StatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetAllStatusesQuery(), cancellationToken));
     }

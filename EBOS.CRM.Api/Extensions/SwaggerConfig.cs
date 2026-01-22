@@ -14,7 +14,7 @@ public static class SwaggerConfig
         });
         services.AddVersionedApiExplorer(options =>
         {
-            options.GroupNameFormat = "'v'VVV"; // genera grupos v1, v2...
+            options.GroupNameFormat = "'v'VVV"; // generates groups v1, v2...
             options.SubstituteApiVersionInUrl = true;
         });
     }
