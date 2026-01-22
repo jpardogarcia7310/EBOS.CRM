@@ -1,12 +1,12 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dtos;
-using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
 
 namespace EBOS.CRM.ApiTests.Controllers.Statuses;
 
-public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>> // Program.cs de tu API
+public class StatusesControllerTest(WebApplicationFactory<Program> factory) : 
+    IClassFixture<WebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -30,7 +30,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IC
 
         var status = await response.Content.ReadFromJsonAsync<StatusResponseDto>();
         Assert.NotNull(status);
-        Assert.Equal(1, status!.Id);
+        Assert.Equal(1, status.Id);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IC
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        // Simulación: endpoint especial que fuerza fallo de DB (ejemplo: /api/v1/statuses/simulate-db-failure)
+        // Simulation: special endpoint that forces a DB failure (example: /api/v1/statuses/simulate-db-failure)
         var response = await _client.GetAsync("/api/v1/statuses/simulate-db-failure");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -54,7 +54,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IC
     [Fact]
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
-        // Simulación: endpoint que fuerza timeout de red
+        // Simulation: endpoint that forces network timeout
         var response = await _client.GetAsync("/api/v1/statuses/simulate-timeout");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -63,11 +63,11 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IC
     [Fact]
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
-        // Simulación: primer intento falla (DB caída), segundo intento recupera
+        // Simulation: first attempt fails (DB drops), second attempt recovers
         var response1 = await _client.GetAsync("/api/v1/statuses/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        // Esperamos que el sistema aplique retry/circuit breaker y se recupere
+        // We expect the system to apply a retry/circuit breaker and recover.
         var response2 = await _client.GetAsync("/api/v1/statuses");
         response2.EnsureSuccessStatusCode();
     }
@@ -78,7 +78,7 @@ public class StatusesControllerTest(WebApplicationFactory<Program> factory) : IC
         var response1 = await _client.GetAsync("/api/v1/statuses/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        // Segundo intento debería recuperarse
+        // Second attempt should recover
         var response2 = await _client.GetAsync("/api/v1/statuses");
         response2.EnsureSuccessStatusCode();
     }

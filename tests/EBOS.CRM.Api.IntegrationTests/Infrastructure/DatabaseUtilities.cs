@@ -8,22 +8,22 @@ namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 public static class DatabaseUtilities
 {
     /// <summary>
-    /// Limpia la tabla Countries y resetea el identity.
-    /// Se ejecuta sin transacciones explícitas para evitar conflictos con SqlServerRetryingExecutionStrategy.
+    /// Clear the Countries table and reset the identity.
+    /// It runs without explicit transactions to avoid conflicts with SqlServerRetryingExecutionStrategy.
     /// </summary>
     public static async Task ResetCountriesAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
 
-        // Ejecutamos directamente los comandos de limpieza
+        // We directly execute the cleaning commands
         await db.Database.ExecuteSqlRawAsync("DELETE FROM dbo.Countries;");
         await db.Database.ExecuteSqlRawAsync("DBCC CHECKIDENT('dbo.Countries', RESEED, 0);");
     }
 
     /// <summary>
-    /// Limpia todas las tablas de la base de datos de pruebas.
-    /// Útil para escenarios de integración donde se necesita un estado inicial limpio.
+    /// Clean all tables in the test database.
+    /// Useful for integration scenarios where a clean initial state is needed.
     /// </summary>
     public static async Task ResetAllAsync(IServiceProvider services)
     {
@@ -37,14 +37,14 @@ public static class DatabaseUtilities
         cmd.CommandText = @"
             DELETE FROM dbo.Countries;
             DBCC CHECKIDENT('dbo.Countries', RESEED, 0);
-            -- Aquí puedes añadir más tablas si lo necesitas
+            -- You can add more tables here if needed
         ";
 
         await cmd.ExecuteNonQueryAsync();
     }
 
     /// <summary>
-    /// Aplica migraciones o EnsureCreated para garantizar que el esquema está listo.
+    /// Apply migrations or EnsureCreated to guarantee that the schema is ready.
     /// </summary>
     public static void EnsureDatabaseReady(IServiceProvider services)
     {

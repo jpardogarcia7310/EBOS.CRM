@@ -1,17 +1,11 @@
-﻿using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
-using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
+﻿using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Statuses.Queries.GetStatusById;
 
 public class GetStatusByIdQueryValidatorTest
 {
-    private readonly GetStatusByIdQueryValidator _validator;
-
-    public GetStatusByIdQueryValidatorTest()
-    {
-        _validator = new GetStatusByIdQueryValidator();
-    }
+    private readonly GetStatusByIdQueryValidator _validator = new();
 
     [Fact]
     public void Validate_PositiveId_Passes()
@@ -38,7 +32,7 @@ public class GetStatusByIdQueryValidatorTest
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
               .WithErrorCode("VAL_ID_POSITIVE")
-              .WithErrorMessage("El identificador debe ser un número entero positivo mayor que 0.");
+              .WithErrorMessage("The identifier must be a positive integer greater than 0.");
     }
 
     [Fact]
@@ -53,7 +47,7 @@ public class GetStatusByIdQueryValidatorTest
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
               .WithErrorCode("VAL_ID_POSITIVE")
-              .WithErrorMessage("El identificador debe ser un número entero positivo mayor que 0.");
+              .WithErrorMessage("The identifier must be a positive integer greater than 0.");
     }
 
     [Fact]

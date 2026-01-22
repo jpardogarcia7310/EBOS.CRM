@@ -9,16 +9,16 @@ public class MapperFixture
 
     public MapperFixture()
     {
-        // Crear configuración de Mapster
+        // Create Mapster configuration
         var config = new TypeAdapterConfig();
 
-        // Escanear automáticamente todas las clases que implementan IRegister (ej. MappingCountry)
+        // Automatically scan all classes that implement IRegister (e.g., MappingCountry)
         config.Scan(AppDomain.CurrentDomain.GetAssemblies());
 
-        // Compilar la configuración
+        // Compile the configuration
         config.Compile();
 
-        // Construir el mapper pasando null como IServiceProvider
+        // Build the mapper, passing null as IServiceProvider
         Mapper = new ServiceMapper(null, config);
     }
 }

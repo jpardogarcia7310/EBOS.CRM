@@ -1,6 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Countries.Dtos;
-using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
-using EBOS.CRM.Application.Features.Statuses.Dtos;
+﻿using EBOS.CRM.Application.Features.Statuses.Dtos;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
@@ -35,7 +33,8 @@ public class GetAllStatusesQueryHandlerTest
             new(1, "Activo")
         };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(statuses);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
@@ -47,7 +46,8 @@ public class GetAllStatusesQueryHandlerTest
         Assert.NotNull(result);
         Assert.Single(result);
         Assert.Equal("Activo", result.First().Description);
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
+            Times.Once);
         _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponseDto>>(statuses), Times.Once);
     }
 
@@ -58,7 +58,8 @@ public class GetAllStatusesQueryHandlerTest
         var statuses = new List<Status>();
         var dtos = new List<StatusResponseDto>();
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(statuses);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
@@ -120,7 +121,8 @@ public class GetAllStatusesQueryHandlerTest
         var statuses = new List<Status> { new() { Id = 1, Description = null! } };
         var dtos = new List<StatusResponseDto> { new(1, null!) };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(statuses);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponseDto>>(statuses)).Returns(dtos);
 
         var query = new GetAllStatusesQuery();
@@ -139,7 +141,8 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var statuses = new List<Status>();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(statuses);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
 
         var query = new GetAllStatusesQuery();
 
@@ -155,12 +158,14 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var query = new GetAllStatusesQuery();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }

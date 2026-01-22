@@ -1,12 +1,12 @@
-﻿using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+﻿using System.Net;
+using System.Net.Http.Json;
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Application.Features.Statuses.Dtos;
 using FluentAssertions;
-using System.Net;
-using System.Net.Http.Json;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Statuses;
 
-public class EstadosTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class StatusesTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -29,7 +29,7 @@ public class EstadosTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
 
         var status = await response.Content.ReadFromJsonAsync<StatusResponseDto>();
         status.Should().NotBeNull();
-        status!.Description.Should().NotBeNullOrEmpty();
+        status.Description.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

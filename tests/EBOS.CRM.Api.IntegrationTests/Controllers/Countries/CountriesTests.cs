@@ -1,12 +1,12 @@
-﻿using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+﻿using System.Net;
+using System.Net.Http.Json;
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Application.Features.Countries.Dtos;
 using FluentAssertions;
-using System.Net;
-using System.Net.Http.Json;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.Country;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Countries;
 
-public class PaisesTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class CountriesTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -29,7 +29,7 @@ public class PaisesTests(CustomWebApplicationFactory factory) : IClassFixture<Cu
 
         var country = await response.Content.ReadFromJsonAsync<CountryResponseDto>();
         country.Should().NotBeNull();
-        country!.Name.Should().NotBeNullOrEmpty();
+        country.Name.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

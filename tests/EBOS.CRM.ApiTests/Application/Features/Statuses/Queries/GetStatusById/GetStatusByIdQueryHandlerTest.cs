@@ -27,7 +27,8 @@ public class GetStatusByIdQueryHandlerTest
         var status = new Status() { Id = 1, Description = "Activo" };
         var dto = new StatusResponseDto(status.Id, status.Description);
 
-        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(status);
+        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(status);
         _mapperMock.Setup(m => m.Map<StatusResponseDto>(status)).Returns(dto);
 
         var query = new GetStatusByIdQuery(1);
@@ -39,7 +40,8 @@ public class GetStatusByIdQueryHandlerTest
         Assert.NotNull(result);
         Assert.Equal(dto.Id, result.Id);
         Assert.Equal(dto.Description, result.Description);
-        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()),
+            Times.Once);
         _mapperMock.Verify(m => m.Map<StatusResponseDto>(status), Times.Once);
     }
 
@@ -47,7 +49,8 @@ public class GetStatusByIdQueryHandlerTest
     public async Task Handle_NonExistingId_ReturnsNull()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>())).ReturnsAsync((Status?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Status?)null);
         var query = new GetStatusByIdQuery(99);
 
         // Act
@@ -105,20 +108,23 @@ public class GetStatusByIdQueryHandlerTest
     {
         // Arrange
         var query = new GetStatusByIdQuery(42);
-        _repositoryMock.Setup(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>())).ReturnsAsync((Status?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Status?)null);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
     public async Task Handle_NullEntity_DoesNotCallMapper()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync((Status?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Status?)null);
         var query = new GetStatusByIdQuery(1);
 
         // Act

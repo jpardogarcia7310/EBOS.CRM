@@ -29,7 +29,7 @@ public class VersioningTests(CustomWebApplicationFactory factory) : IClassFixtur
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    // Si en el futuro añades v2, puedes habilitar estos tests:
+    // If you add v2 in the future, you can enable these tests:
     //[Fact]
     //public async Task GetAll_V2_Returns_OK()
     //{

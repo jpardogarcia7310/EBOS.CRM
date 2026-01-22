@@ -1,10 +1,10 @@
-﻿using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+﻿using System.Net;
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using FluentAssertions;
-using System.Net;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.Country;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Countries;
 
-public class PaisesConcurrencyTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class CountriesConcurrencyTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 

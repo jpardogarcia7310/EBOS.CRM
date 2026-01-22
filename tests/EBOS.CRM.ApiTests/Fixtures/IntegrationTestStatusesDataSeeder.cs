@@ -13,13 +13,13 @@ public static class IntegrationTestStatusesDataSeeder
         var statuses = new List<Status>
             {
                 new() {
-                    Description  = "Activo"
+                    Description  = "Active"
                 },
                 new() {
-                    Description  = "Moroso"
+                    Description  = "Defaulter"
                 },
                 new() {
-                    Description  = "Suspendido"
+                    Description  = "Suspended"
                 }
             };
 

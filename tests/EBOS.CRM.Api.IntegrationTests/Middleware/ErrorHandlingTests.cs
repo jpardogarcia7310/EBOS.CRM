@@ -6,8 +6,7 @@ using System.Net.Http.Json;
 
 namespace EBOS.CRM.Api.IntegrationTests.Middleware;
 
-public class ErrorHandlingTests(CustomWebApplicationFactory factory)
-    : IClassFixture<CustomWebApplicationFactory>
+public class ErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -26,7 +25,7 @@ public class ErrorHandlingTests(CustomWebApplicationFactory factory)
     [Fact]
     public async Task GetById_Returns_400_WhenIdIsInvalid()
     {
-        // Si tu controlador valida que el ID debe ser positivo
+        // If your controller validates that the ID must be positive
         var response = await _client.GetAsync("/api/v1/Countries/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 

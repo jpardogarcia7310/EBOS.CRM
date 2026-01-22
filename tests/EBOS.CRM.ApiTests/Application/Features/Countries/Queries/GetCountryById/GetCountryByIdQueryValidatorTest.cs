@@ -5,12 +5,7 @@ namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetCountryByI
 
 public class GetCountryByIdValidatorTests
 {
-    private readonly GetCountryByIdQueryValidator _validator;
-
-    public GetCountryByIdValidatorTests()
-    {
-        _validator = new GetCountryByIdQueryValidator();
-    }
+    private readonly GetCountryByIdQueryValidator _validator = new();
 
     [Fact]
     public void Validate_PositiveId_Passes()

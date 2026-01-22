@@ -26,14 +26,16 @@ public class GetAllCountriesQueryHandlerTests
         // Arrange
         var countries = new List<Country>
         {
-            new() { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", InternationalPhoneCode = "34" }
+            new() { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724", 
+                Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", InternationalPhoneCode = "34" }
         };
         var dtos = new List<CountryResponseDto>
         {
             new(1, "España", "ES", "ESP", "724", ".es", "Euro", "EUR", "34")
         };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
         _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries)).Returns(dtos);
 
         var query = new GetAllCountriesQuery();
@@ -45,7 +47,8 @@ public class GetAllCountriesQueryHandlerTests
         Assert.NotNull(result);
         Assert.Single(result);
         Assert.Equal("España", result.First().Name);
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), 
+            Times.Once);
         _mapperMock.Verify(m => m.Map<IEnumerable<CountryResponseDto>>(countries), Times.Once);
     }
 
@@ -56,7 +59,8 @@ public class GetAllCountriesQueryHandlerTests
         var countries = new List<Country>();
         var dtos = new List<CountryResponseDto>();
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
         _mapperMock.Setup(m => m.Map<IEnumerable<CountryResponseDto>>(countries)).Returns(dtos);
 
         var query = new GetAllCountriesQuery();
@@ -137,7 +141,8 @@ public class GetAllCountriesQueryHandlerTests
     {
         // Arrange
         var countries = new List<Country>();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(countries);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
 
         var query = new GetAllCountriesQuery();
 
@@ -153,12 +158,14 @@ public class GetAllCountriesQueryHandlerTests
     {
         // Arrange
         var query = new GetAllCountriesQuery();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), 
+            Times.Once);
     }
 }

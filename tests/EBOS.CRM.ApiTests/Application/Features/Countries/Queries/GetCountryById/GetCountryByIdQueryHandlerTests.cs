@@ -24,10 +24,15 @@ public class GetCountryByIdQueryHandlerTests
     public async Task Handle_ExistingId_ReturnsMappedDto()
     {
         // Arrange
-        var country = new Country { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", InternationalPhoneCode = "34" };
-        var dto = new CountryResponseDto(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code, country.Iso31661NumCode, country.Domain, country.Currency, country.CurrencyCode, country.InternationalPhoneCode);
+        var country = new Country { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", 
+            Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", 
+            InternationalPhoneCode = "34" };
+        var dto = new CountryResponseDto(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code, 
+            country.Iso31661NumCode, country.Domain, country.Currency, country.CurrencyCode, 
+            country.InternationalPhoneCode);
 
-        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(country);
+        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(country);
         _mapperMock.Setup(m => m.Map<CountryResponseDto>(country)).Returns(dto);
 
         var query = new GetCountryByIdQuery(1);
@@ -39,7 +44,8 @@ public class GetCountryByIdQueryHandlerTests
         Assert.NotNull(result);
         Assert.Equal(dto.Id, result.Id);
         Assert.Equal(dto.Name, result.Name);
-        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()), 
+            Times.Once);
         _mapperMock.Verify(m => m.Map<CountryResponseDto>(country), Times.Once);
     }
 
@@ -47,7 +53,8 @@ public class GetCountryByIdQueryHandlerTests
     public async Task Handle_NonExistingId_ReturnsNull()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>())).ReturnsAsync((Country?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country?)null);
         var query = new GetCountryByIdQuery(99);
 
         // Act
@@ -105,20 +112,23 @@ public class GetCountryByIdQueryHandlerTests
     {
         // Arrange
         var query = new GetCountryByIdQuery(42);
-        _repositoryMock.Setup(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>())).ReturnsAsync((Country?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country?)null);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
     public async Task Handle_NullEntity_DoesNotCallMapper()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync((Country?)null);
+        _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country?)null);
         var query = new GetCountryByIdQuery(1);
 
         // Act

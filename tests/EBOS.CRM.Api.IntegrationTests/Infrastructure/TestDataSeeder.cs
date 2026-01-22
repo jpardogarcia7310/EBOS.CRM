@@ -7,8 +7,8 @@ namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 public static class TestDataSeeder
 {
     /// <summary>
-    /// Seeder idempotente: comprueba existencia por Iso31661A2Code antes de insertar.
-    /// Añade validación previa y captura excepciones para exponer la causa real.
+    /// Idempotent seeder: checks for existence by Iso31661A2Code before inserting.
+    /// Add pre-validation and exception capture to expose the real cause.
     /// </summary>
     public static async Task SeedCountriesAsync(CrmDbContext db)
     {
@@ -24,7 +24,7 @@ public static class TestDataSeeder
         {
             var exists = await db.Countries.AnyAsync(x => x.Iso31661A2Code == c.A2);
             if (exists) continue;
-            // Validación previa para evitar SaveChanges fallidos y dar mensajes claros
+            // Prior validation to avoid failed SaveChanges and provide clear messages
             var validation = ValidateSeedRow(c.Name, c.A2, c.A3, c.Num, c.Domain, c.CurrencyCode);
             if (validation.Any())
             {
