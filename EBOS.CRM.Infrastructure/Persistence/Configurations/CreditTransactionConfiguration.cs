@@ -44,12 +44,10 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
 
         });
         
+        builder.HasIndex(ct => new { ct.Date, ct.CreditAccountId })
+            .HasDatabaseName("IX_CreditTransaction_Date_Account");
         builder.HasIndex(ct => new { ct.CreditAccountId, ct.Date })
             .HasDatabaseName("IX_CreditTransaction_Account_Date");
-        builder.HasIndex(ct => ct.Date) 
-            .HasDatabaseName("IX_CreditTransaction_Date"); 
-        builder.HasIndex(ct => ct.CreditAccountId) 
-            .HasDatabaseName("IX_CreditTransaction_Account"); 
 
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
@@ -58,7 +56,7 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
         builder.HasOne(m => m.CreditAccount)
             .WithMany(c => c.CreditTransactions)
             .HasForeignKey(m => m.CreditAccountId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Index for FK: CreditTransactions.CreditAccountId
         builder.HasIndex(m => m.CreditAccountId)

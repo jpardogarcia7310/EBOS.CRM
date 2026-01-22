@@ -21,9 +21,5 @@ public class IdentificationTypeConfiguration : IEntityTypeConfiguration<Identifi
             .HasMaxLength(200);
         builder.Property(t => t.Erased)
             .IsRequired();
-
-        builder.HasIndex(it => it.Code)
-            .IsUnique()
-            .HasDatabaseName("IX_IdentificationType_Code_Unique");
     }
 }

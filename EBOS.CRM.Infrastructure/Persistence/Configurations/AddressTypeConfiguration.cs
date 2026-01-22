@@ -22,23 +22,5 @@ public class AddressTypeConfiguration : IEntityTypeConfiguration<AddressType>
             .HasMaxLength(200);
         builder.Property(t => t.Erased)
             .IsRequired();
-        
-        builder.ToTable("AddressTypes", "CRM", table =>
-        {
-            table.HasCheckConstraint( "CK_AddressType_Code_NotEmpty", "LEN([Code]) > 0" );
-        }); 
-        
-        builder.HasIndex(at => at.Code) 
-            .IsUnique() 
-            .HasDatabaseName("IX_AddressType_Code_Unique");
-        
-        // ------------------------------------------------------------
-        // One-to-N: Address (principal) → AddressType (dependent)
-        // FK: Address.AddressTypeId
-        // ------------------------------------------------------------
-        builder.HasMany(at => at.Addresses) 
-            .WithOne(a => a.AddressType) 
-            .HasForeignKey(a => a.AddressTypeId) 
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

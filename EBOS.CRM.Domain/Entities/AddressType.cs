@@ -7,10 +7,8 @@ public class AddressType : ErasableEntity
 {
     [Required]
     [MaxLength(50)]
-    public string Code { get; set; } = null!; 
+    public string Code { get; set; } = null!;        // Ej: MAIN, BILLING, SHIPPING
     [Required]
-    [MaxLength(200)]
-    public string Description { get; set; } = null!; 
-    
-    public ICollection<Address> Addresses { get; set; } = new List<Address>();
+    [MaxLength(50)]
+    public string Description { get; set; } = null!; // Ej: Dirección principal
 }

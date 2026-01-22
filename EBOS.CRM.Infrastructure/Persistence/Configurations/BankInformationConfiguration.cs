@@ -26,12 +26,12 @@ public class BankInformationConfiguration : IEntityTypeConfiguration<BankInforma
         builder.Property(c => c.Erased)
             .IsRequired(); 
         
-        builder.HasIndex(b => b.CustomerId)
-            .IsUnique(); 
-        
         // ------------------------------------------------------------
         // One-to-One: BankInformation (principal) → Customer (dependent)
         // FK: BankInformation.CustomerId
+        //
+        // BankInformation owns the FK, so the relationship is configured
+        // primarily in BankInformationConfiguration.
         // ------------------------------------------------------------
         builder.HasOne(bi => bi.Customer)
             .WithOne(c => c.BankInformation)

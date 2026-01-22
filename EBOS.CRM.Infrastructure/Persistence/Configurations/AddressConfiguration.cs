@@ -72,10 +72,6 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                       "CK_Address_IsPrimary_Boolean",
                       "[IsPrimary] IN (0, 1)"
               );
-              a.HasCheckConstraint( 
-                     "CK_Address_Primary_NotErasable", 
-                     "NOT ([IsPrimary] = 1 AND [Erased] = 1)"
-              );
         });
 
         builder.HasIndex(a => new { a.City, a.StateOrProvince })
@@ -85,7 +81,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         builder.HasIndex(a => new { a.CustomerId, a.IsPrimary }) 
                .IsUnique() 
                .HasFilter("[IsPrimary] = 1") 
-               .HasDatabaseName("IX_Address_Unique_Primary_Per_Customer"); 
+               .HasDatabaseName("IX_Address_Unique_Primary"); 
         
         // ------------------------------------------------------------
         // One-to-Many: Customer (principal) → Address (dependent)
@@ -95,7 +91,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .WithMany(c => c.Addresses)
                .HasForeignKey(d => d.CustomerId)
                .OnDelete(DeleteBehavior.Restrict);
-
+        // Index for FK: Address.CustomerId
         builder.HasIndex(d => d.CustomerId)
                .HasDatabaseName("IX_Address_CustomerId");
 
@@ -107,7 +103,7 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
                .WithMany()
                .HasForeignKey(d => d.CountryId)
                .OnDelete(DeleteBehavior.Restrict);
-
+        // Index for FK: Address.CountryId
         builder.HasIndex(d => d.CountryId)
                .HasDatabaseName("IX_Address_CountryId");
         

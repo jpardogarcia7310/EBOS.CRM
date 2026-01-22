@@ -11,19 +11,18 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         builder.ToTable("CreditAccounts", "CRM");
 
         // Primary Key (BIGINT IDENTITY)
-        builder.HasKey(ca => ca.Id);
-        builder.Property(ca => ca.Id)
+        builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id)
                .ValueGeneratedOnAdd();
 
         // Basic properties
-        builder.Property(ca => ca.MaxAmount)
+        builder.Property(c => c.MaxAmount)
                .IsRequired()
                .HasPrecision(18, 2);
-        builder.Property(ca => ca.UsedAmount)
+        builder.Property(c => c.UsedAmount)
                .IsRequired()
                .HasPrecision(18, 2);
-        builder.Ignore(ca => ca.AvailableAmount); 
-        builder.Property(ca => ca.Erased)
+        builder.Property(c => c.Erased)
                .IsRequired();
 
         builder.ToTable("CreditAccounts", "CRM", ca =>
@@ -42,30 +41,25 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
                );
         });
         
-        builder.HasIndex(ca => ca.CustomerId) 
-               .IsUnique() 
-               .HasDatabaseName("IX_CreditAccount_Customer_Unique");    
-        
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId
         // ------------------------------------------------------------
-        builder.HasOne(ca => ca.Customer)
-               .WithOne(c => c.CreditAccount)
-               .HasForeignKey<CreditAccount>(ca => ca.CustomerId)
+        builder.HasOne(c => c.Customer)
+               .WithOne(cl => cl.CreditAccount)
+               .HasForeignKey<CreditAccount>(c => c.CustomerId)
                .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasIndex(ca => ca.CustomerId)
+        // Index for FK: CreditAccount.CustomerId
+        builder.HasIndex(c => c.CustomerId)
                .HasDatabaseName("IX_CreditAccount_CustomerId");
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
         // FK: CreditTransactions.CreditAccountId
         // ------------------------------------------------------------
-        builder.HasMany(ca => ca.CreditTransactions)
-               .WithOne(ct => ct.CreditAccount)
-               .HasForeignKey(ct => ct.CreditAccountId)
-               .OnDelete(DeleteBehavior.Restrict);
-        
+        builder.HasMany(c => c.CreditTransactions)
+               .WithOne(m => m.CreditAccount)
+               .HasForeignKey(m => m.CreditAccountId)
+               .OnDelete(DeleteBehavior.Cascade);
         // ------------------------------------------------------------
         // One-to-One: CreditAccount (principal) → Customer (dependent)
         // FK: CreditAccount.CustomerId

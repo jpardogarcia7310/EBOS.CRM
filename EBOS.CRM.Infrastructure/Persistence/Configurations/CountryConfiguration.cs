@@ -44,7 +44,7 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                 // Table declaration with its additional constraints (example: check format if desired)
                 // Note: EF does not validate complex expressions in the database; if you want database-level constraints,
                 // you can add CHECK constraints with HasCheckConstraint:
-                builder.ToTable("Countries", "CRM", c =>
+                builder.ToTable("Countries", "EBOS", c =>
                 {
                     c.HasCheckConstraint(
                             "CK_Countries_IsoA2_Length", 
@@ -52,12 +52,6 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                     c.HasCheckConstraint(
                             "CK_Countries_IsoA3_Length", 
                             "LEN([Iso31661A3Code]) = 3");
-                    c.HasCheckConstraint(
-                            "CK_Countries_ISO_Num_Length", 
-                            "LEN([Iso31661NumCode]) >= 1");
-                    c.HasCheckConstraint(
-                            "CK_Country_Domain_Valid", 
-                            "[Domain] LIKE '%.%'");
                     c.HasCheckConstraint(
                             "CK_Country_IsoA2_Uppercase",
                             "UPPER([Iso31661A2Code]) = [Iso31661A2Code]"
@@ -78,21 +72,21 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                 // ------------------------------------------------------------
                 builder.HasIndex(c => c.Iso31661A2Code)
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661A2Code_Unique"); 
+                        .HasDatabaseName("IX_Countries_Iso31661A2Code"); 
                 // ------------------------------------------------------------
                 // Unique index for ISO 3166-1 Alpha-3 code
                 // Ensures each country has a unique 3-letter ISO code
                 // ------------------------------------------------------------
                 builder.HasIndex(c => c.Iso31661A3Code)
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661A3Code_Unique"); 
+                        .HasDatabaseName("IX_Countries_Iso31661A3Code"); 
                 // ------------------------------------------------------------
                 // Unique index for ISO 3166-1 Numeric code
                 // Ensures each country has a unique numeric ISO code
                 // ------------------------------------------------------------
                 builder.HasIndex(c => c.Iso31661NumCode)
                         .IsUnique()
-                        .HasDatabaseName("IX_Countries_Iso31661NumCode_Unique");
+                        .HasDatabaseName("IX_Countries_Iso31661NumCode");
                 // ------------------------------------------------------------
                 // Non-unique index for Name
                 // Improves search performance when filtering by country name
