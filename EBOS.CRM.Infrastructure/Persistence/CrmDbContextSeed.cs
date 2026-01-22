@@ -12,11 +12,11 @@ public static class CrmDbContextSeed
         // Seeding Countries: reduced and validated example.
         if (!await context.Countries.AnyAsync(cancellationToken))
         {
-            await SeedPaises(context, cancellationToken);
+            await SeedCountries(context, cancellationToken);
         }
         if (!await context.Statuses.AnyAsync(cancellationToken))
         {
-            await SeedEstados(context, cancellationToken);
+            await SeedStatuses(context, cancellationToken);
         }
         if (!await context.AddressTypes.AnyAsync(cancellationToken))
         {
@@ -28,7 +28,7 @@ public static class CrmDbContextSeed
         }
     }
 
-    private static async Task SeedEstados(CrmDbContext context, CancellationToken cancellationToken)
+    private static async Task SeedStatuses(CrmDbContext context, CancellationToken cancellationToken)
     {
         var statuses = new List<Status>
         {
@@ -151,7 +151,7 @@ public static class CrmDbContextSeed
         }
     }
 
-    private static async Task SeedPaises(CrmDbContext context, CancellationToken cancellationToken)
+    private static async Task SeedCountries(CrmDbContext context, CancellationToken cancellationToken)
     {
         const string dolarCaribeOriental = "Dólar del Caribe Oriental";
         const string dolarAustraliano = "Dólar australiano";
