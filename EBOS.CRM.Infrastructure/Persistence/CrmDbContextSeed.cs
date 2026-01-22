@@ -33,11 +33,11 @@ public static class CrmDbContextSeed
         var statuses = new List<Status>
         {
             new() {
-                Description = "Activo" },
+                Description = "Active" },
             new() {
-                Description = "Moroso" },
+                Description = "Debtor" },
             new() {
-                Description = "Suspendido" }
+                Description = "Suspended" }
         };
         // Basic validation before insertion
         var invalid = statuses
