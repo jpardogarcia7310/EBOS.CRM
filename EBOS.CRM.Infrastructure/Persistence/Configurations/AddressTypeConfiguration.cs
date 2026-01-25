@@ -20,7 +20,5 @@ public class AddressTypeConfiguration : IEntityTypeConfiguration<AddressType>
         builder.Property(t => t.Description)
             .IsRequired()
             .HasMaxLength(200);
-        builder.Property(t => t.Erased)
-            .IsRequired();
     }
 }

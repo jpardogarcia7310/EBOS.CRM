@@ -26,11 +26,11 @@ public class GetAllStatusesQueryHandlerTest
         // Arrange
         var statuses = new List<Status>
         {
-            new() { Id = 1, Description = "Activo" }
+            new() { Id = 1, Description = "Active" }
         };
         var dtos = new List<StatusResponse>
         {
-            new(1, "Activo")
+            new(1, "Active")
         };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
@@ -45,7 +45,7 @@ public class GetAllStatusesQueryHandlerTest
         // Assert
         Assert.NotNull(result);
         Assert.Single(result);
-        Assert.Equal("Activo", result.First().Description);
+        Assert.Equal("Active", result.First().Description);
         _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
         _mapperMock.Verify(m => m.Map<IEnumerable<StatusResponse>>(statuses), Times.Once);
@@ -99,11 +99,11 @@ public class GetAllStatusesQueryHandlerTest
     public async Task Handle_MapperConfigurationInvalid_ThrowsMappingException()
     {
         // Arrange
-        var statuses = new List<Status> { new() { Id = 1, Description = "Activo" } };
+        var statuses = new List<Status> { new() { Id = 1, Description = "Active" } };
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                        .ReturnsAsync(statuses);
 
-        // Simulamos que el mapper de Mapster falla
+        // We simulated that the Mapster mapper failed
         _mapperMock.Setup(m => m.Map<IEnumerable<StatusResponse>>(statuses))
                    .Throws(new InvalidOperationException("Mapping failed"));
 

@@ -3,7 +3,7 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class AddressType : ErasableEntity
+public class AddressType : BaseEntity
 {
     [Required]
     [MaxLength(50)]
