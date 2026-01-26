@@ -9,7 +9,7 @@ public class IndividualCustomerConfiguration : IEntityTypeConfiguration<Individu
     public void Configure(EntityTypeBuilder<IndividualCustomer> builder)
     {
         // This entity participates in TPH inheritance, so no table mapping here.
-        // Table is defined in ClienteConfiguration.
+        // Table is defined in CustomerConfiguration.
 
         // Basic properties
         builder.Property(c => c.FirstName)

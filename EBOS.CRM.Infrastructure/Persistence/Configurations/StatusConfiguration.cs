@@ -8,7 +8,7 @@ public class StatusConfiguration : IEntityTypeConfiguration<Status>
 {
     public void Configure(EntityTypeBuilder<Status> builder)
     {
-        builder.ToTable("Statuses", "CRM");
+        builder.ToTable("Statuses", "EBOS");
 
         // Primary Key (BIGINT IDENTITY)
         builder.HasKey(e => e.Id);
