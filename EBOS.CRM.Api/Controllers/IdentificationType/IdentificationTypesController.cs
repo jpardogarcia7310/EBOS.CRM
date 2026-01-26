@@ -1,7 +1,6 @@
 ﻿using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAllAddressesType;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
+using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +37,6 @@ public class IdentificationTypesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [MapToApiVersion("1.0")]
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(ICollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

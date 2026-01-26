@@ -3,16 +3,16 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 
-namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeById;
+namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
-public class GetIdentificationTypeQueryHandler(IIdentificationTypeRepository repository, IMapper mapper) 
-    : IRequestHandler<GetIdentificationTypeQuery, IdentificationTypeResponse?>
+public class GetIdentificationTypeByIdQueryHandler(IIdentificationTypeRepository repository, IMapper mapper) 
+    : IRequestHandler<GetIdentificationTypeByIdQuery, IdentificationTypeResponse?>
 {
     private readonly IIdentificationTypeRepository _repository = repository ?? 
                                                                  throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeQuery request, CancellationToken cancellationToken)
+    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeByIdQuery request, CancellationToken cancellationToken)
     {
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();

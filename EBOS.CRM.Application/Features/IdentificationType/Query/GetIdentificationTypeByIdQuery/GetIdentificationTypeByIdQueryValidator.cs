@@ -1,11 +1,11 @@
 ﻿using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 using FluentValidation;
 
-namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeById;
+namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
-public class GetIdentificationTypeQueryValidator : AbstractValidator<GetAddressTypeByIdQuery>
+public class GetIdentificationTypeByIdQueryValidator : AbstractValidator<GetAddressTypeByIdQuery>
 {
-    public GetIdentificationTypeQueryValidator()
+    public GetIdentificationTypeByIdQueryValidator()
     {
         RuleFor(x => x.Id)
             .GreaterThan(0)
