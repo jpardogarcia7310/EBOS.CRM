@@ -10,5 +10,5 @@ public class IdentificationType : ErasableEntity
     public string Code { get; set; } = null!;        // Ej: DNI, NIF, CIF
     [Required]
     [MaxLength(200)]
-    public string Description { get; set; } = null!; // Ej: Documento Nacional de Identidad
+    public string Description { get; set; } = null!; 
 }

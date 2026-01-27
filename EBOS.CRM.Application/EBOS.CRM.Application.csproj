@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Requests\" />
     <Folder Include="Features\Countries\Queries\GetAllCountries\" />
   </ItemGroup>
 

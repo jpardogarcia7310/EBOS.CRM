@@ -1,5 +1,4 @@
 ﻿using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAllAddressesType;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;

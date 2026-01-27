@@ -11,7 +11,7 @@ public class GetAllStatusesQueryHandler(IStatusRepository repository, IMapper ma
     public async Task<IEnumerable<StatusResponse>> Handle(GetAllStatusesQuery request, 
         CancellationToken cancellationToken)
     {
-        // 👇 This throws an OperationCancelledException if the token has already been cancelled.
+        // 👇 This throws an OperationCancelledException if the token has already been canceled.
         cancellationToken.ThrowIfCancellationRequested();
 
         var entities = await repository.GetAllAsync(cancellationToken);

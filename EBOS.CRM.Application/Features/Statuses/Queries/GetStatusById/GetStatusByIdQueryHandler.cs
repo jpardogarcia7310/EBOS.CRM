@@ -10,7 +10,7 @@ public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper map
 {
     public async Task<StatusResponse?> Handle(GetStatusByIdQuery request, CancellationToken cancellationToken)
     {
-        // 👇 It throws OperationCancelledException if the token has already been cancelled
+        // 👇 It throws OperationCancelledException if the token has already been canceled
         cancellationToken.ThrowIfCancellationRequested();
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);

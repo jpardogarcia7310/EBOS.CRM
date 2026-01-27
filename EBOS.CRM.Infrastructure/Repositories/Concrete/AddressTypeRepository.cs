@@ -6,22 +6,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
-public class AddressTypeRepository : IAddressTypeRepository
+public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepository
 {
-    private readonly CrmDbContext _context;
-    private readonly DbSet<AddressType> _dbSet;
+    private readonly DbSet<AddressType> _dbSet = context.Set<AddressType>();
     private IDbContextTransaction? _currentTransaction;
-
-    public AddressTypeRepository(CrmDbContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dbSet = _context.Set<AddressType>();
-    }
+    
 
     #region Queries
     public async Task<AddressType?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+        return await _dbSet.FirstOrDefaultAsync(at => at.Id == id, cancellationToken);
     }
 
     public async Task<ICollection<AddressType>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -33,14 +27,14 @@ public class AddressTypeRepository : IAddressTypeRepository
     #region IUnitOfWork
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        return await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_currentTransaction != null)
             return;
-        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken = default)
