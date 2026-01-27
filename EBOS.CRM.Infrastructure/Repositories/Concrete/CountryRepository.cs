@@ -6,17 +6,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
-public class CountryRepository : ICountryRepository
+public class CountryRepository(CrmDbContext context) :  ICountryRepository
 {
-    private readonly CrmDbContext _context;
-    private readonly DbSet<Country> _dbSet;
+    private readonly DbSet<Country> _dbSet = context.Set<Country>();
     private IDbContextTransaction? _currentTransaction;
-
-    public CountryRepository(CrmDbContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dbSet = _context.Set<Country>();
-    }
+    
 
     #region Queries
     public async Task<Country?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -33,14 +27,14 @@ public class CountryRepository : ICountryRepository
     #region IUnitOfWork
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        return await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_currentTransaction != null)
             return;
-        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken = default)
