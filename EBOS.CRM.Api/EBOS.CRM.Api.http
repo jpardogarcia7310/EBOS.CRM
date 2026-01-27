@@ -1,0 +1,6 @@
+@EBOS.CRM.Api_HostAddress = http://localhost:5003
+
+GET {{EBOS.CRM.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
