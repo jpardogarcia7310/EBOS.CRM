@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
-public class IdentificationTypeRepository : IIdentificationTypeRepository
+public class IdentificationTypeRepository(CrmDbContext context) : IIdentificationTypeRepository
 {
-    private readonly CrmDbContext _context;
-    private readonly DbSet<IdentificationType> _dbSet;
+    private readonly DbSet<IdentificationType> _dbSet = context.Set<IdentificationType>();
     private IDbContextTransaction? _currentTransaction;
-
-    public IdentificationTypeRepository(CrmDbContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dbSet = _context.Set<IdentificationType>();
-    }
-
+    
     #region Queries
     public async Task<IdentificationType?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
@@ -33,14 +26,14 @@ public class IdentificationTypeRepository : IIdentificationTypeRepository
     #region IUnitOfWork
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        return await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_currentTransaction != null)
             return;
-        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken = default)
