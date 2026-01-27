@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+﻿using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Text.Json;
 
 namespace EBOS.CRM.Api.Validation;
 
@@ -25,25 +25,23 @@ public class FluentValidationActionFilter : IAsyncActionFilter
 
             var validationContextType = typeof(ValidationContext<>).MakeGenericType(argType);
             var validationContext = Activator.CreateInstance(validationContextType, argValue) as IValidationContext;
-            var result = validator.Validate(validationContext!);
+            var result = await validator.ValidateAsync(validationContext!);
 
-            if (result != null && result.Errors?.Any() == true)
+            if (result == null || result.Errors?.Any() != true) continue;
+            foreach (var f in result.Errors)
             {
-                foreach (var f in result.Errors)
+                var prop = NormalizePropertyName(f.PropertyName);
+                context.ModelState.AddModelError(prop, f.ErrorMessage ?? "Invalid value");
+
+                var code = string.IsNullOrWhiteSpace(f.ErrorCode) ? null : f.ErrorCode;
+                var entry = new { message = f.ErrorMessage ?? "Invalid value", code };
+
+                if (!failuresMap.TryGetValue(prop, out var list))
                 {
-                    var prop = NormalizePropertyName(f.PropertyName);
-                    context.ModelState.AddModelError(prop, f.ErrorMessage ?? "Invalid value");
-
-                    var code = string.IsNullOrWhiteSpace(f.ErrorCode) ? null : f.ErrorCode;
-                    var entry = new { message = f.ErrorMessage ?? "Invalid value", code };
-
-                    if (!failuresMap.TryGetValue(prop, out var list))
-                    {
-                        list = [];
-                        failuresMap[prop] = list;
-                    }
-                    list.Add(entry);
+                    list = [];
+                    failuresMap[prop] = list;
                 }
+                list.Add(entry);
             }
         }
 

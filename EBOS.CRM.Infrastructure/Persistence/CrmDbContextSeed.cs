@@ -9,21 +9,156 @@ public static class CrmDbContextSeed
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        // Seeding Countries: ejemplo reducido y validado.
+        // Seeding Countries: reduced and validated example.
         if (!await context.Countries.AnyAsync(cancellationToken))
         {
             await SeedCountries(context, cancellationToken);
+        }
+        if (!await context.Statuses.AnyAsync(cancellationToken))
+        {
+            await SeedStatuses(context, cancellationToken);
+        }
+        if (!await context.AddressTypes.AnyAsync(cancellationToken))
+        {
+            await SeedAddressTypes(context, cancellationToken);
+        }
+        if (!await context.IdentificationTypes.AnyAsync(cancellationToken))
+        {
+            await SeedIdentificationTypes(context, cancellationToken);
+        }
+    }
+
+    private static async Task SeedStatuses(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var statuses = new List<Status>
+        {
+            new() {
+                Description = "Active" },
+            new() {
+                Description = "Debtor" },
+            new() {
+                Description = "Suspended" }
+        };
+        // Basic validation before insertion
+        var invalid = statuses
+            .Select((s, i) => new { Index = i, Status = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.Status.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid status entries. Please validate the seed source.");
+        }
+
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(statuses, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    private static async Task SeedAddressTypes(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var addressTypes = new List<AddressType>
+        {
+            new() {
+                Code = "DNI",
+                Description = "Documento Nacional de Identidad" },
+            new() {
+                Code = "NIE",
+                Description = "Numero de Identificación de Extranjeros" },
+            new() {
+                Code = "NIF",
+                Description = "Numero de Identificación Fiscal" },
+            new() {
+                Code = "PASS",
+                Description = "Pasaporte"
+            }
+        };
+        // Basic validation before insertion
+        var invalid = addressTypes
+            .Select((s, i) => new { Index = i, AddressType = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.AddressType.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid AddressTypes entries. " +
+                                                "Please validate the seed source.");
+        }
+
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(addressTypes, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+    private static async Task SeedIdentificationTypes(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var identificationTypes = new List<IdentificationType>
+        {
+            new() {
+                Code = "DNI",
+                Description = "Documento Nacional de Identidad" },
+            new() {
+                Code = "NIE",
+                Description = "Numero de Identificación de Extranjeros" },
+            new() {
+                Code = "NIF",
+                Description = "Numero de Identificación Fiscal" },
+            new() {
+                Code = "PASS",
+                Description = "Pasaporte"
+            }
+        };
+        // Basic validation before insertion
+        var invalid = identificationTypes
+            .Select((s, i) => new { Index = i, IdentificationType = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.IdentificationType.Description))
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid IdentificationTypes entries. " +
+                                                "Please validate the seed source.");
+        }
+
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await context.AddRangeAsync(identificationTypes, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await tx.RollbackAsync(cancellationToken);
+            throw;
         }
     }
 
     private static async Task SeedCountries(CrmDbContext context, CancellationToken cancellationToken)
     {
-        const string DolarCaribeOriental = "Dólar del Caribe Oriental";
-        const string DolarAustraliano = "Dólar australiano";
-        const string FrancoAfricaOccidental = "Franco CFA de África Occidental";
-        const string FrancoAfricaCentral = "Franco CFA de África Central";
-        const string DolarEstadounidense = "Dólar estadounidense";
-        const string DolarNeozelandes = "Dólar neozelandés";
+        const string dolarCaribeOriental = "Dólar del Caribe Oriental";
+        const string dolarAustraliano = "Dólar australiano";
+        const string francoAfricaOccidental = "Franco CFA de África Occidental";
+        const string francoAfricaCentral = "Franco CFA de África Central";
+        const string dolarEstadounidense = "Dólar estadounidense";
+        const string dolarNeozelandes = "Dólar neozelandés";
 
         var countries = new List<Country>
         {
@@ -54,7 +189,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Antigua y Barbuda",
                 Iso31661A2Code = "AG", Iso31661A3Code = "ATG", Iso31661NumCode = "028", Domain = ".ag", InternationalPhoneCode = "1-268",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Arabia Saudita",
                 Iso31661A2Code = "SA", Iso31661A3Code = "SAU", Iso31661NumCode = "682", Domain = ".sa", InternationalPhoneCode = "216",
@@ -78,7 +213,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Australia",
                 Iso31661A2Code = "AU", Iso31661A3Code = "AUS", Iso31661NumCode = "036", Domain = ".au", InternationalPhoneCode = "61",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Austria",
                 Iso31661A2Code = "AT", Iso31661A3Code = "AUT", Iso31661NumCode = "040", Domain = ".at", InternationalPhoneCode = "43",
@@ -123,7 +258,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Benín",
                 Iso31661A2Code = "BJ", Iso31661A3Code = "BEN", Iso31661NumCode = "204", Domain = ".bj", InternationalPhoneCode = "229",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Bermudas",
                 Iso31661A2Code = "BM", Iso31661A3Code = "BMU", Iso31661NumCode = "060", Domain = ".bm", InternationalPhoneCode = "1-441",
@@ -176,7 +311,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Camerún",
                 Iso31661A2Code = "CM", Iso31661A3Code = "CMR", Iso31661NumCode = "120", Domain = ".cm", InternationalPhoneCode = "237",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "Canadá",
                 Iso31661A2Code = "CA", Iso31661A3Code = "CAN", Iso31661NumCode = "124", Domain = ".ca", InternationalPhoneCode = "1",
@@ -184,7 +319,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Caribe Neerlandés",
                 Iso31661A2Code = "BQ", Iso31661A3Code = "BES", Iso31661NumCode = "535", Domain = ".bq", InternationalPhoneCode = "599",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Catar",
                 Iso31661A2Code = "QA", Iso31661A3Code = "QAT", Iso31661NumCode = "634", Domain = ".qa", InternationalPhoneCode = "974",
@@ -192,7 +327,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Chad",
                 Iso31661A2Code = "TD", Iso31661A3Code = "TCD", Iso31661NumCode = "148", Domain = ".td", InternationalPhoneCode = "235",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "Chile",
                 Iso31661A2Code = "CL", Iso31661A3Code = "CHL", Iso31661NumCode = "152", Domain = ".cl", InternationalPhoneCode = "56",
@@ -228,7 +363,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Costa de Marfil",
                 Iso31661A2Code = "CI", Iso31661A3Code = "CIV", Iso31661NumCode = "384", Domain = ".ci", InternationalPhoneCode = "225",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Costa Rica",
                 Iso31661A2Code = "CR", Iso31661A3Code = "CRI", Iso31661NumCode = "188", Domain = ".cr", InternationalPhoneCode = "506",
@@ -253,12 +388,12 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Dominica",
                 Iso31661A2Code = "DM", Iso31661A3Code = "DMA", Iso31661NumCode = "212", Domain = ".dm", InternationalPhoneCode = "1-767",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
 
             new() {
                 Name = "Ecuador",
                 Iso31661A2Code = "EC", Iso31661A3Code = "ECU", Iso31661NumCode = "218", Domain = ".ec", InternationalPhoneCode = "593",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Egipto",
                 Iso31661A2Code = "EG", Iso31661A3Code = "EGY", Iso31661NumCode = "818", Domain = ".eg", InternationalPhoneCode = "20",
@@ -266,7 +401,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "El Salvador",
                 Iso31661A2Code = "SV", Iso31661A3Code = "SLV", Iso31661NumCode = "222", Domain = ".sv", InternationalPhoneCode = "503",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Emiratos Árabes Unidos",
                 Iso31661A2Code = "AE", Iso31661A3Code = "ARE", Iso31661NumCode = "784", Domain = ".ae", InternationalPhoneCode = "971",
@@ -290,11 +425,11 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Estados Federados de Micronesia",
                 Iso31661A2Code = "FM", Iso31661A3Code = "FSM", Iso31661NumCode = "583", Domain = ".fm", InternationalPhoneCode = "691",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Estados Unidos",
                 Iso31661A2Code = "US", Iso31661A3Code = "USA", Iso31661NumCode = "840", Domain = ".us", InternationalPhoneCode = "1",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Estonia",
                 Iso31661A2Code = "EE", Iso31661A3Code = "EST", Iso31661NumCode = "233", Domain = ".ee", InternationalPhoneCode = "372",
@@ -328,7 +463,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Gabón",
                 Iso31661A2Code = "GA", Iso31661A3Code = "GAB", Iso31661NumCode = "266", Domain = ".ga", InternationalPhoneCode = "241",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "Gambia",
                 Iso31661A2Code = "GM", Iso31661A3Code = "GMB", Iso31661NumCode = "270", Domain = ".gm", InternationalPhoneCode = "220",
@@ -352,7 +487,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Granada",
                 Iso31661A2Code = "GD", Iso31661A3Code = "GRD", Iso31661NumCode = "308", Domain = ".gd", InternationalPhoneCode = "1-473",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Grecia",
                 Iso31661A2Code = "GR", Iso31661A3Code = "GRC", Iso31661NumCode = "300", Domain = ".gr", InternationalPhoneCode = "30",
@@ -368,7 +503,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Guam",
                 Iso31661A2Code = "GU", Iso31661A3Code = "GUM", Iso31661NumCode = "316", Domain = ".gu", InternationalPhoneCode = "1-671",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Guatemala",
                 Iso31661A2Code = "GT", Iso31661A3Code = "GTM", Iso31661NumCode = "320", Domain = ".gt", InternationalPhoneCode = "502",
@@ -388,11 +523,11 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Guinea Ecuatorial",
                 Iso31661A2Code = "GQ", Iso31661A3Code = "GNQ", Iso31661NumCode = "226", Domain = ".gq", InternationalPhoneCode = "240",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "Guinea-Bisáu",
                 Iso31661A2Code = "GW", Iso31661A3Code = "GNB", Iso31661NumCode = "624", Domain = ".gw", InternationalPhoneCode = "245",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
 
             new() {
                 Name = "Haití",
@@ -442,7 +577,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Isla de Navidad",
                 Iso31661A2Code = "CX", Iso31661A3Code = "CXR", Iso31661NumCode = "162", Domain = ".cx", InternationalPhoneCode = "61",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Isla de San Martín",
                 Iso31661A2Code = "MF", Iso31661A3Code = "MAF", Iso31661NumCode = "663", Domain = ".mf" , InternationalPhoneCode = "590",
@@ -454,7 +589,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Isla Norfolk",
                 Iso31661A2Code = "NF", Iso31661A3Code = "NFK", Iso31661NumCode = "574", Domain = ".nf", InternationalPhoneCode = "6723",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Islandia",
                 Iso31661A2Code = "IS", Iso31661A3Code = "ISL", Iso31661NumCode = "352", Domain = ".is", InternationalPhoneCode = "354",
@@ -470,11 +605,11 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Islas Cocos",
                 Iso31661A2Code = "CC", Iso31661A3Code = "CCK", Iso31661NumCode = "166", Domain = ".cc", InternationalPhoneCode = "61-891",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Islas Cook",
                 Iso31661A2Code = "CK", Iso31661A3Code = "COK", Iso31661NumCode = "184", Domain = ".ck", InternationalPhoneCode = "682",
-                Currency = DolarNeozelandes, CurrencyCode = "NZD" },
+                Currency = dolarNeozelandes, CurrencyCode = "NZD" },
             new() {
                 Name = "Islas Feroe",
                 Iso31661A2Code = "FO", Iso31661A3Code = "FRO", Iso31661NumCode = "234", Domain = ".fo", InternationalPhoneCode = "298",
@@ -482,7 +617,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Islas Heard y McDonald",
                 Iso31661A2Code = "HM", Iso31661A3Code = "HMD", Iso31661NumCode = "334", Domain = ".hm", InternationalPhoneCode = "0",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Islas Malvinas",
                 Iso31661A2Code = "FK", Iso31661A3Code = "FLK", Iso31661NumCode = "238", Domain = ".fk", InternationalPhoneCode = "500",
@@ -490,15 +625,15 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Islas Marianas del Norte",
                 Iso31661A2Code = "MP", Iso31661A3Code = "MNP", Iso31661NumCode = "580", Domain = ".mp", InternationalPhoneCode = "1-670",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Islas Marshall",
                 Iso31661A2Code = "MH", Iso31661A3Code = "MHL", Iso31661NumCode = "584", Domain = ".mh", InternationalPhoneCode = "692",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Islas Pitcairn",
                 Iso31661A2Code = "PN", Iso31661A3Code = "PCN", Iso31661NumCode = "612", Domain = ".pn", InternationalPhoneCode = "649",
-                Currency = DolarNeozelandes, CurrencyCode = "NZD" },
+                Currency = dolarNeozelandes, CurrencyCode = "NZD" },
             new() {
                 Name = "Islas Salomón",
                 Iso31661A2Code = "SB", Iso31661A3Code = "SLB", Iso31661NumCode = "090", Domain = ".sb", InternationalPhoneCode = "677",
@@ -506,19 +641,19 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Islas Turcas y Caicos",
                 Iso31661A2Code = "TC", Iso31661A3Code = "TCA", Iso31661NumCode = "796", Domain = ".tc", InternationalPhoneCode = "1-649",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Islas ultramarinas menores de los Estados Unidos",
                 Iso31661A2Code = "UM", Iso31661A3Code = "UMI", Iso31661NumCode = "581", Domain = ".us", InternationalPhoneCode = "1",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Islas Vírgenes Británicas",
                 Iso31661A2Code = "VG", Iso31661A3Code = "VGB", Iso31661NumCode = "092", Domain = ".vg", InternationalPhoneCode = "1-284",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Islas Vírgenes de los Estados Unidos",
                 Iso31661A2Code = "VI", Iso31661A3Code = "VIR", Iso31661NumCode = "850", Domain = ".vi", InternationalPhoneCode = "1-340",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Israel",
                 Iso31661A2Code = "IL", Iso31661A3Code = "ISR", Iso31661NumCode = "376", Domain = ".il", InternationalPhoneCode = "972",
@@ -560,7 +695,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Kiribati",
                 Iso31661A2Code = "KI", Iso31661A3Code = "KIR", Iso31661NumCode = "296", Domain = ".ki", InternationalPhoneCode = "686",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Kosovo",
                 Iso31661A2Code = "XK", Iso31661A3Code = "XXK", Iso31661NumCode = "412", Domain = ".ko", InternationalPhoneCode = "383",
@@ -634,7 +769,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Malí",
                 Iso31661A2Code = "ML", Iso31661A3Code = "MLI", Iso31661NumCode = "466", Domain = ".ml", InternationalPhoneCode = "223",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Malta",
                 Iso31661A2Code = "MT", Iso31661A3Code = "MLT", Iso31661NumCode = "470", Domain = ".mt", InternationalPhoneCode = "356",
@@ -674,7 +809,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Montserrat",
                 Iso31661A2Code = "MS", Iso31661A3Code = "MSR", Iso31661NumCode = "500", Domain = ".ms", InternationalPhoneCode = "1-664",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Mozambique",
                 Iso31661A2Code = "MZ", Iso31661A3Code = "MOZ", Iso31661NumCode = "508", Domain = ".mz", InternationalPhoneCode = "259",
@@ -691,7 +826,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Nauru",
                 Iso31661A2Code = "NR", Iso31661A3Code = "NRU", Iso31661NumCode = "520", Domain = ".nr", InternationalPhoneCode = "674",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
             new() {
                 Name = "Nepal",
                 Iso31661A2Code = "NP", Iso31661A3Code = "NPL", Iso31661NumCode = "524", Domain = ".np", InternationalPhoneCode = "977",
@@ -703,7 +838,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Níger",
                 Iso31661A2Code = "NE", Iso31661A3Code = "NER", Iso31661NumCode = "562", Domain = ".ne", InternationalPhoneCode = "227",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Nigeria",
                 Iso31661A2Code = "NG", Iso31661A3Code = "NGA", Iso31661NumCode = "566", Domain = ".ng", InternationalPhoneCode = "234",
@@ -711,7 +846,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Niue",
                 Iso31661A2Code = "NU", Iso31661A3Code = "NIU", Iso31661NumCode = "570", Domain = ".nu", InternationalPhoneCode = "683",
-                Currency = DolarNeozelandes, CurrencyCode = "NZD" },
+                Currency = dolarNeozelandes, CurrencyCode = "NZD" },
             new() {
                 Name = "Noruega",
                 Iso31661A2Code = "NO", Iso31661A3Code = "NOR", Iso31661NumCode = "578", Domain = ".no", InternationalPhoneCode = "47",
@@ -723,7 +858,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Nueva Zelanda",
                 Iso31661A2Code = "NZ", Iso31661A3Code = "NZL", Iso31661NumCode = "554", Domain = ".nz", InternationalPhoneCode = "64",
-                Currency = DolarNeozelandes, CurrencyCode = "NZD" },
+                Currency = dolarNeozelandes, CurrencyCode = "NZD" },
 
             new() {
                 Name = "Omán",
@@ -741,7 +876,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Palaos",
                 Iso31661A2Code = "PW", Iso31661A3Code = "PLW", Iso31661NumCode = "585", Domain = ".pw", InternationalPhoneCode = "680",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Palestina",
                 Iso31661A2Code = "PS", Iso31661A3Code = "PSE", Iso31661NumCode = "275", Domain = ".ps", InternationalPhoneCode = "970",
@@ -781,7 +916,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Puerto Rico",
                 Iso31661A2Code = "PR", Iso31661A3Code = "PRI", Iso31661NumCode = "630", Domain = ".pr", InternationalPhoneCode = "1-787",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
 
             new() {
                 Name = "Reino Unido",
@@ -790,7 +925,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "República Centroafricana",
                 Iso31661A2Code = "CF", Iso31661A3Code = "CAF", Iso31661NumCode = "140", Domain = ".cf", InternationalPhoneCode = "236",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "República Checa",
                 Iso31661A2Code = "CZ", Iso31661A3Code = "CZE", Iso31661NumCode = "203", Domain = ".cz", InternationalPhoneCode = "420",
@@ -798,7 +933,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "República del Congo",
                 Iso31661A2Code = "CG", Iso31661A3Code = "COG", Iso31661NumCode = "178", Domain = ".cg", InternationalPhoneCode = "242",
-                Currency = FrancoAfricaCentral, CurrencyCode = "XAF" },
+                Currency = francoAfricaCentral, CurrencyCode = "XAF" },
             new() {
                 Name = "República Democrática del Congo",
                 Iso31661A2Code = "CD", Iso31661A3Code = "COD", Iso31661NumCode = "180", Domain = ".cd", InternationalPhoneCode = "243",
@@ -835,11 +970,11 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Samoa Americana",
                 Iso31661A2Code = "AS", Iso31661A3Code = "ASM", Iso31661NumCode = "016", Domain = ".as", InternationalPhoneCode = "1-684",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "San Cristóbal y Nieves",
                 Iso31661A2Code = "KN", Iso31661A3Code = "KNA", Iso31661NumCode = "659", Domain = ".kn", InternationalPhoneCode = "1-869",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "San Marino",
                 Iso31661A2Code = "SM", Iso31661A3Code = "SMR", Iso31661NumCode = "674", Domain = ".sm", InternationalPhoneCode = "378",
@@ -851,7 +986,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "San Vicente y las Granadinas",
                 Iso31661A2Code = "VC", Iso31661A3Code = "VCT", Iso31661NumCode = "670", Domain = ".vc", InternationalPhoneCode = "1-784",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Santa Elena, Ascensión y Tristán de Acuña",
                 Iso31661A2Code = "SH", Iso31661A3Code = "SHN", Iso31661NumCode = "654", Domain = ".sh", InternationalPhoneCode = "290",
@@ -859,7 +994,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Santa Lucía",
                 Iso31661A2Code = "LC", Iso31661A3Code = "LCA", Iso31661NumCode = "662", Domain = ".lc", InternationalPhoneCode = "1-758",
-                Currency = DolarCaribeOriental, CurrencyCode = "XCD" },
+                Currency = dolarCaribeOriental, CurrencyCode = "XCD" },
             new() {
                 Name = "Santo Tomé y Príncipe",
                 Iso31661A2Code = "ST", Iso31661A3Code = "STP", Iso31661NumCode = "678", Domain = ".st", InternationalPhoneCode = "239",
@@ -867,7 +1002,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Senegal",
                 Iso31661A2Code = "SN", Iso31661A3Code = "SEN", Iso31661NumCode = "686", Domain = ".sn", InternationalPhoneCode = "221",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Serbia",
                 Iso31661A2Code = "RS", Iso31661A3Code = "SRB", Iso31661NumCode = "688", Domain = ".rs", InternationalPhoneCode = "381",
@@ -948,7 +1083,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Territorio Británico del Océano Índico",
                 Iso31661A2Code = "IO", Iso31661A3Code = "IOT", Iso31661NumCode = "086", Domain = ".io", InternationalPhoneCode = "246",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Territorios Australes Franceses",
                 Iso31661A2Code = "TF", Iso31661A3Code = "ATF", Iso31661NumCode = "260", Domain = ".tf", InternationalPhoneCode = "33",
@@ -956,15 +1091,15 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Timor Oriental",
                 Iso31661A2Code = "TL", Iso31661A3Code = "TLS", Iso31661NumCode = "626", Domain = ".tl", InternationalPhoneCode = "670",
-                Currency = DolarEstadounidense, CurrencyCode = "USD" },
+                Currency = dolarEstadounidense, CurrencyCode = "USD" },
             new() {
                 Name = "Togo",
                 Iso31661A2Code = "TG", Iso31661A3Code = "TGO", Iso31661NumCode = "768", Domain = ".tg", InternationalPhoneCode = "228",
-                Currency = FrancoAfricaOccidental, CurrencyCode = "XOF" },
+                Currency = francoAfricaOccidental, CurrencyCode = "XOF" },
             new() {
                 Name = "Tokelau",
                 Iso31661A2Code = "TK", Iso31661A3Code = "TKL", Iso31661NumCode = "772", Domain = ".tk", InternationalPhoneCode = "690",
-                Currency = DolarNeozelandes, CurrencyCode = "NZD" },
+                Currency = dolarNeozelandes, CurrencyCode = "NZD" },
             new() {
                 Name = "Tonga",
                 Iso31661A2Code = "TO", Iso31661A3Code = "TON", Iso31661NumCode = "776", Domain = ".to", InternationalPhoneCode = "676",
@@ -988,7 +1123,7 @@ public static class CrmDbContextSeed
             new() {
                 Name = "Tuvalu",
                 Iso31661A2Code = "TV", Iso31661A3Code = "TUV", Iso31661NumCode = "798", Domain = ".tv", InternationalPhoneCode = "688",
-                Currency = DolarAustraliano, CurrencyCode = "AUD" },
+                Currency = dolarAustraliano, CurrencyCode = "AUD" },
 
             new() {
                 Name = "Ucrania",
@@ -1044,7 +1179,7 @@ public static class CrmDbContextSeed
                 Currency = "Dólar zimbabuense", CurrencyCode = "ZWL" },
         };
 
-        // Validación básica antes de insertar
+        // Basic validation before insertion
         var invalid = countries
             .Select((c, i) => new { Index = i, Country = c })
             .Where(x =>
@@ -1055,13 +1190,12 @@ public static class CrmDbContextSeed
                 string.IsNullOrWhiteSpace(x.Country.Currency) ||
                 string.IsNullOrWhiteSpace(x.Country.CurrencyCode))
             .ToList();
-
         if (invalid.Count != 0)
         {
             throw new InvalidOperationException("Seed data contains invalid country entries. Please validate the seed source.");
         }
 
-        using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
+        await using var tx = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             await context.AddRangeAsync(countries, cancellationToken);

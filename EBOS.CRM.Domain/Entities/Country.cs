@@ -7,26 +7,26 @@ public class Country : BaseEntity
 {
     [Required]
     [MaxLength(200)]
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = null!;
     [Required]
     [MaxLength(2)]
-    public string Iso31661A2Code { get; set; } = default!;
+    public string Iso31661A2Code { get; set; } = null!;
     [Required]
     [MaxLength(3)]
-    public string Iso31661A3Code { get; set; } = default!;
+    public string Iso31661A3Code { get; set; } = null!;
     [Required]
     [MaxLength(10)]
-    public string Iso31661NumCode { get; set; } = default!;
+    public string Iso31661NumCode { get; set; } = null!;
     [Required]
-    [MaxLength(50)]
-    public string Domain { get; set; } = default!;
+    [MaxLength(5)]
+    public string Domain { get; set; } = null!;
     [Required]
     [MaxLength(100)]
-    public string Currency { get; set; } = default!;
+    public string Currency { get; set; } = null!;
     [Required]
     [MaxLength(10)]
-    public string CurrencyCode { get; set; } = default!;
+    public string CurrencyCode { get; set; } = null!;
     [Required]
     [MaxLength(20)]
-    public string InternationalPhoneCode { get; set; } = default!;
+    public string InternationalPhoneCode { get; set; } = null!; 
 }

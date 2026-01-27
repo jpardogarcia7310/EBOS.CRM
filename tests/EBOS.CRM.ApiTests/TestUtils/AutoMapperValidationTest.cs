@@ -1,5 +1,4 @@
-﻿using EBOS.CRM.Application.Mappings;
-using Mapster;
+﻿using Mapster;
 
 namespace EBOS.CRM.ApiTests.TestUtils;
 
@@ -14,10 +13,10 @@ public class MapsterValidationTest
             RequireDestinationMemberSource = true
         };
 
-        // Escanea todas las clases que implementan IRegister (incluye MappingCountry)
+        // Scan all classes that implement IRegister
         config.Scan(AppDomain.CurrentDomain.GetAssemblies());
 
-        // Compila en modo fail-fast: si algo está mal, lanza excepción
+        // Compiles in fail-fast mode: if something goes wrong, throws an exception
         var ex = Record.Exception(() => config.Compile(failFast: true));
 
         Assert.Null(ex);

@@ -9,24 +9,27 @@ Este documento describe la organización de carpetas, namespaces y responsabilid
 EBOS.CRM.Api 
 │ 
 ├── Controllers 
-│ └── v1
 │   ├── Countries
 │   │ └── CountriesController.cs 
-│   └── Requests
-│     └── AddCountryRQ
-│ 
+│   ├── Statuses
+│   │ └── StatusesController.cs 
+│   └── TaxRegimes
+│	 └── TaxRegimesController.cs 
+│
 ├── Extensions 
 │ ├── ApiBehaviorConfig.cs 
-│ ├── SwaggerConfig.cs 
-│ └── ServiceCollectionExtensions.cs 
+│ ├── ConfigureSwaggerOptions.cs 
+│ ├── ServiceCollectionExtensions.cs 
+│ └── SwaggerConfig.cs 
 │ 
 ├── Middleware 
 │ └── ErrorHandlingMiddleware.cs 
 │ 
 ├── Swagger 
-│ ├── ValidationProblemDetailsSchemaFilter.cs 
+│ ├── DebugGroupNameOperationFilter.cs 
+│ ├── ErrorResponsesOperationFilter.cs 
 │ ├── ValidationProblemDetailsOperationFilter.cs 
-│ └── ErrorResponsesOperationFilter.cs 
+│ └── ValidationProblemDetailsSchemaFilter.cs 
 │ 
 ├── Validation 
 │ └── FluentValidationActionFilter.cs 

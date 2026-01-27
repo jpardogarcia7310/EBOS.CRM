@@ -64,7 +64,7 @@ public class CountryRepository : ICountryRepository
 
     public async Task EndTransactionAsync(CancellationToken cancellationToken = default)
     {
-        // Responder a la cancelación lo antes posible
+        // Respond to the cancellation as soon as possible
         cancellationToken.ThrowIfCancellationRequested();
 
         if (_currentTransaction == null)

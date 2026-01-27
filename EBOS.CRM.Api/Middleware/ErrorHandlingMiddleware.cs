@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace EBOS.CRM.Api.Middleware;
 
@@ -47,10 +46,12 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
             {
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status400BadRequest,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Extensions =
+                {
+                    ["errorsDetailed"] = errorsDetailed
+                }
             };
-
-            problem.Extensions["errorsDetailed"] = errorsDetailed;
 
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(problem);

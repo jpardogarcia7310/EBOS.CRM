@@ -6,8 +6,7 @@ using System.Net.Http.Json;
 
 namespace EBOS.CRM.Api.IntegrationTests.Middleware;
 
-public class ErrorHandlingTests(CustomWebApplicationFactory factory)
-    : IClassFixture<CustomWebApplicationFactory>
+public class ErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -19,20 +18,20 @@ public class ErrorHandlingTests(CustomWebApplicationFactory factory)
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(404);
+        problem.Status.Should().Be(404);
         problem.Title.Should().Be("Resource not found");
     }
 
     [Fact]
     public async Task GetById_Returns_400_WhenIdIsInvalid()
     {
-        // Si tu controlador valida que el ID debe ser positivo
+        // If your controller validates that the ID must be positive
         var response = await _client.GetAsync("/api/v1/Countries/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(400);
+        problem.Status.Should().Be(400);
         problem.Title.Should().Be("One or more validation errors occurred.");
     }
 }

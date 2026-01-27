@@ -1,4 +1,5 @@
-﻿using EBOS.CRM.Api.Extensions;
+﻿using System.Text.Json;
+using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Validation;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
@@ -11,23 +12,22 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
 var services = builder.Services;
 
 #if DEBUG
-// --- BLOQUE DE DIAGNÓSTICO ---
+// --- DIAGNOSTIC BLOCK ---
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
-// --- FIN BLOQUE DE DIAGNÓSTICO ---
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+// --- END OF DIAGNOSTIC BLOCK ---
 #endif
 
 // Application layer registrations
 services.AddApplication();
-builder.Services.AddApplicattionMappings();
+builder.Services.AddApplicationMappings();
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Infrastructure
@@ -36,7 +36,7 @@ services.AddInfrastructure(builder.Configuration);
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-// Si quieres escanear TODOS los ensamblados cargados:
+// If you want to scan ALL loaded assemblies:
 builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()); 
 
 // Register the action filter that runs FluentValidation for MVC model binding
@@ -63,7 +63,7 @@ SwaggerConfig.ApiVersioning(services);
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-// Registrar la configuración que crea un SwaggerDoc por versión y filtra por GroupName
+// Register the configuration that creates a SwaggerDoc per version and filters by GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 // Global JSON options
@@ -76,7 +76,7 @@ services.Configure<JsonOptions>(options =>
 var app = builder.Build();
 
 #if DEBUG
-// --- BLOQUE DE DIAGNÓSTICO: listar versiones y ApiDescriptions en consola ---
+// --- DIAGNOSTIC BLOCK: List versions and API descriptions in the console ---
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 Console.WriteLine("=== ApiVersionDescriptions ===");
 foreach (var desc in provider.ApiVersionDescriptions)
@@ -84,16 +84,18 @@ foreach (var desc in provider.ApiVersionDescriptions)
     Console.WriteLine($"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
 }
 
-var apiExplorer = app.Services.GetRequiredService<Microsoft.AspNetCore.Mvc.ApiExplorer.IApiDescriptionGroupCollectionProvider>();
+var apiExplorer = app.Services.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
 Console.WriteLine("=== ApiDescriptions ===");
 foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
 {
     foreach (var api in group.Items)
     {
-        Console.WriteLine($"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: {api.ActionDescriptor.RouteValues["controller"]} | Action: {api.ActionDescriptor.RouteValues["action"]}");
+        Console.WriteLine($"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: " +
+                          $"{api.ActionDescriptor.RouteValues["controller"]} | Action: " +
+                          $"{api.ActionDescriptor.RouteValues["action"]}");
     }
 }
-// --- FIN BLOQUE DE DIAGNÓSTICO ---
+// --- END OF DIAGNOSTIC BLOCK ---
 #endif
 
 using var scope = app.Services.CreateScope();
@@ -106,20 +108,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        foreach (var group in provider.ApiVersionDescriptions.Select(d => d.GroupName))
+        var descriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var group in descriptionProvider.ApiVersionDescriptions.Select(d => d.GroupName))
         {
             options.SwaggerEndpoint($"/swagger/{group}/swagger.json",
                                     $"EBOS.CRM API {group.ToUpperInvariant()}");
         }
-        // Mostrar tags separados por versión
-        options.DefaultModelsExpandDepth(-1); // opcional: oculta modelos por defecto
-        options.DisplayOperationId();         // opcional: muestra operationId
+        // Show tags separated by version
+        options.DefaultModelsExpandDepth(-1); // Optional: Hides default models
+        options.DisplayOperationId();         // Optional: Displays operationId
     });
 
-    await db.Database.MigrateAsync(cancellationToken);
+    await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
 }
-await CrmDbContextSeed.SeedAsync(db, cancellationToken);
+await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
 
 // Middleware pipeline
 app.UseApiErrorHandling();
@@ -133,6 +135,6 @@ await app.RunAsync();
 
 public partial class Program
 {
-    // Evita que el analizador sugiera instanciación; mantiene la clase usable por WebApplicationFactory
+    // Prevents the parser from suggesting instantiation; keeps the class usable by WebApplicationFactory
     protected Program() { }
 }

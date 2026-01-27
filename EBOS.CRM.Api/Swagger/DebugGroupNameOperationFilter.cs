@@ -8,9 +8,6 @@ public class DebugGroupNameOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (operation == null || context == null) 
-            return;
-
         var group = context.ApiDescription.GroupName ?? "NULL";
         operation.Extensions["x-groupName"] = new OpenApiString(group);
     }

@@ -11,22 +11,22 @@ using Microsoft.Extensions.Logging;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncDisposable
+public abstract class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly IContainer _sqlContainer;
     private readonly string _connectionString;
     private readonly ILogger<CustomWebApplicationFactory> _logger;
     private bool _isStarted;
 
-    private const string saPassword = "StrongP@ssw0rd2025!";
+    private const string SaPassword = "StrongP@ssw0rd2025!";
 
-    public CustomWebApplicationFactory()
+    protected CustomWebApplicationFactory()
     {
-        // Construir el contenedor SQL Server
+        // Build the SQL Server container
         _sqlContainer = new ContainerBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
             .WithEnvironment("ACCEPT_EULA", "Y")
-            .WithEnvironment("SA_PASSWORD", saPassword)
+            .WithEnvironment("SA_PASSWORD", SaPassword)
             .WithExposedPort(1433)
             .WithPortBinding(1433, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
@@ -38,12 +38,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         var mappedPort = _sqlContainer.GetMappedPublicPort(1433);
         var host = _sqlContainer.Hostname;
 
-        // Cadena de conexión a master para esperar disponibilidad
+        // Master connection string to wait for availability
         var masterSb = new SqlConnectionStringBuilder
         {
             DataSource = $"{host},{mappedPort}",
             UserID = "sa",
-            Password = saPassword,
+            Password = SaPassword,
             InitialCatalog = "master",
             TrustServerCertificate = true,
             Encrypt = false
@@ -51,12 +51,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
 
         WaitForSqlServerAsync(masterSb.ConnectionString).GetAwaiter().GetResult();
 
-        // Cadena de conexión a la base de pruebas
+        // Connection string to the test base
         var sb = new SqlConnectionStringBuilder
         {
             DataSource = $"{host},{mappedPort}",
             UserID = "sa",
-            Password = saPassword,
+            Password = SaPassword,
             InitialCatalog = "TestCrmDb",
             TrustServerCertificate = true,
             Encrypt = false
@@ -101,7 +101,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     {
         builder.ConfigureServices(services =>
         {
-            // Elimina el DbContext original
+            // Remove the original DbContext
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
             if (descriptor != null)
@@ -109,11 +109,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
                 services.Remove(descriptor);
             }
 
-            // Registra el DbContext apuntando a la base de pruebas
+            // Register the DbContext pointing to the test database
             services.AddDbContext<CrmDbContext>(options =>
                 options.UseSqlServer(_connectionString));
 
-            // Aplica migraciones o EnsureCreated
+            // Apply migrations or EnsureCreated
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
@@ -135,7 +135,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         {
             try
             {
-                using var conn = new SqlConnection(connectionString);
+                await using var conn = new SqlConnection(connectionString);
                 await conn.OpenAsync();
                 return;
             }
@@ -163,7 +163,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Error stopping testcontainer during DisposeAsync.");
+            _logger.LogWarning(ex, "Error stopping test container during DisposeAsync.");
         }
 
         try
@@ -172,7 +172,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Error disposing base WebApplicationFactory.");
+            _logger.LogWarning(ex, "Error disposing base WebApplicationFactory.");
         }
     }
 }

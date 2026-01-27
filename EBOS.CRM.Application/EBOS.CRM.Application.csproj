@@ -8,13 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Countries\Queries\GetAllCountries\" />
-    <Folder Include="Features\Countries\Queries\GetCountryById\" />
-    <Folder Include="Features\Entities\Commands\AddEntity\" />
-    <Folder Include="Features\Entities\Commands\DeleteEntity\" />
-    <Folder Include="Features\Entities\Commands\UpdateEntity\" />
-    <Folder Include="Features\Entities\Dtos\" />
-    <Folder Include="Features\Entities\Queries\GetAllEntities\" />
-    <Folder Include="Features\Entities\Queries\GetEntityById\" />
   </ItemGroup>
 
   <ItemGroup>

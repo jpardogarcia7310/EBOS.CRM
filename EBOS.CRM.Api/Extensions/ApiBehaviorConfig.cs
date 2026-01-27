@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Text.Json;
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -18,9 +18,12 @@ public static class ApiBehaviorConfig
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status400BadRequest,
-                Instance = context.HttpContext.Request.Path
+                Instance = context.HttpContext.Request.Path,
+                Extensions =
+                {
+                    ["errorsDetailed"] = detailed
+                }
             };
-            pd.Extensions["errorsDetailed"] = detailed;
 
             return new BadRequestObjectResult(pd)
             {
@@ -38,7 +41,7 @@ public static class ApiBehaviorConfig
             string.IsNullOrEmpty(k) ? k : k.Split('.')[^1];
 
         return modelState
-            .Where(kvp => kvp.Value?.Errors?.Count > 0)
+            .Where(kvp => kvp.Value?.Errors.Count > 0)
             .ToDictionary(
                 kvp => ToCamel(TrimKey(kvp.Key)),
                 kvp => kvp.Value!.Errors
@@ -63,8 +66,8 @@ public static class ApiBehaviorConfig
                     var list = new List<object>();
                     foreach (var o in arrObj)
                     {
-                        var props = o?.GetType().GetProperties() ?? [];
-                        string msg = "Invalid value";
+                        var props = o.GetType().GetProperties();
+                        var msg = "Invalid value";
                         string? code = null;
 
                         foreach (var p in props)
