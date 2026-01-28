@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+using System.Security.Cryptography;
+using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EBOS.CRM.Api.Middleware;
@@ -37,7 +39,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
                     {
                         message = e.ErrorMessage ?? "Invalid value",
                         code = string.IsNullOrWhiteSpace(e.ErrorCode)
-                            ? $"VAL_{Math.Abs((e.PropertyName + "|" + (e.ErrorMessage ?? "")).GetHashCode()):D6}"
+                            ? ComputeStableCode(e.PropertyName ?? string.Empty, e.ErrorMessage ?? "Invalid value")
                             : e.ErrorCode
                     }).ToArray()
                 );
@@ -77,12 +79,21 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
             var problem = new ProblemDetails
             {
                 Title = "An unexpected error occurred.",
-                Detail = ex.Message,
+                Detail = "Please contact support if the problem persists.",
                 Status = StatusCodes.Status500InternalServerError
             };
 
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsJsonAsync(problem);
         }
+    }
+
+    private static string ComputeStableCode(string key, string message)
+    {
+        var payload = $"{key}|{message}";
+        var bytes = Encoding.UTF8.GetBytes(payload);
+        var hash = SHA256.HashData(bytes);
+        var hex = Convert.ToHexString(hash);
+        return $"VAL_{hex.Substring(0, 12)}";
     }
 }

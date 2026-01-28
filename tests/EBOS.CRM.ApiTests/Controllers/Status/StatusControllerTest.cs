@@ -1,42 +1,43 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Application.Contracts.Responses;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
-namespace EBOS.CRM.ApiTests.Controllers.Countries;
+namespace EBOS.CRM.ApiTests.Controllers.Status;
 
-public class CountryControllerTests(WebApplicationFactory<Program> factory) : 
+public class StatusControllerTest(WebApplicationFactory<Program> factory) : 
     IClassFixture<WebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
 
     #region CRUD Básicos
     [Fact]
-    public async Task GetAllCountries_ReturnsSuccessAndList()
+    public async Task GetAllStatuses_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync("/api/v1/countries");
+        var response = await _client.GetAsync("/api/v1/Status");
         response.EnsureSuccessStatusCode();
 
-        var countries = await response.Content.ReadFromJsonAsync<IEnumerable<CountryResponse>>();
-        Assert.NotNull(countries);
-        Assert.NotEmpty(countries);
+        var statuses = await response.Content.ReadFromJsonAsync<IEnumerable<StatusResponse>>();
+        Assert.NotNull(statuses);
+        Assert.NotEmpty(statuses);
     }
 
     [Fact]
-    public async Task GetCountryById_ExistingId_ReturnsCountry()
+    public async Task GetStatusById_ExistingId_ReturnsCountry()
     {
-        var response = await _client.GetAsync("/api/v1/countries/1");
+        var response = await _client.GetAsync("/api/v1/Status/1");
         response.EnsureSuccessStatusCode();
 
-        var country = await response.Content.ReadFromJsonAsync<CountryResponse>();
-        Assert.NotNull(country);
-        Assert.Equal(1, country.Id);
+        var status = await response.Content.ReadFromJsonAsync<StatusResponse>();
+        Assert.NotNull(status);
+        Assert.Equal(1, status.Id);
     }
 
     [Fact]
-    public async Task GetCountryById_NonExistingId_ReturnsNotFound()
+    public async Task GetStatusById_NonExistingId_ReturnsNotFound()
     {
-        var response = await _client.GetAsync("/api/v1/countries/9999");
+        var response = await _client.GetAsync("/api/v1/Status/9999");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -45,8 +46,8 @@ public class CountryControllerTests(WebApplicationFactory<Program> factory) :
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        // Simulation: special endpoint that forces a DB failure (example: /api/v1/countries/simulate-db-failure)
-        var response = await _client.GetAsync("/api/v1/countries/simulate-db-failure");
+        // Simulation: special endpoint that forces a DB failure (example: /api/v1/Status/simulate-db-failure)
+        var response = await _client.GetAsync("/api/v1/Status/simulate-db-failure");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -55,7 +56,7 @@ public class CountryControllerTests(WebApplicationFactory<Program> factory) :
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
         // Simulation: endpoint that forces network timeout
-        var response = await _client.GetAsync("/api/v1/countries/simulate-timeout");
+        var response = await _client.GetAsync("/api/v1/Status/simulate-timeout");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -64,22 +65,22 @@ public class CountryControllerTests(WebApplicationFactory<Program> factory) :
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
         // Simulation: first attempt fails (DB drops), second attempt recovers
-        var response1 = await _client.GetAsync("/api/v1/countries/simulate-db-failure");
+        var response1 = await _client.GetAsync("/api/v1/Status/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // We expect the system to apply a retry/circuit breaker and recover.
-        var response2 = await _client.GetAsync("/api/v1/countries");
+        var response2 = await _client.GetAsync("/api/v1/Status");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync("/api/v1/countries/simulate-timeout");
+        var response1 = await _client.GetAsync("/api/v1/Status/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // Second attempt should recover
-        var response2 = await _client.GetAsync("/api/v1/countries");
+        var response2 = await _client.GetAsync("/api/v1/Status");
         response2.EnsureSuccessStatusCode();
     }
     #endregion

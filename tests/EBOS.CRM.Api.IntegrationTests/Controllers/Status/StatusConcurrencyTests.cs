@@ -2,9 +2,9 @@
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using FluentAssertions;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.Countries;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
 
-public class CountriesConcurrencyTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class StatusConcurrencyTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -12,7 +12,7 @@ public class CountriesConcurrencyTests(CustomWebApplicationFactory factory) : IC
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync("/api/v1/Countries"))
+            .Select(_ => _client.GetAsync("/api/v1/Status"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -24,7 +24,7 @@ public class CountriesConcurrencyTests(CustomWebApplicationFactory factory) : IC
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync("/api/v1/Countries/1"))
+            .Select(_ => _client.GetAsync("/api/v1/Status/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);

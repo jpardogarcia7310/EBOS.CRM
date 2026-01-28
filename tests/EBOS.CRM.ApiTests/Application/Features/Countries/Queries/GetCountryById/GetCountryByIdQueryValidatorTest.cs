@@ -32,7 +32,7 @@ public class GetCountryByIdValidatorTests
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
               .WithErrorCode("VAL_ID_POSITIVE")
-              .WithErrorMessage("El identificador debe ser un número entero positivo mayor que 0.");
+              .WithErrorMessage("The identifier must be a positive integer greater than 0.");
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class GetCountryByIdValidatorTests
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
               .WithErrorCode("VAL_ID_POSITIVE")
-              .WithErrorMessage("El identificador debe ser un número entero positivo mayor que 0.");
+              .WithErrorMessage("The identifier must be a positive integer greater than 0.");
     }
 
     [Fact]

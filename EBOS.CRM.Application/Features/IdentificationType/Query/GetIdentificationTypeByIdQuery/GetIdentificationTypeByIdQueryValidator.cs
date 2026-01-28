@@ -1,9 +1,8 @@
-﻿using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 using FluentValidation;
 
 namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
-public class GetIdentificationTypeByIdQueryValidator : AbstractValidator<GetAddressTypeByIdQuery>
+public class GetIdentificationTypeByIdQueryValidator : AbstractValidator<GetIdentificationTypeByIdQuery>
 {
     public GetIdentificationTypeByIdQueryValidator()
     {
