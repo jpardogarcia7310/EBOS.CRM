@@ -1,6 +1,8 @@
 ﻿using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.Infrastructure.Repositories.Concrete;
+using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +18,10 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("CrmConnection")));
 
         // Repositories base (AddScoped for per-request lifetime)
+        services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)

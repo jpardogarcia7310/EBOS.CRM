@@ -4,11 +4,13 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Swagger;
 
-public class ValidationProblemDetailsOperationFilter : IOperationFilter
+public sealed class ValidationProblemDetailsOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (!operation.Responses.TryGetValue("400", out var response)) return;
+        if (!operation.Responses.TryGetValue("400", out var response))
+            return;
+
         var example = new OpenApiObject
         {
             ["type"] = new OpenApiString("https://tools.ietf.org/html/rfc7231#section-6.5.1"),
@@ -46,5 +48,4 @@ public class ValidationProblemDetailsOperationFilter : IOperationFilter
             Example = example
         };
     }
-
 }

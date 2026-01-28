@@ -1,78 +1,72 @@
-﻿using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
-public abstract class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly IContainer _sqlContainer;
-    private readonly string _connectionString;
-    private readonly ILogger<CustomWebApplicationFactory> _logger;
-    private bool _isStarted;
+    private readonly bool _useTestcontainers;
+    private readonly IContainer? _sqlContainer;
+    private readonly string? _connectionString;
 
     private const string SaPassword = "StrongP@ssw0rd2025!";
 
-    protected CustomWebApplicationFactory()
+    public CustomWebApplicationFactory()
     {
-        // Build the SQL Server container
-        _sqlContainer = new ContainerBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithEnvironment("ACCEPT_EULA", "Y")
-            .WithEnvironment("SA_PASSWORD", SaPassword)
-            .WithExposedPort(1433)
-            .WithPortBinding(1433, true)
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
-            .Build();
+        _useTestcontainers = string.Equals(
+            Environment.GetEnvironmentVariable("USE_TESTCONTAINERS"),
+            "true",
+            StringComparison.OrdinalIgnoreCase);
 
-        _sqlContainer.StartAsync().GetAwaiter().GetResult();
-        _isStarted = true;
-
-        var mappedPort = _sqlContainer.GetMappedPublicPort(1433);
-        var host = _sqlContainer.Hostname;
-
-        // Master connection string to wait for availability
-        var masterSb = new SqlConnectionStringBuilder
+        if (_useTestcontainers)
         {
-            DataSource = $"{host},{mappedPort}",
-            UserID = "sa",
-            Password = SaPassword,
-            InitialCatalog = "master",
-            TrustServerCertificate = true,
-            Encrypt = false
-        };
+            _sqlContainer = new ContainerBuilder()
+                .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+                .WithEnvironment("ACCEPT_EULA", "Y")
+                .WithEnvironment("SA_PASSWORD", SaPassword)
+                .WithExposedPort(1433)
+                .WithPortBinding(1433, true)
+                .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
+                .Build();
 
-        WaitForSqlServerAsync(masterSb.ConnectionString).GetAwaiter().GetResult();
+            _sqlContainer.StartAsync().GetAwaiter().GetResult();
 
-        // Connection string to the test base
-        var sb = new SqlConnectionStringBuilder
-        {
-            DataSource = $"{host},{mappedPort}",
-            UserID = "sa",
-            Password = SaPassword,
-            InitialCatalog = "TestCrmDb",
-            TrustServerCertificate = true,
-            Encrypt = false
-        };
+            var mappedPort = _sqlContainer.GetMappedPublicPort(1433);
+            var host = _sqlContainer.Hostname;
 
-        _connectionString = sb.ConnectionString;
+            var masterSb = new SqlConnectionStringBuilder
+            {
+                DataSource = $"{host},{mappedPort}",
+                UserID = "sa",
+                Password = SaPassword,
+                InitialCatalog = "master",
+                TrustServerCertificate = true,
+                Encrypt = false
+            };
 
-        var loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder.AddConsole();
-        });
+            WaitForSqlServerAsync(masterSb.ConnectionString).GetAwaiter().GetResult();
 
-        _logger = loggerFactory.CreateLogger<CustomWebApplicationFactory>();
+            var sb = new SqlConnectionStringBuilder
+            {
+                DataSource = $"{host},{mappedPort}",
+                UserID = "sa",
+                Password = SaPassword,
+                InitialCatalog = "TestCrmDb",
+                TrustServerCertificate = true,
+                Encrypt = false
+            };
+
+            _connectionString = sb.ConnectionString;
+        }
     }
-
-    public string ConnectionString => _connectionString;
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
@@ -80,28 +74,10 @@ public abstract class CustomWebApplicationFactory : WebApplicationFactory<Progra
         return base.CreateHost(builder);
     }
 
-    public void EnsureDatabaseCreated()
-    {
-        _ = CreateClient();
-
-        using var scope = Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
-
-        try
-        {
-            db.Database.Migrate();
-        }
-        catch
-        {
-            db.Database.EnsureCreated();
-        }
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
-            // Remove the original DbContext
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
             if (descriptor != null)
@@ -109,23 +85,31 @@ public abstract class CustomWebApplicationFactory : WebApplicationFactory<Progra
                 services.Remove(descriptor);
             }
 
-            // Register the DbContext pointing to the test database
-            services.AddDbContext<CrmDbContext>(options =>
-                options.UseSqlServer(_connectionString));
-
-            // Apply migrations or EnsureCreated
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
-            try
+            if (_useTestcontainers && _connectionString != null)
             {
-                db.Database.Migrate();
+                services.AddDbContext<CrmDbContext>(options =>
+                    options.UseSqlServer(_connectionString));
             }
-            catch
+            else
             {
-                db.Database.EnsureCreated();
+                services.AddDbContext<CrmDbContext>(options =>
+                {
+                    options.UseInMemoryDatabase("IntegrationTestsDb");
+                    options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+                });
             }
         });
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (_sqlContainer != null)
+        {
+            await _sqlContainer.StopAsync();
+            await _sqlContainer.DisposeAsync();
+        }
+
+        await base.DisposeAsync();
     }
 
     private static async Task WaitForSqlServerAsync(string connectionString, int maxRetries = 30, int delayMs = 1000)
@@ -145,34 +129,6 @@ public abstract class CustomWebApplicationFactory : WebApplicationFactory<Progra
                 if (retries >= maxRetries) throw;
                 await Task.Delay(delayMs);
             }
-        }
-    }
-
-    public override async ValueTask DisposeAsync()
-    {
-        GC.SuppressFinalize(this);
-
-        try
-        {
-            if (_isStarted)
-            {
-                await _sqlContainer.StopAsync();
-                await _sqlContainer.DisposeAsync();
-                _isStarted = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Error stopping test container during DisposeAsync.");
-        }
-
-        try
-        {
-            await base.DisposeAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Error disposing base WebApplicationFactory.");
         }
     }
 }

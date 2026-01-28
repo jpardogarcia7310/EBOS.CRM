@@ -14,9 +14,15 @@ namespace EBOS.CRM.Api.Controllers.Country;
 public class CountryController(IMediator mediator) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Returns a country by its identifier.
+    /// </summary>
+    /// <example>
+    /// GET /api/v1/Country/1
+    /// </example>
+    /// <response code="200">Country found.</response>
+    /// <response code="404">Country not found.</response>
     [HttpGet("{id:long}")]
-    [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(CountryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -37,9 +43,14 @@ public class CountryController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>
+    /// Returns all countries.
+    /// </summary>
+    /// <example>
+    /// GET /api/v1/Country
+    /// </example>
+    /// <response code="200">List of countries.</response>
     [HttpGet]
-    [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(ICollection<CountryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)

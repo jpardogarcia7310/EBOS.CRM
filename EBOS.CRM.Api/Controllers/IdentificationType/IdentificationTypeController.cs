@@ -10,11 +10,18 @@ namespace EBOS.CRM.Api.Controllers.IdentificationType;
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
-public class IdentificationTypesController(IMediator mediator) : ControllerBase
+public class IdentificationTypeController(IMediator mediator) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Returns an identification type by its identifier.
+    /// </summary>
+    /// <example>
+    /// GET /api/v2/IdentificationType/1
+    /// </example>
+    /// <response code="200">Identification type found.</response>
+    /// <response code="404">Identification type not found.</response>
     [HttpGet("{id:long}")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IdentificationTypeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -35,8 +42,14 @@ public class IdentificationTypesController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>
+    /// Returns all identification types.
+    /// </summary>
+    /// <example>
+    /// GET /api/v2/IdentificationType
+    /// </example>
+    /// <response code="200">List of identification types.</response>
     [HttpGet]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(ICollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)

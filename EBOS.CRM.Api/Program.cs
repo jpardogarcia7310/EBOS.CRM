@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
-using EBOS.CRM.Api.Validation;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Infrastructure;
@@ -34,20 +33,11 @@ services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>
 services.AddInfrastructure(builder.Configuration);
 
 // Register FluentValidation validators (from Application assembly)
-builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-
-// If you want to scan ALL loaded assemblies:
-builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()); 
-
-// Register the action filter that runs FluentValidation for MVC model binding
-services.AddScoped<FluentValidationActionFilter>();
+builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 
 // Controllers + JSON options and register the filter globally
 services
-    .AddControllers(options =>
-    {
-        options.Filters.Add<FluentValidationActionFilter>();
-    })
+    .AddControllers()
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -56,22 +46,15 @@ services
 // Configure consistent ModelState -> ValidationProblemDetails mapping
 services.Configure<ApiBehaviorOptions>(ApiBehaviorConfig.Configure);
 
-// ApiVersioning
+// API Versioning
 SwaggerConfig.ApiVersioning(services);
 
 // Swagger / OpenAPI
 services.AddEndpointsApiExplorer();
+// ⚠️ IMPORTANT: SwaggerGen must come AFTER ApiVersioning + ApiExplorer
 services.AddSwaggerGen();
-
 // Register the configuration that creates a SwaggerDoc per version and filters by GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-
-// Global JSON options
-services.Configure<JsonOptions>(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
-
 
 var app = builder.Build();
 
@@ -119,7 +102,10 @@ if (app.Environment.IsDevelopment())
         options.DisplayOperationId();         // Optional: Displays operationId
     });
 
-    await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+    if (db.Database.IsRelational())
+    {
+        await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+    }
 }
 await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
 
@@ -135,6 +121,6 @@ await app.RunAsync();
 
 public partial class Program
 {
-    // Prevents the parser from suggesting instantiation; keeps the class usable by WebApplicationFactory
-    protected Program() { }
+    // Exposed for WebApplicationFactory in integration tests.
+    public Program() { }
 }

@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using System.Net;
 
@@ -11,29 +11,28 @@ public class VersioningTests(CustomWebApplicationFactory factory) : IClassFixtur
     [Fact]
     public async Task GetAll_V1_Returns_OK()
     {
-        var response = await _client.GetAsync("/api/v1/Countries");
+        var response = await _client.GetAsync("/api/v1/Country");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task GetById_V1_Returns_OK_WhenExists()
     {
-        var response = await _client.GetAsync("/api/v1/Countries/1");
+        var response = await _client.GetAsync("/api/v1/Country/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task GetById_V1_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync("/api/v1/Countries/999999");
+        var response = await _client.GetAsync("/api/v1/Country/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    // If you add v2 in the future, you can enable these tests:
-    //[Fact]
-    //public async Task GetAll_V2_Returns_OK()
-    //{
-    //    var response = await _client.GetAsync("/api/v2/Countries");
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //}
+    [Fact]
+    public async Task GetAll_V2_Returns_OK()
+    {
+        var response = await _client.GetAsync("/api/v2/Country");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 }

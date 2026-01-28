@@ -4,16 +4,16 @@ using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.Countries;
+namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
 
-public class CountriesErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class StatusErrorHandlingTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 
     [Fact]
     public async Task GetById_Returns_404_WhenCountryNotFound()
     {
-        var response = await _client.GetAsync("/api/v1/Countries/999999");
+        var response = await _client.GetAsync("/api/v1/Status/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();

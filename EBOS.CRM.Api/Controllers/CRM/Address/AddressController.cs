@@ -9,14 +9,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
 [ApiController]
-[ApiVersion("2.1")]
+[ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class AddressController(IMediator mediator) : ControllerBase
 {
     #region Commands
+    /// <summary>
+    /// Creates a new address.
+    /// </summary>
+    /// <example>
+    /// POST /api/v2/Address
+    /// {
+    ///   "street": "Main St",
+    ///   "externalNumber": "123",
+    ///   "city": "Quito",
+    ///   "stateOrProvince": "Pichincha",
+    ///   "postalCode": "EC17001",
+    ///   "customerId": 1,
+    ///   "countryId": 1,
+    ///   "addressTypeId": 1
+    /// }
+    /// </example>
+    /// <response code="200">Address created.</response>
+    /// <response code="400">Validation error.</response>
     [HttpPost]
-    [MapToApiVersion("2.1")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,8 +44,15 @@ public class AddressController(IMediator mediator) : ControllerBase
     #endregion
     
     #region Queries
+    /// <summary>
+    /// Returns an address by its identifier.
+    /// </summary>
+    /// <example>
+    /// GET /api/v2/Address/1
+    /// </example>
+    /// <response code="200">Address found.</response>
+    /// <response code="404">Address not found.</response>
     [HttpGet("{id:long}")]
-    [MapToApiVersion("2.1")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -49,8 +73,14 @@ public class AddressController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>
+    /// Returns all addresses.
+    /// </summary>
+    /// <example>
+    /// GET /api/v2/Address
+    /// </example>
+    /// <response code="200">List of addresses.</response>
     [HttpGet]
-    [MapToApiVersion("2.1")]
     [ProducesResponseType(typeof(ICollection<AddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)

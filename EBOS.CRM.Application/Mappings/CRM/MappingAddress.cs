@@ -46,6 +46,9 @@ public class MappingAddress : IRegister
             .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.CountryId, src => src.CountryId)
             .Map(dest => dest.AddressTypeId, src => src.AddressTypeId)
-            .Map(dest => dest.Erased, src => !src.Active);
+            .Map(dest => dest.Erased, src => !src.Active)
+            .Ignore(dest => dest.Customer)
+            .Ignore(dest => dest.Country)
+            .Ignore(dest => dest.AddressType);
     }
 }

@@ -7,14 +7,15 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Extensions;
 
-// Usamos constructor principal (primary constructor) como solicitaste
-public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) : IConfigureOptions<SwaggerGenOptions>
+public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
+    : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IApiVersionDescriptionProvider _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+    private readonly IApiVersionDescriptionProvider _provider = provider 
+        ?? throw new ArgumentNullException(nameof(provider));
 
     public void Configure(SwaggerGenOptions options)
     {
-        // Crear un SwaggerDoc por cada versión detectada
+        // 1. Create a SwaggerDoc for each detected version
         foreach (var description in _provider.ApiVersionDescriptions)
         {
             options.SwaggerDoc(description.GroupName, new OpenApiInfo
@@ -25,7 +26,7 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
             });
         }
 
-        // XML comments si existen
+        // 2. Include XML comments if they exist
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         if (File.Exists(xmlPath))
@@ -33,27 +34,24 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
             options.IncludeXmlComments(xmlPath);
         }
 
-        // Filtros personalizados y respuestas comunes
+        // 3. Custom filters (one-time, no duplicates)
         options.SchemaFilter<ValidationProblemDetailsSchemaFilter>();
         options.OperationFilter<ValidationProblemDetailsOperationFilter>();
-        options.AddErrorResponses();
+        options.OperationFilter<ErrorResponsesOperationFilter>();
 
-        // --- BLOQUE DE DIAGNÓSTICO ---
-        // Registrar temporalmente el filtro de debug para exponer x-groupName en cada operación
-        // (quítalo cuando ya no lo necesites)
+        // 4. Optional diagnostic filter (you can remove it when you no longer need it)
         options.OperationFilter<DebugGroupNameOperationFilter>();
-        // --- FIN BLOQUE DE DIAGNÓSTICO ---
 
-        // INCLUSION: usar GroupName proporcionado por VersionedApiExplorer
-        // Esto asegura que cada SwaggerDoc solo incluya las operaciones asignadas a esa versión
-        options.DocInclusionPredicate((docName, apiDesc) => string.Equals(apiDesc.GroupName, docName, StringComparison.OrdinalIgnoreCase));
+        // 5. Include only the operations whose GroupName matches the document
+        options.DocInclusionPredicate((docName, apiDesc) =>
+            string.Equals(apiDesc.GroupName, docName, StringComparison.OrdinalIgnoreCase));
 
-        // TAGS por versión y controlador (opcional)
+        // 6. Group by version + driver (optional, but very useful)
         options.TagActionsBy(apiDesc =>
         {
             var controller = apiDesc.ActionDescriptor.RouteValues["controller"] ?? "Default";
             var group = apiDesc.GroupName?.ToUpperInvariant();
-            return group is null ? new[] { controller } : [$"{group} - {controller}"];
+            return group is null ? new[] { controller } : new[] { $"{group} - {controller}" };
         });
     }
 }
