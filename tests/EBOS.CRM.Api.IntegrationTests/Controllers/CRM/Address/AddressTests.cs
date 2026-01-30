@@ -20,7 +20,6 @@ public class AddressTests : IClassFixture<InMemoryAddressWebApplicationFactory>
             factory.Repository.AddAsync(new Domain.Entities.CRM.Address
             {
                 Id = 1,
-                IsPrimary = false,
                 Street = "Main St",
                 ExternalNumber = "123",
                 InternalNumber = null,
@@ -33,7 +32,6 @@ public class AddressTests : IClassFixture<InMemoryAddressWebApplicationFactory>
                 GoogleMapsUrl = null,
                 Latitude = 0,
                 Longitude = 0,
-                CustomerId = 1,
                 CountryId = 1,
                 AddressTypeId = 1
             }).GetAwaiter().GetResult();
@@ -66,7 +64,6 @@ public class AddressTests : IClassFixture<InMemoryAddressWebApplicationFactory>
     public async Task Add_Returns_Address_WhenValid()
     {
         var request = new AddAddressRequest(
-            IsPrimary: false,
             Street: "Second St",
             ExternalNumber: "45",
             InternalNumber: null,
@@ -79,7 +76,6 @@ public class AddressTests : IClassFixture<InMemoryAddressWebApplicationFactory>
             GoogleMapsUrl: null,
             Latitude: "0",
             Longitude: "0",
-            CustomerId: 2,
             CountryId: 1,
             AddressTypeId: 1
         );
@@ -90,7 +86,6 @@ public class AddressTests : IClassFixture<InMemoryAddressWebApplicationFactory>
         var created = await response.Content.ReadFromJsonAsync<AddressResponse>();
         created.Should().NotBeNull();
         created.Street.Should().Be("Second St");
-        created.CustomerId.Should().Be(2);
     }
 
     [Fact]

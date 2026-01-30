@@ -4,6 +4,7 @@ using EBOS.CRM.Infrastructure.Persistence;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class AddressRepository(CrmDbContext context) : BaseRepository<Address>(context), IAddressRepository
+public class TaxInformationRepository(CrmDbContext context) : BaseRepository<TaxInformation>(context), 
+    ITaxInformationRepository
 {
 }

@@ -1,36 +1,22 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public abstract class Customer : ErasableEntity
+public class Customer : ErasableEntity
 {
-    [Required]
-    [MaxLength(50)]
-    public string Code { get; set; } = null!; // CRM Internal Code
-    [Required]
-    [MaxLength(100)]
+    public string Code { get; set; } = null!;
     public string Email { get; set; } = null!;
-    [Required]
-    [MaxLength(12)]
     public string Phone { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
 
-    // Foreign Keys
-    public long PrimaryAddressId { get; set; }
-    [ForeignKey(nameof(PrimaryAddressId))]
-    public virtual Address PrimaryAddress { get; set; } = null!;
-    
-    public virtual TaxInformation? TaxInformation { get; set; }
-
-    public virtual BankInformation? BankInformation { get; set; }
+    public long StatusId { get; set; }
+    public Status Status { get; set; } = null!;
 
     public CreditAccount? CreditAccount { get; set; }
-    
-    public long StatusId { get; set; }
-    [ForeignKey(nameof(StatusId))]
-    public virtual Status Status { get; set; } = null!;
+    public TaxInformation? TaxInformation { get; set; }
+    public BankInformation? BankInformation { get; set; }
 
-    public ICollection<Address> Addresses { get; set; } = new List<Address>();
+    // Optional: Only if you want direct navigation
+    public ICollection<Address> Addresses { get; set; } = new List<Address>(); 
+    public ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
 }

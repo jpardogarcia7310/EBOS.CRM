@@ -22,7 +22,6 @@ public class AddressValidationTests(InMemoryAddressWebApplicationFactory factory
     public async Task Add_Returns_400_WhenRequestIsInvalid()
     {
         var request = new AddAddressRequest(
-            IsPrimary: false,
             Street: "",
             ExternalNumber: "",
             InternalNumber: null,
@@ -35,7 +34,6 @@ public class AddressValidationTests(InMemoryAddressWebApplicationFactory factory
             GoogleMapsUrl: "invalid-url",
             Latitude: "999",
             Longitude: "999",
-            CustomerId: 0,
             CountryId: 0,
             AddressTypeId: 0
         );

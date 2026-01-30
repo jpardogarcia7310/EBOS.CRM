@@ -35,16 +35,17 @@ public sealed class InMemoryAddressRepository : IAddressRepository
         return Task.CompletedTask;
     }
 
-    public void AttachAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task AttachAsync(Address entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!_items.Contains(entity))
         {
             _items.Add(entity);
         }
+        return Task.CompletedTask;
     }
 
-    public void UpdateAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(Address entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var index = _items.FindIndex(x => x.Id == entity.Id);
@@ -52,12 +53,14 @@ public sealed class InMemoryAddressRepository : IAddressRepository
         {
             _items[index] = entity;
         }
+        return Task.CompletedTask;
     }
 
-    public void DeleteAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(Address entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         _items.RemoveAll(x => x.Id == entity.Id);
+        return Task.CompletedTask;
     }
 
     public Task<Address?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -85,7 +88,7 @@ public sealed class InMemoryAddressRepository : IAddressRepository
     public Task<bool> ExistPrimaryAddressInCustomerId(long customerId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var exists = _items.Any(x => x.CustomerId == customerId && x is { IsPrimary: true, Erased: false });
+        var exists = _items.Any(x =>  x is { Erased: false });
         return Task.FromResult(exists);
     }
 }

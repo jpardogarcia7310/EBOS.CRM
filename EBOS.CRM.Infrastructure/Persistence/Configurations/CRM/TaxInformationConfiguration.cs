@@ -10,12 +10,9 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
     {
         builder.ToTable("TaxInformation", "CRM");
 
-        // Primary Key (BIGINT IDENTITY)
         builder.HasKey(ti => ti.Id);
-        builder.Property(ti => ti.Id)
-            .ValueGeneratedOnAdd();
+        builder.Property(ti => ti.Id).ValueGeneratedOnAdd();
 
-        // Basic properties
         builder.Property(ti => ti.TaxName)
             .IsRequired()
             .HasMaxLength(200);
@@ -24,40 +21,17 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
             .HasMaxLength(20);
         builder.Property(ti => ti.Erased)
             .IsRequired();
-        
+
         builder.ToTable("TaxInformation", "CRM", ti =>
         {
             ti.HasCheckConstraint(
                 "CK_TaxInformation_TIN_Valid",
-                "[TaxIdentificationNumber] NOT LIKE '%[^A-Za-z0-9]%'"
-            );
+                "[TaxIdentificationNumber] NOT LIKE '%[^A-Za-z0-9]%'");
         });
-        
-        // ------------------------------------------------------------
-        // One-to-One: TaxInformation (principal) → Customer (dependent)
-        // FK: TaxInformation.CustomerId
-        //
-        // TaxInformation owns the FK, so the relationship is configured
-        // primarily in TaxInformationConfiguration.
-        // ------------------------------------------------------------
+
         builder.HasOne(ti => ti.Customer)
             .WithOne(c => c.TaxInformation)
             .HasForeignKey<TaxInformation>(ti => ti.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
-    
-        // ------------------------------------------------------------
-        // One-to-One: Address (principal) → TaxInformation (dependent)
-        // FK: TaxInformation.AddressId
-        //
-        // Address owns the FK, so the relationship is configured
-        // primarily in AddressConfiguration.
-        // ------------------------------------------------------------
-        builder.HasOne(ti => ti.Address) 
-            .WithMany() 
-            .HasForeignKey(ti => ti.AddressId) 
-            .OnDelete(DeleteBehavior.Restrict); 
-        
-        builder.HasIndex(ti => ti.AddressId) 
-            .HasDatabaseName("IX_TaxInformation_AddressId");
     }
 }
