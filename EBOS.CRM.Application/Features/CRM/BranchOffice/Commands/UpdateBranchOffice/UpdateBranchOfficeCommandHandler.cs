@@ -1,0 +1,61 @@
+using EBOS.CRM.Application.Contracts.Requests.Services;
+using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Services;
+using EBOS.CRM.Application.Services.Audit;
+using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using MapsterMapper;
+using MediatR;
+
+namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
+
+public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
+    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
+{
+    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var updateRequest = request.BranchOfficeRequest
+                           ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+
+        var entity = await repository.GetByIdAsync(updateRequest.Id, cancellationToken);
+        if (entity is null)
+        {
+            return null;
+        }
+
+        var oldValues = AuditSerialization.Serialize(entity);
+
+        mapper.Map(updateRequest, entity);
+
+        await repository.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            await repository.UpdateAsync(entity, cancellationToken);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            var auditRequest = new AuditInsertRequest(
+                UserId: currentUser.UserId,
+                TimeStamp: DateTimeOffset.UtcNow,
+                Action: AuditActions.Update,
+                Entity: nameof(Domain.Entities.CRM.BranchOffice),
+                RegisterId: entity.Id,
+                OldValues: oldValues,
+                NewValues: AuditSerialization.Serialize(entity),
+                CorrelationId: currentUser.CorrelationId);
+
+            await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+
+            await repository.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await repository.RollbackAsync(cancellationToken);
+            throw;
+        }
+
+        return mapper.Map<BranchOfficeResponse>(entity);
+    }
+}
