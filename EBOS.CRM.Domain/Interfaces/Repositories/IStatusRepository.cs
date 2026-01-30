@@ -3,7 +3,7 @@ using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories;
 
-public interface IStatusRepository : IUnitOfWork
+public interface IStatusRepository
 {
     #region Queries
     Task<Status?> GetByIdAsync(long id, CancellationToken cancellationToken = default);

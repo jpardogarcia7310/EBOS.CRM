@@ -43,17 +43,17 @@ public sealed class FailingAddressRepository : IAddressRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public void AttachAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task AttachAsync(Address entity, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public void UpdateAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(Address entity, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public void DeleteAsync(Address entity, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(Address entity, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }

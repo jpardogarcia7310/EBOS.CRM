@@ -10,6 +10,7 @@ namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
 [ApiController]
 [ApiVersion("2.0")]
+[ApiVersion("3.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class AddressController(IMediator mediator) : ControllerBase

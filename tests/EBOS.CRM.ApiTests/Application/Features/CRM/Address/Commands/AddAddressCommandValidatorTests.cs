@@ -21,7 +21,7 @@ public class AddAddressCommandValidatorTests
     [Fact]
     public void Validate_EmptyStreet_Fails()
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { Street = "" } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Street = "" });
 
         var result = _validator.TestValidate(command);
 
@@ -31,7 +31,7 @@ public class AddAddressCommandValidatorTests
     [Fact]
     public void Validate_EmptyExternalNumber_Fails()
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { ExternalNumber = "" } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { ExternalNumber = "" });
 
         var result = _validator.TestValidate(command);
 
@@ -41,7 +41,7 @@ public class AddAddressCommandValidatorTests
     [Fact]
     public void Validate_ShortPostalCode_Fails()
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { PostalCode = "1" } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { PostalCode = "1" });
 
         var result = _validator.TestValidate(command);
 
@@ -51,7 +51,7 @@ public class AddAddressCommandValidatorTests
     [Fact]
     public void Validate_InvalidGoogleMapsUrl_Fails()
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { GoogleMapsUrl = "http://example.com" } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { GoogleMapsUrl = "https://example.com" });
 
         var result = _validator.TestValidate(command);
 
@@ -63,7 +63,7 @@ public class AddAddressCommandValidatorTests
     [InlineData("-91")]
     public void Validate_InvalidLatitude_Fails(string value)
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { Latitude = value } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Latitude = value });
 
         var result = _validator.TestValidate(command);
 
@@ -75,7 +75,7 @@ public class AddAddressCommandValidatorTests
     [InlineData("-181")]
     public void Validate_InvalidLongitude_Fails(string value)
     {
-        var command = BuildValidCommand() with { AddressRequest = BuildValidRequest() with { Longitude = value } };
+        var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Longitude = value });
 
         var result = _validator.TestValidate(command);
 
@@ -87,7 +87,6 @@ public class AddAddressCommandValidatorTests
     {
         var request = BuildValidRequest() with
         {
-            CustomerId = 0,
             CountryId = 0,
             AddressTypeId = 0
         };
@@ -95,7 +94,6 @@ public class AddAddressCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.CustomerId);
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.CountryId);
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.AddressTypeId);
     }
@@ -103,7 +101,6 @@ public class AddAddressCommandValidatorTests
     private static AddAddressCommand BuildValidCommand() => new(BuildValidRequest());
 
     private static AddAddressRequest BuildValidRequest() => new(
-        IsPrimary: false,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,
@@ -116,7 +113,6 @@ public class AddAddressCommandValidatorTests
         GoogleMapsUrl: "https://maps.example.com/q",
         Latitude: "0",
         Longitude: "0",
-        CustomerId: 1,
         CountryId: 1,
         AddressTypeId: 1
     );

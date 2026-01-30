@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
+using EBOS.CRM.Api.Services;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
@@ -31,6 +33,9 @@ services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>
 
 // Infrastructure
 services.AddInfrastructure(builder.Configuration);
+
+services.AddHttpContextAccessor();
+services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
@@ -110,6 +115,7 @@ if (app.Environment.IsDevelopment())
 await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
 
 // Middleware pipeline
+app.UseCorrelationId();
 app.UseApiErrorHandling();
 
 app.UseHttpsRedirection();
@@ -122,5 +128,4 @@ await app.RunAsync();
 public partial class Program
 {
     // Exposed for WebApplicationFactory in integration tests.
-    public Program() { }
 }

@@ -4,5 +4,8 @@
 public record AddressTypeResponse(
     long Id,
     string Code,
-    string Description
+    string Description,
+    string? Category,
+    bool AllowsMultiple,
+    bool RequiresPrimary
 );
