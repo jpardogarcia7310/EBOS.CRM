@@ -30,7 +30,6 @@ public class AddressErrorHandlingTests(AddressErrorHandlingTests.FailingAddressF
     public async Task Add_Returns_500_WhenRepositoryFails()
     {
         var request = new AddAddressRequest(
-            IsPrimary: false,
             Street: "Main St",
             ExternalNumber: "123",
             InternalNumber: null,
@@ -43,7 +42,6 @@ public class AddressErrorHandlingTests(AddressErrorHandlingTests.FailingAddressF
             GoogleMapsUrl: null,
             Latitude: "0",
             Longitude: "0",
-            CustomerId: 1,
             CountryId: 1,
             AddressTypeId: 1
         );
