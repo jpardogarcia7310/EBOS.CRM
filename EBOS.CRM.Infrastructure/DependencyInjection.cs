@@ -35,8 +35,11 @@ public static class DependencyInjection
         services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
         services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
+        services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
+        services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
         services.AddScoped<ITaxInformationAddressRepository, TaxInformationAddressRepository>();
         services.AddScoped<ITaxInformationRepository, TaxInformationRepository>();
         services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();

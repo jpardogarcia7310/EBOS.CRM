@@ -35,4 +35,10 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\AddressType\" />
+    <Folder Include="Controllers\CRM\Address\" />
+    <Folder Include="Controllers\IdentificationType\" />
+  </ItemGroup>
+
 </Project>

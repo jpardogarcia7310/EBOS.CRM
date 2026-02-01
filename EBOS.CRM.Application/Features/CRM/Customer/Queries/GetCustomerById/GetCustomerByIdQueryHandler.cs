@@ -8,8 +8,7 @@ namespace EBOS.CRM.Application.Features.CRM.Customer.Queries.GetCustomerById;
 public class GetCustomerByIdQueryHandler(ICustomerRepository repository, IMapper mapper)
     : IRequestHandler<GetCustomerByIdQuery, CustomerResponse?>
 {
-    private readonly ICustomerRepository _repository = repository ??
-                                                      throw new ArgumentNullException(nameof(repository));
+    private readonly ICustomerRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
     public async Task<CustomerResponse?> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)

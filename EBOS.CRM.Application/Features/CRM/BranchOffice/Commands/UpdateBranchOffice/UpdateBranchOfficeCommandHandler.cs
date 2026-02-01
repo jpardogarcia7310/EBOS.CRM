@@ -1,6 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -16,18 +15,13 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var updateRequest = request.BranchOfficeRequest
-                           ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
-
-        var entity = await repository.GetByIdAsync(updateRequest.Id, cancellationToken);
+        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
-        {
             return null;
-        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-
-        mapper.Map(updateRequest, entity);
+        mapper.Map(entityRequest, entity);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -40,14 +34,13 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(Domain.Entities.CRM.BranchOffice),
+                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOffice),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
-
             await repository.CommitAsync(cancellationToken);
         }
         catch

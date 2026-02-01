@@ -10,20 +10,20 @@ namespace EBOS.CRM.Infrastructure.Persistence;
 public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
 {
     // DbSets
-    public DbSet<Customer> Customers => Set<Customer>(); 
-    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>(); 
-    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>(); 
-    public DbSet<Address> Addresses => Set<Address>(); 
-    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>(); 
-    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>(); 
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
+    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
+    public DbSet<Address> Addresses => Set<Address>();
+    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
+    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
-    public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>(); 
-    public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>(); 
-    public DbSet<Status> Statuses => Set<Status>(); 
+    public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
+    public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
+    public DbSet<Status> Statuses => Set<Status>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Load all entity configurations.
@@ -62,11 +62,11 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
         if (erasedPropertyMethod == null)
             return;
 
-        var entityTypes = modelBuilder.Model.GetEntityTypes() 
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
             .Where(e => softErasableInterface.IsAssignableFrom(e.ClrType))
             .Where(e => e.BaseType == null)
             .ToList();
-        
+
         foreach (var entityType in entityTypes)
         {
             var clrType = entityType.ClrType;
@@ -74,8 +74,8 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
 
             var convertedParam = Expression.Convert(parameter, typeof(object));
             var erasedProperty = Expression.Call(
-                erasedPropertyMethod, 
-                convertedParam, 
+                erasedPropertyMethod,
+                convertedParam,
                 Expression.Constant(nameof(ISoftDeletable.Erased)));
             var compare = Expression.Equal(erasedProperty, Expression.Constant(false));
             var lambda = Expression.Lambda(compare, parameter);

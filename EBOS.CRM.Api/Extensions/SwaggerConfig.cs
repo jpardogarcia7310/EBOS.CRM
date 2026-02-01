@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -11,6 +12,7 @@ public static class SwaggerConfig
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.ReportApiVersions = true;
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
         });
         services.AddVersionedApiExplorer(options =>
         {

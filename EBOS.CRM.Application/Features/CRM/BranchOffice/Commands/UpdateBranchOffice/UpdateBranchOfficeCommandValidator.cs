@@ -6,14 +6,9 @@ public class UpdateBranchOfficeCommandValidator : AbstractValidator<UpdateBranch
 {
     public UpdateBranchOfficeCommandValidator()
     {
+        RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.BranchOfficeRequest).NotNull();
-        RuleFor(x => x.BranchOfficeRequest.Id).GreaterThan(0);
-
-        RuleFor(x => x.BranchOfficeRequest.Name)
-            .NotEmpty().MaximumLength(200);
-
-        RuleFor(x => x.BranchOfficeRequest.PhoneNumber)
-            .NotEmpty().MaximumLength(20);
+        RuleFor(x => x.BranchOfficeRequest.Name).NotEmpty(); RuleFor(x => x.BranchOfficeRequest.PhoneNumber).NotEmpty();
 
         RuleFor(x => x.BranchOfficeRequest.CorporateCustomerId).GreaterThan(0);
     }

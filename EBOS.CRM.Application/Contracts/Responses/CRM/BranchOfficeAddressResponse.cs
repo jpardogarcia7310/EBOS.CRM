@@ -1,0 +1,12 @@
+namespace EBOS.CRM.Application.Contracts.Responses.CRM;
+
+public record BranchOfficeAddressResponse(
+    long Id,
+    long BranchOfficeId,
+    long AddressId,
+    bool IsPrimary,
+    DateTime ValidFrom,
+    DateTime? ValidTo,
+    bool IsCurrent,
+    bool Active
+);

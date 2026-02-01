@@ -10,7 +10,7 @@ namespace EBOS.CRM.Api.Extensions;
 public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
     : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IApiVersionDescriptionProvider _provider = provider 
+    private readonly IApiVersionDescriptionProvider _provider = provider
         ?? throw new ArgumentNullException(nameof(provider));
 
     public void Configure(SwaggerGenOptions options)
@@ -22,7 +22,7 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
             {
                 Title = "EBOS.CRM API",
                 Version = description.ApiVersion.ToString(),
-                Description = $"Documentación de la API EBOS.CRM (versión {description.ApiVersion})"
+                Description = $"EBOS.CRM API documentation (version {{description.ApiVersion}})"
             });
         }
 

@@ -2,7 +2,7 @@
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class CustomerAddress: ErasableEntity
+public class CustomerAddress : ErasableEntity
 {
     public long CustomerId { get; set; }
     public Customer Customer { get; set; } = null!;

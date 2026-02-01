@@ -1,8 +1,8 @@
-﻿using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories;
 
-public interface IAddressTypeRepository
+public interface IAddressTypeRepository : IPagedRepository<AddressType>
 {
     #region Queries
     Task<AddressType?> GetByIdAsync(long id, CancellationToken cancellationToken = default);

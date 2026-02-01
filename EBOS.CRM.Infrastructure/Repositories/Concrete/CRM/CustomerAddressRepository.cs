@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class CustomerAddressRepository(CrmDbContext context) : BaseRepository<CustomerAddress>(context), 
+public class CustomerAddressRepository(CrmDbContext context) : BaseRepository<CustomerAddress>(context),
     ICustomerAddressRepository
 {
     public async Task<bool> ExistsPrimaryAddressForCustomerAsync(long customerId, CancellationToken cancellationToken = default)

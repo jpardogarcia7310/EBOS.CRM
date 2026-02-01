@@ -37,12 +37,47 @@ bld/
 # Build results on 'Bin' directories
 **/[Bb]in/*
 
-#Directorio de Visual Studio
-.vs/
-.vs/*.slnx
+# Visual Studio cache
+*.cache
+*.dbmdl
+*.jfm
 
-# Directorio de Rider
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+############################
+#   JetBrains Rider / IntelliJ
+############################
+
 .idea/
+*.iml
+*.ipr
+*.iws
+
+# Rider system files
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf/
+
+############################
+#   OS-specific
+############################
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
 
 # Uncomment if you have tasks that rely on *.refresh files to move binaries
 # (https://github.com/github/gitignore/pull/3736)

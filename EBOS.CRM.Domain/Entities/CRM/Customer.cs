@@ -17,6 +17,6 @@ public class Customer : ErasableEntity
     public BankInformation? BankInformation { get; set; }
 
     // Optional: Only if you want direct navigation
-    public ICollection<Address> Addresses { get; set; } = new List<Address>(); 
+    public ICollection<Address> Addresses { get; set; } = new List<Address>();
     public ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
 }

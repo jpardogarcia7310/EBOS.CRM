@@ -14,7 +14,7 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Id)
             .ValueGeneratedOnAdd();
-        
+
         // Basic properties
         builder.Property(m => m.Date)
             .IsRequired();
@@ -43,7 +43,7 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
             );
 
         });
-        
+
         builder.HasIndex(ct => new { ct.Date, ct.CreditAccountId })
             .HasDatabaseName("IX_CreditTransaction_Date_Account");
         builder.HasIndex(ct => new { ct.CreditAccountId, ct.Date })

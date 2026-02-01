@@ -3,4 +3,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Queries.GetCustomerById;
 
-public sealed record GetCustomerByIdQuery(long Id) : IRequest<CustomerResponse?>;
+public record GetCustomerByIdQuery(long Id) : IRequest<CustomerResponse?>;

@@ -27,20 +27,20 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
 
         builder.ToTable("CreditAccounts", "CRM", ca =>
         {
-               ca.HasCheckConstraint(
-                      "CK_CreditAccount_MaxAmount_Positive",
-                      "[MaxAmount] > 0"
-               );
-               ca.HasCheckConstraint(
-                      "CK_CreditAccount_UsedAmount_NonNegative",
-                      "[UsedAmount] >= 0"
-               );
-               ca.HasCheckConstraint(
-                      "CK_CreditAccount_UsedAmount_WithinLimit",
-                      "[UsedAmount] <= [MaxAmount]"
-               );
+            ca.HasCheckConstraint(
+                   "CK_CreditAccount_MaxAmount_Positive",
+                   "[MaxAmount] > 0"
+            );
+            ca.HasCheckConstraint(
+                   "CK_CreditAccount_UsedAmount_NonNegative",
+                   "[UsedAmount] >= 0"
+            );
+            ca.HasCheckConstraint(
+                   "CK_CreditAccount_UsedAmount_WithinLimit",
+                   "[UsedAmount] <= [MaxAmount]"
+            );
         });
-        
+
         // ------------------------------------------------------------
         // One-to-One: Customer (principal) → CreditAccount (dependent)
         // FK: CreditAccount.CustomerId

@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
+using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
@@ -10,11 +10,7 @@ public class MappingCreditAccount : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CreditAccount, CreditAccountResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.MaxAmount, src => src.MaxAmount)
-            .Map(dest => dest.UsedAmount, src => src.UsedAmount)
             .Map(dest => dest.AvailableAmount, src => src.AvailableAmount)
-            .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddCreditAccountRequest, CreditAccount>()

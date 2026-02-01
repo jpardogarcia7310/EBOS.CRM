@@ -16,18 +16,23 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                 d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
             if (descriptor != null)
                 services.Remove(descriptor);
+            var contextDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(CrmDbContext));
+            if (contextDescriptor != null)
+                services.Remove(contextDescriptor);
 
             // Add InMemory DbContext
+            var dbName = $"IntegrationTestsDb_{Guid.NewGuid()}";
             services.AddDbContext<CrmDbContext>(options =>
             {
-                options.UseInMemoryDatabase("IntegrationTestsDb");
+                options.UseInMemoryDatabase(dbName);
             });
 
             // Seed data
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
-            IntegrationTestCountriesDataSeeder.Seed(db);
+            IntegrationTestCrmDataSeeder.Seed(db);
         });
     }
 }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
-public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper mapper) 
+public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper mapper)
     : IRequestHandler<GetCountryByIdQuery, CountryResponse?>
 {
     private readonly ICountryRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -15,7 +15,7 @@ public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper m
     {
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
         return entity is null ? null : _mapper.Map<CountryResponse>(entity);
     }

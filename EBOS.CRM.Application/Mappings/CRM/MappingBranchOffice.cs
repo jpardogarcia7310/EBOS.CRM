@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
+using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
@@ -10,10 +10,6 @@ public class MappingBranchOffice : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<BranchOffice, BranchOfficeResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Name, src => src.Name)
-            .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
-            .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddBranchOfficeRequest, BranchOffice>()

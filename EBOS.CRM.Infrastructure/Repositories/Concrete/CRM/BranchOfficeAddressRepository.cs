@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class BranchOfficeAddressRepository(CrmDbContext context) : BaseRepository<BranchOfficeAddress>(context), 
+public class BranchOfficeAddressRepository(CrmDbContext context) : BaseRepository<BranchOfficeAddress>(context),
     IBranchOfficeAddressRepository
 {
-    public async Task<BranchOfficeAddress?> GetCurrentPrimaryAsync(long branchOfficeId, 
+    public async Task<BranchOfficeAddress?> GetCurrentPrimaryAsync(long branchOfficeId,
         CancellationToken cancellationToken = default)
     {
         return await AsQueryable()

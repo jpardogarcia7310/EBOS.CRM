@@ -8,21 +8,15 @@ using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
-public sealed class AuditServiceClient : IAuditService
+public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServiceOptions> options)
+    : IAuditService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    private readonly HttpClient _httpClient;
-    private readonly AuditServiceOptions _options;
-
-    public AuditServiceClient(HttpClient httpClient, IOptions<AuditServiceOptions> options)
-    {
-        _httpClient = httpClient;
-        _options = options.Value;
-    }
+    private readonly AuditServiceOptions _options = options.Value;
 
     public async Task<AuditInsertResponse> InsertAuditAsync(
         AuditInsertRequest request,
@@ -35,7 +29,7 @@ public sealed class AuditServiceClient : IAuditService
 
         var endpoint = "api/audit/InsertAudit";
         return await ExecuteWithRetryAsync(
-            () => _httpClient.PostAsJsonAsync(endpoint, request, JsonOptions, cancellationToken),
+            () => httpClient.PostAsJsonAsync(endpoint, request, JsonOptions, cancellationToken),
             async response =>
             {
                 var payload = await response.Content.ReadFromJsonAsync<AuditInsertResponse>(
@@ -91,7 +85,7 @@ public sealed class AuditServiceClient : IAuditService
         CancellationToken cancellationToken)
     {
         return ExecuteWithRetryAsync(
-            () => _httpClient.GetAsync(endpoint, cancellationToken),
+            () => httpClient.GetAsync(endpoint, cancellationToken),
             async response =>
             {
                 var payload = await response.Content.ReadFromJsonAsync<List<AuditRecord>>(

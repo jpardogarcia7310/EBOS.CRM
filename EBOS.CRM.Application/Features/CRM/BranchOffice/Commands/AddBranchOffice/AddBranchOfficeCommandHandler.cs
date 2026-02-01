@@ -1,6 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -9,16 +8,15 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
 
-public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService, 
+public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddBranchOfficeCommand, BranchOfficeResponse>
 {
     public async Task<BranchOfficeResponse> Handle(AddBranchOfficeCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var branchOfficeRequest = request.BranchOfficeRequest
-                                  ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
-        var entity = mapper.Map<Domain.Entities.CRM.BranchOffice>(branchOfficeRequest);
+        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -38,7 +36,6 @@ public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, I
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
-
             await repository.CommitAsync(cancellationToken);
         }
         catch

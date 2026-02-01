@@ -2,7 +2,7 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class BranchOffice: ErasableEntity
+public class BranchOffice : ErasableEntity
 {
     public string Name { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;

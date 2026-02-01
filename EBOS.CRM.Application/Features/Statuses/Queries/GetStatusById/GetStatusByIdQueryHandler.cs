@@ -5,7 +5,7 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 
-public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper mapper) 
+public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper mapper)
     : IRequestHandler<GetStatusByIdQuery, StatusResponse?>
 {
     public async Task<StatusResponse?> Handle(GetStatusByIdQuery request, CancellationToken cancellationToken)

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EBOS.CRM.Api.Middleware;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Interfaces;
 
 namespace EBOS.CRM.Api.Services;
@@ -42,7 +41,7 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor accessor)
             }
 
             var header = httpContext.Request.Headers[CorrelationIdMiddleware.HeaderName].FirstOrDefault();
-            return string.IsNullOrWhiteSpace(header) ? Guid.NewGuid().ToString("D") : header!;
+            return string.IsNullOrWhiteSpace(header) ? Guid.NewGuid().ToString("D") : header;
         }
     }
 }

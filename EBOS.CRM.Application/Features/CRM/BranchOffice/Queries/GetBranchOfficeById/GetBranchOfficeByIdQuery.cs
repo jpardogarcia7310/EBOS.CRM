@@ -3,4 +3,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetBranchOfficeById;
 
-public sealed record GetBranchOfficeByIdQuery(long Id) : IRequest<BranchOfficeResponse?>;
+public record GetBranchOfficeByIdQuery(long Id) : IRequest<BranchOfficeResponse?>;

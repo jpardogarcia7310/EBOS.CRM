@@ -1,5 +1,4 @@
 using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -7,7 +6,7 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.DeleteTaxInformation;
 
-public class DeleteTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService, 
+public class DeleteTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<DeleteTaxInformationCommand, bool>
 {
     public async Task<bool> Handle(DeleteTaxInformationCommand request, CancellationToken cancellationToken)
@@ -16,12 +15,9 @@ public class DeleteTaxInformationCommandHandler(ITaxInformationRepository reposi
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
-        {
             return false;
-        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-
         await repository.BeginTransactionAsync(cancellationToken);
 
         try
@@ -36,11 +32,10 @@ public class DeleteTaxInformationCommandHandler(ITaxInformationRepository reposi
                 Entity: nameof(Domain.Entities.CRM.TaxInformation),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
-                NewValues: AuditSerialization.Serialize(entity),
+                NewValues: null,
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
-
             await repository.CommitAsync(cancellationToken);
         }
         catch

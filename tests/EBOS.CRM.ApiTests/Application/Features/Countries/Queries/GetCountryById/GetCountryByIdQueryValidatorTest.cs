@@ -1,9 +1,9 @@
-﻿using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
+using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetCountryById;
 
-public class GetCountryByIdValidatorTests
+public class GetCountryByIdValidatorTest
 {
     private readonly GetCountryByIdQueryValidator _validator = new();
 

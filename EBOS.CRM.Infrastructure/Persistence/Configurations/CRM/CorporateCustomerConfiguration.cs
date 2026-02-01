@@ -20,7 +20,7 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .HasMaxLength(20);
         builder.Property(c => c.Erased)
             .IsRequired();
-        
+
         builder.ToTable("Customers", "CRM", c =>
         {
             c.HasCheckConstraint(

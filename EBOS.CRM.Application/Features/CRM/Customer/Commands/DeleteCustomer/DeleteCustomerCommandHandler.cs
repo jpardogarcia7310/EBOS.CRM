@@ -6,7 +6,7 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.DeleteCustomer;
 
-public class DeleteCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService, 
+public class DeleteCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<DeleteCustomerCommand, bool>
 {
     public async Task<bool> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
@@ -15,12 +15,9 @@ public class DeleteCustomerCommandHandler(ICustomerRepository repository, IAudit
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
-        {
             return false;
-        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-
         await repository.BeginTransactionAsync(cancellationToken);
 
         try
@@ -35,11 +32,10 @@ public class DeleteCustomerCommandHandler(ICustomerRepository repository, IAudit
                 Entity: nameof(Domain.Entities.CRM.Customer),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
-                NewValues: AuditSerialization.Serialize(entity),
+                NewValues: null,
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
-
             await repository.CommitAsync(cancellationToken);
         }
         catch

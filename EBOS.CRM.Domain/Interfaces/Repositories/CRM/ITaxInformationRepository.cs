@@ -1,8 +1,6 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
-
 namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
-public interface ITaxInformationRepository : IRepository<TaxInformation>, IUnitOfWork
-{
-}
+public interface ITaxInformationRepository : IRepository<TaxInformation>, IPagedRepository<TaxInformation>, IUnitOfWork;
+

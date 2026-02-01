@@ -3,4 +3,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetTaxInformationById;
 
-public sealed record GetTaxInformationByIdQuery(long Id) : IRequest<TaxInformationResponse?>;
+public record GetTaxInformationByIdQuery(long Id) : IRequest<TaxInformationResponse?>;

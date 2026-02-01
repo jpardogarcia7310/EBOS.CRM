@@ -1,8 +1,8 @@
-﻿using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories;
 
-public interface IIdentificationTypeRepository
+public interface IIdentificationTypeRepository : IPagedRepository<IdentificationType>
 {
     #region Queries
     Task<IdentificationType?> GetByIdAsync(long id, CancellationToken cancellationToken = default);

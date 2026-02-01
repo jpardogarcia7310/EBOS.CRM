@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
+using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
@@ -10,10 +10,6 @@ public class MappingTaxInformation : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<TaxInformation, TaxInformationResponse>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.TaxName, src => src.TaxName)
-            .Map(dest => dest.TaxIdentificationNumber, src => src.TaxIdentificationNumber)
-            .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddTaxInformationRequest, TaxInformation>()

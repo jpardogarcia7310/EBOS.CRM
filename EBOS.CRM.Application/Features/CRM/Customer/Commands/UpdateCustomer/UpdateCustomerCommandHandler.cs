@@ -1,6 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -9,25 +8,20 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
 
-public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService, 
+public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateCustomerCommand, CustomerResponse?>
 {
     public async Task<CustomerResponse?> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var updateRequest = request.CustomerRequest
-                           ?? throw new ArgumentNullException(nameof(request.CustomerRequest));
-
-        var entity = await repository.GetByIdAsync(updateRequest.Id, cancellationToken);
+        var entityRequest = request.CustomerRequest ?? throw new ArgumentNullException(nameof(request.CustomerRequest));
+        var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
-        {
             return null;
-        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-
-        mapper.Map(updateRequest, entity);
+        mapper.Map(entityRequest, entity);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -47,7 +41,6 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAudit
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
-
             await repository.CommitAsync(cancellationToken);
         }
         catch
