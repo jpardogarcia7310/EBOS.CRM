@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 
 namespace EBOS.CRM.ApiTests.TestUtils;
 

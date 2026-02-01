@@ -1,0 +1,21 @@
+using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.DeleteBankInformation;
+using FluentValidation.TestHelper;
+
+namespace EBOS.CRM.ApiTests.Application.Features.CRM.BankInformation.Commands.DeleteBankInformation;
+
+public class DeleteBankInformationCommandValidatorTest
+{
+    private readonly DeleteBankInformationCommandValidator _validator = new();
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Validate_InvalidId_Fails(long id)
+    {
+        var command = new DeleteBankInformationCommand(id);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.Id);
+    }
+}

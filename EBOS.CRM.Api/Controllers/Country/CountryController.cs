@@ -1,8 +1,10 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using EBOS.CRM.Application.Contracts.Requests.Common;
+using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.Country;
 
@@ -51,11 +53,13 @@ public class CountryController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of countries.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(ICollection<CountryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<CountryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllCountriesQuery(), cancellationToken));
+        return Ok(await mediator.Send(new GetAllCountriesQuery(query), cancellationToken));
     }
     #endregion
 }
+
+

@@ -1,12 +1,15 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using EBOS.CRM.Application.Contracts.Requests.Common;
+using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.IdentificationType;
 
 [ApiController]
+[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
@@ -50,12 +53,14 @@ public class IdentificationTypeController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of identification types.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(ICollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllIdentificationTypeQuery(), cancellationToken));
+        return Ok(await mediator.Send(new GetAllIdentificationTypeQuery(query), cancellationToken));
     }
 
     #endregion
 }
+
+

@@ -1,8 +1,10 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using EBOS.CRM.Application.Contracts.Requests.Common;
+using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.Status;
 
@@ -51,11 +53,13 @@ public class StatusController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of statuses.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(ICollection<StatusResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<StatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllStatusesQuery(), cancellationToken));
+        return Ok(await mediator.Send(new GetAllStatusesQuery(query), cancellationToken));
     }
     #endregion
 }
+
+

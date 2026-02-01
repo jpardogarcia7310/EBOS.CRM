@@ -1,7 +1,7 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Interfaces.Repositories;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
-public interface IAddressRepository : IRepository<Address>, IUnitOfWork
-{  }
+public interface IAddressRepository : IRepository<Address>, IPagedRepository<Address>, IUnitOfWork;

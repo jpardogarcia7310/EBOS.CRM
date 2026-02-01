@@ -1,5 +1,7 @@
 ﻿using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Primitives.Paging;
+using EBOS.CRM.Infrastructure.Repositories;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,5 +17,9 @@ public class StatusRepository(CrmDbContext context) : IStatusRepository
     public Task<ICollection<Status>> GetAllAsync(CancellationToken cancellationToken = default) => 
         _dbSet.AsNoTracking().ToListAsync(cancellationToken) 
             .ContinueWith<ICollection<Status>>(t => t.Result, cancellationToken);
+
+    public Task<PagedResult<Status>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
+        => _dbSet.AsNoTracking()
+            .ApplyPagedQueryAsync(query, cancellationToken);
     #endregion
 }

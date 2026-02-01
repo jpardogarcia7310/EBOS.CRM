@@ -1,0 +1,39 @@
+using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
+using Mapster;
+
+namespace EBOS.CRM.Application.Mappings.CRM;
+
+public class MappingBranchOfficeAddress : IRegister
+{
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<BranchOfficeAddress, BranchOfficeAddressResponse>()
+            .Map(dest => dest.Active, src => !src.Erased);
+
+        config.NewConfig<AddBranchOfficeAddressRequest, BranchOfficeAddress>()
+            .Map(dest => dest.BranchOfficeId, src => src.BranchOfficeId)
+            .Map(dest => dest.AddressId, src => src.AddressId)
+            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
+            .Map(dest => dest.ValidFrom, src => src.ValidFrom)
+            .Map(dest => dest.ValidTo, src => src.ValidTo)
+            .Map(dest => dest.IsCurrent, src => src.IsCurrent)
+            .Map(dest => dest.Erased, _ => false)
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.BranchOffice)
+            .Ignore(dest => dest.Address);
+
+        config.NewConfig<UpdateBranchOfficeAddressRequest, BranchOfficeAddress>()
+            .Map(dest => dest.BranchOfficeId, src => src.BranchOfficeId)
+            .Map(dest => dest.AddressId, src => src.AddressId)
+            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
+            .Map(dest => dest.ValidFrom, src => src.ValidFrom)
+            .Map(dest => dest.ValidTo, src => src.ValidTo)
+            .Map(dest => dest.IsCurrent, src => src.IsCurrent)
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.BranchOffice)
+            .Ignore(dest => dest.Address);
+    }
+}

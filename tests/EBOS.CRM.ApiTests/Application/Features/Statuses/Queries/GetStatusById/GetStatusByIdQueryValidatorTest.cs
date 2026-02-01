@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
+using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Statuses.Queries.GetStatusById;
