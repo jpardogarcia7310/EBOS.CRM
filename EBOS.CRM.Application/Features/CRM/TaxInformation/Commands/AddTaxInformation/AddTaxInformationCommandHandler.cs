@@ -29,7 +29,7 @@ public class AddTaxInformationCommandHandler(ITaxInformationRepository repositor
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Add,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.TaxInformation),
+                Entity: nameof(Domain.Entities.CRM.TaxInformation),
                 RegisterId: entity.Id,
                 OldValues: null,
                 NewValues: AuditSerialization.Serialize(entity),

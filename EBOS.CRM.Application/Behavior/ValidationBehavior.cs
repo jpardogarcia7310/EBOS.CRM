@@ -3,10 +3,10 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Behavior;
 
-public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) : 
+public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
     IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, 
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         if (!validators.Any()) return await next(cancellationToken);

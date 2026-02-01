@@ -18,9 +18,9 @@ public class AddTaxInformationCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddTaxInformationRequest BuildAddRequest() => new(
-        TaxName: "Tax",
-        TaxIdentificationNumber: "TAX123",
-        CustomerId: 1
-    );
+    private static AddTaxInformationRequest BuildAddRequest() => new(
+            TaxName: "Tax",
+            TaxIdentificationNumber: "TAX123",
+            CustomerId: 1
+        );
 }

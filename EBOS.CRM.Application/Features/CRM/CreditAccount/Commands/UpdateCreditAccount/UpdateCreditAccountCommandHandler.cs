@@ -34,7 +34,7 @@ public class UpdateCreditAccountCommandHandler(ICreditAccountRepository reposito
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.CreditAccount),
+                Entity: nameof(Domain.Entities.CRM.CreditAccount),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

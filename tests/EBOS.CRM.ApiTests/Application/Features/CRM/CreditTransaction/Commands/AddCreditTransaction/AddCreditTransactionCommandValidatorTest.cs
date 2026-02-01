@@ -18,12 +18,12 @@ public class AddCreditTransactionCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddCreditTransactionRequest BuildAddRequest() => new(
-        Date: DateTime.UtcNow,
-        Amount: 50m,
-        Type: "Consumption",
-        ExternalReference: "REF",
-        Comments: "Comment",
-        CreditAccountId: 1
-    );
+    private static AddCreditTransactionRequest BuildAddRequest() => new(
+            Date: DateTime.UtcNow,
+            Amount: 50m,
+            Type: "Consumption",
+            ExternalReference: "REF",
+            Comments: "Comment",
+            CreditAccountId: 1
+        );
 }

@@ -28,7 +28,7 @@ public class GetAllCountriesQueryHandlerTest
         // Arrange
         var countries = new List<Country>
         {
-            new() { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724", 
+            new() { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", Iso31661NumCode = "724",
                 Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", InternationalPhoneCode = "34" }
         };
         var dtos = new List<CountryResponse>
@@ -49,7 +49,7 @@ public class GetAllCountriesQueryHandlerTest
         Assert.NotNull(result);
         Assert.Single(result.Items);
         Assert.Equal("España", result.Items.First().Name);
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()), 
+        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
             Times.Once);
         _mapperMock.Verify(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries), Times.Once);
     }
@@ -169,7 +169,7 @@ public class GetAllCountriesQueryHandlerTest
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()), 
+        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }

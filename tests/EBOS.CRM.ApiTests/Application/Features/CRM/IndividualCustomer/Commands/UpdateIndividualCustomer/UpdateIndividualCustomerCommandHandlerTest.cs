@@ -97,16 +97,16 @@ public class UpdateIndividualCustomerCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateIndividualCustomerRequest BuildUpdateRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1,
-        FirstName: "John",
-        LastName: "Doe",
-        BirthDate: DateTime.UtcNow.AddYears(-20),
-        IdentificationNumber: "ID123",
-        IdentificationTypeId: 1
-    );
+    private static UpdateIndividualCustomerRequest BuildUpdateRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1,
+            FirstName: "John",
+            LastName: "Doe",
+            BirthDate: DateTime.UtcNow.AddYears(-20),
+            IdentificationNumber: "ID123",
+            IdentificationTypeId: 1
+        );
 }

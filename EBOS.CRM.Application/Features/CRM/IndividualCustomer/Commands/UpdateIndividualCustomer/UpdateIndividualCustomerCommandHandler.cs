@@ -34,7 +34,7 @@ public class UpdateIndividualCustomerCommandHandler(IIndividualCustomerRepositor
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.IndividualCustomer),
+                Entity: nameof(Domain.Entities.CRM.IndividualCustomer),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

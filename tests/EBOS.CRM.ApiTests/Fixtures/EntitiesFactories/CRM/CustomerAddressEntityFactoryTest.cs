@@ -22,7 +22,7 @@ public class CustomerAddressEntityFactoryTest
             IsCurrent = isCurrent
         };
     }
-    
+
     [Fact]
     public void CreateValidCustomerAddress_Defaults_AreSet()
     {

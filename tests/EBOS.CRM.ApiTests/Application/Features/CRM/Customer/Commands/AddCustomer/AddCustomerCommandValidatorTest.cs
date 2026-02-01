@@ -18,11 +18,11 @@ public class AddCustomerCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddCustomerRequest BuildAddRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1
-    );
+    private static AddCustomerRequest BuildAddRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1
+        );
 }

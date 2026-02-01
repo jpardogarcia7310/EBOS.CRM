@@ -12,5 +12,5 @@ public class Country : BaseEntity
     public string Domain { get; set; } = null!;
     public string Currency { get; set; } = null!;
     public string CurrencyCode { get; set; } = null!;
-    public string InternationalPhoneCode { get; set; } = null!; 
+    public string InternationalPhoneCode { get; set; } = null!;
 }

@@ -18,16 +18,16 @@ public class AddIndividualCustomerCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddIndividualCustomerRequest BuildAddRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1,
-        FirstName: "John",
-        LastName: "Doe",
-        BirthDate: DateTime.UtcNow.AddYears(-20),
-        IdentificationNumber: "ID123",
-        IdentificationTypeId: 1
-    );
+    private static AddIndividualCustomerRequest BuildAddRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1,
+            FirstName: "John",
+            LastName: "Doe",
+            BirthDate: DateTime.UtcNow.AddYears(-20),
+            IdentificationNumber: "ID123",
+            IdentificationTypeId: 1
+        );
 }

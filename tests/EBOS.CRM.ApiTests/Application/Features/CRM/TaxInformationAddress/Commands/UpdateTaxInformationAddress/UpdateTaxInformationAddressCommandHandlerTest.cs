@@ -97,12 +97,12 @@ public class UpdateTaxInformationAddressCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateTaxInformationAddressRequest BuildUpdateRequest() => new(
-        TaxInformationId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static UpdateTaxInformationAddressRequest BuildUpdateRequest() => new(
+            TaxInformationId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

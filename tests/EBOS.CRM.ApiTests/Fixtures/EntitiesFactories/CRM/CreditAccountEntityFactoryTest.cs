@@ -17,7 +17,7 @@ public class CreditAccountEntityFactoryTest
             CustomerId = customerId
         };
     }
-    
+
     [Fact]
     public void CreateValidCreditAccount_Defaults_AreSet()
     {

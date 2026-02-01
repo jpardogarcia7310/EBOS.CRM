@@ -24,10 +24,10 @@ public class MappingAddress : IRegister
             .Map(dest => dest.PostalCode, src => src.PostalCode)
             .Map(dest => dest.GoogleMapsUrl, src => src.GoogleMapsUrl)
             .Map(dest => dest.Latitude,
-                src => src.Latitude.HasValue ? 
+                src => src.Latitude.HasValue ?
                     src.Latitude.Value.ToString(CultureInfo.InvariantCulture) : null)
             .Map(dest => dest.Longitude,
-                src => src.Longitude.HasValue ? 
+                src => src.Longitude.HasValue ?
                     src.Longitude.Value.ToString(CultureInfo.InvariantCulture) : null)
             .Map(dest => dest.CountryId, src => src.CountryId)
             .Map(dest => dest.AddressTypeId, src => src.AddressTypeId)
@@ -108,9 +108,9 @@ public class MappingAddress : IRegister
 
     private static decimal? ParseNullableDecimal(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value)) 
-            return null; 
-        return decimal.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, 
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+        return decimal.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands,
             CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
-    }  
+    }
 }

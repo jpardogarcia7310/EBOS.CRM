@@ -1,6 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -9,18 +8,18 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 
-public class AddAddressCommandHandler(IAddressRepository repository, IAuditService auditService, 
+public class AddAddressCommandHandler(IAddressRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddAddressCommand, AddressResponse>
 {
     public async Task<AddressResponse> Handle(AddAddressCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var addressRequest = request.AddressRequest 
+        var addressRequest = request.AddressRequest
                              ?? throw new ArgumentNullException(nameof(request.AddressRequest));
         // Mapster creates the complete entity
         var entity = mapper.Map<Domain.Entities.CRM.Address>(addressRequest);
-        
+
         await repository.BeginTransactionAsync(cancellationToken);
 
         try

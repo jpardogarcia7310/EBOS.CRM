@@ -78,9 +78,9 @@ public class AddBranchOfficeCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static AddBranchOfficeRequest BuildAddRequest() => new(
-        Name: "Main",
-        PhoneNumber: "123",
-        CorporateCustomerId: 1
-    );
+    private static AddBranchOfficeRequest BuildAddRequest() => new(
+            Name: "Main",
+            PhoneNumber: "123",
+            CorporateCustomerId: 1
+        );
 }

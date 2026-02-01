@@ -78,9 +78,9 @@ public class AddTaxInformationCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static AddTaxInformationRequest BuildAddRequest() => new(
-        TaxName: "Tax",
-        TaxIdentificationNumber: "TAX123",
-        CustomerId: 1
-    );
+    private static AddTaxInformationRequest BuildAddRequest() => new(
+            TaxName: "Tax",
+            TaxIdentificationNumber: "TAX123",
+            CustomerId: 1
+        );
 }

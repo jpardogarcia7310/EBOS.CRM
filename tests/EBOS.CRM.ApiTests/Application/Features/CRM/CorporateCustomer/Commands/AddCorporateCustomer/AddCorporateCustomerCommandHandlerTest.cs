@@ -78,13 +78,13 @@ public class AddCorporateCustomerCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static AddCorporateCustomerRequest BuildAddRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1,
-        LegalName: "Corp",
-        TaxIdentification: "TAX999"
-    );
+    private static AddCorporateCustomerRequest BuildAddRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1,
+            LegalName: "Corp",
+            TaxIdentification: "TAX999"
+        );
 }

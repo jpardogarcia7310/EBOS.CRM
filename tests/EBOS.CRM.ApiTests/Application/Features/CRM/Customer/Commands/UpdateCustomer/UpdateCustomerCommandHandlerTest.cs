@@ -97,11 +97,11 @@ public class UpdateCustomerCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateCustomerRequest BuildUpdateRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1
-    );
+    private static UpdateCustomerRequest BuildUpdateRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1
+        );
 }

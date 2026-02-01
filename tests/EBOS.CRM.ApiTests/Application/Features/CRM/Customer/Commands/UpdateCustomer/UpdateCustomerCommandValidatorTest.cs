@@ -18,11 +18,11 @@ public class UpdateCustomerCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateCustomerRequest BuildUpdateRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1
-    );
+    private static UpdateCustomerRequest BuildUpdateRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1
+        );
 }

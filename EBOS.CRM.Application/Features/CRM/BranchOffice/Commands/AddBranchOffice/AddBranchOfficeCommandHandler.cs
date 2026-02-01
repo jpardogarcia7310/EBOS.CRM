@@ -29,7 +29,7 @@ public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, I
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Add,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOffice),
+                Entity: nameof(Domain.Entities.CRM.BranchOffice),
                 RegisterId: entity.Id,
                 OldValues: null,
                 NewValues: AuditSerialization.Serialize(entity),

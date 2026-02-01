@@ -18,12 +18,12 @@ public class AddBranchOfficeAddressCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddBranchOfficeAddressRequest BuildAddRequest() => new(
-        BranchOfficeId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static AddBranchOfficeAddressRequest BuildAddRequest() => new(
+            BranchOfficeId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

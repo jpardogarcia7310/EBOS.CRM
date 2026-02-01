@@ -29,7 +29,7 @@ public class DeleteCreditTransactionCommandHandler(ICreditTransactionRepository 
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Delete,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.CreditTransaction),
+                Entity: nameof(Domain.Entities.CRM.CreditTransaction),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: null,

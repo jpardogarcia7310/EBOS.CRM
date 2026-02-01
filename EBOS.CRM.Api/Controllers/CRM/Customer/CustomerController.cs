@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
@@ -102,5 +101,7 @@ public class CustomerController(IMediator mediator) : ControllerBase
 
     #endregion
 }
+
+
 
 

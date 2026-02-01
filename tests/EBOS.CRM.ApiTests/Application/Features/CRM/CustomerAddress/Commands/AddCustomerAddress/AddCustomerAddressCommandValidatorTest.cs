@@ -18,12 +18,12 @@ public class AddCustomerAddressCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddCustomerAddressRequest BuildAddRequest() => new(
-        CustomerId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static AddCustomerAddressRequest BuildAddRequest() => new(
+            CustomerId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

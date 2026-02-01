@@ -18,10 +18,10 @@ public class UpdateBankInformationCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateBankInformationRequest BuildUpdateRequest() => new(
-        Iban: "ES1200000000000000000000",
-        Bic: "BANKESMM",
-        BankName: "Bank",
-        CustomerId: 1
-    );
+    private static UpdateBankInformationRequest BuildUpdateRequest() => new(
+            Iban: "ES1200000000000000000000",
+            Bic: "BANKESMM",
+            BankName: "Bank",
+            CustomerId: 1
+        );
 }

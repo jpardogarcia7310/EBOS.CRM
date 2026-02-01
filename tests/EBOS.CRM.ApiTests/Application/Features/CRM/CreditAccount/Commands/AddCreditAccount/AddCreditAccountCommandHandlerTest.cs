@@ -78,9 +78,9 @@ public class AddCreditAccountCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static AddCreditAccountRequest BuildAddRequest() => new(
-        MaxAmount: 1000m,
-        UsedAmount: 100m,
-        CustomerId: 1
-    );
+    private static AddCreditAccountRequest BuildAddRequest() => new(
+            MaxAmount: 1000m,
+            UsedAmount: 100m,
+            CustomerId: 1
+        );
 }

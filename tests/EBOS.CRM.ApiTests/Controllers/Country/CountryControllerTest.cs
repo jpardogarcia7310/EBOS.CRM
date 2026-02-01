@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace EBOS.CRM.ApiTests.Controllers.Country;
 
-public class CountryControllerTest(CustomWebApplicationFactory<Program> factory) : 
+public class CountryControllerTest(CustomWebApplicationFactory<Program> factory) :
     IClassFixture<CustomWebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();

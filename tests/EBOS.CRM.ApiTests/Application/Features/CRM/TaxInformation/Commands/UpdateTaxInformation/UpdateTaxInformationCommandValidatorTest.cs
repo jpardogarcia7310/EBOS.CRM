@@ -18,9 +18,9 @@ public class UpdateTaxInformationCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
-        TaxName: "Tax",
-        TaxIdentificationNumber: "TAX123",
-        CustomerId: 1
-    );
+    private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
+            TaxName: "Tax",
+            TaxIdentificationNumber: "TAX123",
+            CustomerId: 1
+        );
 }

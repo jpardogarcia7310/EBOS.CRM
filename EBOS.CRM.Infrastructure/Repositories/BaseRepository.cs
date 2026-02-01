@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
-public class BaseRepository<T>(CrmDbContext context): IRepository<T>, IPagedRepository<T> where T : class, ISoftDeletable
+public class BaseRepository<T>(CrmDbContext context) : IRepository<T>, IPagedRepository<T> where T : class, ISoftDeletable
 {
     protected readonly CrmDbContext Context = context;
     protected readonly DbSet<T> DbSet = context.Set<T>();

@@ -18,12 +18,12 @@ public class UpdateTaxInformationAddressCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateTaxInformationAddressRequest BuildUpdateRequest() => new(
-        TaxInformationId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static UpdateTaxInformationAddressRequest BuildUpdateRequest() => new(
+            TaxInformationId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

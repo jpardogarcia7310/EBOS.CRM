@@ -29,7 +29,7 @@ public class AddBankInformationCommandHandler(IBankInformationRepository reposit
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Add,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BankInformation),
+                Entity: nameof(Domain.Entities.CRM.BankInformation),
                 RegisterId: entity.Id,
                 OldValues: null,
                 NewValues: AuditSerialization.Serialize(entity),

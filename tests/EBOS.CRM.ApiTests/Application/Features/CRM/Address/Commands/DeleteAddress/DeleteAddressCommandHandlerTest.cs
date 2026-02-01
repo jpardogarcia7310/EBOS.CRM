@@ -50,8 +50,17 @@ public class DeleteAddressCommandHandlerTest
     [Fact]
     public async Task Handle_WhenEntityFound_DeletesAndAudits()
     {
-        var entity = new CRMAddress { Id = 1, Street = "Old", ExternalNumber = "1", City = "Quito", StateOrProvince = "Pichincha",
-            PostalCode = "EC17001", CountryId = 1, AddressTypeId = 1 };
+        var entity = new CRMAddress
+        {
+            Id = 1,
+            Street = "Old",
+            ExternalNumber = "1",
+            City = "Quito",
+            StateOrProvince = "Pichincha",
+            PostalCode = "EC17001",
+            CountryId = 1,
+            AddressTypeId = 1
+        };
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);
@@ -71,8 +80,17 @@ public class DeleteAddressCommandHandlerTest
     [Fact]
     public async Task Handle_WhenSaveChangesThrows_RollsBack()
     {
-        var entity = new CRMAddress { Id = 1, Street = "Old", ExternalNumber = "1", City = "Quito", StateOrProvince = "Pichincha",
-            PostalCode = "EC17001", CountryId = 1, AddressTypeId = 1 };
+        var entity = new CRMAddress
+        {
+            Id = 1,
+            Street = "Old",
+            ExternalNumber = "1",
+            City = "Quito",
+            StateOrProvince = "Pichincha",
+            PostalCode = "EC17001",
+            CountryId = 1,
+            AddressTypeId = 1
+        };
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

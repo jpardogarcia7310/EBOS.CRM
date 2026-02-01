@@ -29,7 +29,7 @@ public class DeleteTaxInformationCommandHandler(ITaxInformationRepository reposi
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Delete,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.TaxInformation),
+                Entity: nameof(Domain.Entities.CRM.TaxInformation),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: null,

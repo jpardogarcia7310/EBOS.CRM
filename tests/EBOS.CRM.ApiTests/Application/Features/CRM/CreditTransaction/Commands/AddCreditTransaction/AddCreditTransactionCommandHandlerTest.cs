@@ -78,12 +78,12 @@ public class AddCreditTransactionCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static AddCreditTransactionRequest BuildAddRequest() => new(
-        Date: DateTime.UtcNow,
-        Amount: 50m,
-        Type: "Consumption",
-        ExternalReference: "REF",
-        Comments: "Comment",
-        CreditAccountId: 1
-    );
+    private static AddCreditTransactionRequest BuildAddRequest() => new(
+            Date: DateTime.UtcNow,
+            Amount: 50m,
+            Type: "Consumption",
+            ExternalReference: "REF",
+            Comments: "Comment",
+            CreditAccountId: 1
+        );
 }

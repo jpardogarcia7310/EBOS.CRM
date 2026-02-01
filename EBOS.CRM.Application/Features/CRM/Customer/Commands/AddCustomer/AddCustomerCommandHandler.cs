@@ -29,7 +29,7 @@ public class AddCustomerCommandHandler(ICustomerRepository repository, IAuditSer
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Add,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.Customer),
+                Entity: nameof(Domain.Entities.CRM.Customer),
                 RegisterId: entity.Id,
                 OldValues: null,
                 NewValues: AuditSerialization.Serialize(entity),

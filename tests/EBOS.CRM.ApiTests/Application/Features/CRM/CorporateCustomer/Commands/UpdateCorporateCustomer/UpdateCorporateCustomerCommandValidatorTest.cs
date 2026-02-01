@@ -18,13 +18,13 @@ public class UpdateCorporateCustomerCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateCorporateCustomerRequest BuildUpdateRequest() => new(
-        Code: "C001",
-        Email: "a@b.com",
-        Phone: "123",
-        CreatedAt: DateTime.UtcNow,
-        StatusId: 1,
-        LegalName: "Corp",
-        TaxIdentification: "TAX999"
-    );
+    private static UpdateCorporateCustomerRequest BuildUpdateRequest() => new(
+            Code: "C001",
+            Email: "a@b.com",
+            Phone: "123",
+            CreatedAt: DateTime.UtcNow,
+            StatusId: 1,
+            LegalName: "Corp",
+            TaxIdentification: "TAX999"
+        );
 }

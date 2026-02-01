@@ -18,9 +18,9 @@ public class UpdateCreditAccountCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateCreditAccountRequest BuildUpdateRequest() => new(
-        MaxAmount: 1000m,
-        UsedAmount: 100m,
-        CustomerId: 1
-    );
+    private static UpdateCreditAccountRequest BuildUpdateRequest() => new(
+            MaxAmount: 1000m,
+            UsedAmount: 100m,
+            CustomerId: 1
+        );
 }

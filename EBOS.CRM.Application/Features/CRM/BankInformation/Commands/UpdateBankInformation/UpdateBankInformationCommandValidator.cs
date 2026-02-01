@@ -9,7 +9,7 @@ public class UpdateBankInformationCommandValidator : AbstractValidator<UpdateBan
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.BankInformationRequest).NotNull();
         RuleFor(x => x.BankInformationRequest.Iban).NotEmpty();
-        RuleFor(x => x.BankInformationRequest.Bic).MaximumLength(500);         RuleFor(x => x.BankInformationRequest.BankName).MaximumLength(500);
+        RuleFor(x => x.BankInformationRequest.Bic).MaximumLength(500); RuleFor(x => x.BankInformationRequest.BankName).MaximumLength(500);
         RuleFor(x => x.BankInformationRequest.CustomerId).GreaterThan(0);
     }
 }

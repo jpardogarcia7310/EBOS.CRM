@@ -18,9 +18,9 @@ public class UpdateBranchOfficeCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateBranchOfficeRequest BuildUpdateRequest() => new(
-        Name: "Main",
-        PhoneNumber: "123",
-        CorporateCustomerId: 1
-    );
+    private static UpdateBranchOfficeRequest BuildUpdateRequest() => new(
+            Name: "Main",
+            PhoneNumber: "123",
+            CorporateCustomerId: 1
+        );
 }

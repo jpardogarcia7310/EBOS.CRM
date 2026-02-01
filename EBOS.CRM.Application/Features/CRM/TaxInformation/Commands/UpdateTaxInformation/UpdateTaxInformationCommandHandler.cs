@@ -34,7 +34,7 @@ public class UpdateTaxInformationCommandHandler(ITaxInformationRepository reposi
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.TaxInformation),
+                Entity: nameof(Domain.Entities.CRM.TaxInformation),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

@@ -29,7 +29,7 @@ public class DeleteBankInformationCommandHandler(IBankInformationRepository repo
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Delete,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BankInformation),
+                Entity: nameof(Domain.Entities.CRM.BankInformation),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: null,

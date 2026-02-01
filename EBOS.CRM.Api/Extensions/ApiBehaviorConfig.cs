@@ -54,7 +54,7 @@ public static class ApiBehaviorConfig
             );
     }
 
-    private static Dictionary<string, object[]> BuildDetailedErrors(HttpContext http, 
+    private static Dictionary<string, object[]> BuildDetailedErrors(HttpContext http,
         Dictionary<string, string[]> simple)
     {
         var detailed = new Dictionary<string, object[]>();

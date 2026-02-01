@@ -18,12 +18,12 @@ public class UpdateBranchOfficeAddressCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
-        BranchOfficeId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
+            BranchOfficeId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

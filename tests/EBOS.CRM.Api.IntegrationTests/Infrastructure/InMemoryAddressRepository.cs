@@ -113,7 +113,7 @@ public sealed class InMemoryAddressRepository : IAddressRepository
     public Task<bool> ExistPrimaryAddressInCustomerId(long customerId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var exists = _items.Any(x =>  x is { Erased: false });
+        var exists = _items.Any(x => x is { Erased: false });
         return Task.FromResult(exists);
     }
 }

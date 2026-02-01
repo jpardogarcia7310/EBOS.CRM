@@ -12,7 +12,7 @@ public sealed class ValidationProblemDetailsSchemaFilter : ISchemaFilter
         if (context.Type != typeof(ValidationProblemDetails))
             return;
 
-        schema.Description ??= 
+        schema.Description ??=
             "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.";
 
         schema.Extensions["x-errors-detailed"] = new OpenApiObject

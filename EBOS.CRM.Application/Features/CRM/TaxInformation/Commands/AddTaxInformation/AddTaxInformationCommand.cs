@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using MediatR;

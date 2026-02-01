@@ -24,8 +24,8 @@ public class BankInformationConfiguration : IEntityTypeConfiguration<BankInforma
         builder.Property(db => db.BankName)
             .HasMaxLength(200);
         builder.Property(c => c.Erased)
-            .IsRequired(); 
-        
+            .IsRequired();
+
         // ------------------------------------------------------------
         // One-to-One: BankInformation (principal) → Customer (dependent)
         // FK: BankInformation.CustomerId

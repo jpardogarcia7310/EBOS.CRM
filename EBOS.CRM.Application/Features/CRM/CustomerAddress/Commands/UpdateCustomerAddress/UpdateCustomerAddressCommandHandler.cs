@@ -34,7 +34,7 @@ public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repo
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.CustomerAddress),
+                Entity: nameof(Domain.Entities.CRM.CustomerAddress),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

@@ -22,7 +22,7 @@ public class BranchOfficeAddressEntityFactoryTest
             IsCurrent = isCurrent
         };
     }
-    
+
     [Fact]
     public void CreateValidBranchOfficeAddress_Defaults_AreSet()
     {

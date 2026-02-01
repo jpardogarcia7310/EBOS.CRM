@@ -29,7 +29,7 @@ public class DeleteCustomerCommandHandler(ICustomerRepository repository, IAudit
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Delete,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.Customer),
+                Entity: nameof(Domain.Entities.CRM.Customer),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: null,

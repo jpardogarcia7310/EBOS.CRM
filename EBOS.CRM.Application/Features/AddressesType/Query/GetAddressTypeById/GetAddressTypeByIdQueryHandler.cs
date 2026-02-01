@@ -5,10 +5,10 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 
-public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, IMapper mapper) 
+public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, IMapper mapper)
     : IRequestHandler<GetAddressTypeByIdQuery, AddressTypeResponse?>
 {
-    private readonly IAddressTypeRepository _repository = repository ?? 
+    private readonly IAddressTypeRepository _repository = repository ??
                                                           throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -16,7 +16,7 @@ public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, I
     {
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
         return entity is null ? null : _mapper.Map<AddressTypeResponse>(entity);
     }

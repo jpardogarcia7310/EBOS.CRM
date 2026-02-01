@@ -29,7 +29,7 @@ public class DeleteBranchOfficeCommandHandler(IBranchOfficeRepository repository
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Delete,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOffice),
+                Entity: nameof(Domain.Entities.CRM.BranchOffice),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: null,

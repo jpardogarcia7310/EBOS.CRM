@@ -29,7 +29,7 @@ public class AddCreditTransactionCommandHandler(ICreditTransactionRepository rep
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Add,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.CreditTransaction),
+                Entity: nameof(Domain.Entities.CRM.CreditTransaction),
                 RegisterId: entity.Id,
                 OldValues: null,
                 NewValues: AuditSerialization.Serialize(entity),

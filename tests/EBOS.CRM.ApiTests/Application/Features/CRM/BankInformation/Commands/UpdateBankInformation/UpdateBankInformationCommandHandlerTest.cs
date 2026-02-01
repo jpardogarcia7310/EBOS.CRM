@@ -98,10 +98,10 @@ public class UpdateBankInformationCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateBankInformationRequest BuildUpdateRequest() => new(
-        Iban: "ES1200000000000000000000",
-        Bic: "BANKESMM",
-        BankName: "Bank",
-        CustomerId: 1
-    );
+    private static UpdateBankInformationRequest BuildUpdateRequest() => new(
+            Iban: "ES1200000000000000000000",
+            Bic: "BANKESMM",
+            BankName: "Bank",
+            CustomerId: 1
+        );
 }

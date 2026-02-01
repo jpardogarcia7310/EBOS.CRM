@@ -18,8 +18,9 @@ public sealed class ValidationProblemDetailsOperationFilter : IOperationFilter
             ["status"] = new OpenApiInteger(400),
             ["errors"] = new OpenApiObject
             {
-                ["name"] = new OpenApiArray { new OpenApiString("El campo Name es obligatorio.") },
-                ["iso31661A2Code"] = new OpenApiArray { new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres.") }
+                ["name"] = new OpenApiArray { new OpenApiString("The Name field is required.") },
+                ["iso31661A2Code"] = new OpenApiArray { new
+                    OpenApiString("The Iso31661A2Code field must have 2 characters.") }
             },
             ["errorsDetailed"] = new OpenApiObject
             {
@@ -27,7 +28,7 @@ public sealed class ValidationProblemDetailsOperationFilter : IOperationFilter
                 {
                     new OpenApiObject
                     {
-                        ["message"] = new OpenApiString("El campo Name es obligatorio."),
+                        ["message"] = new OpenApiString("The Name field is required."),
                         ["code"] = new OpenApiString("VAL_NAME_REQUIRED")
                     }
                 },
@@ -35,7 +36,7 @@ public sealed class ValidationProblemDetailsOperationFilter : IOperationFilter
                 {
                     new OpenApiObject
                     {
-                        ["message"] = new OpenApiString("El campo Iso31661A2Code debe tener 2 caracteres."),
+                        ["message"] = new OpenApiString("The Iso31661A2Code field must have 2 characters."),
                         ["code"] = new OpenApiString("VAL_ISOA2_LENGTH")
                     }
                 }

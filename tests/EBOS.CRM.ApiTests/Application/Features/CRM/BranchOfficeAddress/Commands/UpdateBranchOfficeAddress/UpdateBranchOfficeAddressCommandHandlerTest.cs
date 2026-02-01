@@ -97,12 +97,12 @@ public class UpdateBranchOfficeAddressCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
-        BranchOfficeId: 1,
-        AddressId: 1,
-        IsPrimary: true,
-        ValidFrom: DateTime.UtcNow,
-        ValidTo: null,
-        IsCurrent: true
-    );
+    private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
+            BranchOfficeId: 1,
+            AddressId: 1,
+            IsPrimary: true,
+            ValidFrom: DateTime.UtcNow,
+            ValidTo: null,
+            IsCurrent: true
+        );
 }

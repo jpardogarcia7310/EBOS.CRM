@@ -82,7 +82,7 @@ internal static class PagedQueryExtensions
 
         var parameter = Expression.Parameter(typeof(T), "x");
         var propertyAccess = Expression.Property(parameter, property);
-        Expression? predicateBody = null;
+        Expression? predicateBody;
 
         if (property.PropertyType == typeof(string))
         {
@@ -108,11 +108,6 @@ internal static class PagedQueryExtensions
             var constant = Expression.Constant(converted, targetType);
             Expression comparison = Expression.Equal(Expression.Convert(propertyAccess, targetType), constant);
             predicateBody = comparison;
-        }
-
-        if (predicateBody is null)
-        {
-            return query;
         }
 
         var predicate = Expression.Lambda<Func<T, bool>>(predicateBody, parameter);

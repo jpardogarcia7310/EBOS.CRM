@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
 using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
@@ -102,5 +101,7 @@ public class BankInformationController(IMediator mediator) : ControllerBase
 
     #endregion
 }
+
+
 
 

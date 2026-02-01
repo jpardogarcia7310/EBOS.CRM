@@ -97,9 +97,9 @@ public class UpdateTaxInformationCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
-        TaxName: "Tax",
-        TaxIdentificationNumber: "TAX123",
-        CustomerId: 1
-    );
+    private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
+            TaxName: "Tax",
+            TaxIdentificationNumber: "TAX123",
+            CustomerId: 1
+        );
 }

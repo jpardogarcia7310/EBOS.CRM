@@ -34,7 +34,7 @@ public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressReposit
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress),
+                Entity: nameof(Domain.Entities.CRM.BranchOfficeAddress),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

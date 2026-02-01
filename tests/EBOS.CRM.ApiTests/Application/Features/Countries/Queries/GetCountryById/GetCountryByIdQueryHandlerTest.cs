@@ -24,11 +24,20 @@ public class GetCountryByIdQueryHandlerTest
     public async Task Handle_ExistingId_ReturnsMappedDto()
     {
         // Arrange
-        var country = new Country { Id = 1, Name = "España", Iso31661A2Code = "ES", Iso31661A3Code = "ESP", 
-            Iso31661NumCode = "724", Domain = ".es", Currency = "Euro", CurrencyCode = "EUR", 
-            InternationalPhoneCode = "34" };
-        var dto = new CountryResponse(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code, 
-            country.Iso31661NumCode, country.Domain, country.Currency, country.CurrencyCode, 
+        var country = new Country
+        {
+            Id = 1,
+            Name = "España",
+            Iso31661A2Code = "ES",
+            Iso31661A3Code = "ESP",
+            Iso31661NumCode = "724",
+            Domain = ".es",
+            Currency = "Euro",
+            CurrencyCode = "EUR",
+            InternationalPhoneCode = "34"
+        };
+        var dto = new CountryResponse(country.Id, country.Name, country.Iso31661A2Code, country.Iso31661A3Code,
+            country.Iso31661NumCode, country.Domain, country.Currency, country.CurrencyCode,
             country.InternationalPhoneCode);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
@@ -44,7 +53,7 @@ public class GetCountryByIdQueryHandlerTest
         Assert.NotNull(result);
         Assert.Equal(dto.Id, result.Id);
         Assert.Equal(dto.Name, result.Name);
-        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()), 
+        _repositoryMock.Verify(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()),
             Times.Once);
         _mapperMock.Verify(m => m.Map<CountryResponse>(country), Times.Once);
     }

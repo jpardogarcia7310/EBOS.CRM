@@ -18,12 +18,12 @@ public class UpdateCreditTransactionCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
-private static UpdateCreditTransactionRequest BuildUpdateRequest() => new(
-        Date: DateTime.UtcNow,
-        Amount: 50m,
-        Type: "Consumption",
-        ExternalReference: "REF",
-        Comments: "Comment",
-        CreditAccountId: 1
-    );
+    private static UpdateCreditTransactionRequest BuildUpdateRequest() => new(
+            Date: DateTime.UtcNow,
+            Amount: 50m,
+            Type: "Consumption",
+            ExternalReference: "REF",
+            Comments: "Comment",
+            CreditAccountId: 1
+        );
 }

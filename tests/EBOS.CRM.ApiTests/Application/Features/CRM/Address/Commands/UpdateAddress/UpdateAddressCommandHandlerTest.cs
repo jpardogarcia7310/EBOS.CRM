@@ -57,8 +57,17 @@ public class UpdateAddressCommandHandlerTest
     [Fact]
     public async Task Handle_WhenEntityFound_UpdatesAndAudits()
     {
-        var entity = new CRMAddress { Id = 1, Street = "Old", ExternalNumber = "1", City = "Quito", StateOrProvince = "Pichincha",
-            PostalCode = "EC17001", CountryId = 1, AddressTypeId = 1 };
+        var entity = new CRMAddress
+        {
+            Id = 1,
+            Street = "Old",
+            ExternalNumber = "1",
+            City = "Quito",
+            StateOrProvince = "Pichincha",
+            PostalCode = "EC17001",
+            CountryId = 1,
+            AddressTypeId = 1
+        };
         var response = new AddressResponse(1, "New", "2", null, null, null, null, "Quito", "Pichincha",
             "EC17001", null, null, null, 1, 1, true);
 
@@ -84,8 +93,17 @@ public class UpdateAddressCommandHandlerTest
     [Fact]
     public async Task Handle_WhenSaveChangesThrows_RollsBack()
     {
-        var entity = new CRMAddress { Id = 1, Street = "Old", ExternalNumber = "1", City = "Quito", StateOrProvince = "Pichincha",
-            PostalCode = "EC17001", CountryId = 1, AddressTypeId = 1 };
+        var entity = new CRMAddress
+        {
+            Id = 1,
+            Street = "Old",
+            ExternalNumber = "1",
+            City = "Quito",
+            StateOrProvince = "Pichincha",
+            PostalCode = "EC17001",
+            CountryId = 1,
+            AddressTypeId = 1
+        };
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

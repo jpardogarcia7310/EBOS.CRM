@@ -18,9 +18,9 @@ public class AddBranchOfficeCommandValidatorTest
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-private static AddBranchOfficeRequest BuildAddRequest() => new(
-        Name: "Main",
-        PhoneNumber: "123",
-        CorporateCustomerId: 1
-    );
+    private static AddBranchOfficeRequest BuildAddRequest() => new(
+            Name: "Main",
+            PhoneNumber: "123",
+            CorporateCustomerId: 1
+        );
 }

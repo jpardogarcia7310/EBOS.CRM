@@ -5,7 +5,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories;
 
 public class CountryEntityFactoryTest
 {
-    public static Country CreateValidCountry(string name = "España", string iso2 = "ES", string iso3 = "ESP", 
+    public static Country CreateValidCountry(string name = "España", string iso2 = "ES", string iso3 = "ESP",
         string num = "724")
     {
         return new Country
