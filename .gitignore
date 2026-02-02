@@ -51,11 +51,9 @@ TestResults/
 ############################
 #   JetBrains Rider / IntelliJ
 ############################
-
+# IDE folders
 .idea/
-*.iml
-*.ipr
-*.iws
+.ides/
 
 # Rider system files
 .idea/**/workspace.xml
@@ -85,6 +83,7 @@ $RECYCLE.BIN/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -364,6 +363,26 @@ node_modules/
 *.ncb
 *.aps
 
+# VS Code files for those working on multiple tools
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+# Local History for Visual Studio
+**/.localhistory/
+
+# Visual Studio History (VSHistory) files
+.vshistory/
+
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
 **/*.DesktopClient/GeneratedArtifacts
@@ -421,12 +440,6 @@ MSBuild_Logs/
 # MFractors (Xamarin productivity tool) working folder
 **/.mfractor/
 
-# Local History for Visual Studio
-**/.localhistory/
-
-# Visual Studio History (VSHistory) files
-.vshistory/
-
 # BeatPulse healthcheck temp database
 healthchecksdb
 
@@ -438,20 +451,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-
-# VS Code files for those working on multiple tools
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
-
-# Local History for Visual Studio Code
-.history/
-
-# Built Visual Studio Code Extensions
-*.vsix
 
 # Windows Installer files from build outputs
 *.cab
