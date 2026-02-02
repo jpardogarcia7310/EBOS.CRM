@@ -3,6 +3,8 @@
     <File Path="documentation/Internal.md" />
     <File Path="documentation/AGENTS.md" />
     <File Path="documentation/Contributing.md" />
+    <File Path="documentation/Features_ES.md" />
+    <File Path="documentation/Features.md" />
     <File Path="documentation/Code of conduct.md" />
     <File Path="README.md" />
   </Folder>
