@@ -1,18 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;// si usas ValidationProblemDetails
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Swagger;
 
-public class ValidationProblemDetailsSchemaFilter : ISchemaFilter
+public sealed class ValidationProblemDetailsSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type != typeof(ValidationProblemDetails)) return;
-        schema.Description ??= "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.";
+        if (context.Type != typeof(ValidationProblemDetails))
+            return;
 
-        var errorsDetailedExample = new OpenApiObject
+        schema.Description ??=
+            "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.";
+
+        schema.Extensions["x-errors-detailed"] = new OpenApiObject
         {
             ["name"] = new OpenApiArray
             {
@@ -31,7 +34,5 @@ public class ValidationProblemDetailsSchemaFilter : ISchemaFilter
                 }
             }
         };
-
-        schema.Extensions["x-errors-detailed"] = errorsDetailedExample;
     }
 }

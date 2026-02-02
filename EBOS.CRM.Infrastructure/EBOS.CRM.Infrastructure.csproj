@@ -22,10 +22,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EBOS.CRM.Domain\EBOS.CRM.Domain.csproj" />
+    <ProjectReference Include="..\EBOS.CRM.Application\EBOS.CRM.Application.csproj" />
   </ItemGroup>
 
 </Project>

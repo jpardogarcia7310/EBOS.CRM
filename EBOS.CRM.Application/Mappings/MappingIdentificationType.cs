@@ -16,6 +16,7 @@ public sealed class MappingIdentificationType : IRegister
         config.NewConfig<IdentificationTypeResponse, IdentificationType>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Code, src => src.Code)
-            .Map(dest => dest.Description, src => src.Description);
+            .Map(dest => dest.Description, src => src.Description)
+            .Ignore(dest => dest.Erased);
     }
 }

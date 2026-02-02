@@ -4,11 +4,13 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Swagger;
 
-public class ErrorResponsesOperationFilter : IOperationFilter
+public sealed class ErrorResponsesOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        // 400 Validation error
+        var schemaGenerator = context.SchemaGenerator;
+        var schemaRepository = context.SchemaRepository;
+
         operation.Responses["400"] = new OpenApiResponse
         {
             Description = "Validation error",
@@ -16,12 +18,11 @@ public class ErrorResponsesOperationFilter : IOperationFilter
             {
                 ["application/problem+json"] = new OpenApiMediaType
                 {
-                    Schema = context.SchemaGenerator.GenerateSchema(typeof(ValidationProblemDetails), context.SchemaRepository)
+                    Schema = schemaGenerator.GenerateSchema(typeof(ValidationProblemDetails), schemaRepository)
                 }
             }
         };
 
-        // 404 Not found
         operation.Responses["404"] = new OpenApiResponse
         {
             Description = "Resource not found",
@@ -29,12 +30,11 @@ public class ErrorResponsesOperationFilter : IOperationFilter
             {
                 ["application/problem+json"] = new OpenApiMediaType
                 {
-                    Schema = context.SchemaGenerator.GenerateSchema(typeof(ProblemDetails), context.SchemaRepository)
+                    Schema = schemaGenerator.GenerateSchema(typeof(ProblemDetails), schemaRepository)
                 }
             }
         };
 
-        // 500 Internal server error
         operation.Responses["500"] = new OpenApiResponse
         {
             Description = "Unexpected error",
@@ -42,7 +42,7 @@ public class ErrorResponsesOperationFilter : IOperationFilter
             {
                 ["application/problem+json"] = new OpenApiMediaType
                 {
-                    Schema = context.SchemaGenerator.GenerateSchema(typeof(ProblemDetails), context.SchemaRepository)
+                    Schema = schemaGenerator.GenerateSchema(typeof(ProblemDetails), schemaRepository)
                 }
             }
         };

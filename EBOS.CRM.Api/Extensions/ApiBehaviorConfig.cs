@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -52,56 +54,24 @@ public static class ApiBehaviorConfig
             );
     }
 
-    private static Dictionary<string, object[]> BuildDetailedErrors(HttpContext http, Dictionary<string, string[]> simple)
+    private static Dictionary<string, object[]> BuildDetailedErrors(HttpContext http,
+        Dictionary<string, string[]> simple)
     {
         var detailed = new Dictionary<string, object[]>();
-
-        if (http.Items.TryGetValue("FluentValidationFailures", out var raw) && raw is IDictionary<string, object[]> map)
+        foreach (var (key, value) in simple)
         {
-            foreach (var kv in simple)
-            {
-                var key = kv.Key;
-                if (map.TryGetValue(key, out var arrObj))
-                {
-                    var list = new List<object>();
-                    foreach (var o in arrObj)
-                    {
-                        var props = o.GetType().GetProperties();
-                        var msg = "Invalid value";
-                        string? code = null;
-
-                        foreach (var p in props)
-                        {
-                            if (string.Equals(p.Name, "message", StringComparison.OrdinalIgnoreCase))
-                            {
-                                msg = p.GetValue(o)?.ToString() ?? "Invalid value";
-                            }
-                            else if (string.Equals(p.Name, "code", StringComparison.OrdinalIgnoreCase))
-                            {
-                                code = p.GetValue(o)?.ToString();
-                            }
-                        }
-
-                        code ??= $"VAL_{Math.Abs((key + "|" + msg).GetHashCode()):D6}";
-                        list.Add(new { message = msg, code });
-                    }
-                    detailed[key] = [.. list];
-                }
-                else
-                {
-                    detailed[key] = [.. kv.Value.Select(m => new { message = m, code = $"VAL_{Math.Abs((key + "|" + m).GetHashCode()):D6}" })];
-                }
-            }
-        }
-        else
-        {
-            foreach (var kv in simple)
-            {
-                var key = kv.Key;
-                detailed[key] = [.. kv.Value.Select(m => new { message = m, code = $"VAL_{Math.Abs((key + "|" + m).GetHashCode()):D6}" })];
-            }
+            detailed[key] = [.. value.Select(m => new { message = m, code = ComputeStableCode(key, m) })];
         }
 
         return detailed;
+    }
+
+    private static string ComputeStableCode(string key, string message)
+    {
+        var payload = $"{key}|{message}";
+        var bytes = Encoding.UTF8.GetBytes(payload);
+        var hash = SHA256.HashData(bytes);
+        var hex = Convert.ToHexString(hash);
+        return $"VAL_{hex.Substring(0, 12)}";
     }
 }

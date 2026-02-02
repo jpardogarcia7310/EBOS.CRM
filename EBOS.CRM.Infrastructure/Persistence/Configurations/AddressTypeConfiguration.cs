@@ -10,7 +10,6 @@ public class AddressTypeConfiguration : IEntityTypeConfiguration<AddressType>
     {
         builder.ToTable("AddressTypes", "EBOS");
 
-        // Primary Key (BIGINT IDENTITY)
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id).ValueGeneratedOnAdd();
 
@@ -20,5 +19,14 @@ public class AddressTypeConfiguration : IEntityTypeConfiguration<AddressType>
         builder.Property(t => t.Description)
             .IsRequired()
             .HasMaxLength(200);
+
+        builder.Property(t => t.Category)
+            .HasMaxLength(50);
+        builder.Property(t => t.AllowsMultiple)
+            .IsRequired()
+            .HasDefaultValue(true);
+        builder.Property(t => t.RequiresPrimary)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }

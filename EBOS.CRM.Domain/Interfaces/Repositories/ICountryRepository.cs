@@ -1,9 +1,9 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories;
 
-public interface ICountryRepository : IUnitOfWork
+public interface ICountryRepository : IPagedRepository<Country>
 {
     #region Queries
     Task<Country?> GetByIdAsync(long id, CancellationToken cancellationToken = default);

@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;

@@ -1,8 +1,10 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using EBOS.CRM.Application.Contracts.Requests.Common;
+using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.Status;
 
@@ -14,9 +16,15 @@ namespace EBOS.CRM.Api.Controllers.Status;
 public class StatusController(IMediator mediator) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Returns a status by its identifier.
+    /// </summary>
+    /// <example>
+    /// GET /api/v1/Status/1
+    /// </example>
+    /// <response code="200">Status found.</response>
+    /// <response code="404">Status not found.</response>
     [HttpGet("{id:long}")]
-    [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(StatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -37,14 +45,21 @@ public class StatusController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>
+    /// Returns all statuses.
+    /// </summary>
+    /// <example>
+    /// GET /api/v1/Status
+    /// </example>
+    /// <response code="200">List of statuses.</response>
     [HttpGet]
-    [MapToApiVersion("1.0")]
-    [MapToApiVersion("2.0")]
-    [ProducesResponseType(typeof(ICollection<StatusResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<StatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllStatusesQuery(), cancellationToken));
+        return Ok(await mediator.Send(new GetAllStatusesQuery(query), cancellationToken));
     }
     #endregion
 }
+
+

@@ -2,7 +2,6 @@
 
 public record AddressResponse(
     long Id,
-    bool IsPrimary,
     string Street,
     string ExternalNumber,
     string? InternalNumber,
@@ -15,7 +14,6 @@ public record AddressResponse(
     string? GoogleMapsUrl,
     string? Latitude,
     string? Longitude,
-    long CustomerId,
     long CountryId,
     long AddressTypeId,
     bool Active

@@ -1,64 +1,68 @@
-﻿using EBOS.Core.Primitives.Interfaces;
+using EBOS.Core.Primitives.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Primitives.Paging;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
-public class BaseRepository<T>(CrmDbContext context) where T : class, ISoftDeletable
+public class BaseRepository<T>(CrmDbContext context) : IRepository<T>, IPagedRepository<T> where T : class, ISoftDeletable
 {
+    protected readonly CrmDbContext Context = context;
     protected readonly DbSet<T> DbSet = context.Set<T>();
     private IDbContextTransaction? _currentTransaction;
 
     #region Commands
-    public virtual async Task AddAsync(T entity, CancellationToken cancellationToken = default)
-    {
-        await DbSet.AddAsync(entity, cancellationToken);
-    }
-    
-    public virtual async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
-    {
-        await DbSet.AddRangeAsync(entities, cancellationToken);
-    }
+    public virtual Task AddAsync(T entity, CancellationToken cancellationToken = default)
+        => DbSet.AddAsync(entity, cancellationToken).AsTask();
 
-    public virtual void AttachAsync(T entity, CancellationToken cancellationToken = default)
+    public virtual Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+        => DbSet.AddRangeAsync(entities, cancellationToken);
+
+    public virtual Task AttachAsync(T entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        context.Attach(entity);
+        Context.Attach(entity);
+        return Task.CompletedTask;
     }
-    
-    public virtual void UpdateAsync(T entity, CancellationToken cancellationToken = default)
+
+    public virtual Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         DbSet.Update(entity);
+        return Task.CompletedTask;
     }
 
-    public virtual void DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (entity is ISoftDeletable softDeletable)
-        {
-            softDeletable.Erased = true;
-            DbSet.Update(entity);
-        }
-        else
-        {
-            DbSet.Remove(entity);
-        }
+        entity.Erased = true;
+        DbSet.Update(entity);
+        return Task.CompletedTask;
     }
     #endregion
 
     #region Queries
     public virtual async Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var result = await DbSet.FindAsync([id], cancellationToken);
-        return result;
+        var entity = await DbSet.FindAsync([id], cancellationToken);
+        return entity is { Erased: false } ? entity : null;
     }
 
-    public virtual async Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        return await DbSet.AsNoTracking().ToListAsync(cancellationToken);
-    }
+    public virtual Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        => DbSet.AsNoTracking()
+            .Where(e => !e.Erased)
+            .ToListAsync(cancellationToken)
+            .ContinueWith<ICollection<T>>(t => t.Result, cancellationToken);
+
+    public virtual Task<PagedResult<T>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
+        => AsQueryable()
+            .AsNoTracking()
+            .ApplyPagedQueryAsync(query, cancellationToken);
+
+    public virtual IQueryable<T> AsQueryable(bool includeErased = false)
+        => includeErased ? DbSet.AsQueryable() : DbSet.Where(e => !e.Erased);
     #endregion
 
     #region IUnitOfWork
@@ -67,7 +71,7 @@ public class BaseRepository<T>(CrmDbContext context) where T : class, ISoftDelet
         if (_currentTransaction != null)
             return;
 
-        _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        _currentTransaction = await Context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken = default)
@@ -81,31 +85,30 @@ public class BaseRepository<T>(CrmDbContext context) where T : class, ISoftDelet
         _currentTransaction = null;
     }
 
-    public async Task EndTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        // Respond to the cancellation as soon as possible
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (_currentTransaction == null)
-            return;
-
-        // There is no DisposeAsync that accepts CancellationToken; we check for cancellation before and after
-        await _currentTransaction.DisposeAsync();
-        _currentTransaction = null;
-    }
-
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
         if (_currentTransaction == null)
             return;
+
         await _currentTransaction.RollbackAsync(cancellationToken);
         await _currentTransaction.DisposeAsync();
         _currentTransaction = null;
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task EndTransactionAsync(CancellationToken cancellationToken = default)
     {
-        return await context.SaveChangesAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (_currentTransaction == null)
+            return;
+
+        await _currentTransaction.DisposeAsync();
+        _currentTransaction = null;
     }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        => Context.SaveChangesAsync(cancellationToken);
     #endregion
 }
+
+
