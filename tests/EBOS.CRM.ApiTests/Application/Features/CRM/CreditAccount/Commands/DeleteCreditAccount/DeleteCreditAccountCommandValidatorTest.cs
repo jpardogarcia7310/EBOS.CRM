@@ -19,3 +19,5 @@ public class DeleteCreditAccountCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

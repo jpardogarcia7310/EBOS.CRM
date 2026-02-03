@@ -27,3 +27,5 @@ public class GetTaxInformationAddressByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<TaxInformationAddressResponse>(entity), Times.Once);
     }
 }
+
+

@@ -4,6 +4,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.DeleteTaxInformation;
 
 public class DeleteTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class DeleteTaxInformationCommandHandler(ITaxInformationRepository reposi
         return true;
     }
 }
+
+
+
+

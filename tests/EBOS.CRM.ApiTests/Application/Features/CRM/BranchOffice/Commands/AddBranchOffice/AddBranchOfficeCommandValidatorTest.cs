@@ -24,3 +24,5 @@ public class AddBranchOfficeCommandValidatorTest
             CorporateCustomerId: 1
         );
 }
+
+

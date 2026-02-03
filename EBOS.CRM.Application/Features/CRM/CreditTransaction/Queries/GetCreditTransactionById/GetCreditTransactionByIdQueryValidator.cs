@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetCreditTransactionById;
 
@@ -9,3 +12,7 @@ public class GetCreditTransactionByIdQueryValidator : AbstractValidator<GetCredi
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

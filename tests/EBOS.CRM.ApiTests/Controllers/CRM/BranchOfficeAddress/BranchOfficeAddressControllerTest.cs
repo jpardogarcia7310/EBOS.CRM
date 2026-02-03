@@ -21,7 +21,7 @@ public class BranchOfficeAddressControllerTest(CustomWebApplicationFactory<Progr
         var response = await _client.GetAsync($"/api/v{_version}/BranchOfficeAddress");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<BranchOfficeAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<BranchOfficeAddressResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class BranchOfficeAddressControllerTest(CustomWebApplicationFactory<Progr
     }
     #endregion
 }
+
+
+
 
 

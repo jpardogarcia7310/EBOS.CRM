@@ -27,3 +27,5 @@ public class GetBankInformationByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<BankInformationResponse>(entity), Times.Once);
     }
 }
+
+

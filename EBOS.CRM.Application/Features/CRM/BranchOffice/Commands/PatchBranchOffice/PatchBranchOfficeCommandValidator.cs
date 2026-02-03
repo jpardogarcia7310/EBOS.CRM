@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.PatchBranchOffice;
 
@@ -34,3 +37,7 @@ public class PatchBranchOfficeCommandValidator : AbstractValidator<PatchBranchOf
         });
     }
 }
+
+
+
+

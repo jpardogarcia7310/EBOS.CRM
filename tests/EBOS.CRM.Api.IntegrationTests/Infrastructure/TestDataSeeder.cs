@@ -56,6 +56,76 @@ public static class TestDataSeeder
         }
     }
 
+    public static async Task SeedAddressTypesAsync(CrmDbContext db)
+    {
+        if (await db.AddressTypes.AnyAsync())
+        {
+            return;
+        }
+
+        db.AddressTypes.AddRange(
+            new AddressType
+            {
+                Code = "HOME",
+                Description = "Home",
+                Category = "Shipping",
+                AllowsMultiple = true,
+                RequiresPrimary = false
+            },
+            new AddressType
+            {
+                Code = "WORK",
+                Description = "Work",
+                Category = "Billing",
+                AllowsMultiple = true,
+                RequiresPrimary = false
+            });
+
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task SeedIdentificationTypesAsync(CrmDbContext db)
+    {
+        if (await db.IdentificationTypes.AnyAsync())
+        {
+            return;
+        }
+
+        db.IdentificationTypes.AddRange(
+            new IdentificationType
+            {
+                Code = "DNI",
+                Description = "Documento"
+            },
+            new IdentificationType
+            {
+                Code = "PASS",
+                Description = "Passport"
+            });
+
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task SeedStatusesAsync(CrmDbContext db)
+    {
+        if (await db.Statuses.AnyAsync())
+        {
+            return;
+        }
+
+        db.Statuses.AddRange(
+            new Status
+            {
+                Description = "Active"
+            },
+            new Status
+            {
+                Description = "Inactive"
+            });
+
+        await db.SaveChangesAsync();
+    }
+
     private static IEnumerable<string> ValidateSeedRow(string name, string a2, string a3, string num, string domain, string currencyCode)
     {
         if (string.IsNullOrWhiteSpace(name)) yield return "Name empty";
@@ -66,3 +136,5 @@ public static class TestDataSeeder
         if (string.IsNullOrWhiteSpace(currencyCode) || currencyCode.Length != 3) yield return "CurrencyCode must be 3 letters";
     }
 }
+
+

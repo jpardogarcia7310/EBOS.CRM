@@ -18,7 +18,7 @@ public class BranchOfficeAddressTest(CustomWebApplicationFactory factory) : ICla
         var response = await _client.GetAsync($"/api/v{_version}/BranchOfficeAddress");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<BranchOfficeAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<BranchOfficeAddressResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class BranchOfficeAddressTest(CustomWebApplicationFactory factory) : ICla
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

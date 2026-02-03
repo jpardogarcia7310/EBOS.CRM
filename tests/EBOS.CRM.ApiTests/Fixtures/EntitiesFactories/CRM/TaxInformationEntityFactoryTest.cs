@@ -41,3 +41,5 @@ public class TaxInformationEntityFactoryTest
         Assert.Equal(2, entity.CustomerId);
     }
 }
+
+

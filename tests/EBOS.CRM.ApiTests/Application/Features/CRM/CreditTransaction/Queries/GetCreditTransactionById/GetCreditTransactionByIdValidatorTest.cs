@@ -19,3 +19,5 @@ public class GetCreditTransactionByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

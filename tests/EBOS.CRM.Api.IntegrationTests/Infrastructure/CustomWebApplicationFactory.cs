@@ -98,6 +98,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
                 });
             }
+
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+            db.Database.EnsureCreated();
+            TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedIdentificationTypesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedStatusesAsync(db).GetAwaiter().GetResult();
         });
     }
 
@@ -132,3 +140,5 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         }
     }
 }
+
+

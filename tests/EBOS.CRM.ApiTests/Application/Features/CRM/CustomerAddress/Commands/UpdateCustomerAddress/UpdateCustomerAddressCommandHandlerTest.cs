@@ -106,3 +106,5 @@ public class UpdateCustomerAddressCommandHandlerTest
             IsCurrent: true
         );
 }
+
+

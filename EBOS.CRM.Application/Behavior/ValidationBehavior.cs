@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 
 namespace EBOS.CRM.Application.Behavior;
@@ -21,3 +21,4 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
         return await next(cancellationToken);
     }
 }
+

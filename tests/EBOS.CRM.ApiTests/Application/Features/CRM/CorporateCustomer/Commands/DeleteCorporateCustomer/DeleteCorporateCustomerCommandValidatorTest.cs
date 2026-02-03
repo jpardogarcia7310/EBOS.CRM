@@ -19,3 +19,5 @@ public class DeleteCorporateCustomerCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

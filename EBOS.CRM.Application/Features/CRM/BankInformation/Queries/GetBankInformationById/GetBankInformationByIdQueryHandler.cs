@@ -3,6 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetBankInformationById;
 
 public class GetBankInformationByIdQueryHandler(IBankInformationRepository repository, IMapper mapper)
@@ -19,3 +20,7 @@ public class GetBankInformationByIdQueryHandler(IBankInformationRepository repos
         return entity is null ? null : _mapper.Map<BankInformationResponse>(entity);
     }
 }
+
+
+
+

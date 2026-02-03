@@ -87,3 +87,5 @@ public class AddTaxInformationAddressCommandHandlerTest
             IsCurrent: true
         );
 }
+
+

@@ -1,8 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -75,3 +74,4 @@ public static class ApiBehaviorConfig
         return $"VAL_{hex.Substring(0, 12)}";
     }
 }
+

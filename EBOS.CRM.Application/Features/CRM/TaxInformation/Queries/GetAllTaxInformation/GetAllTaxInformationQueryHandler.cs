@@ -3,16 +3,17 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformation;
 
 public class GetAllTaxInformationQueryHandler(ITaxInformationRepository repository, IMapper mapper)
-    : IRequestHandler<GetAllTaxInformationQuery, ICollection<TaxInformationResponse>>
+    : IRequestHandler<GetAllTaxInformationQuery, IReadOnlyCollection<TaxInformationResponse>>
 {
     private readonly ITaxInformationRepository _repository = repository ??
                                                             throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<ICollection<TaxInformationResponse>> Handle(GetAllTaxInformationQuery request,
+    public async Task<IReadOnlyCollection<TaxInformationResponse>> Handle(GetAllTaxInformationQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -21,3 +22,8 @@ public class GetAllTaxInformationQueryHandler(ITaxInformationRepository reposito
         return entities.Select(e => _mapper.Map<TaxInformationResponse>(e)).ToList();
     }
 }
+
+
+
+
+

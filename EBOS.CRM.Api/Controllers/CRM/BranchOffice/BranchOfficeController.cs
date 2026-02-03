@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetBranchOfficeById;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOffice;
 
@@ -92,15 +89,19 @@ public class BranchOfficeController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<BranchOfficeResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<BranchOfficeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllBranchOfficesQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllBranchOfficesQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

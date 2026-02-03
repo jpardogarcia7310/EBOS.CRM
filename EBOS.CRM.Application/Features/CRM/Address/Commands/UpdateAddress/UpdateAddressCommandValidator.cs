@@ -1,6 +1,7 @@
 using FluentValidation;
 using System.Globalization;
 
+
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
 
 public class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressCommand>
@@ -62,3 +63,7 @@ public class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressComm
         return parsed >= min && parsed <= max;
     }
 }
+
+
+
+

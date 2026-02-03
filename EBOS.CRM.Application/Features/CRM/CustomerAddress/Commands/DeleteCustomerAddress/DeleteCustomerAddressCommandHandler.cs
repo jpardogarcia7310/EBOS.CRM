@@ -4,6 +4,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.DeleteCustomerAddress;
 
 public class DeleteCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class DeleteCustomerAddressCommandHandler(ICustomerAddressRepository repo
         return true;
     }
 }
+
+
+
+

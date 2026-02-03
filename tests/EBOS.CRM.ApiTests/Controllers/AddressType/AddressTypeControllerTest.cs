@@ -21,7 +21,7 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
         var response = await _client.GetAsync($"/api/v{_version}/AddressType");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<AddressTypeResponse>();
+        var items = await response.Content.ReadItemsAsync<AddressTypeResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -94,4 +94,7 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     }
     #endregion
 }
+
+
+
 

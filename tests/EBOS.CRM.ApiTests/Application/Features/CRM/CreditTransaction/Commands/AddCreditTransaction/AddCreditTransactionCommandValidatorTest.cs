@@ -27,3 +27,5 @@ public class AddCreditTransactionCommandValidatorTest
             CreditAccountId: 1
         );
 }
+
+

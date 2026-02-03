@@ -1,4 +1,7 @@
+
+
 using EBOS.Core.Primitives;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -12,3 +15,4 @@ public class BranchOffice : ErasableEntity
 
     public ICollection<BranchOfficeAddress> BranchOfficeAddresses { get; set; } = new List<BranchOfficeAddress>();
 }
+

@@ -35,3 +35,5 @@ public class BankInformationConcurrencyTest(CustomWebApplicationFactory factory)
     }
 }
 
+
+

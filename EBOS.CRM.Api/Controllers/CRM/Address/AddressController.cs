@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAddressById;
 using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
@@ -150,14 +147,18 @@ public class AddressController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of addresses.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<AddressResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<AddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllAddressQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllAddressQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 

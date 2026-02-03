@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -13,3 +13,4 @@ public sealed class IndividualCustomer : Customer
     public long IdentificationTypeId { get; set; }
     public IdentificationType IdentificationType { get; set; } = null!;
 }
+

@@ -19,3 +19,5 @@ public class GetIndividualCustomerByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

@@ -18,7 +18,7 @@ public class CustomerAddressTest(CustomWebApplicationFactory factory) : IClassFi
         var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<CustomerAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<CustomerAddressResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class CustomerAddressTest(CustomWebApplicationFactory factory) : IClassFi
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

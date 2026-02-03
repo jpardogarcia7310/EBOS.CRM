@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
-
 namespace EBOS.CRM.Api.Extensions;
 
 public static class SwaggerConfig
@@ -21,3 +18,4 @@ public static class SwaggerConfig
         });
     }
 }
+

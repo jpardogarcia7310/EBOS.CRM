@@ -110,3 +110,5 @@ public class UpdateIndividualCustomerCommandHandlerTest
             IdentificationTypeId: 1
         );
 }
+
+

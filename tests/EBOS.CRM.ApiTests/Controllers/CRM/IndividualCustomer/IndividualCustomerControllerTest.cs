@@ -21,7 +21,7 @@ public class IndividualCustomerControllerTest(CustomWebApplicationFactory<Progra
         var response = await _client.GetAsync($"/api/v{_version}/IndividualCustomer");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<IndividualCustomerResponse>();
+        var items = await response.Content.ReadItemsAsync<IndividualCustomerResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class IndividualCustomerControllerTest(CustomWebApplicationFactory<Progra
     }
     #endregion
 }
+
+
+
 
 

@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.DeleteAddress;
 
@@ -9,3 +12,7 @@ public class DeleteAddressCommandValidator : AbstractValidator<DeleteAddressComm
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

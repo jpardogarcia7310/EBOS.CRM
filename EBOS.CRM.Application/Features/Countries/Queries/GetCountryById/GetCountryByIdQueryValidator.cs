@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
@@ -12,3 +12,6 @@ public class GetCountryByIdQueryValidator : AbstractValidator<GetCountryByIdQuer
             .WithErrorCode("VAL_ID_POSITIVE");
     }
 }
+
+
+

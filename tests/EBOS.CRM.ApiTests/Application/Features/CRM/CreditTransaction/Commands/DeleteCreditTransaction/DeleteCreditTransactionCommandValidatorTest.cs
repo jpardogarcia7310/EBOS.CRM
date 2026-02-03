@@ -19,3 +19,5 @@ public class DeleteCreditTransactionCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

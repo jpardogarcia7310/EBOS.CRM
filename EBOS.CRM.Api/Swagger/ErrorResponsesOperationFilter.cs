@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using Microsoft.OpenApi.Models;
 
 namespace EBOS.CRM.Api.Swagger;
 

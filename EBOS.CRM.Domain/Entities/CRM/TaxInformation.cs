@@ -1,4 +1,7 @@
+
+
 using EBOS.Core.Primitives;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -12,3 +15,4 @@ public class TaxInformation : ErasableEntity
 
     public ICollection<TaxInformationAddress> TaxInformationAddresses { get; set; } = new List<TaxInformationAddress>();
 }
+

@@ -18,7 +18,7 @@ public class CreditAccountTest(CustomWebApplicationFactory factory) : IClassFixt
         var response = await _client.GetAsync($"/api/v{_version}/CreditAccount");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<CreditAccountResponse>();
+        var items = await response.Content.ReadItemsAsync<CreditAccountResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class CreditAccountTest(CustomWebApplicationFactory factory) : IClassFixt
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

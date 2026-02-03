@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
 
+
 namespace EBOS.CRM.Domain.Entities.CRM;
 
 public sealed class CreditTransaction : ErasableEntity
@@ -21,3 +22,5 @@ public sealed class CreditTransaction : ErasableEntity
     [ForeignKey(nameof(CreditAccountId))]
     public CreditAccount CreditAccount { get; set; } = null!;
 }
+
+

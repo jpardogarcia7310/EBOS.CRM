@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.DeleteCreditTransaction;
 
@@ -9,3 +12,7 @@ public class DeleteCreditTransactionCommandValidator : AbstractValidator<DeleteC
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

@@ -21,7 +21,7 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
         var response = await _client.GetAsync($"/api/v{_version}/Status");
         response.EnsureSuccessStatusCode();
 
-        var statuses = await response.Content.ReadPagedItemsAsync<StatusResponse>();
+        var statuses = await response.Content.ReadItemsAsync<StatusResponse>();
         Assert.NotNull(statuses);
         Assert.NotEmpty(statuses);
     }
@@ -94,4 +94,7 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     }
     #endregion
 }
+
+
+
 

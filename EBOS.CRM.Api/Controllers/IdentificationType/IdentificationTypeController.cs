@@ -2,9 +2,6 @@ using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.IdentificationType;
 
@@ -53,14 +50,18 @@ public class IdentificationTypeController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of identification types.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<IdentificationTypeResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllIdentificationTypeQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllIdentificationTypeQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 

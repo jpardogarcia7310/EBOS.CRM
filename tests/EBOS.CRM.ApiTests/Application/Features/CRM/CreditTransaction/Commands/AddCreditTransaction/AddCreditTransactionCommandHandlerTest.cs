@@ -87,3 +87,5 @@ public class AddCreditTransactionCommandHandlerTest
             CreditAccountId: 1
         );
 }
+
+

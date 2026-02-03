@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
 
@@ -12,3 +15,7 @@ public class AddBankInformationCommandValidator : AbstractValidator<AddBankInfor
         RuleFor(x => x.BankInformationRequest.CustomerId).GreaterThan(0);
     }
 }
+
+
+
+

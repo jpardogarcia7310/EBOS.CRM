@@ -5,6 +5,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
 
 public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,
@@ -68,3 +69,7 @@ public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditS
             !entity.Erased);
     }
 }
+
+
+
+

@@ -38,3 +38,5 @@ public class AddressTypeEntityFactoryTest
         Assert.Equal("Billing", addressType.Description);
     }
 }
+
+

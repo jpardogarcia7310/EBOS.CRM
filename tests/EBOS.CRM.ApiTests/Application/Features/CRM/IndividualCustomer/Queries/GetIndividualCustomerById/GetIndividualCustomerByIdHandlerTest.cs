@@ -27,3 +27,5 @@ public class GetIndividualCustomerByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<IndividualCustomerResponse>(entity), Times.Once);
     }
 }
+
+

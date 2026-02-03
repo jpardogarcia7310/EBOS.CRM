@@ -18,7 +18,7 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
         var response = await _client.GetAsync($"/api/v{_version}/BankInformation");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<BankInformationResponse>();
+        var items = await response.Content.ReadItemsAsync<BankInformationResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

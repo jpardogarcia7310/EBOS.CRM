@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
 
@@ -12,3 +15,7 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
         RuleFor(x => x.CustomerRequest.StatusId).GreaterThan(0);
     }
 }
+
+
+
+

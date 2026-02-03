@@ -21,7 +21,7 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
         var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<CustomerAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<CustomerAddressResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
     }
     #endregion
 }
+
+
+
 
 

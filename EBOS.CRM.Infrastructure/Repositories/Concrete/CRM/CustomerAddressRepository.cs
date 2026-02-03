@@ -1,7 +1,7 @@
-﻿using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
@@ -22,3 +22,5 @@ public class CustomerAddressRepository(CrmDbContext context) : BaseRepository<Cu
             .FirstOrDefaultAsync(ca => ca.CustomerId == customerId && ca.IsPrimary && ca.IsCurrent, cancellationToken);
     }
 }
+
+

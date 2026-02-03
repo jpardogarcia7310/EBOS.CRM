@@ -24,3 +24,5 @@ public class AddCreditAccountCommandValidatorTest
             CustomerId: 1
         );
 }
+
+

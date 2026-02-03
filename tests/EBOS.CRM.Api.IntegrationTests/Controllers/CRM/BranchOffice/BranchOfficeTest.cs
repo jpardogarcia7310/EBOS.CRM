@@ -18,7 +18,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
         var response = await _client.GetAsync($"/api/v{_version}/BranchOffice");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<BranchOfficeResponse>();
+        var items = await response.Content.ReadItemsAsync<BranchOfficeResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

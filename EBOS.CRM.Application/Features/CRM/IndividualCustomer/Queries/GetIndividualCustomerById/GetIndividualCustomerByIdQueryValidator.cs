@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetIndividualCustomerById;
 
@@ -9,3 +12,7 @@ public class GetIndividualCustomerByIdQueryValidator : AbstractValidator<GetIndi
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

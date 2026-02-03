@@ -4,7 +4,7 @@ using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
-using Microsoft.Extensions.Options;
+
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
@@ -139,3 +139,4 @@ public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServ
                 lastException);
     }
 }
+

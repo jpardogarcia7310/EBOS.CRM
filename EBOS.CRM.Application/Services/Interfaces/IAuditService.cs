@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Services.Audit;
 
+
 namespace EBOS.CRM.Application.Services.Interfaces;
 
 public interface IAuditService
@@ -22,3 +23,5 @@ public interface IAuditService
         long registerId,
         CancellationToken cancellationToken = default);
 }
+
+

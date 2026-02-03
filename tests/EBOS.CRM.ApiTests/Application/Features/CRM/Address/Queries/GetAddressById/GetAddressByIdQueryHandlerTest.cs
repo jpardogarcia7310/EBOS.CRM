@@ -27,3 +27,5 @@ public class GetAddressByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<AddressResponse>(entity), Times.Once);
     }
 }
+
+

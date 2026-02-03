@@ -27,3 +27,5 @@ public class GetCreditTransactionByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<CreditTransactionResponse>(entity), Times.Once);
     }
 }
+
+

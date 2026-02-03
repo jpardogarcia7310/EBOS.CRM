@@ -18,7 +18,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
         var response = await _client.GetAsync($"/api/v{_version}/Customer");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<CustomerResponse>();
+        var items = await response.Content.ReadItemsAsync<CustomerResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

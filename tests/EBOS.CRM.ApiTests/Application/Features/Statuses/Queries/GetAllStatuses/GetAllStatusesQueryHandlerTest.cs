@@ -4,8 +4,6 @@ using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using Moq;
-using EBOS.CRM.Domain.Primitives.Paging;
-using EBOS.CRM.Application.Contracts.Requests.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Statuses.Queries.GetAllStatuses;
 
@@ -35,20 +33,20 @@ public class GetAllStatusesQueryHandlerTest
             new(1, "Active")
         };
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<StatusResponse>>(statuses)).Returns(dtos);
 
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result.Items);
-        Assert.Equal("Active", result.Items.First().Description);
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
+        Assert.Single(result);
+        Assert.Equal("Active", result.First().Description);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
         _mapperMock.Verify(m => m.Map<IReadOnlyCollection<StatusResponse>>(statuses), Times.Once);
     }
@@ -60,27 +58,27 @@ public class GetAllStatusesQueryHandlerTest
         var statuses = new List<Status>();
         var dtos = new List<StatusResponse>();
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<StatusResponse>>(statuses)).Returns(dtos);
 
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Empty(result.Items);
+        Assert.Empty(result);
     }
 
     [Fact]
     public async Task Handle_RepositoryThrows_PropagatesException()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new Exception("DB error"));
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
@@ -91,7 +89,7 @@ public class GetAllStatusesQueryHandlerTest
     {
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
             () => _handler.Handle(query, cts.Token));
@@ -102,14 +100,14 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var statuses = new List<Status> { new() { Id = 1, Description = "Active" } };
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
 
         // We simulated that the Mapster mapper failed
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<StatusResponse>>(statuses))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -123,19 +121,19 @@ public class GetAllStatusesQueryHandlerTest
         var statuses = new List<Status> { new() { Id = 1, Description = null! } };
         var dtos = new List<StatusResponse> { new(1, null!) };
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<StatusResponse>>(statuses)).Returns(dtos);
 
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result.Items);
-        Assert.Null(result.Items.First().Description);
+        Assert.Single(result);
+        Assert.Null(result.First().Description);
     }
 
     [Fact]
@@ -143,10 +141,10 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var statuses = new List<Status>();
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
 
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
@@ -159,19 +157,23 @@ public class GetAllStatusesQueryHandlerTest
     public async Task Handle_RepositoryCalledOnce_WithCancellationToken()
     {
         // Arrange
-        var query = new GetAllStatusesQuery(new PagedQueryRequest());
+        var query = new GetAllStatusesQuery();
         var statuses = new List<Status>();
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Status>(statuses, 1, 50, statuses.Count, statuses.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(statuses);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }
+
+
+
+
 
 
 

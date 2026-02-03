@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
 
@@ -13,3 +16,7 @@ public class UpdateBranchOfficeCommandValidator : AbstractValidator<UpdateBranch
         RuleFor(x => x.BranchOfficeRequest.CorporateCustomerId).GreaterThan(0);
     }
 }
+
+
+
+

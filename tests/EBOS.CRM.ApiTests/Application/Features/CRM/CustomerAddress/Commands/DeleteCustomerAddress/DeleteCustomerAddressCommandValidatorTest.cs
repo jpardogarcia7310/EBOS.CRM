@@ -19,3 +19,5 @@ public class DeleteCustomerAddressCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

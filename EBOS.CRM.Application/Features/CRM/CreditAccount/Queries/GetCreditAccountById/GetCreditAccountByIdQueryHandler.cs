@@ -3,6 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetCreditAccountById;
 
 public class GetCreditAccountByIdQueryHandler(ICreditAccountRepository repository, IMapper mapper)
@@ -19,3 +20,7 @@ public class GetCreditAccountByIdQueryHandler(ICreditAccountRepository repositor
         return entity is null ? null : _mapper.Map<CreditAccountResponse>(entity);
     }
 }
+
+
+
+

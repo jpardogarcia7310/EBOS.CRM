@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.DeleteBranchOffice;
 
@@ -9,3 +12,7 @@ public class DeleteBranchOfficeCommandValidator : AbstractValidator<DeleteBranch
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

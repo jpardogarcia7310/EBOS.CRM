@@ -1,7 +1,8 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
+
 
 namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
@@ -21,3 +22,6 @@ public class GetIdentificationTypeByIdQueryHandler(IIdentificationTypeRepository
         return entity is null ? null : _mapper.Map<IdentificationTypeResponse>(entity);
     }
 }
+
+
+

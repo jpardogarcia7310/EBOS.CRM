@@ -21,7 +21,7 @@ public class IdentificationTypeControllerTest(CustomWebApplicationFactory<Progra
         var response = await _client.GetAsync($"/api/v{_version}/IdentificationType");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<IdentificationTypeResponse>();
+        var items = await response.Content.ReadItemsAsync<IdentificationTypeResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -94,4 +94,7 @@ public class IdentificationTypeControllerTest(CustomWebApplicationFactory<Progra
     }
     #endregion
 }
+
+
+
 

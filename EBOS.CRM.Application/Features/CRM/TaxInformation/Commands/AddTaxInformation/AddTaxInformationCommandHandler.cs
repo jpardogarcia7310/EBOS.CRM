@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 
 public class AddTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddTaxInformationCommandHandler(ITaxInformationRepository repositor
         return mapper.Map<TaxInformationResponse>(entity);
     }
 }
+
+
+
+

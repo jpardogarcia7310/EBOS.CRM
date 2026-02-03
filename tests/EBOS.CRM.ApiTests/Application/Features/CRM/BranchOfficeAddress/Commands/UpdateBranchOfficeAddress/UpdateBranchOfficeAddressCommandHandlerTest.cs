@@ -106,3 +106,5 @@ public class UpdateBranchOfficeAddressCommandHandlerTest
             IsCurrent: true
         );
 }
+
+

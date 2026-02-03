@@ -1,9 +1,9 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 

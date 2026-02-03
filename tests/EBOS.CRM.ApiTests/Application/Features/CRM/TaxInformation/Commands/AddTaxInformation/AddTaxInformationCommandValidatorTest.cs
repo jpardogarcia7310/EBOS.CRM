@@ -24,3 +24,5 @@ public class AddTaxInformationCommandValidatorTest
             CustomerId: 1
         );
 }
+
+

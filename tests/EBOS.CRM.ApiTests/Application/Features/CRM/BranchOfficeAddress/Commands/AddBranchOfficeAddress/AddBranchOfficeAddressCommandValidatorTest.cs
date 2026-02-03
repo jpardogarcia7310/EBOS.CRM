@@ -27,3 +27,5 @@ public class AddBranchOfficeAddressCommandValidatorTest
             IsCurrent: true
         );
 }
+
+

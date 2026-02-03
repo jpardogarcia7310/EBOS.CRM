@@ -1,7 +1,8 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
+
 
 namespace EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 
@@ -21,3 +22,6 @@ public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, I
         return entity is null ? null : _mapper.Map<AddressTypeResponse>(entity);
     }
 }
+
+
+

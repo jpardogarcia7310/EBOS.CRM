@@ -1,13 +1,12 @@
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
-using EBOS.CRM.Domain.Primitives.Paging;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
-public class BaseRepository<T>(CrmDbContext context) : IRepository<T>, IPagedRepository<T> where T : class, ISoftDeletable
+public class BaseRepository<T>(CrmDbContext context) : IRepository<T> where T : class, ISoftDeletable
 {
     protected readonly CrmDbContext Context = context;
     protected readonly DbSet<T> DbSet = context.Set<T>();
@@ -55,11 +54,6 @@ public class BaseRepository<T>(CrmDbContext context) : IRepository<T>, IPagedRep
             .Where(e => !e.Erased)
             .ToListAsync(cancellationToken)
             .ContinueWith<ICollection<T>>(t => t.Result, cancellationToken);
-
-    public virtual Task<PagedResult<T>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-        => AsQueryable()
-            .AsNoTracking()
-            .ApplyPagedQueryAsync(query, cancellationToken);
 
     public virtual IQueryable<T> AsQueryable(bool includeErased = false)
         => includeErased ? DbSet.AsQueryable() : DbSet.Where(e => !e.Erased);
@@ -110,5 +104,8 @@ public class BaseRepository<T>(CrmDbContext context) : IRepository<T>, IPagedRep
         => Context.SaveChangesAsync(cancellationToken);
     #endregion
 }
+
+
+
 
 

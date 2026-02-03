@@ -18,7 +18,7 @@ public class CreditTransactionTest(CustomWebApplicationFactory factory) : IClass
         var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<CreditTransactionResponse>();
+        var items = await response.Content.ReadItemsAsync<CreditTransactionResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class CreditTransactionTest(CustomWebApplicationFactory factory) : IClass
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

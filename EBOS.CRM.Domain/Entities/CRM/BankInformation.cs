@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
 
+
 namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class BankInformation : ErasableEntity
@@ -19,3 +20,5 @@ public class BankInformation : ErasableEntity
     [ForeignKey(nameof(CustomerId))]
     public Customer Customer { get; set; } = null!;
 }
+
+

@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;
 
 public class AddIndividualCustomerCommandHandler(IIndividualCustomerRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddIndividualCustomerCommandHandler(IIndividualCustomerRepository r
         return mapper.Map<IndividualCustomerResponse>(entity);
     }
 }
+
+
+
+

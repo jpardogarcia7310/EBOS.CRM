@@ -18,7 +18,7 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
         var response = await _client.GetAsync($"/api/v{_version}/IdentificationType");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<IdentificationTypeResponse>();
+        var items = await response.Content.ReadItemsAsync<IdentificationTypeResponse>();
         items.Should().NotBeNull();
         items.Should().NotBeEmpty();
     }
@@ -41,6 +41,9 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 
 

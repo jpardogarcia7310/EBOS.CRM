@@ -1,7 +1,8 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
+
 
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
@@ -20,3 +21,6 @@ public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper m
         return entity is null ? null : _mapper.Map<CountryResponse>(entity);
     }
 }
+
+
+

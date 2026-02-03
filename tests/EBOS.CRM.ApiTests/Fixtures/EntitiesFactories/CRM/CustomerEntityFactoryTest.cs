@@ -52,3 +52,5 @@ public class CustomerEntityFactoryTest
         Assert.Equal(2, entity.StatusId);
     }
 }
+
+

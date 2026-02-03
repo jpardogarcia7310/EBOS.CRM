@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.UpdateBranc
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetBranchOfficeAddressById;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetAllBranchOfficeAddresses;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOfficeAddress;
 
@@ -92,15 +89,19 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<BranchOfficeAddressResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<BranchOfficeAddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllBranchOfficeAddressesQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllBranchOfficeAddressesQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

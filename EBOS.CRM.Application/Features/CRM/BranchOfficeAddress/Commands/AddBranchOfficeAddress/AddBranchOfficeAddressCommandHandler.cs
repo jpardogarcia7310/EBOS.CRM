@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.AddBranchOfficeAddress;
 
 public class AddBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository
         return mapper.Map<BranchOfficeAddressResponse>(entity);
     }
 }
+
+
+
+

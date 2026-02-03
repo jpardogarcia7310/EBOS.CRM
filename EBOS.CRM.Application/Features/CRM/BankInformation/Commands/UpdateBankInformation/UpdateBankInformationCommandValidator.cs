@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;
 
@@ -13,3 +16,7 @@ public class UpdateBankInformationCommandValidator : AbstractValidator<UpdateBan
         RuleFor(x => x.BankInformationRequest.CustomerId).GreaterThan(0);
     }
 }
+
+
+
+

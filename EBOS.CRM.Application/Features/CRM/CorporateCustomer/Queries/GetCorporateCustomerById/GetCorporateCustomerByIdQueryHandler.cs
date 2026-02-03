@@ -3,6 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetCorporateCustomerById;
 
 public class GetCorporateCustomerByIdQueryHandler(ICorporateCustomerRepository repository, IMapper mapper)
@@ -19,3 +20,7 @@ public class GetCorporateCustomerByIdQueryHandler(ICorporateCustomerRepository r
         return entity is null ? null : _mapper.Map<CorporateCustomerResponse>(entity);
     }
 }
+
+
+
+

@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
 using EBOS.CRM.Application.Features.CRM.Customer.Queries.GetCustomerById;
 using EBOS.CRM.Application.Features.CRM.Customer.Queries.GetAllCustomers;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.Customer;
 
@@ -92,15 +89,19 @@ public class CustomerController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<CustomerResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CustomerResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllCustomersQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllCustomersQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

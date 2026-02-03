@@ -86,3 +86,5 @@ public class GetStatusByIdQueryValidatorTest
         Assert.Contains(results, r => !r.IsValid); // At least one invalid
     }
 }
+
+

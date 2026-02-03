@@ -19,3 +19,5 @@ public class GetBankInformationByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

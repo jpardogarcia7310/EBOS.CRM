@@ -14,11 +14,11 @@ Use the instructions below when making changes in this solution.
   - Integration tests: `tests/EBOS.CRM.Api.IntegrationTests`
 
 ## Testing Conventions
-- List endpoints return a **paged response**:
-  - DTO: `EBOS.CRM.Application.Contracts.Responses.Common.PagedResponse<T>`
-  - Tests should deserialize list endpoints via `PagedResponse<T>` and use `Items`.
+- List endpoints return a **raw list**:
+  - DTO: `IReadOnlyCollection<T>`
+  - Tests should deserialize list endpoints as `IReadOnlyCollection<T>`.
   - Helpers:
-    - Unit/integration tests: `ReadPagedItemsAsync<T>()` in `tests/**/TestUtils/HttpContentExtensions.cs`
+    - Unit/integration tests: `ReadItemsAsync<T>()` in `tests/**/TestUtils/HttpContentExtensions.cs`
     - Controller helper: `GetFirstIdAsync<T>()` in `tests/EBOS.CRM.ApiTests/TestUtils/ControllerTestHelper.cs`
 
 ## Running Tests
@@ -30,18 +30,15 @@ Use the instructions below when making changes in this solution.
   - `dotnet test tests/EBOS.CRM.Api.IntegrationTests/EBOS.CRM.Api.IntegrationTests.csproj`
 
 ## Repository Patterns
-- Repositories that support pagination implement `IPagedRepository<T>` and must expose:
-  - `Task<PagedResult<T>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)`
-- When adding new repositories in tests (fake/failing), implement `GetPagedAsync`.
+- Repositories expose list reads via `GetAllAsync` and return `ICollection<T>`.
 
 ## CQRS/Handlers
 - Handlers live in `EBOS.CRM.Application/Features/**`.
-- Query handlers returning lists should return `PagedResponse<T>`.
-- Tests in `tests/EBOS.CRM.ApiTests/Application/**` should mock paged repositories using `PagedResult<T>`.
+- Query handlers returning lists should return `IReadOnlyCollection<T>`.
 
 ## API Controllers
-- Controllers reside in `EBOS.CRM.Api/Controllers/**` and accept `PagedQueryRequest` for list endpoints.
-- List endpoints should return `PagedResponse<T>` with HTTP 200.
+- Controllers reside in `EBOS.CRM.Api/Controllers/**`.
+- List endpoints should return `IReadOnlyCollection<T>` with HTTP 200.
 
 ## Coding Guidelines
 - Prefer small, focused changes.

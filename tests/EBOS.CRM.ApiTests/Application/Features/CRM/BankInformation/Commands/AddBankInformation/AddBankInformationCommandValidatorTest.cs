@@ -25,3 +25,5 @@ public class AddBankInformationCommandValidatorTest
             CustomerId: 1
         );
 }
+
+

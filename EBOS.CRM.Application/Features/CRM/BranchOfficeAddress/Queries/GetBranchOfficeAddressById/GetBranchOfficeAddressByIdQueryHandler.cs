@@ -3,6 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetBranchOfficeAddressById;
 
 public class GetBranchOfficeAddressByIdQueryHandler(IBranchOfficeAddressRepository repository, IMapper mapper)
@@ -19,3 +20,7 @@ public class GetBranchOfficeAddressByIdQueryHandler(IBranchOfficeAddressReposito
         return entity is null ? null : _mapper.Map<BranchOfficeAddressResponse>(entity);
     }
 }
+
+
+
+

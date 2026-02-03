@@ -1,6 +1,6 @@
-﻿using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations;
 
@@ -105,3 +105,4 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
                 .HasDatabaseName("IX_Countries_CurrencyCode");
     }
 }
+

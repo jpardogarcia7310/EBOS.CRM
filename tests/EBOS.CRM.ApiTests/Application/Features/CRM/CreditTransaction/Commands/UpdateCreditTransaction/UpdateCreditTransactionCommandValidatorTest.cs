@@ -27,3 +27,5 @@ public class UpdateCreditTransactionCommandValidatorTest
             CreditAccountId: 1
         );
 }
+
+

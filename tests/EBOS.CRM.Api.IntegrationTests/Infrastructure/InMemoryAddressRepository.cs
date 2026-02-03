@@ -1,6 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
-using EBOS.CRM.Domain.Primitives.Paging;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
@@ -76,30 +75,6 @@ public sealed class InMemoryAddressRepository : IAddressRepository
         return Task.FromResult<ICollection<Address>>(_items.ToList());
     }
 
-    public Task<PagedResult<Address>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var normalized = query.Normalize();
-        var totalCount = _items.Count;
-        var pageSize = normalized.PageSize;
-        var pageNumber = normalized.PageNumber;
-        var totalPages = totalCount == 0 ? 0 : (int)Math.Ceiling(totalCount / (double)pageSize);
-        var items = _items
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        return Task.FromResult(new PagedResult<Address>(
-            items,
-            pageNumber,
-            pageSize,
-            totalCount,
-            totalPages,
-            normalized.SortBy,
-            normalized.SortDirection,
-            normalized.Filter));
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     public Task CommitAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
@@ -117,3 +92,5 @@ public sealed class InMemoryAddressRepository : IAddressRepository
         return Task.FromResult(exists);
     }
 }
+
+

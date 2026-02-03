@@ -48,7 +48,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
         var response = await _client.GetAsync($"/api/v{_version}/Address");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<AddressResponse>();
+        var items = await response.Content.ReadItemsAsync<AddressResponse>();
         items.Should().NotBeNull();
         items.Should().NotBeEmpty();
     }
@@ -168,6 +168,9 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 
 
