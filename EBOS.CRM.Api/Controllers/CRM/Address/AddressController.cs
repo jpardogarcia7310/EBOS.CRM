@@ -19,6 +19,13 @@ namespace EBOS.CRM.Api.Controllers.CRM.Address;
 [Produces("application/json")]
 public class AddressController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
+    /// <summary>
+    /// Creates a new address.
+    /// </summary>
+    /// <param name="request">Address payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Address created.</response>
+    /// <response code="400">Invalid request.</response>
     [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
@@ -28,6 +35,14 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         return Ok(await mediator.Send(new AddAddressCommand(request), cancellationToken));
     }
 
+    /// <summary>
+    /// Updates an address by id.
+    /// </summary>
+    /// <param name="id">Address id.</param>
+    /// <param name="request">Address payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Address updated.</response>
+    /// <response code="404">Address not found.</response>
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
@@ -49,6 +64,13 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         return Ok(dto);
     }
 
+    /// <summary>
+    /// Deletes an address by id.
+    /// </summary>
+    /// <param name="id">Address id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Address deleted.</response>
+    /// <response code="404">Address not found.</response>
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -68,6 +90,14 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         return Ok();
     }
 
+    /// <summary>
+    /// Gets an address by id.
+    /// </summary>
+    /// <param name="id">Address id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Address found.</response>
+    /// <response code="400">Invalid id.</response>
+    /// <response code="404">Address not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

@@ -17,6 +17,14 @@ namespace EBOS.CRM.Api.Controllers.Status;
 public class StatusController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Gets a status by id.
+    /// </summary>
+    /// <param name="id">Status id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Status found.</response>
+    /// <response code="400">Invalid id.</response>
+    /// <response code="404">Status not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(StatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

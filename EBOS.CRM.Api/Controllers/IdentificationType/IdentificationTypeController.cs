@@ -17,6 +17,14 @@ namespace EBOS.CRM.Api.Controllers.IdentificationType;
 public class IdentificationTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Gets an identification type by id.
+    /// </summary>
+    /// <param name="id">Identification type id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Identification type found.</response>
+    /// <response code="400">Invalid id.</response>
+    /// <response code="404">Identification type not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(IdentificationTypeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

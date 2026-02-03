@@ -17,6 +17,14 @@ namespace EBOS.CRM.Api.Controllers.AddressType;
 public class AddressTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Gets an address type by id.
+    /// </summary>
+    /// <param name="id">Address type id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Address type found.</response>
+    /// <response code="400">Invalid id.</response>
+    /// <response code="404">Address type not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(AddressTypeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
