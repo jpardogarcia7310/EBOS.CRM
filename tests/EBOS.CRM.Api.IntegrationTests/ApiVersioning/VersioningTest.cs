@@ -13,31 +13,32 @@ public class VersioningTest(CustomWebApplicationFactory factory) : IClassFixture
     [Fact]
     public async Task GetAll_LatestVersion_Returns_OK()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country");
+        var response = await _client.GetAsync($"/api/v{_version}/Country");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task GetById_LatestVersion_Returns_OK_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country/1");
+        var response = await _client.GetAsync($"/api/v{_version}/Country/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task GetById_LatestVersion_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/Country/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task GetAll_LatestVersion_Returns_OK_Repeatable()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country");
+        var response = await _client.GetAsync($"/api/v{_version}/Country");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
+
 
 
 

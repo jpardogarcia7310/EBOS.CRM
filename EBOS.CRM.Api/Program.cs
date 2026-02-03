@@ -88,6 +88,7 @@ foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
 
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
 var cancellationToken = app.Lifetime.ApplicationStopping;
 
 if (app.Environment.IsDevelopment())
@@ -109,10 +110,32 @@ if (app.Environment.IsDevelopment())
 
     if (db.Database.IsRelational())
     {
-        await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+        if (await db.Database.CanConnectAsync(cancellationToken).ConfigureAwait(false))
+        {
+            await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            logger.LogWarning("Database connection failed. Skipping migrations in Development.");
+        }
     }
 }
-await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
+try
+{
+    if (!db.Database.IsRelational() ||
+        await db.Database.CanConnectAsync(cancellationToken).ConfigureAwait(false))
+    {
+        await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
+    }
+    else
+    {
+        logger.LogWarning("Database connection failed. Skipping seed.");
+    }
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "Error while seeding database. Application will continue to start.");
+}
 
 // Middleware pipeline
 app.UseCorrelationId();

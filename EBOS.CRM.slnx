@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/documentation/">
-    <File Path="documentation/Internal.md" />
     <File Path="documentation/AGENTS.md" />
     <File Path="documentation/Contributing.md" />
     <File Path="documentation/Code of conduct.md" />

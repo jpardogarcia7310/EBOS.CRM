@@ -18,7 +18,7 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     [Fact]
     public async Task GetAllStatuses_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Status");
+        var response = await _client.GetAsync($"/api/v{_version}/Status");
         response.EnsureSuccessStatusCode();
 
         var statuses = await response.Content.ReadPagedItemsAsync<StatusResponse>();
@@ -30,9 +30,9 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     public async Task GetStatusById_ExistingId_ReturnsCountry()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<StatusResponse>(
-            _client, $"/api/{_version}/Status", x => x.Id);
+            _client, $"/api/v{_version}/Status", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/Status/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/{id}");
         response.EnsureSuccessStatusCode();
 
         var status = await response.Content.ReadFromJsonAsync<StatusResponse>();
@@ -44,9 +44,9 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     public async Task GetStatusById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<StatusResponse>(
-            _client, $"/api/{_version}/Status", x => x.Id);
+            _client, $"/api/v{_version}/Status", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/Status/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -56,7 +56,7 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
         // Simulation: special endpoint that forces a DB failure (example: /api/v1/Status/simulate-db-failure)
-        var response = await _client.GetAsync($"/api/{_version}/Status/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/simulate-db-failure");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -65,7 +65,7 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
         // Simulation: endpoint that forces network timeout
-        var response = await _client.GetAsync($"/api/{_version}/Status/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/simulate-timeout");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -74,24 +74,25 @@ public class StatusControllerTest(CustomWebApplicationFactory<Program> factory) 
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
         // Simulation: first attempt fails (DB drops), second attempt recovers
-        var response1 = await _client.GetAsync($"/api/{_version}/Status/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/Status/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // We expect the system to apply a retry/circuit breaker and recover.
-        var response2 = await _client.GetAsync($"/api/{_version}/Status");
+        var response2 = await _client.GetAsync($"/api/v{_version}/Status");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/Status/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/Status/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // Second attempt should recover
-        var response2 = await _client.GetAsync($"/api/{_version}/Status");
+        var response2 = await _client.GetAsync($"/api/v{_version}/Status");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
 

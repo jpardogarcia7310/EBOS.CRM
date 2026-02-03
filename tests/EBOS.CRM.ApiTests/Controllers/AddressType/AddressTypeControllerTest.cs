@@ -18,7 +18,7 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     [Fact]
     public async Task GetAllAddressTypes_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/AddressType");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType");
         response.EnsureSuccessStatusCode();
 
         var items = await response.Content.ReadPagedItemsAsync<AddressTypeResponse>();
@@ -30,9 +30,9 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     public async Task GetAddressTypeById_ExistingId_ReturnsAddressType()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<AddressTypeResponse>(
-            _client, $"/api/{_version}/AddressType", x => x.Id);
+            _client, $"/api/v{_version}/AddressType", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/{id}");
         response.EnsureSuccessStatusCode();
 
         var item = await response.Content.ReadFromJsonAsync<AddressTypeResponse>();
@@ -44,9 +44,9 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     public async Task GetAddressTypeById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<AddressTypeResponse>(
-            _client, $"/api/{_version}/AddressType", x => x.Id);
+            _client, $"/api/v{_version}/AddressType", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -56,7 +56,7 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
         // Simulation: special endpoint that forces a DB failure (example: /api/v2/AddressType/simulate-db-failure)
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/simulate-db-failure");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -65,7 +65,7 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
         // Simulation: endpoint that forces network timeout
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/simulate-timeout");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -74,24 +74,25 @@ public class AddressTypeControllerTest(CustomWebApplicationFactory<Program> fact
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
         // Simulation: first attempt fails (DB drops), second attempt recovers
-        var response1 = await _client.GetAsync($"/api/{_version}/AddressType/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/AddressType/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // We expect the system to apply a retry/circuit breaker and recover.
-        var response2 = await _client.GetAsync($"/api/{_version}/AddressType");
+        var response2 = await _client.GetAsync($"/api/v{_version}/AddressType");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/AddressType/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/AddressType/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
         // Second attempt should recover
-        var response2 = await _client.GetAsync($"/api/{_version}/AddressType");
+        var response2 = await _client.GetAsync($"/api/v{_version}/AddressType");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
 

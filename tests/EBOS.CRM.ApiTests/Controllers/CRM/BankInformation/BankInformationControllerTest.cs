@@ -12,13 +12,13 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
     IClassFixture<CustomWebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "BankInformation");
 
     #region CRUD Básicos
     [Fact]
     public async Task GetAllBankInformations_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/BankInformation");
+        var response = await _client.GetAsync($"/api/v{_version}/BankInformation");
         response.EnsureSuccessStatusCode();
 
         var items = await response.Content.ReadPagedItemsAsync<BankInformationResponse>();
@@ -30,9 +30,9 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
     public async Task GetBankInformationById_ExistingId_ReturnsBankInformation()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<BankInformationResponse>(
-            _client, $"/api/{_version}/BankInformation", x => x.Id);
+            _client, $"/api/v{_version}/BankInformation", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/BankInformation/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/BankInformation/{id}");
         response.EnsureSuccessStatusCode();
 
         var item = await response.Content.ReadFromJsonAsync<BankInformationResponse>();
@@ -44,9 +44,9 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
     public async Task GetBankInformationById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<BankInformationResponse>(
-            _client, $"/api/{_version}/BankInformation", x => x.Id);
+            _client, $"/api/v{_version}/BankInformation", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/BankInformation/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/BankInformation/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -55,36 +55,38 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        var response = await _client.GetAsync($"/api/{_version}/BankInformation/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/BankInformation/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
-        var response = await _client.GetAsync($"/api/{_version}/BankInformation/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/BankInformation/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/BankInformation/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/BankInformation/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/BankInformation");
+        var response2 = await _client.GetAsync($"/api/v{_version}/BankInformation");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/BankInformation/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/BankInformation/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/BankInformation");
+        var response2 = await _client.GetAsync($"/api/v{_version}/BankInformation");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
+
 

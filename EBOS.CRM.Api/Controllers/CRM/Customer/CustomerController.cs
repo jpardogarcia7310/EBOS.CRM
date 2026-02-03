@@ -13,7 +13,7 @@ using EBOS.CRM.Application.Contracts.Responses.Common;
 namespace EBOS.CRM.Api.Controllers.CRM.Customer;
 
 [ApiController]
-[ApiVersion("3.0")]
+[ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class CustomerController(IMediator mediator) : ControllerBase

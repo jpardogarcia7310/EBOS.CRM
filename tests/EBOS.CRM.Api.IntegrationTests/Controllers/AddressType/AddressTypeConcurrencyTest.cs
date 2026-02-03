@@ -14,7 +14,7 @@ public class AddressTypeConcurrencyTest(CustomWebApplicationFactory factory) : I
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/AddressType"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/AddressType"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +26,7 @@ public class AddressTypeConcurrencyTest(CustomWebApplicationFactory factory) : I
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/AddressType/1"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/AddressType/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -34,6 +34,7 @@ public class AddressTypeConcurrencyTest(CustomWebApplicationFactory factory) : I
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.OK);
     }
 }
+
 
 
 

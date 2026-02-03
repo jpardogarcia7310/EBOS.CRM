@@ -8,13 +8,13 @@ namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.CreditAccount;
 public class CreditAccountConcurrencyTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "CreditAccount");
 
     [Fact]
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/CreditAccount"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/CreditAccount"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +26,7 @@ public class CreditAccountConcurrencyTest(CustomWebApplicationFactory factory) :
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/CreditAccount/999999"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/CreditAccount/999999"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -34,3 +34,5 @@ public class CreditAccountConcurrencyTest(CustomWebApplicationFactory factory) :
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.NotFound);
     }
 }
+
+

@@ -8,13 +8,13 @@ namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.IndividualCustomer;
 public class IndividualCustomerConcurrencyTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "IndividualCustomer");
 
     [Fact]
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/IndividualCustomer"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/IndividualCustomer"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +26,7 @@ public class IndividualCustomerConcurrencyTest(CustomWebApplicationFactory facto
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/IndividualCustomer/999999"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/IndividualCustomer/999999"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -34,3 +34,5 @@ public class IndividualCustomerConcurrencyTest(CustomWebApplicationFactory facto
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.NotFound);
     }
 }
+
+

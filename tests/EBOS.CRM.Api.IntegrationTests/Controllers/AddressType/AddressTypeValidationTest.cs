@@ -13,10 +13,11 @@ public class AddressTypeValidationTest(CustomWebApplicationFactory factory) : IC
     [Fact]
     public async Task GetById_Returns_400_WhenIdIsInvalid()
     {
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/-1");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
+
 
 
 

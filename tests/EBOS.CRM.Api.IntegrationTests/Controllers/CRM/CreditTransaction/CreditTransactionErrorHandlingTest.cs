@@ -15,12 +15,12 @@ public class CreditTransactionErrorHandlingTest(
     : IClassFixture<CreditTransactionErrorHandlingTest.FailingCreditTransactionFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "CreditTransaction");
 
     [Fact]
     public async Task GetAll_Returns_500_WhenRepositoryFails()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
@@ -47,3 +47,5 @@ public class CreditTransactionErrorHandlingTest(
         }
     }
 }
+
+
