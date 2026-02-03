@@ -17,6 +17,27 @@ namespace EBOS.CRM.Api.Controllers.AddressType;
 public class AddressTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
+    [HttpGet("{id:long}")]
+    [ProducesResponseType(typeof(AddressTypeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
+    {
+        var dto = await mediator.Send(new GetAddressTypeByIdQuery(id), cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Resource not found",
+                Detail = $"AddressType with id {id} not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return Ok(dto);
+    }
+
     /// <summary>
     /// Returns all resources (paginated).
     /// </summary>

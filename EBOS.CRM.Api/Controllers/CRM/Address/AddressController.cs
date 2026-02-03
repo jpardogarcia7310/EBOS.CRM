@@ -19,6 +19,76 @@ namespace EBOS.CRM.Api.Controllers.CRM.Address;
 [Produces("application/json")]
 public class AddressController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
+    [HttpPost]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddAsync([FromBody] AddAddressRequest request, CancellationToken cancellationToken = default)
+    {
+        return Ok(await mediator.Send(new AddAddressCommand(request), cancellationToken));
+    }
+
+    [HttpPut("{id:long}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateAddressRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var dto = await mediator.Send(new UpdateAddressCommand(id, request), cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Resource not found",
+                Detail = $"Address with id {id} not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return Ok(dto);
+    }
+
+    [HttpDelete("{id:long}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] long id, CancellationToken cancellationToken = default)
+    {
+        var deleted = await mediator.Send(new DeleteAddressCommand(id), cancellationToken);
+        if (!deleted)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Resource not found",
+                Detail = $"Address with id {id} not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return Ok();
+    }
+
+    [HttpGet("{id:long}")]
+    [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
+    {
+        var dto = await mediator.Send(new GetAddressByIdQuery(id), cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Resource not found",
+                Detail = $"Address with id {id} not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return Ok(dto);
+    }
+
     /// <summary>
     /// Returns all resources (paginated).
     /// </summary>
