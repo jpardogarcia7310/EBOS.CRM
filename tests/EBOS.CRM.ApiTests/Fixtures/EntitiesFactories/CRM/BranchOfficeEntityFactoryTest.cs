@@ -41,3 +41,5 @@ public class BranchOfficeEntityFactoryTest
         Assert.Equal(2, entity.CorporateCustomerId);
     }
 }
+
+

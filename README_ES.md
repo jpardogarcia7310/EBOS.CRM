@@ -23,7 +23,6 @@ Este proyecto es **Software Libre**. Su objetivo es llegar a ser un stack CRM in
 - Soporte multi-tenant y aislamiento de datos.
 - Autenticacion OAuth2/OpenID Connect con roles.
 - Auditoria e historial de cambios.
-- Busqueda avanzada, filtros y paginacion.
 - Webhooks e integraciones con eventos.
 - Modulo UI para administracion y reporting.
 - Imagenes Docker y Helm charts para despliegues.

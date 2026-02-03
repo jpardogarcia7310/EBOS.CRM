@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 
@@ -13,3 +16,7 @@ public class UpdateCustomerAddressCommandValidator : AbstractValidator<UpdateCus
         RuleFor(x => x.CustomerAddressRequest.CustomerId).GreaterThan(0); RuleFor(x => x.CustomerAddressRequest.AddressId).GreaterThan(0);
     }
 }
+
+
+
+

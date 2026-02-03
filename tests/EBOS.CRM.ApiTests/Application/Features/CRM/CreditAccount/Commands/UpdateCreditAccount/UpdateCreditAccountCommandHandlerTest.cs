@@ -98,8 +98,11 @@ public class UpdateCreditAccountCommandHandlerTest
     }
 
     private static UpdateCreditAccountRequest BuildUpdateRequest() => new(
+            Id: 1,
             MaxAmount: 1000m,
             UsedAmount: 100m,
             CustomerId: 1
         );
 }
+
+

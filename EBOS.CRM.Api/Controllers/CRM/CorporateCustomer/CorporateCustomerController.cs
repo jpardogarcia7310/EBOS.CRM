@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorpora
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetCorporateCustomerById;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetAllCorporateCustomers;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CorporateCustomer;
 
@@ -92,15 +89,19 @@ public class CorporateCustomerController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<CorporateCustomerResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CorporateCustomerResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllCorporateCustomersQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllCorporateCustomersQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

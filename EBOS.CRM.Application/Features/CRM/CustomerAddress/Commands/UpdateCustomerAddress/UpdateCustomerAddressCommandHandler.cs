@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 
 public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
@@ -52,3 +53,7 @@ public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repo
         return mapper.Map<CustomerAddressResponse>(entity);
     }
 }
+
+
+
+

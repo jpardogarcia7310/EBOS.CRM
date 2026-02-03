@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddress;
 
 public class AddCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
         return mapper.Map<CustomerAddressResponse>(entity);
     }
 }
+
+
+
+

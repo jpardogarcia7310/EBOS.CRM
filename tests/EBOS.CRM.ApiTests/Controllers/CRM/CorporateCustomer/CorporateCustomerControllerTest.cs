@@ -21,7 +21,7 @@ public class CorporateCustomerControllerTest(CustomWebApplicationFactory<Program
         var response = await _client.GetAsync($"/api/v{_version}/CorporateCustomer");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<CorporateCustomerResponse>();
+        var items = await response.Content.ReadItemsAsync<CorporateCustomerResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class CorporateCustomerControllerTest(CustomWebApplicationFactory<Program
     }
     #endregion
 }
+
+
+
 
 

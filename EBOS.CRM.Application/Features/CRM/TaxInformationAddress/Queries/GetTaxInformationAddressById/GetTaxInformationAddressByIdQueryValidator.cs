@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Queries.GetTaxInformationAddressById;
 
@@ -9,3 +12,7 @@ public class GetTaxInformationAddressByIdQueryValidator : AbstractValidator<GetT
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

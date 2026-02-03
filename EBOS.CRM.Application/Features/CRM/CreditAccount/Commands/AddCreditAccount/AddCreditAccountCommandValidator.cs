@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.AddCreditAccount;
 
@@ -12,3 +15,7 @@ public class AddCreditAccountCommandValidator : AbstractValidator<AddCreditAccou
         RuleFor(x => x.CreditAccountRequest.CustomerId).GreaterThan(0);
     }
 }
+
+
+
+

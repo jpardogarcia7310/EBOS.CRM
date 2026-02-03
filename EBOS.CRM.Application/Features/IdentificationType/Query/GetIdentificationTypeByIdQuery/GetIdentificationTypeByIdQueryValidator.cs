@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
@@ -12,3 +15,7 @@ public class GetIdentificationTypeByIdQueryValidator : AbstractValidator<GetIden
             .WithErrorCode("VAL_ID_POSITIVE");
     }
 }
+
+
+
+

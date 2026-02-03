@@ -1,6 +1,4 @@
 using System.Security.Claims;
-using EBOS.CRM.Api.Middleware;
-using EBOS.CRM.Application.Services.Interfaces;
 
 namespace EBOS.CRM.Api.Services;
 
@@ -45,3 +43,4 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor accessor)
         }
     }
 }
+

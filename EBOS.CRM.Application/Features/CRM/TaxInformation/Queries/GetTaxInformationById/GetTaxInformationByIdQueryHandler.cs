@@ -3,6 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetTaxInformationById;
 
 public class GetTaxInformationByIdQueryHandler(ITaxInformationRepository repository, IMapper mapper)
@@ -19,3 +20,7 @@ public class GetTaxInformationByIdQueryHandler(ITaxInformationRepository reposit
         return entity is null ? null : _mapper.Map<TaxInformationResponse>(entity);
     }
 }
+
+
+
+

@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.UpdateTaxInforma
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetTaxInformationById;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformations;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.TaxInformation;
 
@@ -92,15 +89,19 @@ public class TaxInformationController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<TaxInformationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<TaxInformationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllTaxInformationsQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllTaxInformationsQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

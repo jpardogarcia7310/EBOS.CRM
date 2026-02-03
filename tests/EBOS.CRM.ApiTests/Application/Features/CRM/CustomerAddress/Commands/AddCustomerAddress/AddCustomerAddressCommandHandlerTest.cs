@@ -87,3 +87,5 @@ public class AddCustomerAddressCommandHandlerTest
             IsCurrent: true
         );
 }
+
+

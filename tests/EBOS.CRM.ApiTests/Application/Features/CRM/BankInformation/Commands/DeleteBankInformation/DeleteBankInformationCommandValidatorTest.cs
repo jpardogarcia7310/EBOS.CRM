@@ -19,3 +19,5 @@ public class DeleteBankInformationCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

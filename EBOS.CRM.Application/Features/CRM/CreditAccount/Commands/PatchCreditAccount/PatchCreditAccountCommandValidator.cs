@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.PatchCreditAccount;
 
@@ -43,3 +46,7 @@ public class PatchCreditAccountCommandValidator : AbstractValidator<PatchCreditA
             .WithMessage("UsedAmount must be less than or equal to MaxAmount when both are provided.");
     }
 }
+
+
+
+

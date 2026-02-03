@@ -1,7 +1,10 @@
-﻿using Mapster;
+using System;
+using System.Linq;
+using System.Reflection;
+using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
+
 
 namespace EBOS.CRM.Application;
 
@@ -44,3 +47,4 @@ public static class DependencyInjection
         return services;
     }
 }
+

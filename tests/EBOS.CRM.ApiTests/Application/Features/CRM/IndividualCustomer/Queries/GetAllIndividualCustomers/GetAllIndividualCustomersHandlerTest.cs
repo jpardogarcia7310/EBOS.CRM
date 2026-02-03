@@ -3,8 +3,6 @@ using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetAllIndivid
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using Moq;
-using EBOS.CRM.Domain.Primitives.Paging;
-using EBOS.CRM.Application.Contracts.Requests.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.IndividualCustomer.Queries.GetAllIndividualCustomers;
 
@@ -20,16 +18,19 @@ public class GetAllIndividualCustomersQueryHandlerTest
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.IndividualCustomer> { new() };
         var dtos = new List<IndividualCustomerResponse>();
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<EBOS.CRM.Domain.Entities.CRM.IndividualCustomer>(entities, 1, 50, entities.Count, entities.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<IndividualCustomerResponse>>(entities))
             .Returns(dtos);
 
-        var result = await handler.Handle(new GetAllIndividualCustomersQuery(new PagedQueryRequest()), CancellationToken.None);
+        var result = await handler.Handle(new GetAllIndividualCustomersQuery(), CancellationToken.None);
 
         Assert.NotNull(result);
     }
 }
+
+
+
 
 
 

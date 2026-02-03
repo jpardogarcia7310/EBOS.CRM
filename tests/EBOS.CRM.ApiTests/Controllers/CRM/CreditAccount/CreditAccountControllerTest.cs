@@ -21,7 +21,7 @@ public class CreditAccountControllerTest(CustomWebApplicationFactory<Program> fa
         var response = await _client.GetAsync($"/api/v{_version}/CreditAccount");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<CreditAccountResponse>();
+        var items = await response.Content.ReadItemsAsync<CreditAccountResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class CreditAccountControllerTest(CustomWebApplicationFactory<Program> fa
     }
     #endregion
 }
+
+
+
 
 

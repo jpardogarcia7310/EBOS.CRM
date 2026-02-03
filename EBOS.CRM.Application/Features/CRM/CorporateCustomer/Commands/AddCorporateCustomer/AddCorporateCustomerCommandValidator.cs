@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
 
@@ -12,3 +15,7 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
         RuleFor(x => x.CorporateCustomerRequest.StatusId).GreaterThan(0);
     }
 }
+
+
+
+

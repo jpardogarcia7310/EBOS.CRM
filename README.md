@@ -23,7 +23,6 @@ This project is **Free Software**. It aims to become a comprehensive, community-
 - Multi-tenant support and tenant-aware data isolation.
 - OAuth2/OpenID Connect authentication with fine-grained roles.
 - Audit trails and data history for key entities.
-- Advanced search, filtering, and pagination across endpoints.
 - Integration webhooks and event-driven data sync.
 - UI module for CRM administration and reporting.
 - Docker images and Helm charts for production deployments.

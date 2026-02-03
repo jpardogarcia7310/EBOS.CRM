@@ -1,8 +1,7 @@
-﻿using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
-using EBOS.CRM.Domain.Primitives.Paging;
 using EBOS.CRM.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
@@ -17,8 +16,9 @@ public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepositor
         _dbSet.AsNoTracking().ToListAsync(cancellationToken)
             .ContinueWith<ICollection<AddressType>>(t => t.Result, cancellationToken);
 
-    public Task<PagedResult<AddressType>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-        => _dbSet.AsNoTracking()
-            .ApplyPagedQueryAsync(query, cancellationToken);
     #endregion
 }
+
+
+
+

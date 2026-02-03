@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.UpdateTaxInformation;
 
@@ -13,3 +16,7 @@ public class UpdateTaxInformationCommandValidator : AbstractValidator<UpdateTaxI
         RuleFor(x => x.TaxInformationRequest.CustomerId).GreaterThan(0);
     }
 }
+
+
+
+

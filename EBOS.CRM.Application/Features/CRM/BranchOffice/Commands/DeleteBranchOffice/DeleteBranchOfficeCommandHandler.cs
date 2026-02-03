@@ -4,6 +4,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.DeleteBranchOffice;
 
 public class DeleteBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class DeleteBranchOfficeCommandHandler(IBranchOfficeRepository repository
         return true;
     }
 }
+
+
+
+

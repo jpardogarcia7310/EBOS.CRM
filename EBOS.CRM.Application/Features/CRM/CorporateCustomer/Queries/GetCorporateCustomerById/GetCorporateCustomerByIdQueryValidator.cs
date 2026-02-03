@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetCorporateCustomerById;
 
@@ -9,3 +12,7 @@ public class GetCorporateCustomerByIdQueryValidator : AbstractValidator<GetCorpo
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

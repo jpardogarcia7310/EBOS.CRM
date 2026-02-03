@@ -1,4 +1,7 @@
-﻿using FluentValidation;
+
+
+using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 
@@ -12,3 +15,6 @@ public class GetStatusByIdQueryValidator : AbstractValidator<GetStatusByIdQuery>
             .WithErrorCode("VAL_ID_POSITIVE");
     }
 }
+
+
+

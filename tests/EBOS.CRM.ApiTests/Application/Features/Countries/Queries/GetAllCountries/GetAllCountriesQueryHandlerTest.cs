@@ -4,8 +4,6 @@ using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using Moq;
-using EBOS.CRM.Domain.Primitives.Paging;
-using EBOS.CRM.Application.Contracts.Requests.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetAllCountries;
 
@@ -36,20 +34,20 @@ public class GetAllCountriesQueryHandlerTest
             new(1, "España", "ES", "ESP", "724", ".es", "Euro", "EUR", "34")
         };
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries)).Returns(dtos);
 
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result.Items);
-        Assert.Equal("España", result.Items.First().Name);
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
+        Assert.Single(result);
+        Assert.Equal("España", result.First().Name);
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
         _mapperMock.Verify(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries), Times.Once);
     }
@@ -61,27 +59,27 @@ public class GetAllCountriesQueryHandlerTest
         var countries = new List<Country>();
         var dtos = new List<CountryResponse>();
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries)).Returns(dtos);
 
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Empty(result.Items);
+        Assert.Empty(result);
     }
 
     [Fact]
     public async Task Handle_RepositoryThrows_PropagatesException()
     {
         // Arrange
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new Exception("DB error"));
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
@@ -92,7 +90,7 @@ public class GetAllCountriesQueryHandlerTest
     {
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
             () => _handler.Handle(query, cts.Token));
@@ -103,14 +101,14 @@ public class GetAllCountriesQueryHandlerTest
     {
         // Arrange
         var countries = new List<Country> { new() { Id = 1, Name = "España" } };
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
 
         // Simulamos que el mapper de Mapster falla
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries))
                    .Throws(new InvalidOperationException("Mapping failed"));
 
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -124,19 +122,19 @@ public class GetAllCountriesQueryHandlerTest
         var countries = new List<Country> { new() { Id = 1, Name = null! } };
         var dtos = new List<CountryResponse> { new(1, null!, "ES", "ESP", "724", ".es", "Euro", "EUR", "34") };
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CountryResponse>>(countries)).Returns(dtos);
 
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result.Items);
-        Assert.Null(result.Items.First().Name);
+        Assert.Single(result);
+        Assert.Null(result.First().Name);
     }
 
     [Fact]
@@ -144,10 +142,10 @@ public class GetAllCountriesQueryHandlerTest
     {
         // Arrange
         var countries = new List<Country>();
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
 
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
@@ -160,19 +158,23 @@ public class GetAllCountriesQueryHandlerTest
     public async Task Handle_RepositoryCalledOnce_WithCancellationToken()
     {
         // Arrange
-        var query = new GetAllCountriesQuery(new PagedQueryRequest());
+        var query = new GetAllCountriesQuery();
         var countries = new List<Country>();
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<Country>(countries, 1, 50, countries.Count, countries.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(countries);
 
         // Act
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()),
+        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }
+
+
+
+
 
 
 

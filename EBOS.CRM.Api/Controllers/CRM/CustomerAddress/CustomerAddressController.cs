@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerA
 using EBOS.CRM.Application.Features.CRM.CustomerAddress.Queries.GetCustomerAddressById;
 using EBOS.CRM.Application.Features.CRM.CustomerAddress.Queries.GetAllCustomerAddresses;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CustomerAddress;
 
@@ -92,15 +89,19 @@ public class CustomerAddressController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<CustomerAddressResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CustomerAddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllCustomerAddressesQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllCustomerAddressesQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 

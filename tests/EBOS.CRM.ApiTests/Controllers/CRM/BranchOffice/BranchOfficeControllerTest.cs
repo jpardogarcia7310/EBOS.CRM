@@ -21,7 +21,7 @@ public class BranchOfficeControllerTest(CustomWebApplicationFactory<Program> fac
         var response = await _client.GetAsync($"/api/v{_version}/BranchOffice");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<BranchOfficeResponse>();
+        var items = await response.Content.ReadItemsAsync<BranchOfficeResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class BranchOfficeControllerTest(CustomWebApplicationFactory<Program> fac
     }
     #endregion
 }
+
+
+
 
 

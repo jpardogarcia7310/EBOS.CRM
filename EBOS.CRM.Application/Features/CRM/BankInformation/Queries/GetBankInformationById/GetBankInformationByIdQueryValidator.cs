@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetBankInformationById;
 
@@ -9,3 +12,7 @@ public class GetBankInformationByIdQueryValidator : AbstractValidator<GetBankInf
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

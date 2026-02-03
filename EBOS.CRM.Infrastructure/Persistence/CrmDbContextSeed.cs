@@ -1,5 +1,5 @@
-﻿using EBOS.CRM.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+using EBOS.CRM.Domain.Entities;
+
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
@@ -1205,3 +1205,4 @@ public static class CrmDbContextSeed
         }
     }
 }
+

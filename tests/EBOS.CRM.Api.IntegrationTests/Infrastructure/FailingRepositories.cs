@@ -2,7 +2,6 @@ using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
-using EBOS.CRM.Domain.Primitives.Paging;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
@@ -14,11 +13,6 @@ public sealed class FailingAddressTypeRepository : IAddressTypeRepository
     }
 
     public Task<ICollection<AddressType>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
-    public Task<PagedResult<AddressType>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -35,11 +29,6 @@ public sealed class FailingIdentificationTypeRepository : IIdentificationTypeRep
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<IdentificationType>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
 }
 
 public sealed class FailingCountryRepository : ICountryRepository
@@ -53,11 +42,6 @@ public sealed class FailingCountryRepository : ICountryRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<Country>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
 }
 
 public sealed class FailingStatusRepository : IStatusRepository
@@ -68,11 +52,6 @@ public sealed class FailingStatusRepository : IStatusRepository
     }
 
     public Task<ICollection<Status>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
-    public Task<PagedResult<Status>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -114,12 +93,6 @@ public sealed class FailingBankInformationRepository : IBankInformationRepositor
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<BankInformation>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -182,12 +155,6 @@ public sealed class FailingBranchOfficeRepository : IBranchOfficeRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<BranchOffice>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -250,12 +217,6 @@ public sealed class FailingBranchOfficeAddressRepository : IBranchOfficeAddressR
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<BranchOfficeAddress>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task<BranchOfficeAddress?> GetCurrentPrimaryAsync(long branchOfficeId, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -323,12 +284,6 @@ public sealed class FailingCorporateCustomerRepository : ICorporateCustomerRepos
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<CorporateCustomer>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -391,12 +346,6 @@ public sealed class FailingCreditAccountRepository : ICreditAccountRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<CreditAccount>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -459,12 +408,6 @@ public sealed class FailingCreditTransactionRepository : ICreditTransactionRepos
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<CreditTransaction>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -527,12 +470,6 @@ public sealed class FailingCustomerRepository : ICustomerRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<Customer>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task<Customer?> GetWithAddressesAsync(long id, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -600,12 +537,6 @@ public sealed class FailingCustomerAddressRepository : ICustomerAddressRepositor
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<CustomerAddress>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task<bool> ExistsPrimaryAddressForCustomerAsync(long customerId, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -678,12 +609,6 @@ public sealed class FailingIndividualCustomerRepository : IIndividualCustomerRep
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<IndividualCustomer>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -746,12 +671,6 @@ public sealed class FailingTaxInformationRepository : ITaxInformationRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<TaxInformation>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -814,12 +733,6 @@ public sealed class FailingTaxInformationAddressRepository : ITaxInformationAddr
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<TaxInformationAddress>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task<TaxInformationAddress?> GetCurrentPrimaryAsync(long taxInformationId, CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -887,12 +800,6 @@ public sealed class FailingAddressRepository : IAddressRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
-
-    public Task<PagedResult<Address>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("Simulated repository failure.");
-    }
-
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -923,5 +830,8 @@ public sealed class FailingAddressRepository : IAddressRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 }
+
+
+
 
 

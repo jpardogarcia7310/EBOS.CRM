@@ -19,3 +19,5 @@ public class GetCustomerAddressByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

@@ -18,7 +18,7 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
         var response = await _client.GetAsync($"/api/v{_version}/CorporateCustomer");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<CorporateCustomerResponse>();
+        var items = await response.Content.ReadItemsAsync<CorporateCustomerResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

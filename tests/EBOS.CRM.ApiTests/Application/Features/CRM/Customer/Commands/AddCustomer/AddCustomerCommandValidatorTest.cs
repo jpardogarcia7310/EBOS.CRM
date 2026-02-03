@@ -26,3 +26,5 @@ public class AddCustomerCommandValidatorTest
             StatusId: 1
         );
 }
+
+

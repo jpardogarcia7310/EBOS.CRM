@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;
 
@@ -12,3 +15,7 @@ public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndivi
         RuleFor(x => x.IndividualCustomerRequest.StatusId).GreaterThan(0); RuleFor(x => x.IndividualCustomerRequest.IdentificationTypeId).GreaterThan(0);
     }
 }
+
+
+
+

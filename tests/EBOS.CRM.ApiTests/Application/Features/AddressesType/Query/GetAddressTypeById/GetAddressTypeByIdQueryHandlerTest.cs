@@ -123,3 +123,5 @@ public class GetAddressTypeByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<AddressTypeResponse>(It.IsAny<AddressType>()), Times.Never);
     }
 }
+
+

@@ -84,3 +84,5 @@ public class DeleteIndividualCustomerCommandHandlerTest
         _repositoryMock.Verify(r => r.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -7,7 +7,7 @@ using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Services.Audit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+
 
 namespace EBOS.CRM.Infrastructure;
 
@@ -54,3 +54,4 @@ public static class DependencyInjection
         return services;
     }
 }
+

@@ -19,3 +19,5 @@ public class GetCorporateCustomerByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
 
@@ -42,3 +45,7 @@ public class PatchCustomerCommandValidator : AbstractValidator<PatchCustomerComm
         });
     }
 }
+
+
+
+

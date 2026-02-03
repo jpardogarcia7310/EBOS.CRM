@@ -2,9 +2,6 @@ using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 using EBOS.CRM.Application.Features.AddressesType.Query.GetAllAddressesType;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.AddressType;
 
@@ -16,7 +13,6 @@ namespace EBOS.CRM.Api.Controllers.AddressType;
 public class AddressTypeController(IMediator mediator) : ControllerBase
 {
     #region Queries
-
     /// <summary>
     /// Returns an address type by its identifier.
     /// </summary>
@@ -54,14 +50,18 @@ public class AddressTypeController(IMediator mediator) : ControllerBase
     /// </example>
     /// <response code="200">List of address types.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<AddressTypeResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<AddressTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllAddressesTypeQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllAddressesTypeQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 

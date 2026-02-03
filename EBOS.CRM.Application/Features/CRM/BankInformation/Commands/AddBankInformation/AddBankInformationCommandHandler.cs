@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
 
 public class AddBankInformationCommandHandler(IBankInformationRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddBankInformationCommandHandler(IBankInformationRepository reposit
         return mapper.Map<BankInformationResponse>(entity);
     }
 }
+
+
+
+

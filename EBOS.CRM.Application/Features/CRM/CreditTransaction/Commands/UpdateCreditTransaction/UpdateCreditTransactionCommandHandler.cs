@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.UpdateCreditTransaction;
 
 public class UpdateCreditTransactionCommandHandler(ICreditTransactionRepository repository, IAuditService auditService,
@@ -52,3 +53,7 @@ public class UpdateCreditTransactionCommandHandler(ICreditTransactionRepository 
         return mapper.Map<CreditTransactionResponse>(entity);
     }
 }
+
+
+
+

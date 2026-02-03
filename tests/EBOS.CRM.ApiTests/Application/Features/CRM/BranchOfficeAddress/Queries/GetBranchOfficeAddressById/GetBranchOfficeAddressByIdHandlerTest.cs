@@ -27,3 +27,5 @@ public class GetBranchOfficeAddressByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<BranchOfficeAddressResponse>(entity), Times.Once);
     }
 }
+
+

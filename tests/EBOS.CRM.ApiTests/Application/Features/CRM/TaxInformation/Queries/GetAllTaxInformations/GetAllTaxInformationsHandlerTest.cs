@@ -3,8 +3,6 @@ using EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformat
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using Moq;
-using EBOS.CRM.Domain.Primitives.Paging;
-using EBOS.CRM.Application.Contracts.Requests.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformations;
 
@@ -20,16 +18,19 @@ public class GetAllTaxInformationsQueryHandlerTest
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.TaxInformation> { new() };
         var dtos = new List<TaxInformationResponse>();
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<EBOS.CRM.Domain.Entities.CRM.TaxInformation>(entities, 1, 50, entities.Count, entities.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<TaxInformationResponse>>(entities))
             .Returns(dtos);
 
-        var result = await handler.Handle(new GetAllTaxInformationsQuery(new PagedQueryRequest()), CancellationToken.None);
+        var result = await handler.Handle(new GetAllTaxInformationsQuery(), CancellationToken.None);
 
         Assert.NotNull(result);
     }
 }
+
+
+
 
 
 

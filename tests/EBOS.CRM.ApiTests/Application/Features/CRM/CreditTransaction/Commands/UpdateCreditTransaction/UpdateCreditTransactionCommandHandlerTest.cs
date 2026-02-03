@@ -106,3 +106,5 @@ public class UpdateCreditTransactionCommandHandlerTest
             CreditAccountId: 1
         );
 }
+
+

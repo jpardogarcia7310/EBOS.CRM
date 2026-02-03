@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;
 
 public class UpdateBankInformationCommandHandler(IBankInformationRepository repository, IAuditService auditService,
@@ -52,3 +53,7 @@ public class UpdateBankInformationCommandHandler(IBankInformationRepository repo
         return mapper.Map<BankInformationResponse>(entity);
     }
 }
+
+
+
+

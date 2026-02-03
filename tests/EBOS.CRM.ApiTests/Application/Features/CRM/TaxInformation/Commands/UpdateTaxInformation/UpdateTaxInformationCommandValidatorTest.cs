@@ -19,8 +19,11 @@ public class UpdateTaxInformationCommandValidatorTest
     }
 
     private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
+            Id: 1,
             TaxName: "Tax",
             TaxIdentificationNumber: "TAX123",
             CustomerId: 1
         );
 }
+
+

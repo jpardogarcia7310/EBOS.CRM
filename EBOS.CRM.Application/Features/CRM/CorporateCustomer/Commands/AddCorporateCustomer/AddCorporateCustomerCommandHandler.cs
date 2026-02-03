@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
 
 public class AddCorporateCustomerCommandHandler(ICorporateCustomerRepository repository, IAuditService auditService,
@@ -47,3 +48,7 @@ public class AddCorporateCustomerCommandHandler(ICorporateCustomerRepository rep
         return mapper.Map<CorporateCustomerResponse>(entity);
     }
 }
+
+
+
+

@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetBranchOfficeAddressById;
 
@@ -9,3 +12,7 @@ public class GetBranchOfficeAddressByIdQueryValidator : AbstractValidator<GetBra
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

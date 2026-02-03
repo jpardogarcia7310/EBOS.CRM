@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.DeleteTaxInformationAddress;
 
@@ -9,3 +12,7 @@ public class DeleteTaxInformationAddressCommandValidator : AbstractValidator<Del
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

@@ -3,6 +3,7 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 
+
 namespace EBOS.CRM.Application.Mappings.CRM;
 
 public class MappingCreditAccount : IRegister
@@ -32,3 +33,5 @@ public class MappingCreditAccount : IRegister
             .Ignore(dest => dest.CreditTransactions);
     }
 }
+
+

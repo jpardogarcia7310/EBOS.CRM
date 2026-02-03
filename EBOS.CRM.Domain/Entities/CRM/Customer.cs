@@ -1,4 +1,7 @@
+
+
 using EBOS.Core.Primitives;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -20,3 +23,4 @@ public class Customer : ErasableEntity
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
     public ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
 }
+

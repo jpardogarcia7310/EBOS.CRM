@@ -21,7 +21,7 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
         var response = await _client.GetAsync($"/api/v{_version}/BankInformation");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<BankInformationResponse>();
+        var items = await response.Content.ReadItemsAsync<BankInformationResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class BankInformationControllerTest(CustomWebApplicationFactory<Program> 
     }
     #endregion
 }
+
+
+
 
 

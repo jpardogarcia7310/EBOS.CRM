@@ -32,16 +32,15 @@ Run tests before opening a PR:
   - `dotnet test tests/EBOS.CRM.Api.IntegrationTests/EBOS.CRM.Api.IntegrationTests.csproj`
 
 ## 5. API Response Conventions
-- List endpoints return a paged response:
-  - DTO: `EBOS.CRM.Application.Contracts.Responses.Common.PagedResponse<T>`
-  - Tests should read list responses via `PagedResponse<T>.Items`.
+- List endpoints return a raw list:
+  - DTO: `IReadOnlyCollection<T>`
+  - Tests should read list responses as `IReadOnlyCollection<T>`.
   - Helpers:
-    - `ReadPagedItemsAsync<T>()` in `tests/**/TestUtils/HttpContentExtensions.cs`
+    - `ReadItemsAsync<T>()` in `tests/**/TestUtils/HttpContentExtensions.cs`
     - `GetFirstIdAsync<T>()` in `tests/EBOS.CRM.ApiTests/TestUtils/ControllerTestHelper.cs`
 
 ## 6. Repository Interfaces
-- Repositories that support pagination implement `IPagedRepository<T>` and must expose:
-  - `Task<PagedResult<T>> GetPagedAsync(PagedQuery query, CancellationToken cancellationToken = default)`
+- Repositories expose list reads via `GetAllAsync` and return `ICollection<T>`.
 
 ## 7. Pull Request Checklist
 - Code builds locally.

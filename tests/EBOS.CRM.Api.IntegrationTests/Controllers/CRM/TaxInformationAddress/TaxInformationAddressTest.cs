@@ -18,7 +18,7 @@ public class TaxInformationAddressTest(CustomWebApplicationFactory factory) : IC
         var response = await _client.GetAsync($"/api/v{_version}/TaxInformationAddress");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<TaxInformationAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<TaxInformationAddressResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class TaxInformationAddressTest(CustomWebApplicationFactory factory) : IC
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

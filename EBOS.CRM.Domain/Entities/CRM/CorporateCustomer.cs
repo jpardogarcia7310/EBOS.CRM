@@ -1,4 +1,7 @@
+
+
 using System.ComponentModel.DataAnnotations;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -13,3 +16,5 @@ public class CorporateCustomer : Customer
 
     public ICollection<BranchOffice> BranchOffices { get; set; } = new List<BranchOffice>();
 }
+
+

@@ -1,7 +1,8 @@
-﻿using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
+
 
 namespace EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 
@@ -17,3 +18,6 @@ public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper map
         return entity is null ? null : mapper.Map<StatusResponse>(entity);
     }
 }
+
+
+

@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.UpdateCreditTransaction;
 
@@ -13,3 +16,7 @@ public class UpdateCreditTransactionCommandValidator : AbstractValidator<UpdateC
         RuleFor(x => x.CreditTransactionRequest.CreditAccountId).GreaterThan(0);
     }
 }
+
+
+
+

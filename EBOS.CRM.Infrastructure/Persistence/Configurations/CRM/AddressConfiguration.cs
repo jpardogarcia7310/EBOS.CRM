@@ -1,6 +1,6 @@
 using EBOS.CRM.Domain.Entities.CRM;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -77,3 +77,4 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasDatabaseName("IX_Address_Country_City");
     }
 }
+

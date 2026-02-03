@@ -1,7 +1,7 @@
-﻿using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
@@ -15,3 +15,5 @@ public class CustomerRepository(CrmDbContext context) : BaseRepository<Customer>
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 }
+
+

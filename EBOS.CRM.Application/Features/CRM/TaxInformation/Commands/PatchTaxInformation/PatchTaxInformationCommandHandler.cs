@@ -5,6 +5,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInformation;
 
 public class PatchTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
@@ -64,3 +65,7 @@ public class PatchTaxInformationCommandHandler(ITaxInformationRepository reposit
             !entity.Erased);
     }
 }
+
+
+
+

@@ -19,3 +19,5 @@ public class GetTaxInformationAddressByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

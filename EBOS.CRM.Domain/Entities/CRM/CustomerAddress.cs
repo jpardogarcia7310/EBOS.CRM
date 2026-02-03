@@ -1,4 +1,7 @@
-﻿using EBOS.Core.Primitives;
+
+
+using EBOS.Core.Primitives;
+
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -15,3 +18,4 @@ public class CustomerAddress : ErasableEntity
     public DateTime? ValidTo { get; set; }
     public bool IsCurrent { get; set; }
 }
+

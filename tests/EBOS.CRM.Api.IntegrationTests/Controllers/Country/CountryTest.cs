@@ -18,7 +18,7 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
         var response = await _client.GetAsync($"/api/v{_version}/Country");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var countries = await response.Content.ReadPagedItemsAsync<CountryResponse>();
+        var countries = await response.Content.ReadItemsAsync<CountryResponse>();
         countries.Should().NotBeNull();
         countries.Should().NotBeEmpty();
     }
@@ -41,3 +41,6 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+

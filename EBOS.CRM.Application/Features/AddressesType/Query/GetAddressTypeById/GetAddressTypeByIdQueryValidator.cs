@@ -1,4 +1,7 @@
-﻿using FluentValidation;
+
+
+using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 
@@ -12,3 +15,6 @@ public class GetAddressTypeByIdQueryValidator : AbstractValidator<GetAddressType
             .WithErrorCode("VAL_ID_POSITIVE");
     }
 }
+
+
+

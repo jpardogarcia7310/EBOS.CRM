@@ -18,7 +18,7 @@ public class AddressTypeTest(CustomWebApplicationFactory factory) : IClassFixtur
         var response = await _client.GetAsync($"/api/v{_version}/AddressType");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<AddressTypeResponse>();
+        var items = await response.Content.ReadItemsAsync<AddressTypeResponse>();
         items.Should().NotBeNull();
         items.Should().NotBeEmpty();
     }
@@ -41,6 +41,9 @@ public class AddressTypeTest(CustomWebApplicationFactory factory) : IClassFixtur
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 
 

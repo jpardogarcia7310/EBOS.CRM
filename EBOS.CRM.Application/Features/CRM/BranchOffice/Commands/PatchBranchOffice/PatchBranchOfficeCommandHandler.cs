@@ -5,6 +5,7 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
+
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.PatchBranchOffice;
 
 public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
@@ -64,3 +65,7 @@ public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository,
             !entity.Erased);
     }
 }
+
+
+
+

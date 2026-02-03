@@ -18,7 +18,7 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
         var response = await _client.GetAsync($"/api/v{_version}/IndividualCustomer");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<IndividualCustomerResponse>();
+        var items = await response.Content.ReadItemsAsync<IndividualCustomerResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

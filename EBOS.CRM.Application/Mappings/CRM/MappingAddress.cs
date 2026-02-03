@@ -1,8 +1,9 @@
-﻿using System.Globalization;
+using System.Globalization;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
+
 
 namespace EBOS.CRM.Application.Mappings.CRM;
 
@@ -114,3 +115,5 @@ public class MappingAddress : IRegister
             CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
     }
 }
+
+

@@ -1,6 +1,6 @@
-﻿using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 

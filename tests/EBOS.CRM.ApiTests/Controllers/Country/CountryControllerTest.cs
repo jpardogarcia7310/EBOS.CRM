@@ -19,7 +19,7 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
         var response = await _client.GetAsync($"/api/v{_version}/Country");
         response.EnsureSuccessStatusCode();
 
-        var countries = await response.Content.ReadPagedItemsAsync<CountryResponse>();
+        var countries = await response.Content.ReadItemsAsync<CountryResponse>();
         Assert.NotNull(countries);
         Assert.NotEmpty(countries);
     }
@@ -94,3 +94,6 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
     }
     #endregion
 }
+
+
+

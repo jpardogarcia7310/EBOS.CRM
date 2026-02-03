@@ -1,6 +1,4 @@
-﻿using EBOS.CRM.Api.Middleware;
 using EBOS.CRM.Api.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -16,3 +14,4 @@ public static class ServiceCollectionExtensions
         options.OperationFilter<ErrorResponsesOperationFilter>();
     }
 }
+

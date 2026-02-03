@@ -18,7 +18,7 @@ public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<Cus
         var response = await _client.GetAsync($"/api/v{_version}/Status");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var statuses = await response.Content.ReadPagedItemsAsync<StatusResponse>();
+        var statuses = await response.Content.ReadItemsAsync<StatusResponse>();
         statuses.Should().NotBeNull();
         statuses.Should().NotBeEmpty();
     }
@@ -41,6 +41,9 @@ public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<Cus
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 
 

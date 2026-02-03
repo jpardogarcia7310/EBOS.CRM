@@ -3,8 +3,6 @@ using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using Moq;
-using EBOS.CRM.Domain.Primitives.Paging;
-using EBOS.CRM.Application.Contracts.Requests.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices;
 
@@ -20,16 +18,19 @@ public class GetAllBranchOfficesQueryHandlerTest
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.BranchOffice> { new() };
         var dtos = new List<BranchOfficeResponse>();
 
-        _repositoryMock.Setup(r => r.GetPagedAsync(It.IsAny<PagedQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PagedResult<EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entities, 1, 50, entities.Count, entities.Count == 0 ? 0 : 1, null, null, null));
+        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<BranchOfficeResponse>>(entities))
             .Returns(dtos);
 
-        var result = await handler.Handle(new GetAllBranchOfficesQuery(new PagedQueryRequest()), CancellationToken.None);
+        var result = await handler.Handle(new GetAllBranchOfficesQuery(), CancellationToken.None);
 
         Assert.NotNull(result);
     }
 }
+
+
+
 
 
 

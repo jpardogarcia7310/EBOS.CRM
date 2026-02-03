@@ -91,3 +91,5 @@ public class AddIndividualCustomerCommandHandlerTest
             IdentificationTypeId: 1
         );
 }
+
+

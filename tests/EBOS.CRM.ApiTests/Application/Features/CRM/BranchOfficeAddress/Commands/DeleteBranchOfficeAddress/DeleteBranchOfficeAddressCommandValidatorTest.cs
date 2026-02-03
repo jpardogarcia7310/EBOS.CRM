@@ -19,3 +19,5 @@ public class DeleteBranchOfficeAddressCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

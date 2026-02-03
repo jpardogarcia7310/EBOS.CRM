@@ -1,4 +1,7 @@
+
+
 using FluentValidation;
+
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.DeleteCorporateCustomer;
 
@@ -9,3 +12,7 @@ public class DeleteCorporateCustomerCommandValidator : AbstractValidator<DeleteC
         RuleFor(x => x.Id).GreaterThan(0);
     }
 }
+
+
+
+

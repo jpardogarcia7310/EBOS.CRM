@@ -19,3 +19,5 @@ public class GetBranchOfficeAddressByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

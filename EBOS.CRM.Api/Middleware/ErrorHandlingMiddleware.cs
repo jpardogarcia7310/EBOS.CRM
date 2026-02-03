@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EBOS.CRM.Api.Middleware;
 
@@ -97,3 +96,4 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         return $"VAL_{hex.Substring(0, 12)}";
     }
 }
+

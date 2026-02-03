@@ -87,3 +87,5 @@ public class AddBranchOfficeAddressCommandHandlerTest
             IsCurrent: true
         );
 }
+
+

@@ -19,3 +19,5 @@ public class GetCreditAccountByIdQueryValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+

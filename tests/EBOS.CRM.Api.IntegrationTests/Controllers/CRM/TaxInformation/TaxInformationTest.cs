@@ -18,7 +18,7 @@ public class TaxInformationTest(CustomWebApplicationFactory factory) : IClassFix
         var response = await _client.GetAsync($"/api/v{_version}/TaxInformation");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadPagedItemsAsync<TaxInformationResponse>();
+        var items = await response.Content.ReadItemsAsync<TaxInformationResponse>();
         items.Should().NotBeNull();
     }
 
@@ -29,5 +29,8 @@ public class TaxInformationTest(CustomWebApplicationFactory factory) : IClassFix
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
+
+
 
 

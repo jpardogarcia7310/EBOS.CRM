@@ -1,9 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using EBOS.CRM.Api.Swagger;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Extensions;
 
@@ -58,3 +56,4 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
         });
     }
 }
+

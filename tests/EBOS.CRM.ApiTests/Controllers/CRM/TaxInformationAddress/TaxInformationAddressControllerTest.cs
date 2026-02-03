@@ -21,7 +21,7 @@ public class TaxInformationAddressControllerTest(CustomWebApplicationFactory<Pro
         var response = await _client.GetAsync($"/api/v{_version}/TaxInformationAddress");
         response.EnsureSuccessStatusCode();
 
-        var items = await response.Content.ReadPagedItemsAsync<TaxInformationAddressResponse>();
+        var items = await response.Content.ReadItemsAsync<TaxInformationAddressResponse>();
         Assert.NotNull(items);
         Assert.NotEmpty(items);
     }
@@ -87,5 +87,8 @@ public class TaxInformationAddressControllerTest(CustomWebApplicationFactory<Pro
     }
     #endregion
 }
+
+
+
 
 

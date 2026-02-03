@@ -105,3 +105,5 @@ public class UpdateBankInformationCommandHandlerTest
             CustomerId: 1
         );
 }
+
+

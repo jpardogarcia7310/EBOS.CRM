@@ -85,3 +85,5 @@ public class AddBankInformationCommandHandlerTest
             CustomerId: 1
         );
 }
+
+

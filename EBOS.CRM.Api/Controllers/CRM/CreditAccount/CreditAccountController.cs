@@ -6,9 +6,6 @@ using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccou
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetCreditAccountById;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetAllCreditAccounts;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using EBOS.CRM.Application.Contracts.Requests.Common;
-using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CreditAccount;
 
@@ -92,15 +89,19 @@ public class CreditAccountController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<CreditAccountResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CreditAccountResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PagedQueryRequest query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllCreditAccountsQuery(query), cancellationToken));
+        return Ok(await mediator.Send(new GetAllCreditAccountsQuery(), cancellationToken));
     }
 
     #endregion
 }
+
+
+
+
 
 
 
