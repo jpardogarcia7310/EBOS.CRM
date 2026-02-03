@@ -1,0 +1,18 @@
+name: WFProtectBranchMain
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-develop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR comes from develop
+        shell: bash
+        run: |
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "PR head must be develop. Found: ${{ github.head_ref }}"
+            exit 1
+          fi

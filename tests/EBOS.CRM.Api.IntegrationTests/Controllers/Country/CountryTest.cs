@@ -41,9 +41,3 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
-
-
-
-
-
-
