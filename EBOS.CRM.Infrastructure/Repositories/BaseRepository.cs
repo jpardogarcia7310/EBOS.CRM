@@ -1,12 +1,9 @@
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
-using EBOS.CRM.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
-public class BaseRepository<T>(CrmDbContext context) : IRepository<T> where T : class, ISoftDeletable
+public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where T : class, ISoftDeletable
 {
     protected readonly CrmDbContext Context = context;
     protected readonly DbSet<T> DbSet = context.Set<T>();
@@ -49,11 +46,29 @@ public class BaseRepository<T>(CrmDbContext context) : IRepository<T> where T : 
         return entity is { Erased: false } ? entity : null;
     }
 
-    public virtual Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet.AsNoTracking()
+            .Where(e => !e.Erased)
+            .ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = Math.Max(1, pageSize);
+
+        return await AsQueryable()
+            .OrderBy(e => EF.Property<long>(e, "Id"))
+            .Skip((safePageNumber - 1) * safePageSize)
+            .Take(safePageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public virtual Task<int> CountAsync(CancellationToken cancellationToken = default)
         => DbSet.AsNoTracking()
             .Where(e => !e.Erased)
-            .ToListAsync(cancellationToken)
-            .ContinueWith<ICollection<T>>(t => t.Result, cancellationToken);
+            .CountAsync(cancellationToken);
 
     public virtual IQueryable<T> AsQueryable(bool includeErased = false)
         => includeErased ? DbSet.AsQueryable() : DbSet.Where(e => !e.Erased);

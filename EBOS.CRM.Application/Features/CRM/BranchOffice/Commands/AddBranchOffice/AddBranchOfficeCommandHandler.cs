@@ -6,7 +6,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
 
 public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,

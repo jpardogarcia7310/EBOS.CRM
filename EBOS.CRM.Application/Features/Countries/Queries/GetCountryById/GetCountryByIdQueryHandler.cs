@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
 
 public class GetCountryByIdQueryHandler(ICountryRepository repository, IMapper mapper)

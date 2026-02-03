@@ -1,7 +1,4 @@
-
-
 using FluentValidation;
-
 
 namespace EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 

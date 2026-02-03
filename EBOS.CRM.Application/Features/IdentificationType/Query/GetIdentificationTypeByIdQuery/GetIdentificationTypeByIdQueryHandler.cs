@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 
 public class GetIdentificationTypeByIdQueryHandler(IIdentificationTypeRepository repository, IMapper mapper)

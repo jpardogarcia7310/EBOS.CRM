@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetCreditTransactionById;
 
 public class GetCreditTransactionByIdQueryHandler(ICreditTransactionRepository repository, IMapper mapper)

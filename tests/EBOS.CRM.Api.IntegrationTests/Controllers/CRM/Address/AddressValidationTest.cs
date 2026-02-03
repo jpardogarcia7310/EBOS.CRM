@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.CRM;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 using FluentAssertions;
 

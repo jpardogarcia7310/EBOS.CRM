@@ -1,7 +1,4 @@
-
-
 using FluentValidation;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
 

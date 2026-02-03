@@ -5,7 +5,6 @@ using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
 
-
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
 public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServiceOptions> options)

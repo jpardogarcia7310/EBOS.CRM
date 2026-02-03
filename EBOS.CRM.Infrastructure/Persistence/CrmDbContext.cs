@@ -4,7 +4,6 @@ using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 
-
 namespace EBOS.CRM.Infrastructure.Persistence;
 
 public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)

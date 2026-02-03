@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.Application.Contracts.Responses.CRM;
+namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record AddressResponse(
     long Id,

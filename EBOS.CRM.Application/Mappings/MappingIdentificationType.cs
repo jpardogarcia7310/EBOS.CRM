@@ -2,7 +2,6 @@ using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Entities;
 using Mapster;
 
-
 namespace EBOS.CRM.Application.Mappings;
 
 public sealed class MappingIdentificationType : IRegister

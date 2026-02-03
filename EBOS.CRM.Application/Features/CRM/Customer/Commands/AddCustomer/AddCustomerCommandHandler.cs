@@ -6,7 +6,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
 
 public class AddCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,

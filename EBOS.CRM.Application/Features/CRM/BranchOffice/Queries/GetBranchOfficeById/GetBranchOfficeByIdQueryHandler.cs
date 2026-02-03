@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetBranchOfficeById;
 
 public class GetBranchOfficeByIdQueryHandler(IBranchOfficeRepository repository, IMapper mapper)

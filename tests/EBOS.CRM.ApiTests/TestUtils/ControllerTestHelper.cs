@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Net.Http.Json;
 
 namespace EBOS.CRM.ApiTests.TestUtils;

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
 namespace EBOS.CRM.Application.Services.Audit;
 
 public static class AuditSerialization

@@ -18,23 +18,16 @@ public class GetAllAddressesQueryHandlerTest
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.Address> { new() };
         var dtos = new List<AddressResponse>();
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressResponse>>(entities))
             .Returns(dtos);
 
-        var result = await handler.Handle(new GetAllAddressQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllAddressesQuery(), CancellationToken.None);
 
         Assert.NotNull(result);
     }
 }
-
-
-
-
-
-
-
-
-
 
