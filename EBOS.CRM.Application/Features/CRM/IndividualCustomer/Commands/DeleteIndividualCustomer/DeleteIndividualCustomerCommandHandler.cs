@@ -4,7 +4,6 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.DeleteIndividualCustomer;
 
 public class DeleteIndividualCustomerCommandHandler(IIndividualCustomerRepository repository, IAuditService auditService,

@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations;
 

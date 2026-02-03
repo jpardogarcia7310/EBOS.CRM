@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
 
 public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, IMapper mapper)

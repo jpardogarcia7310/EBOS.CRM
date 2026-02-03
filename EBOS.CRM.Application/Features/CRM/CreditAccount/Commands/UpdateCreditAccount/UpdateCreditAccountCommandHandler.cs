@@ -6,7 +6,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccount;
 
 public class UpdateCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,

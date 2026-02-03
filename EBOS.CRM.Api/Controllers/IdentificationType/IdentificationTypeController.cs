@@ -2,6 +2,10 @@ using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using MediatR;
+using EBOS.CRM.Api.Options;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Localization;
+using EBOS.CRM.Api.Resources;
 
 namespace EBOS.CRM.Api.Controllers.IdentificationType;
 
@@ -10,17 +14,9 @@ namespace EBOS.CRM.Api.Controllers.IdentificationType;
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
-public class IdentificationTypeController(IMediator mediator) : ControllerBase
+public class IdentificationTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
-    /// <summary>
-    /// Returns an identification type by its identifier.
-    /// </summary>
-    /// <example>
-    /// GET /api/v2/IdentificationType/1
-    /// </example>
-    /// <response code="200">Identification type found.</response>
-    /// <response code="404">Identification type not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(IdentificationTypeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -43,22 +39,56 @@ public class IdentificationTypeController(IMediator mediator) : ControllerBase
     }
 
     /// <summary>
-    /// Returns all identification types.
+    /// Returns all resources (paginated).
     /// </summary>
-    /// <example>
-    /// GET /api/v2/IdentificationType
-    /// </example>
-    /// <response code="200">List of identification types.</response>
+    /// <param name="paginationOptions">Pagination settings.</param>
+    /// <param name="pageNumber">1-based page number.</param>
+    /// <param name="pageSize">Page size (must be &lt;= configured max).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">List of resources. Adds X-Total-Count header.</response>
+    /// <response code="400">Invalid pageSize.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        return Ok(await mediator.Send(new GetAllIdentificationTypeQuery(), cancellationToken));
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        if (safePageSize > settings.MaxPageSize)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid pageSize",
+                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+
+        var result = await mediator.Send(new GetAllIdentificationTypeQuery(safePageNumber, safePageSize), cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
     }
 
     #endregion
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

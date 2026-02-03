@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.Application.Contracts.Responses;
+namespace EBOS.CRM.Application.Contracts.Responses;
 
 
 public record IdentificationTypeResponse(

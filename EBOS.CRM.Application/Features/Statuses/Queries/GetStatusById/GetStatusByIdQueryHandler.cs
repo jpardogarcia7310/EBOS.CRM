@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 
 public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper mapper)

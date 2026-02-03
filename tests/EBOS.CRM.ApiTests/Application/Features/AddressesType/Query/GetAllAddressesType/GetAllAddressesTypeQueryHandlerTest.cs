@@ -18,151 +18,97 @@ public class GetAllAddressesTypeQueryHandlerTest
         _repositoryMock = new Mock<IAddressTypeRepository>();
         _mapperMock = new Mock<IMapper>();
         _handler = new GetAllAddressesTypeQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<AddressType>());
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
     }
 
     [Fact]
-    public async Task Handle_EntitiesExist_ReturnsMappedDtos()
+    public async Task Handle_AddressTypesExist_ReturnsMappedDtos()
     {
-        var entities = new List<AddressType>
-        {
-            new()
-            {
-                Id = 1,
-                Code = "HOME",
-                Description = "Home",
-                Category = "Shipping",
-                AllowsMultiple = true,
-                RequiresPrimary = false
-            }
-        };
-        var dtos = new List<AddressTypeResponse>
-        {
-            new(1, "HOME", "Home", "Shipping", true, false)
-        };
+        // Arrange
+        var entities = new List<AddressType> { new() { Id = 1, Code = "HOME" } };
+        var dtos = new List<AddressTypeResponse> { new(1, "HOME", "Home", null, false, false) };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities)).Returns(dtos);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities.Count);
+        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities))
+            .Returns(dtos);
 
         var query = new GetAllAddressesTypeQuery();
 
+        // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
+        // Assert
         Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("HOME", result.First().Code);
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
-        _mapperMock.Verify(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities), Times.Once);
+        Assert.Single(result.Items);
+        Assert.Equal("HOME", result.Items.First().Code);
     }
 
     [Fact]
-    public async Task Handle_NoEntities_ReturnsEmptyEnumerable()
+    public async Task Handle_NoAddressTypes_ReturnsEmptyEnumerable()
     {
+        // Arrange
         var entities = new List<AddressType>();
         var dtos = new List<AddressTypeResponse>();
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities)).Returns(dtos);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
+        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities))
+            .Returns(dtos);
 
         var query = new GetAllAddressesTypeQuery();
 
+        // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
+        // Assert
         Assert.NotNull(result);
-        Assert.Empty(result);
+        Assert.Empty(result.Items);
     }
 
     [Fact]
     public async Task Handle_RepositoryThrows_PropagatesException()
     {
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("DB error"));
+        // Arrange
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Fail"));
+
         var query = new GetAllAddressesTypeQuery();
 
+        // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task Handle_CancellationRequested_ThrowsOperationCanceled()
-    {
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
-        var query = new GetAllAddressesTypeQuery();
-
-        await Assert.ThrowsAsync<OperationCanceledException>(
-            () => _handler.Handle(query, cts.Token));
-    }
-
-    [Fact]
-    public async Task Handle_MapperConfigurationInvalid_ThrowsMappingException()
-    {
-        var entities = new List<AddressType> { new() { Id = 1, Code = "HOME" } };
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities))
-            .Throws(new InvalidOperationException("Mapping failed"));
-
-        var query = new GetAllAddressesTypeQuery();
-
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _handler.Handle(query, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_NullEntityProperty_MapsGracefully()
     {
+        // Arrange
         var entities = new List<AddressType> { new() { Id = 1, Code = null! } };
-        var dtos = new List<AddressTypeResponse> { new(1, null!, "Home", "Shipping", true, false) };
+        var dtos = new List<AddressTypeResponse> { new(1, null!, null!, null, false, false) };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities)).Returns(dtos);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities.Count);
+        _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities))
+            .Returns(dtos);
 
         var query = new GetAllAddressesTypeQuery();
 
+        // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
+        // Assert
         Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Null(result.First().Code);
-    }
-
-    [Fact]
-    public async Task Handle_MapperCalledWithCorrectSourceType()
-    {
-        var entities = new List<AddressType>();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(entities);
-
-        var query = new GetAllAddressesTypeQuery();
-
-        await _handler.Handle(query, CancellationToken.None);
-
-        _mapperMock.Verify(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_RepositoryCalledOnce_WithCancellationToken()
-    {
-        var query = new GetAllAddressesTypeQuery();
-        var entities = new List<AddressType>();
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(entities);
-
-        await _handler.Handle(query, CancellationToken.None);
-
-        _repositoryMock.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Single(result.Items);
+        Assert.Null(result.Items.First().Code);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

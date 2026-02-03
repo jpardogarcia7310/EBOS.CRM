@@ -69,10 +69,29 @@ public sealed class InMemoryAddressRepository : IAddressRepository
         return Task.FromResult(_items.FirstOrDefault(x => x.Id == id));
     }
 
-    public Task<ICollection<Address>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<Address>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<ICollection<Address>>(_items.ToList());
+        return Task.FromResult<IReadOnlyCollection<Address>>(_items.ToList());
+    }
+
+    public Task<IReadOnlyCollection<Address>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = Math.Max(1, pageSize);
+        var paged = _items
+            .OrderBy(x => x.Id)
+            .Skip((safePageNumber - 1) * safePageSize)
+            .Take(safePageSize)
+            .ToList();
+        return Task.FromResult<IReadOnlyCollection<Address>>(paged);
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(_items.Count);
     }
 
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;

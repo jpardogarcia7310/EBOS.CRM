@@ -1,13 +1,10 @@
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
-using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Services.Audit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
 
 namespace EBOS.CRM.Infrastructure;
 

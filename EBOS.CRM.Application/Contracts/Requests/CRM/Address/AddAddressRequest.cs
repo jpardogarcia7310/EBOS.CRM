@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.Application.Contracts.Requests.CRM.Address;
+namespace EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 
 public record AddAddressRequest(
     string Street,

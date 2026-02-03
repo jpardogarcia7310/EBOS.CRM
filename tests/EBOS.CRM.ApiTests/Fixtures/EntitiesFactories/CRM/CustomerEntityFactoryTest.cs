@@ -1,4 +1,3 @@
-using EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;

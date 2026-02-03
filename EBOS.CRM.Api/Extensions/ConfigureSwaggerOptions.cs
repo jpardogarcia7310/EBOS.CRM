@@ -39,6 +39,7 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
         options.SchemaFilter<ValidationProblemDetailsSchemaFilter>();
         options.OperationFilter<ValidationProblemDetailsOperationFilter>();
         options.OperationFilter<ErrorResponsesOperationFilter>();
+        options.OperationFilter<PaginationOperationFilter>();
 
         // 4. Optional diagnostic filter (you can remove it when you no longer need it)
         options.OperationFilter<DebugGroupNameOperationFilter>();

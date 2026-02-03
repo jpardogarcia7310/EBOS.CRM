@@ -7,7 +7,7 @@ using FluentAssertions;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
 
-public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class tatusTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
     private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);

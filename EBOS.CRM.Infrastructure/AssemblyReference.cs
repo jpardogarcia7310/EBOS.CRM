@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.Infrastructure;
+namespace EBOS.CRM.Infrastructure;
 
 /// <summary>
 /// Marker class used for automatic registration of services and repositories

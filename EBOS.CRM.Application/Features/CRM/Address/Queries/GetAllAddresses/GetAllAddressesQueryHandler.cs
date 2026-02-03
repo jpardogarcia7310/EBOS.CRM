@@ -2,26 +2,27 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
-
+using EBOS.CRM.Application.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 
 public class GetAllAddressesQueryHandler(IAddressRepository repository, IMapper mapper)
-    : IRequestHandler<GetAllAddressQuery, IReadOnlyCollection<AddressResponse>>
+    : IRequestHandler<GetAllAddressesQuery, PagedResult<AddressResponse>>
 {
     private readonly IAddressRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<IReadOnlyCollection<AddressResponse>> Handle(GetAllAddressQuery request,
-        CancellationToken cancellationToken)
+    public async Task<PagedResult<AddressResponse>> Handle(GetAllAddressesQuery request, CancellationToken cancellationToken)
     {
-        // 👇 This throws an OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllAsync(cancellationToken);
-        return _mapper.Map<IReadOnlyCollection<AddressResponse>>(entities);
+        var entities = await _repository.GetAllPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var items = _mapper.Map<IReadOnlyCollection<AddressResponse>>(entities);
+        var total = await _repository.CountAsync(cancellationToken);
+        return new PagedResult<AddressResponse>(items, total);
     }
 }
+
 
 
 

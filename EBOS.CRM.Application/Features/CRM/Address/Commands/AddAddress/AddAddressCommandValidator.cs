@@ -1,7 +1,6 @@
 using FluentValidation;
 using System.Globalization;
 
-
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 
 public class AddAddressCommandValidator : AbstractValidator<AddAddressCommand>

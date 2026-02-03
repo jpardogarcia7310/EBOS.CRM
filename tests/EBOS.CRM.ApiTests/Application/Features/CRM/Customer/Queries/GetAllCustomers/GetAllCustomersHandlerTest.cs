@@ -18,8 +18,10 @@ public class GetAllCustomersQueryHandlerTest
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.Customer> { new() };
         var dtos = new List<CustomerResponse>();
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CustomerResponse>>(entities))
             .Returns(dtos);
 
@@ -28,10 +30,3 @@ public class GetAllCustomersQueryHandlerTest
         Assert.NotNull(result);
     }
 }
-
-
-
-
-
-
-

@@ -3,7 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetIndividualCustomerById;
 
 public class GetIndividualCustomerByIdQueryHandler(IIndividualCustomerRepository repository, IMapper mapper)

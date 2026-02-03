@@ -1,5 +1,6 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
+using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
@@ -32,6 +33,8 @@ services.AddInfrastructure(builder.Configuration);
 
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.AddLocalization();
 
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
