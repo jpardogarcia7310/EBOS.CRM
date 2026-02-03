@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Contracts.Requests.CRM;
+namespace EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 
 public sealed record PatchBranchOfficeRequest(
     string? Name,

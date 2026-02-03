@@ -3,16 +3,12 @@ using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Services;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases

@@ -1,9 +1,8 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 
-public record UpdateCustomerRequest(
+public sealed record UpdateCustomerRequest(
+    long Id,
     string Code,
     string Email,
     string Phone,
-    DateTime CreatedAt,
-    long StatusId
-);
+    long StatusId);

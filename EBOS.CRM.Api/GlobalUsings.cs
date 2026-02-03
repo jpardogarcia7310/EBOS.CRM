@@ -1,0 +1,11 @@
+global using System;
+global using System.Linq;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ModelBinding;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.AspNetCore.Mvc.Versioning;
+global using Microsoft.AspNetCore.Mvc.ApiExplorer;
+global using Swashbuckle.AspNetCore.SwaggerGen;
+global using EBOS.CRM.Application.Services.Interfaces;
+global using EBOS.CRM.Api.Middleware;
