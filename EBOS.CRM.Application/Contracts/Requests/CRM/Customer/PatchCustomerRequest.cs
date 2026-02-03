@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Contracts.Requests.CRM;
+namespace EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 
 public sealed record PatchCustomerRequest(
     string? Code,

@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Contracts.Requests.CRM;
+namespace EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 
 public sealed record PatchTaxInformationRequest(
     string? TaxName,

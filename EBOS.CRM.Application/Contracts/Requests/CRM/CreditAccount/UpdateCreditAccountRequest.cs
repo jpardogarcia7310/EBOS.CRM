@@ -1,7 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
 
-public record UpdateCreditAccountRequest(
+public sealed record UpdateCreditAccountRequest(
+    long Id,
     decimal MaxAmount,
     decimal UsedAmount,
-    long CustomerId
-);
+    long CustomerId);

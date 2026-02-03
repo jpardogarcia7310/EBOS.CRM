@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Contracts.Requests.CRM;
+namespace EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
 
 public sealed record PatchCreditAccountRequest(
     decimal? MaxAmount,

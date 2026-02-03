@@ -1,7 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 
-public record UpdateBranchOfficeRequest(
+public sealed record UpdateBranchOfficeRequest(
+    long Id,
     string Name,
     string PhoneNumber,
-    long CorporateCustomerId
-);
+    long CorporateCustomerId);
