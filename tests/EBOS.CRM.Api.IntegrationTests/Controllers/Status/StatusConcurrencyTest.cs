@@ -6,6 +6,7 @@ using FluentAssertions;
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
 
 public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+
 {
     private readonly HttpClient _client = factory.CreateClient();
     private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
@@ -34,8 +35,3 @@ public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClass
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.OK);
     }
 }
-
-
-
-
-

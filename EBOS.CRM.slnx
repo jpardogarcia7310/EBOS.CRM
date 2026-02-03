@@ -3,13 +3,19 @@
     <File Path="documentation/Internal.md" />
     <File Path="documentation/AGENTS.md" />
     <File Path="documentation/Contributing.md" />
-    <File Path="documentation/Features_ES.md" />
-    <File Path="documentation/Features.md" />
     <File Path="documentation/Code of conduct.md" />
-    <File Path="README.md" />
+    <File Path="documentation/Roadmap.md" />
+    <File Path="documentation/Roadmap_ES.md" />
+  </Folder>
+  <Folder Name="/documentation/Features/">
+    <File Path="documentation/Features/Features.md" />
+    <File Path="documentation/Features/Features_ES.md" />
   </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/source/">
     <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" Id="b94674de-a33b-4841-b1af-7cfbd17e3871" />

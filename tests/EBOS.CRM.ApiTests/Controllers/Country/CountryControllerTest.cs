@@ -33,6 +33,7 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
             _client, $"/api/{_version}/Country", x => x.Id);
 
         var response = await _client.GetAsync($"/api/{_version}/Country/{id}");
+        var response = await _client.GetAsync("/api/v1/Country/1");
         response.EnsureSuccessStatusCode();
 
         var country = await response.Content.ReadFromJsonAsync<CountryResponse>();
@@ -47,6 +48,8 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
             _client, $"/api/{_version}/Country", x => x.Id);
 
         var response = await _client.GetAsync($"/api/{_version}/Country/{id + 9999}");
+        var response = await _client.GetAsync("/api/v1/Country/9999");
+
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -79,6 +82,8 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
 
         // We expect the system to apply a retry/circuit breaker and recover.
         var response2 = await _client.GetAsync($"/api/{_version}/Country");
+        Assert.Equal(HttpStatusCode.NotFound, response2.StatusCode);
+
         response2.EnsureSuccessStatusCode();
     }
 
@@ -94,4 +99,3 @@ public class CountryControllerTest(CustomWebApplicationFactory<Program> factory)
     }
     #endregion
 }
-
