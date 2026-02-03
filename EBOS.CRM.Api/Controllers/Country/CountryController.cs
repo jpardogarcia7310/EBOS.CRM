@@ -17,6 +17,14 @@ namespace EBOS.CRM.Api.Controllers.Country;
 public class CountryController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     #region Queries
+    /// <summary>
+    /// Gets a country by id.
+    /// </summary>
+    /// <param name="id">Country id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Country found.</response>
+    /// <response code="400">Invalid id.</response>
+    /// <response code="404">Country not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(CountryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
