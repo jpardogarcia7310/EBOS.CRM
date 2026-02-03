@@ -6,6 +6,7 @@ using FluentAssertions;
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.Status;
 
 public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+
 {
     private readonly HttpClient _client = factory.CreateClient();
     private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
@@ -14,7 +15,7 @@ public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClass
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/v{_version}/Status"))
+            .Select(_ => _client.GetAsync($"/api/{_version}/Status"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +27,7 @@ public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClass
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/v{_version}/Status/1"))
+            .Select(_ => _client.GetAsync($"/api/{_version}/Status/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -34,4 +35,3 @@ public class StatusConcurrencyTest(CustomWebApplicationFactory factory) : IClass
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.OK);
     }
 }
-

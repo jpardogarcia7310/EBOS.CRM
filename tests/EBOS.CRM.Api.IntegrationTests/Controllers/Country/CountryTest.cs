@@ -15,7 +15,7 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
     {
-        var response = await _client.GetAsync($"/api/v{_version}/Country");
+        var response = await _client.GetAsync($"/api/{_version}/Country");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var countries = await response.Content.ReadPagedItemsAsync<CountryResponse>();
@@ -26,7 +26,7 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
     [Fact]
     public async Task GetById_Returns_Country_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/v{_version}/Country/1");
+        var response = await _client.GetAsync($"/api/{_version}/Country/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var country = await response.Content.ReadFromJsonAsync<CountryResponse>();
@@ -37,8 +37,7 @@ public class CountryTest(CustomWebApplicationFactory factory) : IClassFixture<Cu
     [Fact]
     public async Task GetById_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/v{_version}/Country/999999");
+        var response = await _client.GetAsync($"/api/{_version}/Country/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
-
