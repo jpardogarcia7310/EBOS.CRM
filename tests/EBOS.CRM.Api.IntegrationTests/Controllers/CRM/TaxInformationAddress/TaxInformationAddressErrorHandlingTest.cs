@@ -15,12 +15,12 @@ public class TaxInformationAddressErrorHandlingTest(
     : IClassFixture<TaxInformationAddressErrorHandlingTest.FailingTaxInformationAddressFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformationAddress");
 
     [Fact]
     public async Task GetAll_Returns_500_WhenRepositoryFails()
     {
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformationAddress");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformationAddress");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
@@ -47,3 +47,4 @@ public class TaxInformationAddressErrorHandlingTest(
         }
     }
 }
+

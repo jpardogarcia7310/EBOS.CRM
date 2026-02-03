@@ -14,12 +14,12 @@ public class CustomerErrorHandlingTest(CustomerErrorHandlingTest.FailingCustomer
     : IClassFixture<CustomerErrorHandlingTest.FailingCustomerFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Customer");
 
     [Fact]
     public async Task GetAll_Returns_500_WhenRepositoryFails()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Customer");
+        var response = await _client.GetAsync($"/api/v{_version}/Customer");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
@@ -46,3 +46,4 @@ public class CustomerErrorHandlingTest(CustomerErrorHandlingTest.FailingCustomer
         }
     }
 }
+

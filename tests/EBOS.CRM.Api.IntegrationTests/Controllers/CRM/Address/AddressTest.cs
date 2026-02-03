@@ -17,7 +17,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     public AddressTest(InMemoryAddressWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
-        _version = ApiVersionHelper.GetLatestVersion(factory);
+        _version = ApiVersionHelper.GetLatestVersion(factory, "Address");
 
         if (!factory.Repository.Items.Any())
         {
@@ -45,7 +45,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Address");
+        var response = await _client.GetAsync($"/api/v{_version}/Address");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var items = await response.Content.ReadPagedItemsAsync<AddressResponse>();
@@ -56,7 +56,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     [Fact]
     public async Task GetById_Returns_Address_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Address/1");
+        var response = await _client.GetAsync($"/api/v{_version}/Address/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var item = await response.Content.ReadFromJsonAsync<AddressResponse>();
@@ -84,7 +84,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
             AddressTypeId: 1
         );
 
-        var response = await _client.PostAsJsonAsync($"/api/{_version}/Address", request);
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Address", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var created = await response.Content.ReadFromJsonAsync<AddressResponse>();
@@ -112,7 +112,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
             AddressTypeId: 1
         );
 
-        var response = await _client.PutAsJsonAsync($"/api/{_version}/Address/1", request);
+        var response = await _client.PutAsJsonAsync($"/api/v{_version}/Address/1", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var updated = await response.Content.ReadFromJsonAsync<AddressResponse>();
@@ -140,34 +140,35 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
             AddressTypeId: 1
         );
 
-        var response = await _client.PutAsJsonAsync($"/api/{_version}/Address/999999", request);
+        var response = await _client.PutAsJsonAsync($"/api/v{_version}/Address/999999", request);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Delete_Returns_OK_WhenExists()
     {
-        var response = await _client.DeleteAsync($"/api/{_version}/Address/1");
+        var response = await _client.DeleteAsync($"/api/v{_version}/Address/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var getResponse = await _client.GetAsync($"/api/{_version}/Address/1");
+        var getResponse = await _client.GetAsync($"/api/v{_version}/Address/1");
         getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Delete_Returns_404_WhenNotFound()
     {
-        var response = await _client.DeleteAsync($"/api/{_version}/Address/999999");
+        var response = await _client.DeleteAsync($"/api/v{_version}/Address/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task GetById_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Address/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/Address/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
+
 
 
 

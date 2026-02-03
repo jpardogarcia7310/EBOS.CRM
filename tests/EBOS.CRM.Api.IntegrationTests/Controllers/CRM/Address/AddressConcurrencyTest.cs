@@ -13,7 +13,7 @@ public class AddressConcurrencyTest : IClassFixture<InMemoryAddressWebApplicatio
     public AddressConcurrencyTest(InMemoryAddressWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
-        _version = ApiVersionHelper.GetLatestVersion(factory);
+        _version = ApiVersionHelper.GetLatestVersion(factory, "Address");
 
         if (!factory.Repository.Items.Any())
         {
@@ -42,7 +42,7 @@ public class AddressConcurrencyTest : IClassFixture<InMemoryAddressWebApplicatio
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/Address"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/Address"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -54,7 +54,7 @@ public class AddressConcurrencyTest : IClassFixture<InMemoryAddressWebApplicatio
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/Address/1"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/Address/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -62,6 +62,7 @@ public class AddressConcurrencyTest : IClassFixture<InMemoryAddressWebApplicatio
         responses.Should().OnlyContain(r => r.StatusCode == HttpStatusCode.OK);
     }
 }
+
 
 
 

@@ -15,7 +15,7 @@ public class AddressTypeTest(CustomWebApplicationFactory factory) : IClassFixtur
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
     {
-        var response = await _client.GetAsync($"/api/{_version}/AddressType");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var items = await response.Content.ReadPagedItemsAsync<AddressTypeResponse>();
@@ -26,7 +26,7 @@ public class AddressTypeTest(CustomWebApplicationFactory factory) : IClassFixtur
     [Fact]
     public async Task GetById_Returns_AddressType_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/1");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var item = await response.Content.ReadFromJsonAsync<AddressTypeResponse>();
@@ -37,7 +37,7 @@ public class AddressTypeTest(CustomWebApplicationFactory factory) : IClassFixtur
     [Fact]
     public async Task GetById_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/AddressType/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/AddressType/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

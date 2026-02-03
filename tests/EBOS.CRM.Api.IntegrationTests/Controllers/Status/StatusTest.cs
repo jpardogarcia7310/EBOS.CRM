@@ -15,7 +15,7 @@ public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<Cus
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Status");
+        var response = await _client.GetAsync($"/api/v{_version}/Status");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var statuses = await response.Content.ReadPagedItemsAsync<StatusResponse>();
@@ -26,7 +26,7 @@ public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<Cus
     [Fact]
     public async Task GetById_Returns_Status_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Status/1");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var status = await response.Content.ReadFromJsonAsync<StatusResponse>();
@@ -37,7 +37,7 @@ public class StatusTest(CustomWebApplicationFactory factory) : IClassFixture<Cus
     [Fact]
     public async Task GetById_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Status/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/Status/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

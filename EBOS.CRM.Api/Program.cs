@@ -106,13 +106,30 @@ if (app.Environment.IsDevelopment())
         options.DefaultModelsExpandDepth(-1); // Optional: Hides default models
         options.DisplayOperationId();         // Optional: Displays operationId
     });
+}
 
+try
+{
     if (db.Database.IsRelational())
     {
-        await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+        var canConnect = await db.Database.CanConnectAsync(cancellationToken).ConfigureAwait(false);
+        if (canConnect)
+        {
+            await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+            await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+            logger.LogWarning("Database unavailable. Skipping migrations and seed.");
+        }
     }
 }
-await CrmDbContextSeed.SeedAsync(db, cancellationToken).ConfigureAwait(false);
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+    logger.LogWarning(ex, "Database init failed. Skipping migrations and seed.");
+}
 
 // Middleware pipeline
 app.UseCorrelationId();

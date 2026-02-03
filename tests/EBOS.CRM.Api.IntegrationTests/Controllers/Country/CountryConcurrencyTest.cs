@@ -14,7 +14,7 @@ public class CountryConcurrencyTest(CustomWebApplicationFactory factory) : IClas
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/Country"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/Country"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +26,7 @@ public class CountryConcurrencyTest(CustomWebApplicationFactory factory) : IClas
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/Country/1"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/Country/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);

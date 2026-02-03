@@ -1,4 +1,4 @@
-﻿using EBOS.CRM.Infrastructure.Persistence;
+using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

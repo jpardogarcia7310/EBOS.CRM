@@ -14,7 +14,7 @@ public class IdentificationTypeConcurrencyTest(CustomWebApplicationFactory facto
     public async Task Stress_GetAll_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/IdentificationType"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/IdentificationType"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
@@ -26,7 +26,7 @@ public class IdentificationTypeConcurrencyTest(CustomWebApplicationFactory facto
     public async Task Stress_GetById_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/{_version}/IdentificationType/1"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/IdentificationType/1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);

@@ -12,13 +12,13 @@ public class CreditTransactionControllerTest(CustomWebApplicationFactory<Program
     IClassFixture<CustomWebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "CreditTransaction");
 
     #region CRUD Básicos
     [Fact]
     public async Task GetAllCreditTransactions_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction");
         response.EnsureSuccessStatusCode();
 
         var items = await response.Content.ReadPagedItemsAsync<CreditTransactionResponse>();
@@ -30,9 +30,9 @@ public class CreditTransactionControllerTest(CustomWebApplicationFactory<Program
     public async Task GetCreditTransactionById_ExistingId_ReturnsCreditTransaction()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<CreditTransactionResponse>(
-            _client, $"/api/{_version}/CreditTransaction", x => x.Id);
+            _client, $"/api/v{_version}/CreditTransaction", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction/{id}");
         response.EnsureSuccessStatusCode();
 
         var item = await response.Content.ReadFromJsonAsync<CreditTransactionResponse>();
@@ -44,9 +44,9 @@ public class CreditTransactionControllerTest(CustomWebApplicationFactory<Program
     public async Task GetCreditTransactionById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<CreditTransactionResponse>(
-            _client, $"/api/{_version}/CreditTransaction", x => x.Id);
+            _client, $"/api/v{_version}/CreditTransaction", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -55,36 +55,37 @@ public class CreditTransactionControllerTest(CustomWebApplicationFactory<Program
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CreditTransaction/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/CreditTransaction/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/CreditTransaction/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/CreditTransaction/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/CreditTransaction");
+        var response2 = await _client.GetAsync($"/api/v{_version}/CreditTransaction");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/CreditTransaction/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/CreditTransaction/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/CreditTransaction");
+        var response2 = await _client.GetAsync($"/api/v{_version}/CreditTransaction");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
 

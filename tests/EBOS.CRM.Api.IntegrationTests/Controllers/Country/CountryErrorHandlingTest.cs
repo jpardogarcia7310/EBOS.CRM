@@ -19,7 +19,7 @@ public class CountryErrorHandlingTest(CountryErrorHandlingTest.FailingCountryFac
     [Fact]
     public async Task GetAll_Returns_500_WhenRepositoryFails()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country");
+        var response = await _client.GetAsync($"/api/v{_version}/Country");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();

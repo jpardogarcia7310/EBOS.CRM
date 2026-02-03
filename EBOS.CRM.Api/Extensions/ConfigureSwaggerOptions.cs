@@ -22,9 +22,12 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
             {
                 Title = "EBOS.CRM API",
                 Version = description.ApiVersion.ToString(),
-                Description = $"EBOS.CRM API documentation (version {{description.ApiVersion}})"
+                Description = $"EBOS.CRM API documentation (version {description.ApiVersion})"
             });
         }
+
+        // Prevent schema ID collisions for types with the same name in different namespaces.
+        options.CustomSchemaIds(type => type.FullName?.Replace("+", ".") ?? type.Name);
 
         // 2. Include XML comments if they exist
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

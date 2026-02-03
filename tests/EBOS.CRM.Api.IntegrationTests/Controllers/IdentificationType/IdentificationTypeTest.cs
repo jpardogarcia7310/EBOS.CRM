@@ -15,7 +15,7 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
     {
-        var response = await _client.GetAsync($"/api/{_version}/IdentificationType");
+        var response = await _client.GetAsync($"/api/v{_version}/IdentificationType");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var items = await response.Content.ReadPagedItemsAsync<IdentificationTypeResponse>();
@@ -26,7 +26,7 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
     [Fact]
     public async Task GetById_Returns_IdentificationType_WhenExists()
     {
-        var response = await _client.GetAsync($"/api/{_version}/IdentificationType/1");
+        var response = await _client.GetAsync($"/api/v{_version}/IdentificationType/1");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var item = await response.Content.ReadFromJsonAsync<IdentificationTypeResponse>();
@@ -37,7 +37,7 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
     [Fact]
     public async Task GetById_Returns_404_WhenNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/IdentificationType/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/IdentificationType/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

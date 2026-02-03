@@ -12,13 +12,13 @@ public class TaxInformationControllerTest(CustomWebApplicationFactory<Program> f
     IClassFixture<CustomWebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformation");
 
     #region CRUD Básicos
     [Fact]
     public async Task GetAllTaxInformations_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformation");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformation");
         response.EnsureSuccessStatusCode();
 
         var items = await response.Content.ReadPagedItemsAsync<TaxInformationResponse>();
@@ -30,9 +30,9 @@ public class TaxInformationControllerTest(CustomWebApplicationFactory<Program> f
     public async Task GetTaxInformationById_ExistingId_ReturnsTaxInformation()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<TaxInformationResponse>(
-            _client, $"/api/{_version}/TaxInformation", x => x.Id);
+            _client, $"/api/v{_version}/TaxInformation", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformation/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformation/{id}");
         response.EnsureSuccessStatusCode();
 
         var item = await response.Content.ReadFromJsonAsync<TaxInformationResponse>();
@@ -44,9 +44,9 @@ public class TaxInformationControllerTest(CustomWebApplicationFactory<Program> f
     public async Task GetTaxInformationById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<TaxInformationResponse>(
-            _client, $"/api/{_version}/TaxInformation", x => x.Id);
+            _client, $"/api/v{_version}/TaxInformation", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformation/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformation/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -55,36 +55,37 @@ public class TaxInformationControllerTest(CustomWebApplicationFactory<Program> f
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformation/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformation/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
-        var response = await _client.GetAsync($"/api/{_version}/TaxInformation/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/TaxInformation/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/TaxInformation/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/TaxInformation/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/TaxInformation");
+        var response2 = await _client.GetAsync($"/api/v{_version}/TaxInformation");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/TaxInformation/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/TaxInformation/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/TaxInformation");
+        var response2 = await _client.GetAsync($"/api/v{_version}/TaxInformation");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
 

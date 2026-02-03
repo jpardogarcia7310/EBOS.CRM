@@ -15,7 +15,7 @@ public class ErrorHandlingTest(CustomWebApplicationFactory factory) : IClassFixt
     [Fact]
     public async Task GetById_Returns_404_WhenCountryNotFound()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Country/999999");
+        var response = await _client.GetAsync($"/api/v{_version}/Country/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
@@ -28,7 +28,7 @@ public class ErrorHandlingTest(CustomWebApplicationFactory factory) : IClassFixt
     public async Task GetById_Returns_400_WhenIdIsInvalid()
     {
         // If your controller validates that the ID must be positive
-        var response = await _client.GetAsync($"/api/{_version}/Country/-1");
+        var response = await _client.GetAsync($"/api/v{_version}/Country/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();

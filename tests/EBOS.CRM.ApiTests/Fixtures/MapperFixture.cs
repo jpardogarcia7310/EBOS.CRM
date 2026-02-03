@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 using MapsterMapper;
 
 namespace EBOS.CRM.ApiTests.Fixtures;

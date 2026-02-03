@@ -1,4 +1,4 @@
-﻿namespace EBOS.CRM.ApiTests.Fixtures;
+namespace EBOS.CRM.ApiTests.Fixtures;
 
 public static class CancellationTokenFixture
 {

@@ -12,12 +12,12 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
     : IClassFixture<InMemoryAddressWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Address");
 
     [Fact]
     public async Task GetById_Returns_400_WhenIdIsInvalid()
     {
-        var response = await _client.GetAsync($"/api/{_version}/Address/-1");
+        var response = await _client.GetAsync($"/api/v{_version}/Address/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -41,7 +41,7 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
             AddressTypeId: 0
         );
 
-        var response = await _client.PostAsJsonAsync($"/api/{_version}/Address", request);
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Address", request);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -65,17 +65,18 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
             AddressTypeId: 0
         );
 
-        var response = await _client.PutAsJsonAsync($"/api/{_version}/Address/1", request);
+        var response = await _client.PutAsJsonAsync($"/api/v{_version}/Address/1", request);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
     public async Task Delete_Returns_400_WhenIdIsInvalid()
     {
-        var response = await _client.DeleteAsync($"/api/{_version}/Address/-1");
+        var response = await _client.DeleteAsync($"/api/v{_version}/Address/-1");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
+
 
 
 

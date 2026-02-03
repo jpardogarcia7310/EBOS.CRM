@@ -12,13 +12,13 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
     IClassFixture<CustomWebApplicationFactory<Program>> // Your API's Program.cs file
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory);
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "CustomerAddress");
 
     #region CRUD Básicos
     [Fact]
     public async Task GetAllCustomerAddresss_ReturnsSuccessAndList()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CustomerAddress");
+        var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress");
         response.EnsureSuccessStatusCode();
 
         var items = await response.Content.ReadPagedItemsAsync<CustomerAddressResponse>();
@@ -30,9 +30,9 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
     public async Task GetCustomerAddressById_ExistingId_ReturnsCustomerAddress()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<CustomerAddressResponse>(
-            _client, $"/api/{_version}/CustomerAddress", x => x.Id);
+            _client, $"/api/v{_version}/CustomerAddress", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/CustomerAddress/{id}");
+        var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress/{id}");
         response.EnsureSuccessStatusCode();
 
         var item = await response.Content.ReadFromJsonAsync<CustomerAddressResponse>();
@@ -44,9 +44,9 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
     public async Task GetCustomerAddressById_NonExistingId_ReturnsNotFound()
     {
         var id = await ControllerTestHelper.GetFirstIdAsync<CustomerAddressResponse>(
-            _client, $"/api/{_version}/CustomerAddress", x => x.Id);
+            _client, $"/api/v{_version}/CustomerAddress", x => x.Id);
 
-        var response = await _client.GetAsync($"/api/{_version}/CustomerAddress/{id + 9999}");
+        var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
     #endregion
@@ -55,36 +55,37 @@ public class CustomerAddressControllerTest(CustomWebApplicationFactory<Program> 
     [Fact]
     public async Task Resilience_DatabaseUnavailable_ReturnsServiceUnavailable()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CustomerAddress/simulate-db-failure");
+        var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Resilience_NetworkInterruption_ReturnsGatewayTimeout()
     {
-        var response = await _client.GetAsync($"/api/{_version}/CustomerAddress/simulate-timeout");
+        var response = await _client.GetAsync($"/api/v{_version}/CustomerAddress/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task Recovery_AfterDatabaseFailure_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/CustomerAddress/simulate-db-failure");
+        var response1 = await _client.GetAsync($"/api/v{_version}/CustomerAddress/simulate-db-failure");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/CustomerAddress");
+        var response2 = await _client.GetAsync($"/api/v{_version}/CustomerAddress");
         response2.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task Recovery_AfterTimeout_RetrySucceeds()
     {
-        var response1 = await _client.GetAsync($"/api/{_version}/CustomerAddress/simulate-timeout");
+        var response1 = await _client.GetAsync($"/api/v{_version}/CustomerAddress/simulate-timeout");
         Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
 
-        var response2 = await _client.GetAsync($"/api/{_version}/CustomerAddress");
+        var response2 = await _client.GetAsync($"/api/v{_version}/CustomerAddress");
         response2.EnsureSuccessStatusCode();
     }
     #endregion
 }
+
 
