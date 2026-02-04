@@ -8,7 +8,9 @@ using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +36,7 @@ services.AddInfrastructure(builder.Configuration);
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.AddLocalization();
 
 // Register FluentValidation validators (from Application assembly)
@@ -59,6 +62,34 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 // Register the configuration that creates a SwaggerDoc per version and filters by GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var oidcOptions = builder.Configuration.GetSection(OidcOptions.SectionName).Get<OidcOptions>() ?? new OidcOptions();
+
+        if (!string.IsNullOrWhiteSpace(oidcOptions.Authority))
+        {
+            options.Authority = oidcOptions.Authority;
+        }
+
+        if (!string.IsNullOrWhiteSpace(oidcOptions.Audience))
+        {
+            options.Audience = oidcOptions.Audience;
+        }
+
+        options.RequireHttpsMetadata = oidcOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = (oidcOptions.ValidIssuers?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Authority),
+            ValidateAudience = (oidcOptions.ValidAudiences?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Audience),
+            ValidIssuers = oidcOptions.ValidIssuers,
+            ValidAudiences = oidcOptions.ValidAudiences,
+            ClockSkew = TimeSpan.FromSeconds(oidcOptions.ClockSkewSeconds)
+        };
+    });
+services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -136,6 +167,7 @@ app.UseApiErrorHandling();
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
