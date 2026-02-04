@@ -5,7 +5,6 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
 public class TaxInformationRepository(CrmDbContext context) : BaseRepository<TaxInformation>(context),
     ITaxInformationRepository
-{
-}
+{ }
 
 

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 
 namespace EBOS.CRM.Application.Services.Authorization;
@@ -21,29 +20,31 @@ public static class PolicyCodeResolver
 
     private static string ResolveAction(string typeName)
     {
+        var returnValue = "read";
+        
         if (typeName.StartsWith("Add", StringComparison.Ordinal))
         {
-            return "create";
+            returnValue = "create";
         }
 
         if (typeName.StartsWith("Update", StringComparison.Ordinal) ||
             typeName.StartsWith("Patch", StringComparison.Ordinal))
         {
-            return "update";
+            returnValue = "update";
         }
 
         if (typeName.StartsWith("Delete", StringComparison.Ordinal))
         {
-            return "delete";
+            returnValue = "delete";
         }
 
         if (typeName.StartsWith("GetAll", StringComparison.Ordinal) ||
             typeName.StartsWith("Get", StringComparison.Ordinal))
         {
-            return "read";
+            returnValue = "read";
         }
 
-        return "read";
+        return returnValue;
     }
 
     private static (string module, string resource) ResolveModuleAndResource(Type requestType)

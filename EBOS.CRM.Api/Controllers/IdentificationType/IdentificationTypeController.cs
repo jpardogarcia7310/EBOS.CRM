@@ -14,7 +14,8 @@ namespace EBOS.CRM.Api.Controllers.IdentificationType;
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
-public class IdentificationTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class IdentificationTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : 
+    ControllerBase
 {
     #region Queries
     /// <summary>
@@ -59,7 +60,8 @@ public class IdentificationTypeController(IMediator mediator, IStringLocalizer<S
     [ProducesResponseType(typeof(IReadOnlyCollection<IdentificationTypeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
@@ -74,7 +76,8 @@ public class IdentificationTypeController(IMediator mediator, IStringLocalizer<S
             });
         }
 
-        var result = await mediator.Send(new GetAllIdentificationTypeQuery(safePageNumber, safePageSize), cancellationToken);
+        var result = await mediator.Send(new GetAllIdentificationTypeQuery(safePageNumber, safePageSize), 
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

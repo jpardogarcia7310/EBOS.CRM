@@ -1,3 +1,4 @@
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,15 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
             }
 
             services.AddSingleton<IAddressRepository>(Repository);
+
+            var currentUserDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(ICurrentUserContext));
+            if (currentUserDescriptor != null)
+            {
+                services.Remove(currentUserDescriptor);
+            }
+
+            services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
         });
     }
 }

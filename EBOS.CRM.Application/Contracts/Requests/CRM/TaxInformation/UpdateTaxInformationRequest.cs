@@ -4,4 +4,5 @@ public sealed record UpdateTaxInformationRequest(
     long Id,
     string TaxName,
     string TaxIdentificationNumber,
-    long CustomerId);
+    long CustomerId
+);

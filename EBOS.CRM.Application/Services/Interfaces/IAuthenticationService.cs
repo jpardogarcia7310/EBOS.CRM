@@ -5,7 +5,6 @@ namespace EBOS.CRM.Application.Services.Interfaces;
 
 public interface IAuthenticationService
 {
-    Task<AuthenticatedUserResponse> AuthenticateAsync(
-        AuthenticateUserRequest request,
+    Task<AuthenticatedUserResponse> AuthenticateAsync(AuthenticateUserRequest request,
         CancellationToken cancellationToken = default);
 }

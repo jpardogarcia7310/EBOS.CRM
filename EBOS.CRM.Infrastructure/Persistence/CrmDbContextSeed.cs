@@ -46,7 +46,8 @@ public static class CrmDbContextSeed
             .ToList();
         if (invalid.Count != 0)
         {
-            throw new InvalidOperationException("Seed data contains invalid status entries. Please validate the seed source.");
+            throw new InvalidOperationException("Seed data contains invalid status entries. " +
+                                                "Please validate the seed source.");
         }
 
         await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>

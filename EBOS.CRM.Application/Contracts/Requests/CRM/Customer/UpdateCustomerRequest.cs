@@ -5,4 +5,5 @@ public sealed record UpdateCustomerRequest(
     string Code,
     string Email,
     string Phone,
-    long StatusId);
+    long StatusId
+);

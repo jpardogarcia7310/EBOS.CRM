@@ -5,7 +5,6 @@ namespace EBOS.CRM.Application.Services.Interfaces;
 
 public interface IAuthorizationService
 {
-    Task<AuthorizeUserResponse> AuthorizeAsync(
-        AuthorizeUserRequest request,
+    Task<AuthorizeUserResponse> AuthorizeAsync(AuthorizeUserRequest request,
         CancellationToken cancellationToken = default);
 }

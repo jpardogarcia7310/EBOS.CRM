@@ -5,7 +5,6 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
 public class CreditAccountRepository(CrmDbContext context) : BaseRepository<CreditAccount>(context),
     ICreditAccountRepository
-{
-}
+{ }
 
 

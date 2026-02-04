@@ -5,4 +5,5 @@ public sealed record AuthenticateUserRequest(
     string Username,
     string Email,
     string DisplayName,
-    bool IsActive);
+    bool IsActive
+);

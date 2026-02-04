@@ -8,8 +8,9 @@ public class UpdateCreditTransactionCommandValidator : AbstractValidator<UpdateC
     {
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.CreditTransactionRequest).NotNull();
-        RuleFor(x => x.CreditTransactionRequest.Type).NotEmpty(); RuleFor(x => x.CreditTransactionRequest.ExternalReference).NotEmpty(); RuleFor(x => x.CreditTransactionRequest.Comments).NotEmpty();
-
+        RuleFor(x => x.CreditTransactionRequest.Type).NotEmpty(); 
+        RuleFor(x => x.CreditTransactionRequest.ExternalReference).NotEmpty(); 
+        RuleFor(x => x.CreditTransactionRequest.Comments).NotEmpty();
         RuleFor(x => x.CreditTransactionRequest.CreditAccountId).GreaterThan(0);
     }
 }

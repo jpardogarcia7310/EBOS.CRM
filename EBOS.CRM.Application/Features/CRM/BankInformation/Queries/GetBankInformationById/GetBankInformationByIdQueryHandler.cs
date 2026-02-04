@@ -8,10 +8,12 @@ namespace EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetBankInfor
 public class GetBankInformationByIdQueryHandler(IBankInformationRepository repository, IMapper mapper)
     : IRequestHandler<GetBankInformationByIdQuery, BankInformationResponse?>
 {
-    private readonly IBankInformationRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IBankInformationRepository _repository = repository ?? 
+                                                              throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<BankInformationResponse?> Handle(GetBankInformationByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BankInformationResponse?> Handle(GetBankInformationByIdQuery request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

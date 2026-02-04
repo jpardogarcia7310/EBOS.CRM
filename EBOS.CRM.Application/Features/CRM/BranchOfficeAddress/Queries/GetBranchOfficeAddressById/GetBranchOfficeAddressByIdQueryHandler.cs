@@ -8,10 +8,12 @@ namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetBranc
 public class GetBranchOfficeAddressByIdQueryHandler(IBranchOfficeAddressRepository repository, IMapper mapper)
     : IRequestHandler<GetBranchOfficeAddressByIdQuery, BranchOfficeAddressResponse?>
 {
-    private readonly IBranchOfficeAddressRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IBranchOfficeAddressRepository _repository = repository ?? 
+                                                                  throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<BranchOfficeAddressResponse?> Handle(GetBranchOfficeAddressByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BranchOfficeAddressResponse?> Handle(GetBranchOfficeAddressByIdQuery request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

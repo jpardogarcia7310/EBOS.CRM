@@ -8,4 +8,5 @@ public sealed record AuthenticatedUserResponse(
     string DisplayName,
     bool IsActive,
     IReadOnlyCollection<string> Roles,
-    IReadOnlyCollection<string> Permissions);
+    IReadOnlyCollection<string> Permissions
+);

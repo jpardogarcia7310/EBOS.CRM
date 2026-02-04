@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddress;
 
-public record AddCustomerAddressCommand(AddCustomerAddressRequest CustomerAddressRequest) : IRequest<CustomerAddressResponse>;
+public record AddCustomerAddressCommand(AddCustomerAddressRequest CustomerAddressRequest) :
+    IRequest<CustomerAddressResponse>;
 
 
 

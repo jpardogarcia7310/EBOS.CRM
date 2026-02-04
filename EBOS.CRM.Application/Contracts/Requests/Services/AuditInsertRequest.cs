@@ -8,4 +8,5 @@ public sealed record AuditInsertRequest(
     long RegisterId,
     string? OldValues,
     string? NewValues,
-    string CorrelationId);
+    string CorrelationId
+    );

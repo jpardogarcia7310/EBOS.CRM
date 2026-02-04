@@ -4,5 +4,4 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.Security.Authorization.Queries.AuthorizeUser;
 
-public sealed record AuthorizeUserQuery(AuthorizeUserRequest Request)
-    : IRequest<AuthorizeUserResponse>;
+public sealed record AuthorizeUserQuery(AuthorizeUserRequest Request) : IRequest<AuthorizeUserResponse>;

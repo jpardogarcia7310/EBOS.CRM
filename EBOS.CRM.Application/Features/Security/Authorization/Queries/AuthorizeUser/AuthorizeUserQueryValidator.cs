@@ -6,11 +6,7 @@ public sealed class AuthorizeUserQueryValidator : AbstractValidator<AuthorizeUse
 {
     public AuthorizeUserQueryValidator()
     {
-        RuleFor(x => x.Request.UserId)
-            .GreaterThan(0);
-
-        RuleFor(x => x.Request.PolicyCode)
-            .NotEmpty()
-            .MaximumLength(100);
+        RuleFor(x => x.Request.UserId).GreaterThan(0);
+        RuleFor(x => x.Request.PolicyCode).NotEmpty().MaximumLength(100);
     }
 }

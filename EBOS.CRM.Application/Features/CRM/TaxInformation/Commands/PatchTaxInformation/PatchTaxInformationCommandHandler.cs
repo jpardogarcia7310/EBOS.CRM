@@ -10,7 +10,8 @@ namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInfo
 public class PatchTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchTaxInformationCommand, TaxInformationResponse?>
 {
-    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request, CancellationToken cancellationToken)
+    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

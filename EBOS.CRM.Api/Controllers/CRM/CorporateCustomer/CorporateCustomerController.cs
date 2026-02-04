@@ -24,7 +24,8 @@ public class CorporateCustomerController(IMediator mediator, IStringLocalizer<Sh
     [Produces("application/json")]
     [ProducesResponseType(typeof(CorporateCustomerResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCorporateCustomerRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddCorporateCustomerRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCorporateCustomerCommand(request), cancellationToken));
     }
@@ -36,7 +37,8 @@ public class CorporateCustomerController(IMediator mediator, IStringLocalizer<Sh
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateCorporateCustomerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateCorporateCustomerCommand(id, request), cancellationToken);
+        var dto = await mediator.Send(new UpdateCorporateCustomerCommand(id, request), 
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(new ProblemDetails
@@ -104,7 +106,8 @@ public class CorporateCustomerController(IMediator mediator, IStringLocalizer<Sh
     [ProducesResponseType(typeof(IReadOnlyCollection<CorporateCustomerResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
@@ -119,7 +122,8 @@ public class CorporateCustomerController(IMediator mediator, IStringLocalizer<Sh
             });
         }
 
-        var result = await mediator.Send(new GetAllCorporateCustomersQuery(safePageNumber, safePageSize), cancellationToken);
+        var result = await mediator.Send(new GetAllCorporateCustomersQuery(safePageNumber, safePageSize), 
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

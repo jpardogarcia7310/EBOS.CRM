@@ -10,11 +10,10 @@ public sealed class AuthorizeUserQueryHandler(IAuthorizationService authorizatio
     private readonly IAuthorizationService _authorizationService = authorizationService
         ?? throw new ArgumentNullException(nameof(authorizationService));
 
-    public Task<AuthorizeUserResponse> Handle(
-        AuthorizeUserQuery request,
-        CancellationToken cancellationToken)
+    public Task<AuthorizeUserResponse> Handle(AuthorizeUserQuery request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        
         return _authorizationService.AuthorizeAsync(request.Request, cancellationToken);
     }
 }

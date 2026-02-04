@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 
-public record UpdateCustomerAddressCommand(long Id, UpdateCustomerAddressRequest CustomerAddressRequest) : IRequest<CustomerAddressResponse?>;
+public record UpdateCustomerAddressCommand(long Id, UpdateCustomerAddressRequest CustomerAddressRequest) :
+    IRequest<CustomerAddressResponse?>;
 
 
 

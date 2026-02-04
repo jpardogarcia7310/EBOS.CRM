@@ -24,7 +24,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
     [Produces("application/json")]
     [ProducesResponseType(typeof(TaxInformationAddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationAddressRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationAddressRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddTaxInformationAddressCommand(request), cancellationToken));
     }
@@ -36,7 +37,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateTaxInformationAddressRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateTaxInformationAddressCommand(id, request), cancellationToken);
+        var dto = await mediator.Send(new UpdateTaxInformationAddressCommand(id, request), 
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(new ProblemDetails
@@ -78,7 +80,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
     {
-        var dto = await mediator.Send(new GetTaxInformationAddressByIdQuery(id), cancellationToken);
+        var dto = await mediator.Send(new GetTaxInformationAddressByIdQuery(id), 
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(new ProblemDetails
@@ -104,7 +107,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
     [ProducesResponseType(typeof(IReadOnlyCollection<TaxInformationAddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
@@ -119,7 +123,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
             });
         }
 
-        var result = await mediator.Send(new GetAllTaxInformationAddressesQuery(safePageNumber, safePageSize), cancellationToken);
+        var result = await mediator.Send(new GetAllTaxInformationAddressesQuery(safePageNumber, safePageSize), 
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
