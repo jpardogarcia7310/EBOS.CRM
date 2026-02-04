@@ -3,6 +3,7 @@ using System.Reflection;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
@@ -22,6 +23,14 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<Policy> Policies => Set<Policy>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<PolicyPermission> PolicyPermissions => Set<PolicyPermission>();
+    public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
