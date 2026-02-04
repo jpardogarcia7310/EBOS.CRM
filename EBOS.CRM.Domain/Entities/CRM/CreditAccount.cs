@@ -8,6 +8,10 @@ public sealed class CreditAccount : ErasableEntity
     public decimal MaxAmount { get; set; }  // Limit granted
     public decimal UsedAmount { get; set; } // What has already been spent
     public decimal AvailableAmount => MaxAmount - UsedAmount;
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     // Foreign Keys
     public long CustomerId { get; set; }

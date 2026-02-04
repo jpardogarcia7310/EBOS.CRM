@@ -13,6 +13,10 @@ public class BankInformation : ErasableEntity
     public string? Bic { get; set; }
     [MaxLength(200)]
     public string? BankName { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     // Foreign Keys
     public long CustomerId { get; set; }

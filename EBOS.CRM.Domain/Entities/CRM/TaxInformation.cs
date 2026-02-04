@@ -6,6 +6,10 @@ public class TaxInformation : ErasableEntity
 {
     public string TaxName { get; set; } = null!;
     public string TaxIdentificationNumber { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     public long CustomerId { get; set; }
     public Customer Customer { get; set; } = null!;

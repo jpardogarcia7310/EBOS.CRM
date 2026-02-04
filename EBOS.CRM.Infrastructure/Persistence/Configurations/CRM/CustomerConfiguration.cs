@@ -21,7 +21,12 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired()
             .HasMaxLength(12);
         builder.Property(c => c.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(c => c.CreatedBy)
             .IsRequired();
+        builder.Property(c => c.UpdatedAt);
+        builder.Property(c => c.UpdatedBy);
         builder.Property(c => c.Erased)
             .IsRequired();
 

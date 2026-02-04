@@ -38,6 +38,13 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
         builder.Property(c => c.InternationalPhoneCode)
                 .IsRequired()
                 .HasMaxLength(20);
+        builder.Property(c => c.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(c => c.CreatedBy)
+                .IsRequired();
+        builder.Property(c => c.UpdatedAt);
+        builder.Property(c => c.UpdatedBy);
 
         // Table declaration with its additional constraints (example: check format if desired)
         // Note: EF does not validate complex expressions in the database; if you want database-level constraints,

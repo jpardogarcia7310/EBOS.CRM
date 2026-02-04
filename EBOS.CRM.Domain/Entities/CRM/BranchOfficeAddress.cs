@@ -1,4 +1,4 @@
-using EBOS.Core.Primitives;
+﻿using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -14,6 +14,8 @@ public class BranchOfficeAddress : ErasableEntity
     public DateTime ValidFrom { get; set; }
     public DateTime? ValidTo { get; set; }
     public bool IsCurrent { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 }
-
-

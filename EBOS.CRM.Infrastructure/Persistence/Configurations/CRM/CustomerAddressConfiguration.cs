@@ -17,6 +17,15 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
             .IsRequired();
         builder.Property(ca => ca.IsCurrent)
             .IsRequired();
+        builder.Property(ca => ca.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ca => ca.CreatedBy)
+            .IsRequired();
+        builder.Property(ca => ca.UpdatedAt);
+        builder.Property(ca => ca.UpdatedBy);
+        builder.Property(ca => ca.Erased)
+            .IsRequired();
 
         builder.HasOne(ca => ca.Customer)
             .WithMany(c => c.CustomerAddresses)

@@ -17,6 +17,13 @@ public class IdentificationTypeConfiguration : IEntityTypeConfiguration<Identifi
         builder.Property(t => t.Description)
             .IsRequired()
             .HasMaxLength(200);
+        builder.Property(t => t.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(t => t.CreatedBy)
+            .IsRequired();
+        builder.Property(t => t.UpdatedAt);
+        builder.Property(t => t.UpdatedBy);
         builder.Property(t => t.Erased)
             .IsRequired();
     }

@@ -40,6 +40,13 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasPrecision(10, 6);
         builder.Property(a => a.Longitude)
             .HasPrecision(10, 6);
+        builder.Property(a => a.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(a => a.CreatedBy)
+            .IsRequired();
+        builder.Property(a => a.UpdatedAt);
+        builder.Property(a => a.UpdatedBy);
         builder.Property(a => a.Erased)
             .IsRequired();
 

@@ -15,6 +15,10 @@ public sealed class CreditTransaction : ErasableEntity
     [Required]
     [MaxLength(500)]
     public string? Comments { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     // Foreign Keys
     public long CreditAccountId { get; set; }

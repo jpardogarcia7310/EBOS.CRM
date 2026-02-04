@@ -17,5 +17,12 @@ public class StatusConfiguration : IEntityTypeConfiguration<Status>
         builder.Property(e => e.Description)
             .IsRequired()
             .HasMaxLength(100);
+        builder.Property(e => e.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(e => e.CreatedBy)
+            .IsRequired();
+        builder.Property(e => e.UpdatedAt);
+        builder.Property(e => e.UpdatedBy);
     }
 }
