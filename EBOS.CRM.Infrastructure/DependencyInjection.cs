@@ -30,6 +30,7 @@ public static class DependencyInjection
         // Authentication and authorization services.
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IPolicyService, PolicyService>();
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAddressRepository, AddressRepository>();

@@ -21,8 +21,10 @@ public class SecurityServiceRegistrationTest : IClassFixture<CustomWebApplicatio
 
         var authenticationService = provider.GetService<IAuthenticationService>();
         var authorizationService = provider.GetService<IAuthorizationService>();
+        var policyService = provider.GetService<IPolicyService>();
 
         Assert.NotNull(authenticationService);
         Assert.NotNull(authorizationService);
+        Assert.NotNull(policyService);
     }
 }
