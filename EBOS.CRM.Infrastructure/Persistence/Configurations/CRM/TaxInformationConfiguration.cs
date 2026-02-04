@@ -17,6 +17,13 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         builder.Property(ti => ti.TaxIdentificationNumber)
             .IsRequired()
             .HasMaxLength(20);
+        builder.Property(ti => ti.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ti => ti.CreatedBy)
+            .IsRequired();
+        builder.Property(ti => ti.UpdatedAt);
+        builder.Property(ti => ti.UpdatedBy);
         builder.Property(ti => ti.Erased)
             .IsRequired();
 

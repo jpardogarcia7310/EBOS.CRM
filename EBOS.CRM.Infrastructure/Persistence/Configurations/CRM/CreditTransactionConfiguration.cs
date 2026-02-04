@@ -26,6 +26,13 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
             .HasMaxLength(200);
         builder.Property(m => m.Comments)
             .HasMaxLength(500);
+        builder.Property(m => m.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(m => m.CreatedBy)
+            .IsRequired();
+        builder.Property(m => m.UpdatedAt);
+        builder.Property(m => m.UpdatedBy);
         builder.Property(c => c.Erased)
             .IsRequired();
 

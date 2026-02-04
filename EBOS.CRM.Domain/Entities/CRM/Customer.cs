@@ -8,6 +8,9 @@ public class Customer : ErasableEntity
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     public long StatusId { get; set; }
     public Status Status { get; set; } = null!;

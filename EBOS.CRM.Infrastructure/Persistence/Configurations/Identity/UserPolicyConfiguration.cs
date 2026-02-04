@@ -13,6 +13,13 @@ public class UserPolicyConfiguration : IEntityTypeConfiguration<UserPolicy>
 
         builder.Property(up => up.AssignedAt)
             .IsRequired();
+        builder.Property(up => up.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(up => up.CreatedBy)
+            .IsRequired();
+        builder.Property(up => up.UpdatedAt);
+        builder.Property(up => up.UpdatedBy);
         builder.Property(up => up.Erased)
             .IsRequired();
 

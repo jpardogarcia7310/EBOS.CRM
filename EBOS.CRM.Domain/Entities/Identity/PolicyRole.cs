@@ -2,13 +2,13 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities.Identity;
 
-public class RolePermission : ErasableEntity
+public class PolicyRole : ErasableEntity
 {
+    public long PolicyId { get; set; }
+    public Policy Policy { get; set; } = null!;
+
     public long RoleId { get; set; }
     public Role Role { get; set; } = null!;
-
-    public long PermissionId { get; set; }
-    public Permission Permission { get; set; } = null!;
 
     public DateTime AssignedAt { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -7,6 +7,10 @@ public class AddressType : BaseEntity
 {
     public string Code { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     // New: Enterprise semantics
     public string? Category { get; set; } // "Shipping", "Billing", "Fiscal", "Operational", etc.

@@ -2,27 +2,26 @@ using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.Identity;
 
-public class RoleConfiguration : IEntityTypeConfiguration<Role>
+public class PolicyRuleConfiguration : IEntityTypeConfiguration<PolicyRule>
 {
-    public void Configure(EntityTypeBuilder<Role> builder)
+    public void Configure(EntityTypeBuilder<PolicyRule> builder)
     {
-        builder.ToTable("Roles", "IAM");
+        builder.ToTable("PolicyRules", "IAM");
 
         builder.HasKey(r => r.Id);
         builder.Property(r => r.Id).ValueGeneratedOnAdd();
 
-        builder.Property(r => r.Code)
-            .IsRequired()
-            .HasMaxLength(64);
         builder.Property(r => r.Name)
             .IsRequired()
-            .HasMaxLength(100);
-        builder.Property(r => r.Description)
-            .HasMaxLength(250);
-        builder.Property(r => r.IsSystem)
+            .HasMaxLength(150);
+        builder.Property(r => r.Effect)
+            .IsRequired()
+            .HasMaxLength(10);
+        builder.Property(r => r.Priority)
             .IsRequired();
         builder.Property(r => r.IsActive)
             .IsRequired();
+
         builder.Property(r => r.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("SYSUTCDATETIME()");
@@ -33,8 +32,12 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Erased)
             .IsRequired();
 
-        builder.HasIndex(r => r.Code)
-            .IsUnique()
-            .HasDatabaseName("UX_Role_Code");
+        builder.HasOne(r => r.Policy)
+            .WithMany(p => p.PolicyRules)
+            .HasForeignKey(r => r.PolicyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(r => new { r.PolicyId, r.Priority })
+            .HasDatabaseName("IX_PolicyRule_Policy_Priority");
     }
 }

@@ -12,4 +12,8 @@ public class Country : BaseEntity
     public string Currency { get; set; } = null!;
     public string CurrencyCode { get; set; } = null!;
     public string InternationalPhoneCode { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 }

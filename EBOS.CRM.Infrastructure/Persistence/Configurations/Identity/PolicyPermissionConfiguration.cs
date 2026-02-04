@@ -13,6 +13,13 @@ public class PolicyPermissionConfiguration : IEntityTypeConfiguration<PolicyPerm
 
         builder.Property(pp => pp.AssignedAt)
             .IsRequired();
+        builder.Property(pp => pp.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(pp => pp.CreatedBy)
+            .IsRequired();
+        builder.Property(pp => pp.UpdatedAt);
+        builder.Property(pp => pp.UpdatedBy);
         builder.Property(pp => pp.Erased)
             .IsRequired();
 

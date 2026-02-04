@@ -17,6 +17,13 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
         builder.Property(bo => bo.PhoneNumber)
             .IsRequired()
             .HasMaxLength(20);
+        builder.Property(bo => bo.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(bo => bo.CreatedBy)
+            .IsRequired();
+        builder.Property(bo => bo.UpdatedAt);
+        builder.Property(bo => bo.UpdatedBy);
         builder.Property(bo => bo.Erased)
             .IsRequired();
 

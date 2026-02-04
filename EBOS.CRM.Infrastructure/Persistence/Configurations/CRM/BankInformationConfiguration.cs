@@ -21,6 +21,13 @@ public class BankInformationConfiguration : IEntityTypeConfiguration<BankInforma
             .HasMaxLength(11); // BIC max length
         builder.Property(db => db.BankName)
             .HasMaxLength(200);
+        builder.Property(db => db.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(db => db.CreatedBy)
+            .IsRequired();
+        builder.Property(db => db.UpdatedAt);
+        builder.Property(db => db.UpdatedBy);
         builder.Property(c => c.Erased)
             .IsRequired();
 

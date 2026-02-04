@@ -26,7 +26,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.IsActive)
             .IsRequired();
         builder.Property(u => u.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(u => u.CreatedBy)
             .IsRequired();
+        builder.Property(u => u.UpdatedAt);
+        builder.Property(u => u.UpdatedBy);
         builder.Property(u => u.Erased)
             .IsRequired();
 

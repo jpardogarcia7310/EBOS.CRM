@@ -4,6 +4,7 @@ using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(CrmDbContext))]
-    partial class CrmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260204115405_UpdateAuditCreatedAtDefaults")]
+    partial class UpdateAuditCreatedAtDefaults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -815,70 +818,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("IdentificationTypes", "EBOS");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.AbacAttribute", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("DataType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("UX_AbacAttribute_Code");
-
-                    b.HasIndex("Category", "Code")
-                        .HasDatabaseName("IX_AbacAttribute_Category_Code");
-
-                    b.ToTable("AbacAttributes", "IAM");
-                });
-
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.Permission", b =>
                 {
                     b.Property<long>("Id")
@@ -1027,162 +966,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UX_PolicyPermission_Policy_Permission");
 
                     b.ToTable("PolicyPermissions", "IAM");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRole", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("PolicyId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("PolicyId", "RoleId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_PolicyRole_Policy_Role");
-
-                    b.ToTable("PolicyRoles", "IAM");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRule", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Effect")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<long>("PolicyId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PolicyId", "Priority")
-                        .HasDatabaseName("IX_PolicyRule_Policy_Priority");
-
-                    b.ToTable("PolicyRules", "IAM");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRuleCondition", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("AttributeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsNegated")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Operator")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long>("PolicyRuleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ValueType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributeId");
-
-                    b.HasIndex("PolicyRuleId", "AttributeId")
-                        .HasDatabaseName("IX_PolicyRuleCondition_Rule_Attribute");
-
-                    b.ToTable("PolicyRuleConditions", "IAM");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.Role", b =>
@@ -1701,55 +1484,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Policy");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRole", b =>
-                {
-                    b.HasOne("EBOS.CRM.Domain.Entities.Identity.Policy", "Policy")
-                        .WithMany("PolicyRoles")
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("EBOS.CRM.Domain.Entities.Identity.Role", "Role")
-                        .WithMany("PolicyRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Policy");
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRule", b =>
-                {
-                    b.HasOne("EBOS.CRM.Domain.Entities.Identity.Policy", "Policy")
-                        .WithMany("PolicyRules")
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Policy");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRuleCondition", b =>
-                {
-                    b.HasOne("EBOS.CRM.Domain.Entities.Identity.AbacAttribute", "Attribute")
-                        .WithMany("PolicyRuleConditions")
-                        .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("EBOS.CRM.Domain.Entities.Identity.PolicyRule", "PolicyRule")
-                        .WithMany("Conditions")
-                        .HasForeignKey("PolicyRuleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Attribute");
-
-                    b.Navigation("PolicyRule");
-                });
-
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.RolePermission", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.Identity.Permission", "Permission")
@@ -1860,11 +1594,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("TaxInformationAddresses");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.AbacAttribute", b =>
-                {
-                    b.Navigation("PolicyRuleConditions");
-                });
-
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.Permission", b =>
                 {
                     b.Navigation("PolicyPermissions");
@@ -1876,22 +1605,11 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("PolicyPermissions");
 
-                    b.Navigation("PolicyRoles");
-
-                    b.Navigation("PolicyRules");
-
                     b.Navigation("UserPolicies");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyRule", b =>
-                {
-                    b.Navigation("Conditions");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.Role", b =>
                 {
-                    b.Navigation("PolicyRoles");
-
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");

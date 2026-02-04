@@ -13,6 +13,13 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 
         builder.Property(ur => ur.AssignedAt)
             .IsRequired();
+        builder.Property(ur => ur.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ur => ur.CreatedBy)
+            .IsRequired();
+        builder.Property(ur => ur.UpdatedAt);
+        builder.Property(ur => ur.UpdatedBy);
         builder.Property(ur => ur.Erased)
             .IsRequired();
 

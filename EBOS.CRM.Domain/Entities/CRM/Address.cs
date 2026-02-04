@@ -16,6 +16,10 @@ public class Address : ErasableEntity
     public string? GoogleMapsUrl { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     public long CountryId { get; set; }
     public Country Country { get; set; } = null!;

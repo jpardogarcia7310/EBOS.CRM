@@ -22,7 +22,12 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
         builder.Property(p => p.IsSystem)
             .IsRequired();
         builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(p => p.CreatedBy)
             .IsRequired();
+        builder.Property(p => p.UpdatedAt);
+        builder.Property(p => p.UpdatedBy);
         builder.Property(p => p.Erased)
             .IsRequired();
 

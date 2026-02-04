@@ -24,7 +24,12 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
         builder.Property(p => p.IsActive)
             .IsRequired();
         builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(p => p.CreatedBy)
             .IsRequired();
+        builder.Property(p => p.UpdatedAt);
+        builder.Property(p => p.UpdatedBy);
         builder.Property(p => p.Erased)
             .IsRequired();
 

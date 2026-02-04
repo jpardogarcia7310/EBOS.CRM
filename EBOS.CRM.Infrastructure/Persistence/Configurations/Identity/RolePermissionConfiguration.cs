@@ -13,6 +13,13 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
 
         builder.Property(rp => rp.AssignedAt)
             .IsRequired();
+        builder.Property(rp => rp.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(rp => rp.CreatedBy)
+            .IsRequired();
+        builder.Property(rp => rp.UpdatedAt);
+        builder.Property(rp => rp.UpdatedBy);
         builder.Property(rp => rp.Erased)
             .IsRequired();
 

@@ -17,6 +17,15 @@ public class TaxInformationAddressConfiguration : IEntityTypeConfiguration<TaxIn
             .IsRequired();
         builder.Property(ta => ta.IsCurrent)
             .IsRequired();
+        builder.Property(ta => ta.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ta => ta.CreatedBy)
+            .IsRequired();
+        builder.Property(ta => ta.UpdatedAt);
+        builder.Property(ta => ta.UpdatedBy);
+        builder.Property(ta => ta.Erased)
+            .IsRequired();
 
         builder.HasOne(ta => ta.TaxInformation)
             .WithMany(ti => ti.TaxInformationAddresses)
