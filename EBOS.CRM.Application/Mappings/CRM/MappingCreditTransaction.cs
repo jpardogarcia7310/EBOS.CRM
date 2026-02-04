@@ -21,6 +21,10 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.CreditAccountId, src => src.CreditAccountId)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CreditAccount);
 
         config.NewConfig<UpdateCreditTransactionRequest, CreditTransaction>()
@@ -32,6 +36,10 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.CreditAccountId, src => src.CreditAccountId)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CreditAccount);
     }
 }

@@ -15,6 +15,10 @@ public sealed class MappingStatus : IRegister
         config.NewConfig<StatusResponse, Status>()
               .Map(dest => dest.Id, src => src.Id)
               .Map(dest => dest.Description, src => src.Description)
+              .Ignore(dest => dest.CreatedAt)
+              .Ignore(dest => dest.CreatedBy)
+              .Ignore(dest => dest.UpdatedAt!)
+              .Ignore(dest => dest.UpdatedBy!)
               .Ignore(dest => dest.Customers);
     }
 }

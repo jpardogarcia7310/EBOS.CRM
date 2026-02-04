@@ -18,6 +18,10 @@ public class MappingBranchOffice : IRegister
             .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CorporateCustomer)
             .Ignore(dest => dest.BranchOfficeAddresses);
 
@@ -27,6 +31,10 @@ public class MappingBranchOffice : IRegister
             .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CorporateCustomer)
             .Ignore(dest => dest.BranchOfficeAddresses);
     }
