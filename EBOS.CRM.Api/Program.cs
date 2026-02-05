@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Options;
@@ -8,8 +9,10 @@ using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -35,6 +38,70 @@ services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
 services.AddLocalization();
+
+var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
+    .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
+
+services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        // To enable EBOS.Auth, set UseAuthority=true and fill Authority/Audience in config.
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.Authority))
+        {
+            options.Authority = authOptions.Authority;
+        }
+
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))
+        {
+            options.MetadataAddress = authOptions.MetadataAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(authOptions.Audience))
+        {
+            options.Audience = authOptions.Audience;
+        }
+
+        options.RequireHttpsMetadata = authOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = authOptions.ValidateIssuer,
+            ValidateAudience = authOptions.ValidateAudience,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = !string.IsNullOrWhiteSpace(authOptions.SigningKey)
+                                       || (authOptions.UseAuthority &&
+                                           (!string.IsNullOrWhiteSpace(authOptions.Authority) ||
+                                            !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))),
+            NameClaimType = authOptions.NameClaimType,
+            RoleClaimType = authOptions.RoleClaimType,
+            ClockSkew = TimeSpan.FromSeconds(authOptions.ClockSkewSeconds)
+        };
+
+        if (!string.IsNullOrWhiteSpace(authOptions.ValidIssuer))
+        {
+            options.TokenValidationParameters.ValidIssuer = authOptions.ValidIssuer;
+        }
+
+        if (authOptions.ValidIssuers is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidIssuers = authOptions.ValidIssuers;
+        }
+
+        if (authOptions.ValidAudiences is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidAudiences = authOptions.ValidAudiences;
+        }
+
+        // For local dev without EBOS.Auth, keep UseAuthority=false and set SigningKey.
+        if (!string.IsNullOrWhiteSpace(authOptions.SigningKey))
+        {
+            options.TokenValidationParameters.IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authOptions.SigningKey));
+        }
+    });
 
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
@@ -136,6 +203,7 @@ app.UseApiErrorHandling();
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
