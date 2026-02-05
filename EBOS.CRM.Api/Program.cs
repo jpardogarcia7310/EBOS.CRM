@@ -76,12 +76,21 @@ services
             options.Authority = oidcOptions.Authority;
         }
 
+        if (!string.IsNullOrWhiteSpace(oidcOptions.MetadataAddress))
+        {
+            options.MetadataAddress = oidcOptions.MetadataAddress;
+        }
+
         if (!string.IsNullOrWhiteSpace(oidcOptions.Audience))
         {
             options.Audience = oidcOptions.Audience;
         }
 
         options.RequireHttpsMetadata = oidcOptions.RequireHttpsMetadata;
+        if (oidcOptions.BackchannelTimeoutSeconds > 0)
+        {
+            options.BackchannelTimeout = TimeSpan.FromSeconds(oidcOptions.BackchannelTimeoutSeconds);
+        }
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = (oidcOptions.ValidIssuers?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Authority),

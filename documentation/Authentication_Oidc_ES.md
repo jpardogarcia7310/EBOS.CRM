@@ -32,6 +32,12 @@ Estructura de ejemplo:
 - Descripcion: URL base del proveedor OIDC. Si se define, la API intentara leer la metadata en `/.well-known/openid-configuration`.
 - Por ahora: Dejalo vacio para evitar llamadas a un proveedor real mientras EBOS.Auth no exista.
 
+### MetadataAddress
+- Tipo: `string`
+- Ejemplo: `https://auth.local/ebos/.well-known/openid-configuration`
+- Descripcion: URL explicita de metadata. Usala si el endpoint esta en una ruta no estandar.
+- Por ahora: Dejalo vacio para evitar llamadas externas.
+
 ### Audience
 - Tipo: `string`
 - Ejemplo: `ebos.crm.api`
@@ -47,6 +53,11 @@ Estructura de ejemplo:
 - Tipo: `int`
 - Ejemplo: `60`
 - Descripcion: Margen de desfase de reloj al validar tiempos (`exp`, `nbf`).
+
+### BackchannelTimeoutSeconds
+- Tipo: `int`
+- Ejemplo: `30`
+- Descripcion: Timeout para obtener metadata OIDC y llaves de firma.
 
 ### ValidIssuers
 - Tipo: `string[]`
@@ -85,6 +96,9 @@ Cuando EBOS.Auth exista:
 2. Define `RequireHttpsMetadata` como `true` en entornos no locales.
 3. Alinea `ValidIssuers` con el issuer real generado por EBOS.Auth.
 4. Mantén `Audience` y `ValidAudiences` alineados con el identificador de la API.
+
+Puerto local por defecto para EBOS.Auth (planificado):
+- `http://127.0.0.1:5013`
 
 ## 5) Notas para EBOS.Auth
 
