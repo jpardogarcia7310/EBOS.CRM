@@ -63,8 +63,21 @@ public static class PolicyCodeResolver
         }
 
         var moduleSegment = segments[featureIndex + 1];
-        var module = ToKebabCase(moduleSegment);
         var resourceSegment = moduleSegment;
+
+        var crmModuleSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "CRM",
+            "Countries",
+            "Statuses",
+            "IdentificationType",
+            "AddressesType",
+            "AddressType"
+        };
+
+        var module = crmModuleSegments.Contains(moduleSegment)
+            ? "crm"
+            : ToKebabCase(moduleSegment);
 
         if (string.Equals(moduleSegment, "CRM", StringComparison.OrdinalIgnoreCase) &&
             featureIndex + 2 < segments.Length)
