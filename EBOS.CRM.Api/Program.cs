@@ -2,6 +2,7 @@ using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
+using EBOS.CRM.Api.Security;
 using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
@@ -46,7 +47,10 @@ builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 
 // Controllers + JSON options and register the filter globally
 services
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        options.Filters.Add<PolicyAuthorizationFilter>();
+    })
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

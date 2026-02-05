@@ -44,6 +44,32 @@ public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provi
         // 4. Optional diagnostic filter (you can remove it when you no longer need it)
         options.OperationFilter<DebugGroupNameOperationFilter>();
 
+        var securityScheme = new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "JWT Authorization header using the Bearer scheme."
+        };
+
+        options.AddSecurityDefinition("Bearer", securityScheme);
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+
         // 5. Include only the operations whose GroupName matches the document
         options.DocInclusionPredicate((docName, apiDesc) =>
             string.Equals(apiDesc.GroupName, docName, StringComparison.OrdinalIgnoreCase));
