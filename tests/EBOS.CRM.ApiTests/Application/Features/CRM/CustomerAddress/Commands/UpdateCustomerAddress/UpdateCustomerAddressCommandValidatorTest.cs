@@ -19,6 +19,7 @@ public class UpdateCustomerAddressCommandValidatorTest
     }
 
     private static UpdateCustomerAddressRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             CustomerId: 1,
             AddressId: 1,
             IsPrimary: true,

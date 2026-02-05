@@ -40,6 +40,13 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
             services.AddSingleton<IAddressRepository>(Repository);
         });
     }
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Remove("X-Tenant-Id");
+        client.DefaultRequestHeaders.Add("X-Tenant-Id", "1");
+        base.ConfigureClient(client);
+    }
 }
 
 

@@ -99,6 +99,7 @@ public class UpdateBranchOfficeCommandHandlerTest
     }
 
     private static UpdateBranchOfficeRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Id: 1,
             Name: "Main",
             PhoneNumber: "123",

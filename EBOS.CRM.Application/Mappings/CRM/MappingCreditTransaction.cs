@@ -13,6 +13,7 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddCreditTransactionRequest, CreditTransaction>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Date, src => src.Date)
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.Type, src => src.Type)
@@ -24,6 +25,7 @@ public class MappingCreditTransaction : IRegister
             .Ignore(dest => dest.CreditAccount);
 
         config.NewConfig<UpdateCreditTransactionRequest, CreditTransaction>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Date, src => src.Date)
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.Type, src => src.Type)

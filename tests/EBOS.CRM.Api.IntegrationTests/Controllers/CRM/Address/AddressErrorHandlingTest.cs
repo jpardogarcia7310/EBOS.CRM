@@ -32,6 +32,7 @@ public class AddressErrorHandlingTest(AddressErrorHandlingTest.FailingAddressFac
     public async Task Add_Returns_500_WhenRepositoryFails()
     {
         var request = new AddAddressRequest(
+            TenantId: 1,
             Street: "Main St",
             ExternalNumber: "123",
             InternalNumber: null,
@@ -56,6 +57,7 @@ public class AddressErrorHandlingTest(AddressErrorHandlingTest.FailingAddressFac
     public async Task Update_Returns_500_WhenRepositoryFails()
     {
         var request = new UpdateAddressRequest(
+            TenantId: 1,
             Street: "Main St",
             ExternalNumber: "123",
             InternalNumber: null,

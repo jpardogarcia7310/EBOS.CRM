@@ -1,6 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 
 public record AddAddressRequest(
+    long TenantId,
     string Street,
     string ExternalNumber,
     string? InternalNumber,

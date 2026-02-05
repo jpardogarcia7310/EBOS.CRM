@@ -13,6 +13,7 @@ public class MappingBranchOffice : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddBranchOfficeRequest, BranchOffice>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
             .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
@@ -22,6 +23,7 @@ public class MappingBranchOffice : IRegister
             .Ignore(dest => dest.BranchOfficeAddresses);
 
         config.NewConfig<UpdateBranchOfficeRequest, BranchOffice>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
             .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)

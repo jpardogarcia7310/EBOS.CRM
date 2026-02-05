@@ -112,6 +112,7 @@ public class UpdateAddressCommandValidatorTest
     private static UpdateAddressCommand BuildValidCommand() => new(1, BuildValidRequest());
 
     private static UpdateAddressRequest BuildValidRequest() => new(
+            TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,

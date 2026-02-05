@@ -20,6 +20,7 @@ public class UpdateCustomerCommandValidatorTest
 
     private static UpdateCustomerRequest BuildUpdateRequest() => new(
             Id: 1,
+            TenantId: 1,
             Code: "C001",
             Email: "a@b.com",
             Phone: "123",

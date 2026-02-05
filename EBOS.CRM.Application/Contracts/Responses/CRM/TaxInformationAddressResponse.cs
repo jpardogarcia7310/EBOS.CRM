@@ -2,6 +2,7 @@ namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record TaxInformationAddressResponse(
     long Id,
+    long TenantId,
     long TaxInformationId,
     long AddressId,
     bool IsPrimary,

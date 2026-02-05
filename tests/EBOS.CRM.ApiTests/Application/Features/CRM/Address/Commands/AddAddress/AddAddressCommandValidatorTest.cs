@@ -101,6 +101,7 @@ public class AddAddressCommandValidatorTest
     private static AddAddressCommand BuildValidCommand() => new(BuildValidRequest());
 
     private static AddAddressRequest BuildValidRequest() => new(
+            TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,

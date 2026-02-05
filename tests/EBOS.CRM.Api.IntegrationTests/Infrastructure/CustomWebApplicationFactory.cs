@@ -109,6 +109,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         });
     }
 
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Remove("X-Tenant-Id");
+        client.DefaultRequestHeaders.Add("X-Tenant-Id", "1");
+        base.ConfigureClient(client);
+    }
+
     public override async ValueTask DisposeAsync()
     {
         if (_sqlContainer != null)

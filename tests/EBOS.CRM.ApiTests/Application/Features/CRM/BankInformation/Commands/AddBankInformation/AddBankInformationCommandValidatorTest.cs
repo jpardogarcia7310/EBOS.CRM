@@ -19,6 +19,7 @@ public class AddBankInformationCommandValidatorTest
     }
 
     private static AddBankInformationRequest BuildAddRequest() => new(
+            TenantId: 1,
             Iban: "ES1200000000000000000000",
             Bic: "BANKESMM",
             BankName: "Bank",

@@ -79,6 +79,7 @@ public class AddBranchOfficeCommandHandlerTest
     }
 
     private static AddBranchOfficeRequest BuildAddRequest() => new(
+            TenantId: 1,
             Name: "Main",
             PhoneNumber: "123",
             CorporateCustomerId: 1

@@ -19,6 +19,7 @@ public class AddBranchOfficeAddressCommandValidatorTest
     }
 
     private static AddBranchOfficeAddressRequest BuildAddRequest() => new(
+            TenantId: 1,
             BranchOfficeId: 1,
             AddressId: 1,
             IsPrimary: true,

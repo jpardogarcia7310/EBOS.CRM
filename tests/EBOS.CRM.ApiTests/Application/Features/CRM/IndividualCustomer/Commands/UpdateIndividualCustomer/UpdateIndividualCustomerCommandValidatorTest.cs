@@ -19,10 +19,10 @@ public class UpdateIndividualCustomerCommandValidatorTest
     }
 
     private static UpdateIndividualCustomerRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Code: "C001",
             Email: "a@b.com",
             Phone: "123",
-            CreatedAt: DateTime.UtcNow,
             StatusId: 1,
             FirstName: "John",
             LastName: "Doe",

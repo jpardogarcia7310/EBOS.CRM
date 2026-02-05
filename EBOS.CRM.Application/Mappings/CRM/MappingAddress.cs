@@ -13,6 +13,7 @@ public class MappingAddress : IRegister
         // Address -> AddressResponse
         config.NewConfig<Address, AddressResponse>()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -36,6 +37,7 @@ public class MappingAddress : IRegister
         // AddressResponse -> Address
         config.NewConfig<AddressResponse, Address>()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -59,6 +61,7 @@ public class MappingAddress : IRegister
 
         // AddAddressRequest -> Address
         config.NewConfig<AddAddressRequest, Address>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -83,6 +86,7 @@ public class MappingAddress : IRegister
 
         // UpdateAddressRequest -> Address
         config.NewConfig<UpdateAddressRequest, Address>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)

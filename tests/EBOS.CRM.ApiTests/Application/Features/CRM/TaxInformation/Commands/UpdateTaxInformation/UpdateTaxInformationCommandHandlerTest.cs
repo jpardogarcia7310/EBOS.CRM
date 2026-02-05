@@ -98,6 +98,7 @@ public class UpdateTaxInformationCommandHandlerTest
     }
 
     private static UpdateTaxInformationRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Id: 1,
             TaxName: "Tax",
             TaxIdentificationNumber: "TAX123",

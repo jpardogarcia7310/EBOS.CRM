@@ -5,37 +5,7 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
 public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepository
 {
-    private readonly CrmDbContext _context = context;
     private readonly DbSet<AddressType> _dbSet = context.Set<AddressType>();
-
-    #region Commands
-    public Task AddAsync(AddressType entity, CancellationToken cancellationToken = default)
-        => _dbSet.AddAsync(entity, cancellationToken).AsTask();
-
-    public Task AddRangeAsync(IEnumerable<AddressType> entities, CancellationToken cancellationToken = default)
-        => _dbSet.AddRangeAsync(entities, cancellationToken);
-
-    public Task AttachAsync(AddressType entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _context.Attach(entity);
-        return Task.CompletedTask;
-    }
-
-    public Task UpdateAsync(AddressType entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _dbSet.Update(entity);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(AddressType entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _dbSet.Remove(entity);
-        return Task.CompletedTask;
-    }
-    #endregion
 
     #region Queries
     public Task<AddressType?> GetByIdAsync(long id, CancellationToken cancellationToken = default)

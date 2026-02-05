@@ -13,6 +13,7 @@ public class MappingTaxInformationAddress : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddTaxInformationAddressRequest, TaxInformationAddress>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.TaxInformationId, src => src.TaxInformationId)
             .Map(dest => dest.AddressId, src => src.AddressId)
             .Map(dest => dest.IsPrimary, src => src.IsPrimary)
@@ -25,6 +26,7 @@ public class MappingTaxInformationAddress : IRegister
             .Ignore(dest => dest.Address);
 
         config.NewConfig<UpdateTaxInformationAddressRequest, TaxInformationAddress>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.TaxInformationId, src => src.TaxInformationId)
             .Map(dest => dest.AddressId, src => src.AddressId)
             .Map(dest => dest.IsPrimary, src => src.IsPrimary)

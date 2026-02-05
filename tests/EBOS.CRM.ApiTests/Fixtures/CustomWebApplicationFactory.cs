@@ -1,3 +1,4 @@
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,14 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
     {
         builder.ConfigureServices(services =>
         {
+            var currentUserDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(ICurrentUserContext));
+            if (currentUserDescriptor != null)
+            {
+                services.Remove(currentUserDescriptor);
+            }
+            services.AddScoped<ICurrentUserContext>(_ => new TestCurrentUserContext());
+
             // Remove existing DbContext
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
@@ -34,6 +43,20 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             db.Database.EnsureCreated();
             IntegrationTestCrmDataSeeder.Seed(db);
         });
+    }
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Remove("X-Tenant-Id");
+        client.DefaultRequestHeaders.Add("X-Tenant-Id", "1");
+        base.ConfigureClient(client);
+    }
+
+    private sealed class TestCurrentUserContext : ICurrentUserContext
+    {
+        public long UserId => 0;
+        public long TenantId => 1;
+        public string CorrelationId => Guid.NewGuid().ToString("D");
     }
 }
 

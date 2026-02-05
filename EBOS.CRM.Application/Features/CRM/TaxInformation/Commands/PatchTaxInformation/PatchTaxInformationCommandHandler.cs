@@ -58,6 +58,7 @@ public class PatchTaxInformationCommandHandler(ITaxInformationRepository reposit
 
         return new TaxInformationResponse(
             entity.Id,
+            entity.TenantId,
             entity.TaxName,
             entity.TaxIdentificationNumber,
             entity.CustomerId,

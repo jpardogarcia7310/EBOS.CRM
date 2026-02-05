@@ -24,6 +24,7 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
     public async Task Add_Returns_400_WhenRequestIsInvalid()
     {
         var request = new AddAddressRequest(
+            TenantId: 1,
             Street: "",
             ExternalNumber: "",
             InternalNumber: null,
@@ -48,6 +49,7 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
     public async Task Update_Returns_400_WhenRequestIsInvalid()
     {
         var request = new UpdateAddressRequest(
+            TenantId: 1,
             Street: "",
             ExternalNumber: "",
             InternalNumber: null,

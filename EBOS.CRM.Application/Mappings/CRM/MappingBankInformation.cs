@@ -13,6 +13,7 @@ public class MappingBankInformation : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddBankInformationRequest, BankInformation>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Iban, src => src.Iban)
             .Map(dest => dest.Bic, src => src.Bic)
             .Map(dest => dest.BankName, src => src.BankName)
@@ -22,6 +23,7 @@ public class MappingBankInformation : IRegister
             .Ignore(dest => dest.Customer);
 
         config.NewConfig<UpdateBankInformationRequest, BankInformation>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Iban, src => src.Iban)
             .Map(dest => dest.Bic, src => src.Bic)
             .Map(dest => dest.BankName, src => src.BankName)

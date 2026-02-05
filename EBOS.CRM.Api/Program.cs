@@ -133,6 +133,7 @@ catch (Exception ex)
 // Middleware pipeline
 app.UseCorrelationId();
 app.UseApiErrorHandling();
+app.UseTenantRequirement();
 
 app.UseHttpsRedirection();
 app.UseRouting();

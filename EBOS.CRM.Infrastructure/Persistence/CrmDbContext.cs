@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
@@ -7,8 +8,11 @@ using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ICurrentUserContext? currentUserContext = null)
+    : DbContext(options)
 {
+    private readonly long _tenantId = currentUserContext?.TenantId ?? 0;
+    public long CurrentTenantId => _tenantId;
     // DbSets
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
@@ -42,6 +46,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CrmDbContext).Assembly);
 
         ApplySoftDeleteQueryFilter(modelBuilder);
+        ApplyTenantQueryFilter(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -93,6 +98,79 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    private void ApplyTenantQueryFilter(ModelBuilder modelBuilder)
+    {
+        var tenantPropertyMethod = typeof(EF)
+            .GetMethod(nameof(EF.Property), BindingFlags.Static | BindingFlags.Public)?
+            .MakeGenericMethod(typeof(long));
+
+        if (tenantPropertyMethod == null)
+        {
+            return;
+        }
+
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
+            .Where(e => e.FindProperty("TenantId") != null)
+            .Where(e => e.BaseType == null)
+            .ToList();
+
+        foreach (var entityType in entityTypes)
+        {
+            var clrType = entityType.ClrType;
+            var parameter = Expression.Parameter(clrType, "e");
+
+            var convertedParam = Expression.Convert(parameter, typeof(object));
+            var tenantProperty = Expression.Call(
+                tenantPropertyMethod,
+                convertedParam,
+                Expression.Constant("TenantId"));
+            var currentTenant = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
+            var compare = Expression.Equal(tenantProperty, currentTenant);
+            var allowAllTenants = Expression.Equal(currentTenant, Expression.Constant(0L));
+            var body = Expression.OrElse(allowAllTenants, compare);
+            var lambda = Expression.Lambda(body, parameter);
+
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    public override int SaveChanges()
+    {
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void ApplyTenantIdToAddedEntities()
+    {
+        if (_tenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State == EntityState.Added))
+        {
+            var tenantProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "TenantId");
+            if (tenantProperty == null)
+            {
+                continue;
+            }
+
+            if (tenantProperty.CurrentValue is long tenantValue && tenantValue > 0)
+            {
+                continue;
+            }
+
+            tenantProperty.CurrentValue = _tenantId;
         }
     }
 }

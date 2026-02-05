@@ -4,7 +4,6 @@ namespace EBOS.CRM.Domain.Entities;
 
 public class Country : BaseEntity
 {
-    public long TenantId { get; set; }
     public string Name { get; set; } = null!;
     public string Iso31661A2Code { get; set; } = null!;
     public string Iso31661A3Code { get; set; } = null!;

@@ -13,6 +13,7 @@ public class MappingCustomerAddress : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddCustomerAddressRequest, CustomerAddress>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.AddressId, src => src.AddressId)
             .Map(dest => dest.IsPrimary, src => src.IsPrimary)
@@ -25,6 +26,7 @@ public class MappingCustomerAddress : IRegister
             .Ignore(dest => dest.Address);
 
         config.NewConfig<UpdateCustomerAddressRequest, CustomerAddress>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.AddressId, src => src.AddressId)
             .Map(dest => dest.IsPrimary, src => src.IsPrimary)

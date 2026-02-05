@@ -22,6 +22,24 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor accessor)
         }
     }
 
+    public long TenantId
+    {
+        get
+        {
+            var httpContext = accessor.HttpContext;
+            if (httpContext == null)
+            {
+                return 0;
+            }
+
+            var claim = httpContext.User.FindFirstValue("tenantId")
+                        ?? httpContext.User.FindFirstValue("tenant_id")
+                        ?? httpContext.Request.Headers["X-Tenant-Id"].FirstOrDefault();
+
+            return long.TryParse(claim, out var tenantId) ? tenantId : 0;
+        }
+    }
+
     public string CorrelationId
     {
         get

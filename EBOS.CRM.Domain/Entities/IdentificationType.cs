@@ -4,7 +4,6 @@ namespace EBOS.CRM.Domain.Entities;
 
 public class IdentificationType : ErasableEntity
 {
-    public long TenantId { get; set; }
     public string Code { get; set; } = null!;        // Ej: DNI, NIF, CIF
     public string Description { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
