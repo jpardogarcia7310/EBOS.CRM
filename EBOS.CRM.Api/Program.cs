@@ -2,6 +2,7 @@ using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
+using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Infrastructure;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -86,7 +88,22 @@ services
             ValidateAudience = (oidcOptions.ValidAudiences?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Audience),
             ValidIssuers = oidcOptions.ValidIssuers,
             ValidAudiences = oidcOptions.ValidAudiences,
-            ClockSkew = TimeSpan.FromSeconds(oidcOptions.ClockSkewSeconds)
+            ClockSkew = TimeSpan.FromSeconds(oidcOptions.ClockSkewSeconds),
+            RoleClaimType = ClaimTypes.Role
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.Principal?.Identity is ClaimsIdentity identity)
+                {
+                    ClaimsMapping.MapClaimValues(identity, oidcOptions.RoleClaimType, ClaimTypes.Role);
+                    ClaimsMapping.MapClaimValues(identity, oidcOptions.PermissionClaimType, "permission");
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 services.AddAuthorization();

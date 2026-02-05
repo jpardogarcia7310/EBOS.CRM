@@ -10,4 +10,6 @@ public sealed class OidcOptions
     public int ClockSkewSeconds { get; init; } = 60;
     public string[]? ValidIssuers { get; init; }
     public string[]? ValidAudiences { get; init; }
+    public string RoleClaimType { get; init; } = "roles";
+    public string PermissionClaimType { get; init; } = "permissions";
 }

@@ -59,6 +59,16 @@ Example structure:
 - Example: `[ "ebos.crm.api" ]`
 - Description: Explicit list of valid `aud` values, used when `Audience` is not enough or for multiple audiences.
 
+### RoleClaimType
+- Type: `string`
+- Example: `roles`
+- Description: Source claim name that will be mapped into `ClaimTypes.Role` during token validation. Supports arrays (JSON), comma, or space-separated values.
+
+### PermissionClaimType
+- Type: `string`
+- Example: `permissions`
+- Description: Source claim name that will be mapped into `permission` claims during token validation. Supports arrays (JSON), comma, or space-separated values.
+
 ## 3) Step-by-step setup (current phase)
 
 1. Set `Authority` to an empty string.
@@ -81,4 +91,3 @@ When EBOS.Auth exists:
 EBOS.Auth will be responsible for:
 - Publishing OIDC metadata.
 - Issuing JWTs that contain `iss` and `aud` values matching this configuration.
-
