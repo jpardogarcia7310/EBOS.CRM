@@ -16,6 +16,9 @@
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="README_ES.md" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
   </Folder>
   <Folder Name="/source/">
