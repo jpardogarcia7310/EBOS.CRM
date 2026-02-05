@@ -6,10 +6,25 @@ namespace EBOS.CRM.Infrastructure.Services.Security;
 
 public sealed class AuthorizationService : IAuthorizationService
 {
-    public Task<AuthorizeUserResponse> AuthorizeAsync(AuthorizeUserRequest request,
+    private readonly IPolicyService _policyService;
+
+    public AuthorizationService(IPolicyService policyService)
+    {
+        _policyService = policyService ?? throw new ArgumentNullException(nameof(policyService));
+    }
+
+    public async Task<AuthorizeUserResponse> AuthorizeAsync(AuthorizeUserRequest request,
         CancellationToken cancellationToken = default)
     {
-        // Placeholder implementation for issue #67 (replace with real policy evaluation).
-        return Task.FromResult(new AuthorizeUserResponse(true));
+        try
+        {
+            await _policyService.EnsureAuthorizedAsync(request.UserId, request.PolicyCode, cancellationToken)
+                .ConfigureAwait(false);
+            return new AuthorizeUserResponse(true);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return new AuthorizeUserResponse(false);
+        }
     }
 }
