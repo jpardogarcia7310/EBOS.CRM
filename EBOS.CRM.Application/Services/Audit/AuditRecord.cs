@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Services.Audit;
 
 public sealed record AuditRecord(

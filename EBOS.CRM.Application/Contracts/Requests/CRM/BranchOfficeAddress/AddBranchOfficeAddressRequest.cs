@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
 
 public record AddBranchOfficeAddressRequest(

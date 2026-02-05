@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -15,7 +18,8 @@ public class AddTaxInformationCommandHandler(ITaxInformationRepository repositor
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.TaxInformationRequest ?? throw new ArgumentNullException(nameof(request.TaxInformationRequest));
+        var entityRequest = request.TaxInformationRequest ?? 
+                            throw new ArgumentNullException(nameof(request.TaxInformationRequest));
         var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.TaxInformation>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
