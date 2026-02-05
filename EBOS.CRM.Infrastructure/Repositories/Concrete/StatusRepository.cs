@@ -5,36 +5,23 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
 public class StatusRepository(CrmDbContext context) : IStatusRepository
 {
-    private readonly CrmDbContext _context = context;
     private readonly DbSet<Status> _dbSet = context.Set<Status>();
 
     #region Commands
     public Task AddAsync(Status entity, CancellationToken cancellationToken = default)
-        => _dbSet.AddAsync(entity, cancellationToken).AsTask();
+        => throw new NotImplementedException();
 
     public Task AddRangeAsync(IEnumerable<Status> entities, CancellationToken cancellationToken = default)
-        => _dbSet.AddRangeAsync(entities, cancellationToken);
+        => throw new NotImplementedException();
 
     public Task AttachAsync(Status entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _context.Attach(entity);
-        return Task.CompletedTask;
-    }
+        => throw new NotImplementedException();
 
     public Task UpdateAsync(Status entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _dbSet.Update(entity);
-        return Task.CompletedTask;
-    }
+        => throw new NotImplementedException();
 
     public Task DeleteAsync(Status entity, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _dbSet.Remove(entity);
-        return Task.CompletedTask;
-    }
+        => throw new NotImplementedException();
     #endregion
 
     #region Queries
@@ -47,7 +34,8 @@ public class StatusRepository(CrmDbContext context) : IStatusRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Status>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Status>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);
