@@ -8,14 +8,17 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.UpdateBranchOfficeAddress;
 
-public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeAddressCommand, BranchOfficeAddressResponse?>
+public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository, 
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<UpdateBranchOfficeAddressCommand, BranchOfficeAddressResponse?>
 {
-    public async Task<BranchOfficeAddressResponse?> Handle(UpdateBranchOfficeAddressCommand request, CancellationToken cancellationToken)
+    public async Task<BranchOfficeAddressResponse?> Handle(UpdateBranchOfficeAddressCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeAddressRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeAddressRequest));
+        var entityRequest = request.BranchOfficeAddressRequest ?? 
+                            throw new ArgumentNullException(nameof(request.BranchOfficeAddressRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

@@ -12,7 +12,8 @@ public class GetIdentificationTypeByIdQueryHandler(IIdentificationTypeRepository
                                                                  throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeByIdQuery request, CancellationToken cancellationToken)
+    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeByIdQuery request,
+        CancellationToken cancellationToken)
     {
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();

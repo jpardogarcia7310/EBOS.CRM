@@ -9,13 +9,16 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;
 
 public class UpdateBankInformationCommandHandler(IBankInformationRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBankInformationCommand, BankInformationResponse?>
+    ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<UpdateBankInformationCommand, BankInformationResponse?>
 {
-    public async Task<BankInformationResponse?> Handle(UpdateBankInformationCommand request, CancellationToken cancellationToken)
+    public async Task<BankInformationResponse?> Handle(UpdateBankInformationCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BankInformationRequest ?? throw new ArgumentNullException(nameof(request.BankInformationRequest));
+        var entityRequest = request.BankInformationRequest ?? 
+                            throw new ArgumentNullException(nameof(request.BankInformationRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

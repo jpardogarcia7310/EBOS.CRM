@@ -9,13 +9,16 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 
 public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateCustomerAddressCommand, CustomerAddressResponse?>
+    ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<UpdateCustomerAddressCommand, CustomerAddressResponse?>
 {
-    public async Task<CustomerAddressResponse?> Handle(UpdateCustomerAddressCommand request, CancellationToken cancellationToken)
+    public async Task<CustomerAddressResponse?> Handle(UpdateCustomerAddressCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CustomerAddressRequest ?? throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
+        var entityRequest = request.CustomerAddressRequest ?? 
+                            throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

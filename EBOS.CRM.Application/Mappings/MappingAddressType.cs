@@ -23,6 +23,10 @@ public sealed class MappingAddressType : IRegister
             .Map(dest => dest.Category, src => src.Category)
             .Map(dest => dest.AllowsMultiple, src => src.AllowsMultiple)
             .Map(dest => dest.RequiresPrimary, src => src.RequiresPrimary)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Addresses);
     }
 }

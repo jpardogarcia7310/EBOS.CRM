@@ -3,8 +3,8 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class BankInformationRepository(CrmDbContext context) : BaseRepository<BankInformation>(context), IBankInformationRepository
-{
-}
+public class BankInformationRepository(CrmDbContext context) : BaseRepository<BankInformation>(context), 
+    IBankInformationRepository
+{ }
 
 

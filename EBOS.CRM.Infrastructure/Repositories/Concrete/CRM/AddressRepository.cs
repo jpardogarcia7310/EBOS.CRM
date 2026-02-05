@@ -3,7 +3,9 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class AddressRepository(CrmDbContext context) : BaseRepository<Address>(context), IAddressRepository;
+public class AddressRepository(CrmDbContext context) : BaseRepository<Address>(context), IAddressRepository
+{ }
+
 
 
 

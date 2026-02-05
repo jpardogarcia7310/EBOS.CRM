@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
 
-public record UpdateCorporateCustomerCommand(long Id, UpdateCorporateCustomerRequest CorporateCustomerRequest) : IRequest<CorporateCustomerResponse?>;
+public record UpdateCorporateCustomerCommand(long Id, UpdateCorporateCustomerRequest CorporateCustomerRequest) : 
+    IRequest<CorporateCustomerResponse?>;
 
 
 

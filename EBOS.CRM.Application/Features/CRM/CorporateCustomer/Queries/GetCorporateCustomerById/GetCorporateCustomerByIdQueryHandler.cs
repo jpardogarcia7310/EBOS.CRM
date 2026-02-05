@@ -8,10 +8,12 @@ namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetCorpora
 public class GetCorporateCustomerByIdQueryHandler(ICorporateCustomerRepository repository, IMapper mapper)
     : IRequestHandler<GetCorporateCustomerByIdQuery, CorporateCustomerResponse?>
 {
-    private readonly ICorporateCustomerRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICorporateCustomerRepository _repository = repository ?? 
+                                                                throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<CorporateCustomerResponse?> Handle(GetCorporateCustomerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<CorporateCustomerResponse?> Handle(GetCorporateCustomerByIdQuery request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
