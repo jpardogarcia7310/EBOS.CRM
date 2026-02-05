@@ -1,4 +1,5 @@
 using EBOS.CRM.Api.Swagger;
+using Microsoft.AspNetCore.Builder;
 
 namespace EBOS.CRM.Api.Extensions;
 

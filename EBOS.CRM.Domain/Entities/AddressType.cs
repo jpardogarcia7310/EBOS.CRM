@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Entities.CRM;
 

@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 

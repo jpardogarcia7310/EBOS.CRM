@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace EBOS.CRM.Domain.Interfaces.Repositories;
 
 public interface IRepository<T> where T : class

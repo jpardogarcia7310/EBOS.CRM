@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Options;
@@ -11,10 +12,21 @@ using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+<<<<<<< features/Foundation/Security-&-IAM/API
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+=======
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+>>>>>>> develop-Security&IAM
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -42,6 +54,76 @@ services.Configure<PaginationOptions>(builder.Configuration.GetSection("Paginati
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.AddLocalization();
 
+var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
+    .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
+
+services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        // To enable EBOS.Auth, set UseAuthority=true and fill Authority/Audience in config.
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.Authority))
+        {
+            options.Authority = authOptions.Authority;
+        }
+
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))
+        {
+            options.MetadataAddress = authOptions.MetadataAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(authOptions.Audience))
+        {
+            options.Audience = authOptions.Audience;
+        }
+
+        options.RequireHttpsMetadata = authOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = authOptions.ValidateIssuer,
+            ValidateAudience = authOptions.ValidateAudience,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = !string.IsNullOrWhiteSpace(authOptions.SigningKey)
+                                       || (authOptions.UseAuthority &&
+                                           (!string.IsNullOrWhiteSpace(authOptions.Authority) ||
+                                            !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))),
+            NameClaimType = authOptions.NameClaimType,
+            RoleClaimType = authOptions.RoleClaimType,
+            ClockSkew = TimeSpan.FromSeconds(authOptions.ClockSkewSeconds)
+        };
+
+        if (!string.IsNullOrWhiteSpace(authOptions.ValidIssuer))
+        {
+            options.TokenValidationParameters.ValidIssuer = authOptions.ValidIssuer;
+        }
+
+        if (authOptions.ValidIssuers is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidIssuers = authOptions.ValidIssuers;
+        }
+
+        if (authOptions.ValidAudiences is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidAudiences = authOptions.ValidAudiences;
+        }
+
+        // For local dev without EBOS.Auth, keep UseAuthority=false and set SigningKey.
+        if (!string.IsNullOrWhiteSpace(authOptions.SigningKey))
+        {
+            options.TokenValidationParameters.IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authOptions.SigningKey));
+        }
+    });
+
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiUser", policy =>
+        policy.RequireAuthenticatedUser());
+});
+
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 
@@ -49,7 +131,14 @@ builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 services
     .AddControllers(options =>
     {
+<<<<<<< features/Foundation/Security-&-IAM/API
+        if (authOptions.Enabled)
+        {
+            options.Filters.Add(new AuthorizeFilter("ApiUser"));
+        }
+=======
         options.Filters.Add<PolicyAuthorizationFilter>();
+>>>>>>> develop-Security&IAM
     })
     .AddJsonOptions(opts =>
     {

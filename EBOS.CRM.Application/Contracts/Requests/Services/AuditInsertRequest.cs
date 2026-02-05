@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Requests.Services;
 
 public sealed record AuditInsertRequest(

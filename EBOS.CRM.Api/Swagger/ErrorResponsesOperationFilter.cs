@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.OpenApi.Models;
 
 namespace EBOS.CRM.Api.Swagger;

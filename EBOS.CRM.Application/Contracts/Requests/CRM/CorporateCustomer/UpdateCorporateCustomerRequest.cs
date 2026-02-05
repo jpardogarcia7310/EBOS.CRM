@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
 
 public record UpdateCorporateCustomerRequest(
