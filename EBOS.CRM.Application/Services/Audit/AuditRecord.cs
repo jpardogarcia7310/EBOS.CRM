@@ -11,4 +11,5 @@ public sealed record AuditRecord(
     long RegisterId,
     string? OldValues,
     string? NewValues,
-    string CorrelationId);
+    string CorrelationId
+);

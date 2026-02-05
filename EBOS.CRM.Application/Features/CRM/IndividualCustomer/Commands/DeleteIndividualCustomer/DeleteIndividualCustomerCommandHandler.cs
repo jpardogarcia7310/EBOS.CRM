@@ -9,8 +9,9 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.DeleteIndividualCustomer;
 
-public class DeleteIndividualCustomerCommandHandler(IIndividualCustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<DeleteIndividualCustomerCommand, bool>
+public class DeleteIndividualCustomerCommandHandler(IIndividualCustomerRepository repository, 
+    IAuditService auditService, ICurrentUserContext currentUser) : 
+    IRequestHandler<DeleteIndividualCustomerCommand, bool>
 {
     public async Task<bool> Handle(DeleteIndividualCustomerCommand request, CancellationToken cancellationToken)
     {

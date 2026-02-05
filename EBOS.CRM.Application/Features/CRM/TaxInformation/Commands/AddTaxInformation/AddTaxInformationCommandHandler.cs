@@ -14,7 +14,8 @@ namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInform
 public class AddTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddTaxInformationCommand, TaxInformationResponse>
 {
-    public async Task<TaxInformationResponse> Handle(AddTaxInformationCommand request, CancellationToken cancellationToken)
+    public async Task<TaxInformationResponse> Handle(AddTaxInformationCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

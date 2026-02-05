@@ -12,13 +12,16 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
 
 public class AddCreditTransactionCommandHandler(ICreditTransactionRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddCreditTransactionCommand, CreditTransactionResponse>
+    ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<AddCreditTransactionCommand, CreditTransactionResponse>
 {
-    public async Task<CreditTransactionResponse> Handle(AddCreditTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<CreditTransactionResponse> Handle(AddCreditTransactionCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CreditTransactionRequest ?? throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
+        var entityRequest = request.CreditTransactionRequest ?? 
+                            throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
         var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);

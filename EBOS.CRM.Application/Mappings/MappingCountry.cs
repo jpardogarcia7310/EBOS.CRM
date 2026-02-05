@@ -28,7 +28,11 @@ public sealed class MappingCountry : IRegister
             .Map(dest => dest.Domain, src => src.Domain)
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.CurrencyCode, src => src.CurrencyCode)
-            .Map(dest => dest.InternationalPhoneCode, src => src.InternationalPhoneCode);
+            .Map(dest => dest.InternationalPhoneCode, src => src.InternationalPhoneCode)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!);
     }
 }
 

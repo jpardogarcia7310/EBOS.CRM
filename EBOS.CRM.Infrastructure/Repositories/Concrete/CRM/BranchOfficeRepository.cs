@@ -5,7 +5,6 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
 public class BranchOfficeRepository(CrmDbContext context) : BaseRepository<BranchOffice>(context),
     IBranchOfficeRepository
-{
-}
+{ }
 
 

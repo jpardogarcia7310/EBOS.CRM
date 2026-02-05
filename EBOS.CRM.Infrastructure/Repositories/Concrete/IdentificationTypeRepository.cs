@@ -3,5 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete;
 
-public class IdentificationTypeRepository(CrmDbContext context)
-    : BaseRepository<IdentificationType>(context), IIdentificationTypeRepository { }
+public class IdentificationTypeRepository(CrmDbContext context) : BaseRepository<IdentificationType>(context), 
+    IIdentificationTypeRepository 
+{ }

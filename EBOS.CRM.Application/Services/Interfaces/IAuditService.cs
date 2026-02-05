@@ -9,20 +9,16 @@ namespace EBOS.CRM.Application.Services.Interfaces;
 
 public interface IAuditService
 {
-    Task<AuditInsertResponse> InsertAuditAsync(
-        AuditInsertRequest request,
+    Task<AuditInsertResponse> InsertAuditAsync(AuditInsertRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyCollection<AuditRecord>> GetAllByEntityAsync(
-        string entity,
+    Task<IReadOnlyCollection<AuditRecord>> GetAllByEntityAsync(string entity,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyCollection<AuditRecord>> GetAllByUserIdAsync(
-        long userId,
+    Task<IReadOnlyCollection<AuditRecord>> GetAllByUserIdAsync(long userId,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyCollection<AuditRecord>> GetAllByRegisterIdAsync(
-        long registerId,
+    Task<IReadOnlyCollection<AuditRecord>> GetAllByRegisterIdAsync(long registerId,
         CancellationToken cancellationToken = default);
 }
 

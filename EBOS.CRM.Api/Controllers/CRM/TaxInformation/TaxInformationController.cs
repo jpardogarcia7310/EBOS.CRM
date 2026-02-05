@@ -27,7 +27,8 @@ public class TaxInformationController(IMediator mediator, IStringLocalizer<Share
     [Produces("application/json")]
     [ProducesResponseType(typeof(TaxInformationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddTaxInformationCommand(request), cancellationToken));
     }
@@ -39,7 +40,8 @@ public class TaxInformationController(IMediator mediator, IStringLocalizer<Share
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateTaxInformationRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateTaxInformationCommand(id, request), cancellationToken);
+        var dto = await mediator.Send(new UpdateTaxInformationCommand(id, request), 
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(new ProblemDetails
@@ -107,7 +109,8 @@ public class TaxInformationController(IMediator mediator, IStringLocalizer<Share
     [ProducesResponseType(typeof(IReadOnlyCollection<TaxInformationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
@@ -122,7 +125,8 @@ public class TaxInformationController(IMediator mediator, IStringLocalizer<Share
             });
         }
 
-        var result = await mediator.Send(new GetAllTaxInformationsQuery(safePageNumber, safePageSize), cancellationToken);
+        var result = await mediator.Send(new GetAllTaxInformationsQuery(safePageNumber, safePageSize), 
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

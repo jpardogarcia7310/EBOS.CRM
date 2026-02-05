@@ -7,8 +7,8 @@ public class AddBranchOfficeCommandValidator : AbstractValidator<AddBranchOffice
     public AddBranchOfficeCommandValidator()
     {
         RuleFor(x => x.BranchOfficeRequest).NotNull();
-        RuleFor(x => x.BranchOfficeRequest.Name).NotEmpty(); RuleFor(x => x.BranchOfficeRequest.PhoneNumber).NotEmpty();
-
+        RuleFor(x => x.BranchOfficeRequest.Name).NotEmpty(); 
+        RuleFor(x => x.BranchOfficeRequest.PhoneNumber).NotEmpty();
         RuleFor(x => x.BranchOfficeRequest.CorporateCustomerId).GreaterThan(0);
     }
 }

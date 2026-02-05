@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;
 
-public record UpdateBankInformationCommand(long Id, UpdateBankInformationRequest BankInformationRequest) : IRequest<BankInformationResponse?>;
+public record UpdateBankInformationCommand(long Id, UpdateBankInformationRequest BankInformationRequest) :
+    IRequest<BankInformationResponse?>;
 
 
 

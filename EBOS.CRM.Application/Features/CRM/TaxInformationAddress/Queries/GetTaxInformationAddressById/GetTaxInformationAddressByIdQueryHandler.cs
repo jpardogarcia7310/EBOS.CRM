@@ -11,10 +11,12 @@ namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Queries.GetTax
 public class GetTaxInformationAddressByIdQueryHandler(ITaxInformationAddressRepository repository, IMapper mapper)
     : IRequestHandler<GetTaxInformationAddressByIdQuery, TaxInformationAddressResponse?>
 {
-    private readonly ITaxInformationAddressRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ITaxInformationAddressRepository _repository = repository ??
+                                                                    throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<TaxInformationAddressResponse?> Handle(GetTaxInformationAddressByIdQuery request, CancellationToken cancellationToken)
+    public async Task<TaxInformationAddressResponse?> Handle(GetTaxInformationAddressByIdQuery request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.AddTaxInformationAddress;
 
-public record AddTaxInformationAddressCommand(AddTaxInformationAddressRequest TaxInformationAddressRequest) : IRequest<TaxInformationAddressResponse>;
+public record AddTaxInformationAddressCommand(AddTaxInformationAddressRequest TaxInformationAddressRequest) : 
+    IRequest<TaxInformationAddressResponse>;
 
 
 

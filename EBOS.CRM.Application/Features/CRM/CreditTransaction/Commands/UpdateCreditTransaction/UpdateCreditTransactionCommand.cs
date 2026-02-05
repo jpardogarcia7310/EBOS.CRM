@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.UpdateCreditTransaction;
 
-public record UpdateCreditTransactionCommand(long Id, UpdateCreditTransactionRequest CreditTransactionRequest) : IRequest<CreditTransactionResponse?>;
+public record UpdateCreditTransactionCommand(long Id, UpdateCreditTransactionRequest CreditTransactionRequest) :
+    IRequest<CreditTransactionResponse?>;
 
 
 

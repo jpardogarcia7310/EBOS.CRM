@@ -52,7 +52,8 @@ public class CountryRepository(CrmDbContext context) : ICountryRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Country>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Country>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);
