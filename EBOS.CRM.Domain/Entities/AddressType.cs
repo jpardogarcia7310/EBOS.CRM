@@ -5,6 +5,7 @@ namespace EBOS.CRM.Domain.Entities;
 
 public class AddressType : BaseEntity
 {
+    public long TenantId { get; set; }
     public string Code { get; set; } = null!;
     public string Description { get; set; } = null!;
     public DateTime CreatedAt { get; set; }

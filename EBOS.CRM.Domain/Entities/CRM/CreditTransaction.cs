@@ -6,6 +6,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public sealed class CreditTransaction : ErasableEntity
 {
+    public long TenantId { get; set; }
     public DateTime Date { get; set; }
     public decimal Amount { get; set; } // Positive: consumption, Negative: refund/adjustment
     public string Type { get; set; } = null!; // "Consumption", "Adjustment", etc.

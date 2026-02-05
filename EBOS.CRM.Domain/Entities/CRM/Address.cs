@@ -4,6 +4,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class Address : ErasableEntity
 {
+    public long TenantId { get; set; }
     public string Street { get; set; } = null!;
     public string ExternalNumber { get; set; } = null!;
     public string? InternalNumber { get; set; }

@@ -5,6 +5,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public sealed class CreditAccount : ErasableEntity
 {
+    public long TenantId { get; set; }
     public decimal MaxAmount { get; set; }  // Limit granted
     public decimal UsedAmount { get; set; } // What has already been spent
     public decimal AvailableAmount => MaxAmount - UsedAmount;

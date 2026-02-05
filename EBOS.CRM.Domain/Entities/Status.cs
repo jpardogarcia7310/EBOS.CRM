@@ -5,6 +5,7 @@ namespace EBOS.CRM.Domain.Entities;
 
 public class Status : BaseEntity
 {
+    public long TenantId { get; set; }
     public string Description { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public long CreatedBy { get; set; }

@@ -4,6 +4,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class BranchOffice : ErasableEntity
 {
+    public long TenantId { get; set; }
     public string Name { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
     public DateTime CreatedAt { get; set; }

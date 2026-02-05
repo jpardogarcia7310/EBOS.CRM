@@ -2,15 +2,13 @@ using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities;
 
-public class IdentificationType : ErasableEntity
+public class Tenant : BaseEntity
 {
-    public long TenantId { get; set; }
-    public string Code { get; set; } = null!;        // Ej: DNI, NIF, CIF
-    public string Description { get; set; } = null!;
+    public string Code { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; }
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
 }
-
-

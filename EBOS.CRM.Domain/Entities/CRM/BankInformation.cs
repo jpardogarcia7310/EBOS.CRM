@@ -6,6 +6,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class BankInformation : ErasableEntity
 {
+    public long TenantId { get; set; }
     [Required]
     [MaxLength(34)]
     public string Iban { get; set; } = null!;

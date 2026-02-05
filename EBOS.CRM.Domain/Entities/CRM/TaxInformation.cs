@@ -4,6 +4,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class TaxInformation : ErasableEntity
 {
+    public long TenantId { get; set; }
     public string TaxName { get; set; } = null!;
     public string TaxIdentificationNumber { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
