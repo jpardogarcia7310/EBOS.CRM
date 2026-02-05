@@ -89,6 +89,39 @@ dotnet run --project EBOS.CRM.Api
 https://localhost:5001/swagger
 ```
 
+## Authentication (EBOS.Auth)
+
+The IdP does not exist yet. The API supports two modes so you can work now and switch later:
+
+- Local mode (no IdP): `Enabled=false`, `UseAuthority=false`, and a symmetric `SigningKey`.
+- IdP mode (once EBOS.Auth exists): `Enabled=true`, `UseAuthority=true`, and fill `Authority`/`Audience`.
+
+Recommended local development example (no 401 in Swagger):
+
+```json
+"Authentication": {
+  "Enabled": false,
+  "UseAuthority": false,
+  "Authority": "http://localhost:5100",
+  "Audience": "ebos.crm.api",
+  "ValidIssuer": "http://localhost:5100",
+  "ValidAudiences": [ "ebos.crm.api" ],
+  "SigningKey": "dev-only-ebos-auth-signing-key-change-me"
+}
+```
+
+When EBOS.Auth is available, switch to:
+
+```json
+"Authentication": {
+  "Enabled": true,
+  "UseAuthority": true,
+  "Authority": "https://auth.your-domain.com",
+  "Audience": "ebos.crm.api",
+  "SigningKey": ""
+}
+```
+
 ## Installation
 
 ### Windows (IIS)

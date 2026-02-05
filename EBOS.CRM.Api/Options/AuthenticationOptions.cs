@@ -4,6 +4,7 @@ public sealed class AuthenticationOptions
 {
     public const string SectionName = "Authentication";
 
+    public bool Enabled { get; set; } = true;
     public bool UseAuthority { get; set; } = false;
     public string? Authority { get; set; }
     public string? Audience { get; set; }

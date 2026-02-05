@@ -121,7 +121,10 @@ builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 services
     .AddControllers(options =>
     {
-        options.Filters.Add(new AuthorizeFilter("ApiUser"));
+        if (authOptions.Enabled)
+        {
+            options.Filters.Add(new AuthorizeFilter("ApiUser"));
+        }
     })
     .AddJsonOptions(opts =>
     {
