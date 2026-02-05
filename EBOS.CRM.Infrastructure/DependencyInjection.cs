@@ -13,6 +13,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
+
         // DbContext registration
         services.AddDbContext<CrmDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("CrmConnection")));
