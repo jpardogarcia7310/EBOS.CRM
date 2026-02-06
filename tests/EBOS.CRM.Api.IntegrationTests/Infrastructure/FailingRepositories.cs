@@ -241,7 +241,7 @@ public sealed class FailingBankInformationRepository : IBankInformationRepositor
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<BankInformation>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<BankInformation>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -312,7 +312,7 @@ public sealed class FailingBranchOfficeRepository : IBranchOfficeRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<BranchOffice>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<BranchOffice>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -383,7 +383,7 @@ public sealed class FailingBranchOfficeAddressRepository : IBranchOfficeAddressR
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<BranchOfficeAddress>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<BranchOfficeAddress>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -459,7 +459,7 @@ public sealed class FailingCorporateCustomerRepository : ICorporateCustomerRepos
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<CorporateCustomer>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<CorporateCustomer>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -530,7 +530,7 @@ public sealed class FailingCreditAccountRepository : ICreditAccountRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<CreditAccount>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<CreditAccount>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -601,7 +601,7 @@ public sealed class FailingCreditTransactionRepository : ICreditTransactionRepos
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<CreditTransaction>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<CreditTransaction>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -672,7 +672,7 @@ public sealed class FailingCustomerRepository : ICustomerRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<Customer>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<Customer>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -748,7 +748,7 @@ public sealed class FailingCustomerAddressRepository : ICustomerAddressRepositor
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<CustomerAddress>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<CustomerAddress>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -829,7 +829,7 @@ public sealed class FailingIndividualCustomerRepository : IIndividualCustomerRep
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<IndividualCustomer>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<IndividualCustomer>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -900,7 +900,7 @@ public sealed class FailingTaxInformationRepository : ITaxInformationRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<TaxInformation>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<TaxInformation>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -971,7 +971,7 @@ public sealed class FailingTaxInformationAddressRepository : ITaxInformationAddr
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<TaxInformationAddress>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<TaxInformationAddress>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
@@ -1047,7 +1047,7 @@ public sealed class FailingAddressRepository : IAddressRepository
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
-    public Task<ICollection<Address>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyCollection<Address>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
