@@ -1,6 +1,7 @@
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using FluentAssertions;
 using System.Reflection;
+using EBOS.Core.Primitives.Interfaces;
 
 namespace EBOS.CRM.ApiTests.Architecture;
 

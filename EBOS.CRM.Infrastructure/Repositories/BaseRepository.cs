@@ -1,5 +1,4 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
@@ -46,7 +45,7 @@ public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where
         return entity is { Erased: false } ? entity : null;
     }
 
-    public virtual async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await DbSet.AsNoTracking()
             .Where(e => !e.Erased)
