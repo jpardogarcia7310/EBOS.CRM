@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using EBOS.CRM.Application.Services.Interfaces;
 
 namespace EBOS.CRM.Api.Middleware;
 

@@ -93,21 +93,21 @@ var app = builder.Build();
 #if DEBUG
 // --- DIAGNOSTIC BLOCK: List versions and API descriptions in the console ---
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-Console.WriteLine("=== ApiVersionDescriptions ===");
+Console.WriteLine(@"=== ApiVersionDescriptions ===");
 foreach (var desc in provider.ApiVersionDescriptions)
 {
-    Console.WriteLine($"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
+    Console.WriteLine($@"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
 }
 
 var apiExplorer = app.Services.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
-Console.WriteLine("=== ApiDescriptions ===");
+Console.WriteLine(@"=== ApiDescriptions ===");
 foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
 {
     foreach (var api in group.Items)
     {
-        Console.WriteLine($"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: " +
-                          $"{api.ActionDescriptor.RouteValues["controller"]} | Action: " +
-                          $"{api.ActionDescriptor.RouteValues["action"]}");
+        Console.WriteLine($@"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: " +
+                          $@"{api.ActionDescriptor.RouteValues["controller"]} | Action: " +
+                          $@"{api.ActionDescriptor.RouteValues["action"]}");
     }
 }
 // --- END OF DIAGNOSTIC BLOCK ---
@@ -170,6 +170,7 @@ app.MapControllers();
 
 await app.RunAsync();
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public partial class Program
 {
     // Exposed for WebApplicationFactory in integration tests.

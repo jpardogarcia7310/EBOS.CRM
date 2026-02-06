@@ -1,18 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Infrastructure;
 
-public sealed class CrmProblemDetailsFactory : ProblemDetailsFactory
+public sealed class CrmProblemDetailsFactory(IOptions<ApiBehaviorOptions> options) : ProblemDetailsFactory
 {
-    private readonly ApiBehaviorOptions _options;
-
-    public CrmProblemDetailsFactory(IOptions<ApiBehaviorOptions> options)
-    {
-        _options = options.Value;
-    }
+    private readonly ApiBehaviorOptions _options = options.Value;
 
     public override ProblemDetails CreateProblemDetails(
         HttpContext httpContext,
@@ -71,10 +64,7 @@ public sealed class CrmProblemDetailsFactory : ProblemDetailsFactory
             problemDetails.Type ??= mapping.Link;
         }
 
-        if (problemDetails.Instance == null)
-        {
-            problemDetails.Instance = httpContext.Request.Path;
-        }
+        problemDetails.Instance ??= httpContext.Request.Path;
 
         problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
     }

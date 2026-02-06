@@ -106,7 +106,7 @@ public class TenantIsolationBehavior<TRequest, TResponse>(ITenantContext tenantC
         {
             ErrorCode = ComputeStableCode("tenantId", message)
         };
-        return new ValidationException(new[] { failure });
+        return new ValidationException([failure]);
     }
 
     private static IEnumerable<object?> GetChildValues(object target)
