@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -47,8 +48,8 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 
     protected override void ConfigureClient(HttpClient client)
     {
-        client.DefaultRequestHeaders.Remove("X-Tenant-Id");
-        client.DefaultRequestHeaders.Add("X-Tenant-Id", "1");
+        client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
+        client.DefaultRequestHeaders.Add(HeaderNames.TenantId, "1");
         base.ConfigureClient(client);
     }
 

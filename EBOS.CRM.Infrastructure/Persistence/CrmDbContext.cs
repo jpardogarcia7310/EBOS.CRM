@@ -139,14 +139,46 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ICurrentUserCo
 
     public override int SaveChanges()
     {
+        EnforceTenantInvariant();
         ApplyTenantIdToAddedEntities();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        EnforceTenantInvariant();
         ApplyTenantIdToAddedEntities();
         return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void EnforceTenantInvariant()
+    {
+        if (_tenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
+        {
+            var tenantProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "TenantId");
+            if (tenantProperty?.CurrentValue is not long tenantValue)
+            {
+                continue;
+            }
+
+            if (tenantValue > 0 && tenantValue != _tenantId)
+            {
+                throw new InvalidOperationException(
+                    $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {_tenantId}.");
+            }
+
+            if (entry.State != EntityState.Added && tenantValue <= 0)
+            {
+                throw new InvalidOperationException(
+                    $"TenantId is required for {entry.Metadata.ClrType.Name}.");
+            }
+        }
     }
 
     private void ApplyTenantIdToAddedEntities()
@@ -167,6 +199,12 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ICurrentUserCo
 
             if (tenantProperty.CurrentValue is long tenantValue && tenantValue > 0)
             {
+                if (tenantValue != _tenantId)
+                {
+                    throw new InvalidOperationException(
+                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {_tenantId}.");
+                }
+
                 continue;
             }
 

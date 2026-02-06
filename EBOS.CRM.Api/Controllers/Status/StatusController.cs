@@ -1,20 +1,17 @@
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.Status;
-
 [ApiController]
 [ApiVersion("1.0")]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class StatusController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class StatusController(IMediator mediator) : ControllerBase
 {
     #region Queries
     /// <summary>
@@ -35,17 +32,15 @@ public class StatusController(IMediator mediator, IStringLocalizer<SharedResourc
         var dto = await mediator.Send(new GetStatusByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Status with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            var details = ProblemDetailsFactory.CreateProblemDetails(
+                HttpContext,
+                StatusCodes.Status404NotFound,
+                title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Status with id {id} not found.");
+            return NotFound(details);
         }
-
         return Ok(dto);
     }
-
     /// <summary>
     /// Returns all resources (paginated).
     /// </summary>
@@ -64,39 +59,12 @@ public class StatusController(IMediator mediator, IStringLocalizer<SharedResourc
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var result = await mediator.Send(new GetAllStatusesQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

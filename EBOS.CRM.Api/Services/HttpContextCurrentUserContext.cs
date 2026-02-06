@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using EBOS.CRM.Api.Constants;
 
 namespace EBOS.CRM.Api.Services;
 
@@ -34,7 +35,7 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor accessor)
 
             var claim = httpContext.User.FindFirstValue("tenantId")
                         ?? httpContext.User.FindFirstValue("tenant_id")
-                        ?? httpContext.Request.Headers["X-Tenant-Id"].FirstOrDefault();
+                        ?? httpContext.Request.Headers[HeaderNames.TenantId].FirstOrDefault();
 
             return long.TryParse(claim, out var tenantId) ? tenantId : 0;
         }

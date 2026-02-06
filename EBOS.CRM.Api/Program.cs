@@ -2,6 +2,9 @@ using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
+using EBOS.CRM.Api.Infrastructure;
+using EBOS.CRM.Api.HostedServices;
+using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Infrastructure;
@@ -10,6 +13,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -33,6 +37,11 @@ services.AddInfrastructure(builder.Configuration);
 
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+services.AddSingleton<ProblemDetailsFactory, CrmProblemDetailsFactory>();
+if (builder.Environment.IsDevelopment())
+{
+    services.AddHostedService<LookupSeedHostedService>();
+}
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
 services.AddLocalization();
 
@@ -41,7 +50,10 @@ builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 
 // Controllers + JSON options and register the filter globally
 services
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        options.Filters.Add<PaginationValidationFilter>();
+    })
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

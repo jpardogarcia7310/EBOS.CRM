@@ -19,6 +19,10 @@ public class MappingTaxInformation : IRegister
             .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Customer)
             .Ignore(dest => dest.TaxInformationAddresses);
 
@@ -28,6 +32,10 @@ public class MappingTaxInformation : IRegister
             .Map(dest => dest.TaxIdentificationNumber, src => src.TaxIdentificationNumber)
             .Map(dest => dest.CustomerId, src => src.CustomerId)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.Customer)
             .Ignore(dest => dest.TaxInformationAddresses);

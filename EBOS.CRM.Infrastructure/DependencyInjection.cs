@@ -4,6 +4,7 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Services.Audit;
+using EBOS.CRM.Infrastructure.Services.Lookup;
 using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Infrastructure;
@@ -43,6 +44,8 @@ public static class DependencyInjection
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
+        services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
+        services.AddScoped<ILookupSeedService, LookupSeedService>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>
