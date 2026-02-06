@@ -7,6 +7,7 @@ using EBOS.CRM.Api.HostedServices;
 using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Options;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
@@ -30,6 +31,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 // Application layer registrations
 services.AddApplication();
 builder.Services.AddApplicationMappings();
+services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Infrastructure
@@ -44,6 +46,19 @@ if (builder.Environment.IsDevelopment())
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.AddOptions<TenantIsolationOptions>()
+    .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
+    .Validate(options => options.MinTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MinTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MaxTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MaxTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MinTraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:MinTraversalDepth must be <= TenantIsolation:MaxTraversalDepth.")
+    .Validate(options =>
+            options.TraversalDepth >= options.MinTraversalDepth &&
+            options.TraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:TraversalDepth must be within the configured min/max range.")
+    .ValidateOnStart();
 services.AddLocalization();
 
 // Register FluentValidation validators (from Application assembly)

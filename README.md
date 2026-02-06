@@ -166,6 +166,27 @@ Errors follow `application/problem+json` (RFC 7807). Example validation error:
 }
 ```
 
+## Configuration
+
+### Tenant isolation
+
+`TenantIsolation:TraversalDepth` controls how deep the tenant validation scans request graphs.
+The allowed range is configured with `TenantIsolation:MinTraversalDepth` and
+`TenantIsolation:MaxTraversalDepth`.
+
+- Range: `1` to `50`
+- Default: `10`
+
+Example:
+
+```json
+"TenantIsolation": {
+  "MinTraversalDepth": 1,
+  "MaxTraversalDepth": 50,
+  "TraversalDepth": 10
+}
+```
+
 ## Main technologies
 
 - ASP.NET Core 8
