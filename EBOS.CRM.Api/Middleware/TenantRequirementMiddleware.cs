@@ -8,7 +8,7 @@ public class TenantRequirementMiddleware(RequestDelegate next)
 {
     private static readonly PathString ApiBasePath = new("/api");
 
-    public async Task Invoke(HttpContext context, ICurrentUserContext currentUserContext)
+    public async Task Invoke(HttpContext context, ITenantContext tenantContext)
     {
         if (!context.Request.Path.StartsWithSegments(ApiBasePath) ||
             context.Request.Path.StartsWithSegments("/swagger") ||
@@ -18,7 +18,7 @@ public class TenantRequirementMiddleware(RequestDelegate next)
             return;
         }
 
-        if (currentUserContext.TenantId <= 0)
+        if (tenantContext.TenantId <= 0)
         {
             var errors = new Dictionary<string, string[]>
             {

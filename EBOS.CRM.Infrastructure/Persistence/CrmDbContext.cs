@@ -8,10 +8,10 @@ using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options, ICurrentUserContext? currentUserContext = null)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null)
     : DbContext(options)
 {
-    private readonly long _tenantId = currentUserContext?.TenantId ?? 0;
+    private readonly long _tenantId = tenantContext?.TenantId ?? 0;
     public long CurrentTenantId => _tenantId;
     // DbSets
     public DbSet<Customer> Customers => Set<Customer>();
