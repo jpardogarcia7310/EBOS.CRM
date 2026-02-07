@@ -9,6 +9,31 @@ public class PatchBranchOfficeCommandValidatorTest
     private readonly PatchBranchOfficeCommandValidator _validator = new();
 
     [Fact]
+    public void Validate_InvalidId_Fails()
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: "Main",
+            PhoneNumber: "123",
+            CorporateCustomerId: null);
+        var command = new PatchBranchOfficeCommand(0, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.Id);
+    }
+
+    [Fact]
+    public void Validate_NullRequest_Fails()
+    {
+        var command = new PatchBranchOfficeCommand(1, null!);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest);
+    }
+
+    [Fact]
     public void Validate_NoPatchFields_ReturnsError()
     {
         var request = new PatchBranchOfficeRequest(
@@ -22,5 +47,86 @@ public class PatchBranchOfficeCommandValidatorTest
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest)
             .WithErrorMessage("At least one field must be provided.");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Validate_EmptyName_Fails(string value)
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: value,
+            PhoneNumber: null,
+            CorporateCustomerId: null);
+        var command = new PatchBranchOfficeCommand(1, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.Name);
+    }
+
+    [Fact]
+    public void Validate_NameTooLong_Fails()
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: new string('a', 201),
+            PhoneNumber: null,
+            CorporateCustomerId: null);
+        var command = new PatchBranchOfficeCommand(1, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.Name);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Validate_EmptyPhoneNumber_Fails(string value)
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: null,
+            PhoneNumber: value,
+            CorporateCustomerId: null);
+        var command = new PatchBranchOfficeCommand(1, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.PhoneNumber);
+    }
+
+    [Fact]
+    public void Validate_PhoneNumberTooLong_Fails()
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: null,
+            PhoneNumber: new string('a', 21),
+            CorporateCustomerId: null);
+        var command = new PatchBranchOfficeCommand(1, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.PhoneNumber);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Validate_InvalidCorporateCustomerId_Fails(long value)
+    {
+        var request = new PatchBranchOfficeRequest(
+            TenantId: 1,
+            Name: null,
+            PhoneNumber: null,
+            CorporateCustomerId: value);
+        var command = new PatchBranchOfficeCommand(1, request);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.CorporateCustomerId);
     }
 }
