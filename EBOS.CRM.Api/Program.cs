@@ -9,6 +9,7 @@ using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Infrastructure;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
@@ -58,6 +59,19 @@ services.AddOptions<TenantIsolationOptions>()
             options.TraversalDepth >= options.MinTraversalDepth &&
             options.TraversalDepth <= options.MaxTraversalDepth,
         "TenantIsolation:TraversalDepth must be within the configured min/max range.")
+    .ValidateOnStart();
+
+services.AddOptions<MultiTenantOptions>()
+    .Bind(builder.Configuration.GetSection(MultiTenantOptions.SectionName))
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         !string.IsNullOrWhiteSpace(options.ConnectionStringTemplate),
+        "MultiTenant:ConnectionStringTemplate is required when Strategy is Database.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         options.ConnectionStringTemplate!.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase),
+        "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Schema ||
+                         !string.IsNullOrWhiteSpace(options.SchemaPrefix),
+        "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
     .ValidateOnStart();
 services.AddLocalization();
 

@@ -5,13 +5,16 @@ using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
+using EBOS.CRM.Infrastructure.Options;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null,
+        IOptions<MultiTenantOptions>? multiTenantOptions = null)
     : DbContext(options)
 {
     private readonly long _tenantId = tenantContext?.TenantId ?? 0;
+    private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
     public long CurrentTenantId => _tenantId;
     // DbSets
     public DbSet<Customer> Customers => Set<Customer>();
@@ -47,6 +50,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
         ApplySoftDeleteQueryFilter(modelBuilder);
         ApplyTenantQueryFilter(modelBuilder);
+        ApplyTenantSchema(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -98,6 +102,28 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    private void ApplyTenantSchema(ModelBuilder modelBuilder)
+    {
+        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || _tenantId <= 0)
+        {
+            return;
+        }
+
+        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{_tenantId}";
+        var targets = new HashSet<string>(_multiTenantOptions.SchemaTargets, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var schema = entityType.GetSchema();
+            if (schema == null || !targets.Contains(schema))
+            {
+                continue;
+            }
+
+            entityType.SetSchema(schemaName);
         }
     }
 
