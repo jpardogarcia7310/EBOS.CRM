@@ -9,6 +9,7 @@ using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Infrastructure;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
@@ -46,6 +47,7 @@ if (builder.Environment.IsDevelopment())
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
     .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
     .Validate(options => options.MinTraversalDepth is >= 1 and <= 50,
@@ -58,6 +60,19 @@ services.AddOptions<TenantIsolationOptions>()
             options.TraversalDepth >= options.MinTraversalDepth &&
             options.TraversalDepth <= options.MaxTraversalDepth,
         "TenantIsolation:TraversalDepth must be within the configured min/max range.")
+    .ValidateOnStart();
+
+services.AddOptions<MultiTenantOptions>()
+    .Bind(builder.Configuration.GetSection(MultiTenantOptions.SectionName))
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         !string.IsNullOrWhiteSpace(options.ConnectionStringTemplate),
+        "MultiTenant:ConnectionStringTemplate is required when Strategy is Database.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         options.ConnectionStringTemplate!.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase),
+        "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Schema ||
+                         !string.IsNullOrWhiteSpace(options.SchemaPrefix),
+        "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
     .ValidateOnStart();
 services.AddLocalization();
 
@@ -161,6 +176,7 @@ catch (Exception ex)
 // Middleware pipeline
 app.UseCorrelationId();
 app.UseApiErrorHandling();
+app.UseTenantResolution();
 app.UseTenantRequirement();
 
 app.UseHttpsRedirection();

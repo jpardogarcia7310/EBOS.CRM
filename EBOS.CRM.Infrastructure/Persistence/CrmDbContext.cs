@@ -5,13 +5,18 @@ using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
+using EBOS.CRM.Domain.Interfaces;
+using EBOS.CRM.Domain.Services;
+using EBOS.CRM.Infrastructure.Options;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null,
+        IOptions<MultiTenantOptions>? multiTenantOptions = null)
     : DbContext(options)
 {
     private readonly long _tenantId = tenantContext?.TenantId ?? 0;
+    private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
     public long CurrentTenantId => _tenantId;
     // DbSets
     public DbSet<Customer> Customers => Set<Customer>();
@@ -47,6 +52,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
         ApplySoftDeleteQueryFilter(modelBuilder);
         ApplyTenantQueryFilter(modelBuilder);
+        ApplyTenantSchema(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -98,6 +104,28 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    private void ApplyTenantSchema(ModelBuilder modelBuilder)
+    {
+        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || _tenantId <= 0)
+        {
+            return;
+        }
+
+        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{_tenantId}";
+        var targets = new HashSet<string>(_multiTenantOptions.SchemaTargets, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var schema = entityType.GetSchema();
+            if (schema == null || !targets.Contains(schema))
+            {
+                continue;
+            }
+
+            entityType.SetSchema(schemaName);
         }
     }
 
@@ -161,12 +189,12 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
         foreach (var entry in ChangeTracker.Entries()
                      .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
         {
-            var tenantProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "TenantId");
-            if (tenantProperty?.CurrentValue is not long tenantValue)
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
             {
                 continue;
             }
 
+            var tenantValue = tenantScoped.TenantId;
             if (tenantValue > 0 && tenantValue != _tenantId)
             {
                 throw new InvalidOperationException(
@@ -175,8 +203,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
             if (entry.State != EntityState.Added && tenantValue <= 0)
             {
-                throw new InvalidOperationException(
-                    $"TenantId is required for {entry.Metadata.ClrType.Name}.");
+                TenantInvariants.EnsureTenantAssigned(tenantScoped);
             }
         }
     }
@@ -191,24 +218,23 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
         foreach (var entry in ChangeTracker.Entries()
                      .Where(e => e.State == EntityState.Added))
         {
-            var tenantProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "TenantId");
-            if (tenantProperty == null)
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
             {
                 continue;
             }
 
-            if (tenantProperty.CurrentValue is long tenantValue && tenantValue > 0)
+            if (tenantScoped.TenantId > 0)
             {
-                if (tenantValue != _tenantId)
+                if (tenantScoped.TenantId != _tenantId)
                 {
                     throw new InvalidOperationException(
-                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {_tenantId}.");
+                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantScoped.TenantId} != {_tenantId}.");
                 }
 
                 continue;
             }
 
-            tenantProperty.CurrentValue = _tenantId;
+            tenantScoped.TenantId = _tenantId;
         }
     }
 }

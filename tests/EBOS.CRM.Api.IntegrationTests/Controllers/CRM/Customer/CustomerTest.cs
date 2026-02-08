@@ -1,8 +1,10 @@
 using System.Net;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using FluentAssertions;
+using System.Net.Http.Json;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.Customer;
 
@@ -10,6 +12,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
 {
     private readonly HttpClient _client = factory.CreateClient();
     private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Customer");
+    private readonly string _statusVersion = ApiVersionHelper.GetLatestVersion(factory, "Status");
 
     [Fact]
     public async Task GetAll_Returns_ListOfItems()
@@ -26,6 +29,40 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
     {
         var response = await _client.GetAsync($"/api/v{_version}/Customer/999999");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Add_Update_Delete_Works_For_Customer()
+    {
+        var statusId = await LookupHelper.GetStatusIdAsync(_client, _statusVersion);
+
+        var addRequest = new AddCustomerRequest(
+            TenantId: 1,
+            Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
+            Email: $"user{Guid.NewGuid():N}@example.com",
+            Phone: "+34 600 123 456",
+            StatusId: statusId);
+
+        var addResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Customer", addRequest);
+        addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var created = await addResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+        created.Should().NotBeNull();
+
+        var updateRequest = new UpdateCustomerRequest(
+            Id: created!.Id,
+            TenantId: 1,
+            Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
+            Email: $"user{Guid.NewGuid():N}@example.com",
+            Phone: "+34 600 999 000",
+            StatusId: statusId);
+
+        var updateResponse =
+            await _client.PutAsJsonAsync($"/api/v{_version}/Customer/{created.Id}", updateRequest);
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var deleteResponse = await _client.DeleteAsync($"/api/v{_version}/Customer/{created.Id}");
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
 

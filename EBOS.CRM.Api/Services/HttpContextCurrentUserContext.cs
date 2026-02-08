@@ -37,7 +37,18 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor accessor)
                         ?? httpContext.User.FindFirstValue("tenant_id")
                         ?? httpContext.Request.Headers[HeaderNames.TenantId].FirstOrDefault();
 
-            return long.TryParse(claim, out var tenantId) ? tenantId : 0;
+            if (long.TryParse(claim, out var tenantId))
+            {
+                return tenantId;
+            }
+
+            if (httpContext.Items.TryGetValue(TenantContextKeys.TenantId, out var resolved) &&
+                resolved is long resolvedTenant && resolvedTenant > 0)
+            {
+                return resolvedTenant;
+            }
+
+            return 0;
         }
     }
 
