@@ -41,7 +41,7 @@ public class IdentificationTypeRepository(CrmDbContext context) : IIdentificatio
         var safePageSize = Math.Max(1, pageSize);
 
         return await _dbSet.AsNoTracking()
-            .OrderBy(c => c.Id)
+            .OrderBy(it => it.Id)
             .Skip((safePageNumber - 1) * safePageSize)
             .Take(safePageSize)
             .ToListAsync(cancellationToken);

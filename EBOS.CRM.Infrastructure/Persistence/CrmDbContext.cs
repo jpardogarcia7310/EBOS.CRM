@@ -1,14 +1,23 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
+using EBOS.CRM.Domain.Interfaces;
+using EBOS.CRM.Domain.Services;
+using EBOS.CRM.Infrastructure.Options;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null,
+        IOptions<MultiTenantOptions>? multiTenantOptions = null)
+    : DbContext(options)
 {
+    private readonly long _tenantId = tenantContext?.TenantId ?? 0;
+    private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
+    public long CurrentTenantId => _tenantId;
     // DbSets
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
@@ -42,6 +51,8 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CrmDbContext).Assembly);
 
         ApplySoftDeleteQueryFilter(modelBuilder);
+        ApplyTenantQueryFilter(modelBuilder);
+        ApplyTenantSchema(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -93,6 +104,137 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    private void ApplyTenantSchema(ModelBuilder modelBuilder)
+    {
+        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || _tenantId <= 0)
+        {
+            return;
+        }
+
+        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{_tenantId}";
+        var targets = new HashSet<string>(_multiTenantOptions.SchemaTargets, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var schema = entityType.GetSchema();
+            if (schema == null || !targets.Contains(schema))
+            {
+                continue;
+            }
+
+            entityType.SetSchema(schemaName);
+        }
+    }
+
+    private void ApplyTenantQueryFilter(ModelBuilder modelBuilder)
+    {
+        var tenantPropertyMethod = typeof(EF)
+            .GetMethod(nameof(EF.Property), BindingFlags.Static | BindingFlags.Public)?
+            .MakeGenericMethod(typeof(long));
+
+        if (tenantPropertyMethod == null)
+        {
+            return;
+        }
+
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
+            .Where(e => e.FindProperty("TenantId") != null)
+            .Where(e => e.BaseType == null)
+            .ToList();
+
+        foreach (var entityType in entityTypes)
+        {
+            var clrType = entityType.ClrType;
+            var parameter = Expression.Parameter(clrType, "e");
+
+            var convertedParam = Expression.Convert(parameter, typeof(object));
+            var tenantProperty = Expression.Call(
+                tenantPropertyMethod,
+                convertedParam,
+                Expression.Constant("TenantId"));
+            var currentTenant = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
+            var compare = Expression.Equal(tenantProperty, currentTenant);
+            var allowAllTenants = Expression.Equal(currentTenant, Expression.Constant(0L));
+            var body = Expression.OrElse(allowAllTenants, compare);
+            var lambda = Expression.Lambda(body, parameter);
+
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    public override int SaveChanges()
+    {
+        EnforceTenantInvariant();
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        EnforceTenantInvariant();
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void EnforceTenantInvariant()
+    {
+        if (_tenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
+        {
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
+            {
+                continue;
+            }
+
+            var tenantValue = tenantScoped.TenantId;
+            if (tenantValue > 0 && tenantValue != _tenantId)
+            {
+                throw new InvalidOperationException(
+                    $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {_tenantId}.");
+            }
+
+            if (entry.State != EntityState.Added && tenantValue <= 0)
+            {
+                TenantInvariants.EnsureTenantAssigned(tenantScoped);
+            }
+        }
+    }
+
+    private void ApplyTenantIdToAddedEntities()
+    {
+        if (_tenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
+            {
+                continue;
+            }
+
+            if (tenantScoped.TenantId > 0)
+            {
+                if (tenantScoped.TenantId != _tenantId)
+                {
+                    throw new InvalidOperationException(
+                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantScoped.TenantId} != {_tenantId}.");
+                }
+
+                continue;
+            }
+
+            tenantScoped.TenantId = _tenantId;
         }
     }
 }

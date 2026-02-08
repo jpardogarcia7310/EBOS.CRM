@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EBOS.CRM.Api.Swagger;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public sealed class PaginationOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)

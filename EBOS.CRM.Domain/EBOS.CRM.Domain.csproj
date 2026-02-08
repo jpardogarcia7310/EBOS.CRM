@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EBOS.Core" Version="1.5.7" />
+    <Folder Include="Interfaces\Services\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\Services\" />
+    <PackageReference Include="EBOS.Core" Version="1.6.4" />
   </ItemGroup>
 
 </Project>

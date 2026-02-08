@@ -56,7 +56,7 @@ public class AddAddressCommandHandlerTest
             CountryId = request.CountryId,
             AddressTypeId = request.AddressTypeId
         };
-        var response = new AddressResponse(1, request.Street, request.ExternalNumber, request.InternalNumber,
+        var response = new AddressResponse(1, request.TenantId, request.Street, request.ExternalNumber, request.InternalNumber,
             request.BetweenStreet1, request.BetweenStreet2, request.Neighbourhood, request.City,
             request.StateOrProvince, request.PostalCode, request.GoogleMapsUrl, request.Latitude,
             request.Longitude, request.CountryId, request.AddressTypeId, true);
@@ -102,6 +102,7 @@ public class AddAddressCommandHandlerTest
     }
 
     private static AddAddressRequest BuildValidRequest() => new(
+            TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,

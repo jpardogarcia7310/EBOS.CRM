@@ -166,6 +166,27 @@ Los errores siguen `application/problem+json` (RFC 7807). Ejemplo:
 }
 ```
 
+## Configuracion
+
+### Aislamiento de tenant
+
+`TenantIsolation:TraversalDepth` controla cuan profundo se recorre el grafo de request para validar el tenant.
+El rango permitido se configura con `TenantIsolation:MinTraversalDepth` y
+`TenantIsolation:MaxTraversalDepth`.
+
+- Rango: `1` a `50`
+- Default: `10`
+
+Ejemplo:
+
+```json
+"TenantIsolation": {
+  "MinTraversalDepth": 1,
+  "MaxTraversalDepth": 50,
+  "TraversalDepth": 10
+}
+```
+
 ## Tecnologias principales
 
 - ASP.NET Core 8

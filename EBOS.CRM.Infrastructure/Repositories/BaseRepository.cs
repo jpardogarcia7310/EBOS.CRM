@@ -1,5 +1,4 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 

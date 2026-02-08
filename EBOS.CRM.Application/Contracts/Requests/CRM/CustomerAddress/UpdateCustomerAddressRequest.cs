@@ -1,6 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
 
 public record UpdateCustomerAddressRequest(
+    long TenantId,
     long CustomerId,
     long AddressId,
     bool IsPrimary,

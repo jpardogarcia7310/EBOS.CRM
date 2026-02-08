@@ -1,9 +1,11 @@
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Services.Audit;
+using EBOS.CRM.Infrastructure.Services.Lookup;
 using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Infrastructure;
@@ -13,8 +15,17 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // DbContext registration
-        services.AddDbContext<CrmDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("CrmConnection")));
+        services.AddDbContext<CrmDbContext>((sp, options) =>
+        {
+            var tenantContext = sp.GetService<ITenantContext>();
+            var multiTenantOptions = sp.GetService<IOptions<MultiTenantOptions>>()?.Value
+                                     ?? new MultiTenantOptions();
+            var baseConnectionString = configuration.GetConnectionString("CrmConnection")
+                                       ?? string.Empty;
+            var connectionString = ResolveConnectionString(baseConnectionString, tenantContext, multiTenantOptions);
+
+            options.UseSqlServer(connectionString);
+        });
 
         services.AddOptions<AuditServiceOptions>()
             .Bind(configuration.GetSection(AuditServiceOptions.SectionName));
@@ -43,12 +54,42 @@ public static class DependencyInjection
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
+        services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
+        services.AddScoped<ILookupSeedService, LookupSeedService>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
         return services;
+    }
+
+    private static string ResolveConnectionString(string baseConnectionString, ITenantContext? tenantContext,
+        MultiTenantOptions options)
+    {
+        var tenantId = tenantContext?.TenantId ?? 0;
+
+        if (options.Strategy != MultiTenantStrategy.Database || tenantId <= 0)
+        {
+            return baseConnectionString;
+        }
+
+        if (string.IsNullOrWhiteSpace(options.ConnectionStringTemplate))
+        {
+            throw new InvalidOperationException(
+                "MultiTenant:ConnectionStringTemplate is required for Database strategy.");
+        }
+
+        var template = options.ConnectionStringTemplate!;
+
+        if (!template.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.");
+        }
+
+        return template.Replace("{tenantId}", tenantId.ToString(),
+            StringComparison.OrdinalIgnoreCase);
     }
 }
 

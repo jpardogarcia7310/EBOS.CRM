@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public sealed class CreditTransaction : ErasableEntity
+public sealed class CreditTransaction : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public DateTime Date { get; set; }
     public decimal Amount { get; set; } // Positive: consumption, Negative: refund/adjustment
     public string Type { get; set; } = null!; // "Consumption", "Adjustment", etc.

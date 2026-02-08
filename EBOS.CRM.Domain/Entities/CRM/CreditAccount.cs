@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public sealed class CreditAccount : ErasableEntity
+public sealed class CreditAccount : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public decimal MaxAmount { get; set; }  // Limit granted
     public decimal UsedAmount { get; set; } // What has already been spent
     public decimal AvailableAmount => MaxAmount - UsedAmount;

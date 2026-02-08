@@ -1,9 +1,11 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class TaxInformationAddress : ErasableEntity
+public class TaxInformationAddress : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public long TaxInformationId { get; set; }
     public TaxInformation TaxInformation { get; set; } = null!;
 

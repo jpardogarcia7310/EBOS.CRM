@@ -98,6 +98,7 @@ public class UpdateBranchOfficeAddressCommandHandlerTest
     }
 
     private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             BranchOfficeId: 1,
             AddressId: 1,
             IsPrimary: true,

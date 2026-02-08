@@ -1,6 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 
 public record AddCreditTransactionRequest(
+    long TenantId,
     DateTime Date,
     decimal Amount,
     string Type,

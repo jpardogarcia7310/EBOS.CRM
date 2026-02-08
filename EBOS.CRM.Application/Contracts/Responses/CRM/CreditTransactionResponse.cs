@@ -2,6 +2,7 @@ namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record CreditTransactionResponse(
     long Id,
+    long TenantId,
     DateTime Date,
     decimal Amount,
     string Type,

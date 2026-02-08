@@ -1,20 +1,17 @@
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
 using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.IdentificationType;
-
 [ApiController]
 [ApiVersion("1.0")]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class IdentificationTypeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class IdentificationTypeController(IMediator mediator) : ControllerBase
 {
     #region Queries
     /// <summary>
@@ -35,17 +32,15 @@ public class IdentificationTypeController(IMediator mediator, IStringLocalizer<S
         var dto = await mediator.Send(new GetIdentificationTypeByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"IdentificationType with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            var details = ProblemDetailsFactory.CreateProblemDetails(
+                HttpContext,
+                StatusCodes.Status404NotFound,
+                title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"IdentificationType with id {id} not found.");
+            return NotFound(details);
         }
-
         return Ok(dto);
     }
-
     /// <summary>
     /// Returns all resources (paginated).
     /// </summary>
@@ -64,39 +59,12 @@ public class IdentificationTypeController(IMediator mediator, IStringLocalizer<S
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var result = await mediator.Send(new GetAllIdentificationTypeQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

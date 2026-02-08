@@ -79,6 +79,7 @@ public class AddTaxInformationAddressCommandHandlerTest
     }
 
     private static AddTaxInformationAddressRequest BuildAddRequest() => new(
+            TenantId: 1,
             TaxInformationId: 1,
             AddressId: 1,
             IsPrimary: true,
