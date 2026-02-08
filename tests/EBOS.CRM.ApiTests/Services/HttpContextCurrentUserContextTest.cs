@@ -38,6 +38,36 @@ public class HttpContextCurrentUserContextTest
     }
 
     [Fact]
+    public void TenantId_UsesItem_WhenHeaderAndClaimMissing()
+    {
+        var context = new DefaultHttpContext();
+        context.Items[TenantContextKeys.TenantId] = 9L;
+
+        var accessor = new HttpContextAccessor { HttpContext = context };
+        var currentUser = new HttpContextCurrentUserContext(accessor);
+
+        Assert.Equal(9, currentUser.TenantId);
+    }
+
+    [Fact]
+    public void TenantId_UsesClaim_WhenItemPresent()
+    {
+        var context = new DefaultHttpContext
+        {
+            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim("tenantId", "5")
+            }))
+        };
+        context.Items[TenantContextKeys.TenantId] = 9L;
+
+        var accessor = new HttpContextAccessor { HttpContext = context };
+        var currentUser = new HttpContextCurrentUserContext(accessor);
+
+        Assert.Equal(5, currentUser.TenantId);
+    }
+
+    [Fact]
     public void TenantId_ReturnsZero_WhenMissing()
     {
         var context = new DefaultHttpContext();

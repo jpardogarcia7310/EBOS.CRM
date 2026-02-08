@@ -135,7 +135,7 @@ public class PatchCustomerCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.StatusId);
+        result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.StatusId!.Value);
     }
 
     private static PatchCustomerRequest BuildRequest() => new(
