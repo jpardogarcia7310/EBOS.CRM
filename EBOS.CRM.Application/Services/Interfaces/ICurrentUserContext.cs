@@ -1,8 +1,7 @@
 namespace EBOS.CRM.Application.Services.Interfaces;
 
-public interface ICurrentUserContext
+public interface ICurrentUserContext : ITenantContext
 {
     long UserId { get; }
-    long TenantId { get; }
     string CorrelationId { get; }
 }

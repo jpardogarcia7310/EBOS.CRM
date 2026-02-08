@@ -1,8 +1,9 @@
-﻿using EBOS.Core.Primitives;
+using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class BranchOfficeAddress : ErasableEntity
+public class BranchOfficeAddress : ErasableEntity, ITenantScopedEntity
 {
     public long TenantId { get; set; }
     public long BranchOfficeId { get; set; }

@@ -7,7 +7,9 @@ using EBOS.CRM.Api.HostedServices;
 using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Options;
 using EBOS.CRM.Infrastructure;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
@@ -30,6 +32,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 // Application layer registrations
 services.AddApplication();
 builder.Services.AddApplicationMappings();
+services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Infrastructure
@@ -37,12 +40,40 @@ services.AddInfrastructure(builder.Configuration);
 
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ICurrentUserContext>());
 services.AddSingleton<ProblemDetailsFactory, CrmProblemDetailsFactory>();
 if (builder.Environment.IsDevelopment())
 {
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
+services.AddOptions<TenantIsolationOptions>()
+    .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
+    .Validate(options => options.MinTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MinTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MaxTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MaxTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MinTraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:MinTraversalDepth must be <= TenantIsolation:MaxTraversalDepth.")
+    .Validate(options =>
+            options.TraversalDepth >= options.MinTraversalDepth &&
+            options.TraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:TraversalDepth must be within the configured min/max range.")
+    .ValidateOnStart();
+
+services.AddOptions<MultiTenantOptions>()
+    .Bind(builder.Configuration.GetSection(MultiTenantOptions.SectionName))
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         !string.IsNullOrWhiteSpace(options.ConnectionStringTemplate),
+        "MultiTenant:ConnectionStringTemplate is required when Strategy is Database.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         options.ConnectionStringTemplate!.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase),
+        "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Schema ||
+                         !string.IsNullOrWhiteSpace(options.SchemaPrefix),
+        "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
+    .ValidateOnStart();
 services.AddLocalization();
 
 // Register FluentValidation validators (from Application assembly)
@@ -77,21 +108,21 @@ var app = builder.Build();
 #if DEBUG
 // --- DIAGNOSTIC BLOCK: List versions and API descriptions in the console ---
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-Console.WriteLine("=== ApiVersionDescriptions ===");
+Console.WriteLine(@"=== ApiVersionDescriptions ===");
 foreach (var desc in provider.ApiVersionDescriptions)
 {
-    Console.WriteLine($"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
+    Console.WriteLine($@"GroupName: {desc.GroupName} | ApiVersion: {desc.ApiVersion}");
 }
 
 var apiExplorer = app.Services.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
-Console.WriteLine("=== ApiDescriptions ===");
+Console.WriteLine(@"=== ApiDescriptions ===");
 foreach (var group in apiExplorer.ApiDescriptionGroups.Items)
 {
     foreach (var api in group.Items)
     {
-        Console.WriteLine($"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: " +
-                          $"{api.ActionDescriptor.RouteValues["controller"]} | Action: " +
-                          $"{api.ActionDescriptor.RouteValues["action"]}");
+        Console.WriteLine($@"Path: {api.RelativePath} | GroupName: {api.GroupName} | Controller: " +
+                          $@"{api.ActionDescriptor.RouteValues["controller"]} | Action: " +
+                          $@"{api.ActionDescriptor.RouteValues["action"]}");
     }
 }
 // --- END OF DIAGNOSTIC BLOCK ---
@@ -145,6 +176,7 @@ catch (Exception ex)
 // Middleware pipeline
 app.UseCorrelationId();
 app.UseApiErrorHandling();
+app.UseTenantResolution();
 app.UseTenantRequirement();
 
 app.UseHttpsRedirection();
@@ -154,6 +186,7 @@ app.MapControllers();
 
 await app.RunAsync();
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public partial class Program
 {
     // Exposed for WebApplicationFactory in integration tests.

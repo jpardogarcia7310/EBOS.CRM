@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using EBOS.CRM.Api.Constants;
+using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
@@ -85,6 +86,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         {
             builder.UseContentRoot(solutionRoot);
         }
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AuditService:Enabled"] = "false"
+            });
+        });
 
         builder.ConfigureServices(services =>
         {
