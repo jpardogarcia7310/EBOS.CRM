@@ -8,6 +8,11 @@ Enterprise scope definition (Sales, Service, Marketing), with a GitHub-ready roa
 - Service: Cases/tickets, SLA, queues and escalation, knowledge base, omnichannel (email/chat/voice), metrics.
 - Marketing: Dynamic segmentation, multichannel campaigns, journeys, scoring, consents/opt-out, attribution.
 
+## Code organization notes
+
+- EBOS schema features live under `EBOS.CRM.Application/Features/EBOS/`.
+- CRM schema features live under `EBOS.CRM.Application/Features/CRM/`.
+
 ## Checklist by module (levels + impact/effort)
 
 Legend:

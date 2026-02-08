@@ -35,6 +35,7 @@ only change the **source** of TenantId (claim instead of header), not the multi-
 - API: `TenantResolutionMiddleware` sets `ICurrentTenantContext.TenantId`.
 - Application: `ICurrentTenantContext` available to handlers and services.
 - Infrastructure: `DbContext` applies `HasQueryFilter(e => e.TenantId == currentTenant.TenantId)`.
+- Configuration: `MultiTenant:SchemaTargets` controls which schemas are renamed for schema-per-tenant; include `CRM` and `EBOS` when both require isolation.
 
 ## Migration path to EBOS.Auth
 

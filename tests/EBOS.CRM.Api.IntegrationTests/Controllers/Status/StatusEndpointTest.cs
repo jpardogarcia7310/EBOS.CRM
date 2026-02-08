@@ -95,17 +95,17 @@ public class StatusEndpointTest(CustomWebApplicationFactory factory) : IClassFix
     private (string Description1, string Description2) SeedUniqueStatuses()
     {
         using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<global::EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
 
         var desc1 = $"Status-{Guid.NewGuid():N}";
         var desc2 = $"Status-{Guid.NewGuid():N}";
 
         db.Statuses.AddRange(
-            new EBOS.CRM.Domain.Entities.Status
+            new Domain.Entities.Status
             {
                 Description = desc1
             },
-            new EBOS.CRM.Domain.Entities.Status
+            new Domain.Entities.Status
             {
                 Description = desc2
             });
@@ -116,3 +116,4 @@ public class StatusEndpointTest(CustomWebApplicationFactory factory) : IClassFix
     }
 
 }
+

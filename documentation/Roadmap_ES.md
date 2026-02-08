@@ -22,10 +22,10 @@ Leyenda:
 - [ ] Enterprise: Auditoria de accesos (Medio / Medio)
 
 2) Multi-tenant y gobernanza
-- [ ] MVP: TenantId en entidades + filtros globales (Alto / Alto)
-- [ ] Enterprise: Aislamiento por esquema/BD (Alto / Alto)
-- [ ] Enterprise: Configuracion por tenant (campos, layouts, reglas) (Alto / Alto)
-- [ ] Best: Metricas/cuotas/facturacion por tenant (Medio / Alto)
+- [x] MVP: TenantId en entidades + filtros globales (Alto / Alto)
+- [x] Enterprise: Aislamiento por esquema/BD (Alto / Alto)
+- [x] Enterprise: Configuracion por tenant (campos, layouts, reglas) (Alto / Alto)
+- [x] Best: Metricas/cuotas/facturacion por tenant (Medio / Alto)
 
 3) Customer 360 (Core CRM)
 - [ ] MVP: Contactos y roles dentro de cuentas (Alto / Medio)
@@ -76,7 +76,7 @@ Leyenda:
 Hito 1 — Fundacion (Seguridad + base multi-tenant)
 - [ ] JWT/OIDC Auth + UseAuthentication — M
 - [ ] RBAC basico por modulo — M
-- [ ] TenantId + filtros globales en EF — L
+- [x] TenantId + filtros globales en EF — L
 - [ ] Auditoria de accesos — M
 - [ ] Health checks — S
 

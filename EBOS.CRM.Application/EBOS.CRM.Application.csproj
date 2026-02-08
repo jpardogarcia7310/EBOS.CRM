@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Countries\Queries\GetAllCountries\" />
+    <Folder Include="Features\Identity\" />
   </ItemGroup>
 
   <ItemGroup>

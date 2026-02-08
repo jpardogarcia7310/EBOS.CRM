@@ -1,9 +1,11 @@
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
+using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 using EBOS.CRM.Infrastructure.Services.Audit;
 using EBOS.CRM.Infrastructure.Services.Lookup;
 using Microsoft.Extensions.Configuration;
@@ -50,6 +52,9 @@ public static class DependencyInjection
         services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
         services.AddScoped<ITaxInformationAddressRepository, TaxInformationAddressRepository>();
         services.AddScoped<ITaxInformationRepository, TaxInformationRepository>();
+        services.AddScoped<ITenantConfigurationRepository, TenantConfigurationRepository>();
+        services.AddScoped<ITenantQuotaRepository, TenantQuotaRepository>();
+        services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
         services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();

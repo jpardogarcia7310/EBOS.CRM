@@ -17,6 +17,18 @@ This project is **Free Software**. It aims to become a comprehensive, community-
 - API versioning with `v1` and `v2` examples.
 - Problem Details (RFC 7807) error format.
 - Swagger UI with custom filters and validation details.
+- Multi-tenant base: tenant-aware domain model, validation, middleware, and data isolation.
+
+## Implemented multi-tenant features
+
+- Tenant entity and TenantId on CRM aggregates.
+- Tenant-aware invariants and enforcement on write.
+- Tenant context service abstraction.
+- Validation to enforce tenant isolation.
+- EF Core global filters by TenantId.
+- Configurable schema/database isolation strategy.
+- Tenant resolution middleware (header and subdomain).
+- Tenant context propagation across request handling.
 
 ## Roadmap (planned)
 

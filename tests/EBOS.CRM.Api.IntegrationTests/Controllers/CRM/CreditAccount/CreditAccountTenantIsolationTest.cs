@@ -5,8 +5,8 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMCreditAccount = EBOS.CRM.Domain.Entities.CRM.CreditAccount;
+using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMCreditAccount = global::EBOS.CRM.Domain.Entities.CRM.CreditAccount;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.CreditAccount;
 
@@ -121,3 +121,4 @@ public class CreditAccountTenantIsolationTest : IClassFixture<CustomWebApplicati
     }
 
 }
+

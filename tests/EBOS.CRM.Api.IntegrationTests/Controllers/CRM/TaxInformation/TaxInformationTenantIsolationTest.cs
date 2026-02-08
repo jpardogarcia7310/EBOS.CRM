@@ -5,8 +5,8 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMTaxInformation = EBOS.CRM.Domain.Entities.CRM.TaxInformation;
+using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMTaxInformation = global::EBOS.CRM.Domain.Entities.CRM.TaxInformation;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.TaxInformation;
 
@@ -127,3 +127,4 @@ public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicat
     }
 
 }
+

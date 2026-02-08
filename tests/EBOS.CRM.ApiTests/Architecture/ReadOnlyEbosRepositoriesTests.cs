@@ -1,7 +1,9 @@
+using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using FluentAssertions;
 using System.Reflection;
-using EBOS.Core.Primitives.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 
 namespace EBOS.CRM.ApiTests.Architecture;
 
@@ -52,10 +54,10 @@ public class ReadOnlyEbosRepositoriesTests
 
         var concreteRepositories = new[]
         {
-            typeof(EBOS.CRM.Infrastructure.Repositories.Concrete.AddressTypeRepository),
-            typeof(EBOS.CRM.Infrastructure.Repositories.Concrete.CountryRepository),
-            typeof(EBOS.CRM.Infrastructure.Repositories.Concrete.IdentificationTypeRepository),
-            typeof(EBOS.CRM.Infrastructure.Repositories.Concrete.StatusRepository)
+            typeof(AddressTypeRepository),
+            typeof(CountryRepository),
+            typeof(IdentificationTypeRepository),
+            typeof(StatusRepository)
         };
 
         foreach (var repoType in concreteRepositories)

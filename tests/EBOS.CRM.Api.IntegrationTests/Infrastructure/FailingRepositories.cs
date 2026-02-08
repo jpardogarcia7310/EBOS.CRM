@@ -2,6 +2,7 @@ using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 

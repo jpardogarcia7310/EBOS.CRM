@@ -96,13 +96,13 @@ public class AddressTypeEndpointTest(CustomWebApplicationFactory factory) : ICla
     private (string Code1, string Code2) SeedUniqueAddressTypes()
     {
         using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<global::EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
 
         var code1 = $"AT{Guid.NewGuid():N}"[..5].ToUpperInvariant();
         var code2 = $"BT{Guid.NewGuid():N}"[..5].ToUpperInvariant();
 
         db.AddressTypes.AddRange(
-            new EBOS.CRM.Domain.Entities.AddressType
+            new Domain.Entities.AddressType
             {
                 Code = code1,
                 Description = $"Desc-{code1}",
@@ -110,7 +110,7 @@ public class AddressTypeEndpointTest(CustomWebApplicationFactory factory) : ICla
                 AllowsMultiple = true,
                 RequiresPrimary = false
             },
-            new EBOS.CRM.Domain.Entities.AddressType
+            new Domain.Entities.AddressType
             {
                 Code = code2,
                 Description = $"Desc-{code2}",
@@ -125,3 +125,4 @@ public class AddressTypeEndpointTest(CustomWebApplicationFactory factory) : ICla
     }
 
 }
+

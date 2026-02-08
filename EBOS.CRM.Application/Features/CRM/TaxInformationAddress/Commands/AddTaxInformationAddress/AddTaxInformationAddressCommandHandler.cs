@@ -16,7 +16,7 @@ public class AddTaxInformationAddressCommandHandler(ITaxInformationAddressReposi
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.TaxInformationAddressRequest ?? throw new ArgumentNullException(nameof(request.TaxInformationAddressRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

@@ -39,5 +39,7 @@ public class TaxInformationAddressConfiguration : IEntityTypeConfiguration<TaxIn
 
         builder.HasIndex(ta => new { ta.TaxInformationId, ta.IsCurrent, ta.IsPrimary })
             .HasDatabaseName("IX_TaxInformationAddress_Current_Primary");
+        builder.HasIndex(ta => ta.TenantId)
+            .HasDatabaseName("IX_TaxInformationAddress_TenantId");
     }
 }

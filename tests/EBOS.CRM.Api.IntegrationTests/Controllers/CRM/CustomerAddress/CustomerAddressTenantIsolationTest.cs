@@ -5,9 +5,9 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
-using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMCustomerAddress = EBOS.CRM.Domain.Entities.CRM.CustomerAddress;
+using CRMAddress = global::EBOS.CRM.Domain.Entities.CRM.Address;
+using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMCustomerAddress = global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.CustomerAddress;
 
@@ -160,3 +160,4 @@ public class CustomerAddressTenantIsolationTest : IClassFixture<CustomWebApplica
     }
 
 }
+

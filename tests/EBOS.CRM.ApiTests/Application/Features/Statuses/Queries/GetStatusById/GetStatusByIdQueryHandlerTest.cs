@@ -1,7 +1,8 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.Statuses.Queries.GetStatusById;
+using EBOS.CRM.Application.Features.EBOS.Statuses.Queries.GetStatusById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -135,5 +136,6 @@ public class GetStatusByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<StatusResponse>(It.IsAny<Status>()), Times.Never);
     }
 }
+
 
 

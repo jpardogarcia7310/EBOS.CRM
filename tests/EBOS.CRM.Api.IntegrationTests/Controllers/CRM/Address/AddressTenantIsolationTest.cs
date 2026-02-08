@@ -65,7 +65,7 @@ public class AddressTenantIsolationTest : IClassFixture<CustomWebApplicationFact
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
         var erasedStreet = $"Erased-{Guid.NewGuid():N}";
 
-        var address1 = new EBOS.CRM.Domain.Entities.CRM.Address
+        var address1 = new global::EBOS.CRM.Domain.Entities.CRM.Address
         {
             TenantId = 1,
             Street = streetTenant1,
@@ -77,7 +77,7 @@ public class AddressTenantIsolationTest : IClassFixture<CustomWebApplicationFact
             AddressTypeId = 1
         };
 
-        var address2 = new EBOS.CRM.Domain.Entities.CRM.Address
+        var address2 = new global::EBOS.CRM.Domain.Entities.CRM.Address
         {
             TenantId = 2,
             Street = streetTenant2,
@@ -89,7 +89,7 @@ public class AddressTenantIsolationTest : IClassFixture<CustomWebApplicationFact
             AddressTypeId = 1
         };
 
-        var erasedAddress = new EBOS.CRM.Domain.Entities.CRM.Address
+        var erasedAddress = new global::EBOS.CRM.Domain.Entities.CRM.Address
         {
             TenantId = 1,
             Street = erasedStreet,
@@ -109,3 +109,4 @@ public class AddressTenantIsolationTest : IClassFixture<CustomWebApplicationFact
     }
 
 }
+

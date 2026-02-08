@@ -5,7 +5,7 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCorporateCustomer = EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
+using CRMCorporateCustomer = global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.CorporateCustomer;
 
@@ -105,3 +105,4 @@ public class CorporateCustomerTenantIsolationTest : IClassFixture<CustomWebAppli
     }
 
 }
+

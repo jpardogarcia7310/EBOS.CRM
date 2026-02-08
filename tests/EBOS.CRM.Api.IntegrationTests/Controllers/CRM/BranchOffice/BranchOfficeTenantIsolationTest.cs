@@ -5,8 +5,8 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMBranchOffice = EBOS.CRM.Domain.Entities.CRM.BranchOffice;
-using CRMCorporateCustomer = EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
+using CRMBranchOffice = global::EBOS.CRM.Domain.Entities.CRM.BranchOffice;
+using CRMCorporateCustomer = global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.BranchOffice;
 
@@ -122,3 +122,4 @@ public class BranchOfficeTenantIsolationTest : IClassFixture<CustomWebApplicatio
     }
 
 }
+

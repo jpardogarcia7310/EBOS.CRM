@@ -127,6 +127,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedIdentificationTypesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedStatusesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantConfigurationsAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantQuotasAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantUsageMetricsAsync(db).GetAwaiter().GetResult();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
         });
     }

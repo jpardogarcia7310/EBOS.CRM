@@ -107,7 +107,7 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
     private (string A2Code1, string A2Code2, string A3Code1, string A3Code2) SeedUniqueCountries()
     {
         using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<global::EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
 
         var a2Code1 = $"X{Guid.NewGuid():N}"[..2].ToUpperInvariant();
         var a2Code2 = $"Y{Guid.NewGuid():N}"[..2].ToUpperInvariant();
@@ -115,7 +115,7 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
         var a3Code2 = $"XB{Guid.NewGuid():N}"[..3].ToUpperInvariant();
 
         db.Countries.AddRange(
-            new EBOS.CRM.Domain.Entities.Country
+            new Domain.Entities.Country
             {
                 Name = $"Country-{a2Code1}",
                 Iso31661A2Code = a2Code1,
@@ -126,7 +126,7 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
                 CurrencyCode = "XCU",
                 InternationalPhoneCode = "+901"
             },
-            new EBOS.CRM.Domain.Entities.Country
+            new Domain.Entities.Country
             {
                 Name = $"Country-{a2Code2}",
                 Iso31661A2Code = a2Code2,
@@ -144,3 +144,4 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
     }
 
 }
+

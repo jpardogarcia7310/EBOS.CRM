@@ -5,10 +5,10 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
-using CRMBranchOffice = EBOS.CRM.Domain.Entities.CRM.BranchOffice;
-using CRMBranchOfficeAddress = EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress;
-using CRMCorporateCustomer = EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
+using CRMAddress = global::EBOS.CRM.Domain.Entities.CRM.Address;
+using CRMBranchOffice = global::EBOS.CRM.Domain.Entities.CRM.BranchOffice;
+using CRMBranchOfficeAddress = global::EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress;
+using CRMCorporateCustomer = global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.BranchOfficeAddress;
 
@@ -184,3 +184,4 @@ public class BranchOfficeAddressTenantIsolationTest : IClassFixture<CustomWebApp
     }
 
 }
+

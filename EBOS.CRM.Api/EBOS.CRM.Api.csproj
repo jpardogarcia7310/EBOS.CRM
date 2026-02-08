@@ -32,4 +32,8 @@
     <ProjectReference Include="..\EBOS.CRM.Infrastructure\EBOS.CRM.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\EBOS\" />
+  </ItemGroup>
+
 </Project>

@@ -5,8 +5,8 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMBankInformation = EBOS.CRM.Domain.Entities.CRM.BankInformation;
+using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMBankInformation = global::EBOS.CRM.Domain.Entities.CRM.BankInformation;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.BankInformation;
 
@@ -129,3 +129,4 @@ public class BankInformationTenantIsolationTest : IClassFixture<CustomWebApplica
     }
 
 }
+

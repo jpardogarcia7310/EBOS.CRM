@@ -10,12 +10,15 @@
   <Folder Name="/documentation/Features/">
     <File Path="documentation/Features/Features.md" />
     <File Path="documentation/Features/Features_ES.md" />
+    <File Path="documentation/Features/Multi-Tenant-Governance.md" />
+    <File Path="documentation/Features/Multi-Tenant-Governance_ES.md" />
   </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="README_ES.md" />
     <File Path=".github/CODEOWNERS" />
   </Folder>
   <Folder Name="/source/">

@@ -97,18 +97,18 @@ public class IdentificationTypeEndpointTest(CustomWebApplicationFactory factory)
     private (string Code1, string Code2) SeedUniqueIdentificationTypes()
     {
         using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<global::EBOS.CRM.Infrastructure.Persistence.CrmDbContext>();
 
         var code1 = $"ID{Guid.NewGuid():N}"[..5].ToUpperInvariant();
         var code2 = $"JD{Guid.NewGuid():N}"[..5].ToUpperInvariant();
 
         db.IdentificationTypes.AddRange(
-            new EBOS.CRM.Domain.Entities.IdentificationType
+            new Domain.Entities.IdentificationType
             {
                 Code = code1,
                 Description = $"Desc-{code1}"
             },
-            new EBOS.CRM.Domain.Entities.IdentificationType
+            new Domain.Entities.IdentificationType
             {
                 Code = code2,
                 Description = $"Desc-{code2}"
@@ -120,3 +120,4 @@ public class IdentificationTypeEndpointTest(CustomWebApplicationFactory factory)
     }
 
 }
+

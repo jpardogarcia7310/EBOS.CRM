@@ -6,8 +6,9 @@ using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
 using EBOS.CRM.Domain.Interfaces;
-using EBOS.CRM.Domain.Services;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Infrastructure.Options;
+using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
@@ -28,6 +29,9 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
+    public DbSet<TenantConfiguration> TenantConfigurations => Set<TenantConfiguration>();
+    public DbSet<TenantQuota> TenantQuotas => Set<TenantQuota>();
+    public DbSet<TenantUsageMetric> TenantUsageMetrics => Set<TenantUsageMetric>();
     public DbSet<Status> Statuses => Set<Status>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();

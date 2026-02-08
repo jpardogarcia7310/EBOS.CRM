@@ -16,7 +16,7 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.CustomerAddressRequest ?? throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

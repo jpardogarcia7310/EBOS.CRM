@@ -16,7 +16,7 @@ public class AddBankInformationCommandHandler(IBankInformationRepository reposit
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.BankInformationRequest ?? throw new ArgumentNullException(nameof(request.BankInformationRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

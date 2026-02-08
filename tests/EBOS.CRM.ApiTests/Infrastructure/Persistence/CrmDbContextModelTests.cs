@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,28 @@ public class CrmDbContextModelTests
             .ToList();
 
         Assert.NotEmpty(tenantEntities);
+    }
+
+    [Fact]
+    public void Model_OnlyOverrides_Targeted_Schemas()
+    {
+        var options = BuildOptions();
+        var multiTenantOptions = OptionsProvider.Create(new MultiTenantOptions
+        {
+            Strategy = MultiTenantStrategy.Schema,
+            SchemaPrefix = "Tenant_",
+            SchemaTargets = ["CRM"]
+        });
+
+        using var context = new CrmDbContext(options, new TestTenantContext(9), multiTenantOptions);
+
+        var customerSchema = context.Model.FindEntityType(typeof(EBOS.CRM.Domain.Entities.CRM.Customer))?.GetSchema();
+        var countrySchema = context.Model.FindEntityType(typeof(Country))?.GetSchema();
+        var roleSchema = context.Model.FindEntityType(typeof(EBOS.CRM.Domain.Entities.Identity.Role))?.GetSchema();
+
+        Assert.Equal("Tenant_9", customerSchema);
+        Assert.Equal("EBOS", countrySchema);
+        Assert.Equal("IAM", roleSchema);
     }
 
     private static DbContextOptions<CrmDbContext> BuildOptions()

@@ -90,6 +90,19 @@ public class HttpContextCurrentUserContextTest
     }
 
     [Fact]
+    public void TenantId_UsesItem_WhenHeaderInvalid()
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Headers[HeaderNames.TenantId] = "not-a-number";
+        context.Items[TenantContextKeys.TenantId] = 4L;
+
+        var accessor = new HttpContextAccessor { HttpContext = context };
+        var currentUser = new HttpContextCurrentUserContext(accessor);
+
+        Assert.Equal(4, currentUser.TenantId);
+    }
+
+    [Fact]
     public void TenantId_ReturnsZero_WhenClaimInvalid_EvenIfHeaderValid()
     {
         var context = new DefaultHttpContext

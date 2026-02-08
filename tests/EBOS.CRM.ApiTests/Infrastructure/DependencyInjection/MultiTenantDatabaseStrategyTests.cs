@@ -52,6 +52,69 @@ public class MultiTenantDatabaseStrategyTests
         Assert.Contains("{tenantId}", ex.Message);
     }
 
+    [Fact]
+    public void DbContext_UsesBaseConnection_ForSharedStrategy()
+    {
+        var configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            [$"{MultiTenantOptions.SectionName}:{nameof(MultiTenantOptions.Strategy)}"] = "Shared"
+        });
+        var services = new ServiceCollection();
+
+        services.AddOptions<MultiTenantOptions>()
+            .Bind(configuration.GetSection(MultiTenantOptions.SectionName));
+        services.AddScoped<ITenantContext>(_ => new TestTenantContext(7));
+        services.AddInfrastructure(configuration);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+
+        var connectionString = context.Database.GetConnectionString();
+        Assert.Equal("Server=base;Database=BaseDb;", connectionString);
+    }
+
+    [Fact]
+    public void DbContext_UsesBaseConnection_ForSchemaStrategy()
+    {
+        var configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            [$"{MultiTenantOptions.SectionName}:{nameof(MultiTenantOptions.Strategy)}"] = "Schema"
+        });
+        var services = new ServiceCollection();
+
+        services.AddOptions<MultiTenantOptions>()
+            .Bind(configuration.GetSection(MultiTenantOptions.SectionName));
+        services.AddScoped<ITenantContext>(_ => new TestTenantContext(7));
+        services.AddInfrastructure(configuration);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+
+        var connectionString = context.Database.GetConnectionString();
+        Assert.Equal("Server=base;Database=BaseDb;", connectionString);
+    }
+
+    [Fact]
+    public void DbContext_UsesBaseConnection_When_TenantId_Missing()
+    {
+        var configuration = BuildConfiguration();
+        var services = new ServiceCollection();
+
+        services.AddOptions<MultiTenantOptions>()
+            .Bind(configuration.GetSection(MultiTenantOptions.SectionName));
+        services.AddScoped<ITenantContext>(_ => new TestTenantContext(0));
+        services.AddInfrastructure(configuration);
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+
+        var connectionString = context.Database.GetConnectionString();
+        Assert.Equal("Server=base;Database=BaseDb;", connectionString);
+    }
+
     private static IConfiguration BuildConfiguration(IDictionary<string, string?>? overrides = null)
     {
         var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "EBOS.CRM.Api");

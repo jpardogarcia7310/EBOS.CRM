@@ -5,10 +5,10 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
-using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMTaxInformation = EBOS.CRM.Domain.Entities.CRM.TaxInformation;
-using CRMTaxInformationAddress = EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress;
+using CRMAddress = global::EBOS.CRM.Domain.Entities.CRM.Address;
+using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMTaxInformation = global::EBOS.CRM.Domain.Entities.CRM.TaxInformation;
+using CRMTaxInformationAddress = global::EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.TaxInformationAddress;
 
@@ -180,3 +180,4 @@ public class TaxInformationAddressTenantIsolationTest : IClassFixture<CustomWebA
     }
 
 }
+
