@@ -127,6 +127,6 @@ public class PatchBranchOfficeCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.CorporateCustomerId);
+        result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.CorporateCustomerId!.Value);
     }
 }

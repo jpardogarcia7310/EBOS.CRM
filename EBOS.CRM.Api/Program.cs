@@ -47,6 +47,7 @@ if (builder.Environment.IsDevelopment())
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
     .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
     .Validate(options => options.MinTraversalDepth is >= 1 and <= 50,
@@ -175,6 +176,7 @@ catch (Exception ex)
 // Middleware pipeline
 app.UseCorrelationId();
 app.UseApiErrorHandling();
+app.UseTenantResolution();
 app.UseTenantRequirement();
 
 app.UseHttpsRedirection();
