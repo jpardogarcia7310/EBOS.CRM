@@ -7,6 +7,23 @@ public class CountryRepository(CrmDbContext context) : ICountryRepository
 {
     private readonly DbSet<Country> _dbSet = context.Set<Country>();
 
+    #region Commands
+    public Task AddAsync(Country entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task AddRangeAsync(IEnumerable<Country> entities, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task AttachAsync(Country entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task UpdateAsync(Country entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task DeleteAsync(Country entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    #endregion
+
     #region Queries
     public Task<Country?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
         => _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
@@ -17,7 +34,8 @@ public class CountryRepository(CrmDbContext context) : ICountryRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Country>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Country>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);

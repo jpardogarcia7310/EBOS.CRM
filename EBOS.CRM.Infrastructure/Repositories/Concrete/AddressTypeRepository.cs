@@ -7,6 +7,24 @@ public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepositor
 {
     private readonly DbSet<AddressType> _dbSet = context.Set<AddressType>();
 
+    #region Commands
+
+    public Task AddAsync(AddressType entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task AddRangeAsync(IEnumerable<AddressType> entities, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task AttachAsync(AddressType entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+
+    public Task UpdateAsync(AddressType entity, CancellationToken cancellationToken = default) 
+        => throw new NotImplementedException();
+
+    public Task DeleteAsync(AddressType entity, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    #endregion
+
     #region Queries
     public Task<AddressType?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
         => _dbSet.AsNoTracking().FirstOrDefaultAsync(at => at.Id == id, cancellationToken);
@@ -17,7 +35,8 @@ public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepositor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<AddressType>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<AddressType>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);
