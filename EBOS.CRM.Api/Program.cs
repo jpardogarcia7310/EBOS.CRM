@@ -8,6 +8,7 @@ using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Services.Commands;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -34,6 +35,8 @@ services.AddApplication();
 builder.Services.AddApplicationMappings();
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+services.AddOptions<CommandExecutionOptions>()
+    .Bind(builder.Configuration.GetSection(CommandExecutionOptions.SectionName));
 
 // Infrastructure
 services.AddInfrastructure(builder.Configuration);

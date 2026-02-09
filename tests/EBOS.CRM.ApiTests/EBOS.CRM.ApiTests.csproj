@@ -37,10 +37,7 @@
 
   <ItemGroup>
     <Folder Include="Application\Features\EBOS\" />
-    <Folder Include="Controllers\AddressType\" />
     <Folder Include="Controllers\CRM\Address\" />
-    <Folder Include="Controllers\IdentificationType\" />
-    <Folder Include="Fixtures\EntitiesFactories\EBOS\" />
   </ItemGroup>
 
 </Project>
