@@ -12,10 +12,9 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("tenantId", "5")
-            }))
+            ]))
         };
         context.Request.Headers[HeaderNames.TenantId] = "7";
 
@@ -40,8 +39,13 @@ public class HttpContextCurrentUserContextTest
     [Fact]
     public void TenantId_UsesItem_WhenHeaderAndClaimMissing()
     {
-        var context = new DefaultHttpContext();
-        context.Items[TenantContextKeys.TenantId] = 9L;
+        var context = new DefaultHttpContext
+        {
+            Items =
+            {
+                [TenantContextKeys.TenantId] = 9L
+            }
+        };
 
         var accessor = new HttpContextAccessor { HttpContext = context };
         var currentUser = new HttpContextCurrentUserContext(accessor);
@@ -54,12 +58,14 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("tenantId", "5")
-            }))
+            ])),
+            Items =
+            {
+                [TenantContextKeys.TenantId] = 9L
+            }
         };
-        context.Items[TenantContextKeys.TenantId] = 9L;
 
         var accessor = new HttpContextAccessor { HttpContext = context };
         var currentUser = new HttpContextCurrentUserContext(accessor);
@@ -107,10 +113,9 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("tenantId", "invalid")
-            }))
+            ]))
         };
         context.Request.Headers[HeaderNames.TenantId] = "7";
 
@@ -125,11 +130,10 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("tenantId", "3"),
                 new Claim("tenant_id", "9")
-            }))
+            ]))
         };
 
         var accessor = new HttpContextAccessor { HttpContext = context };
@@ -143,12 +147,11 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("sub", "11"),
                 new Claim("userId", "22"),
                 new Claim(ClaimTypes.NameIdentifier, "33")
-            }))
+            ]))
         };
 
         var accessor = new HttpContextAccessor { HttpContext = context };
@@ -162,11 +165,10 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("userId", "22"),
                 new Claim(ClaimTypes.NameIdentifier, "33")
-            }))
+            ]))
         };
 
         var accessor = new HttpContextAccessor { HttpContext = context };
@@ -180,10 +182,9 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim(ClaimTypes.NameIdentifier, "33")
-            }))
+            ]))
         };
 
         var accessor = new HttpContextAccessor { HttpContext = context };
@@ -197,10 +198,9 @@ public class HttpContextCurrentUserContextTest
     {
         var context = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
+            User = new ClaimsPrincipal(new ClaimsIdentity([
                 new Claim("sub", "invalid")
-            }))
+            ]))
         };
 
         var accessor = new HttpContextAccessor { HttpContext = context };

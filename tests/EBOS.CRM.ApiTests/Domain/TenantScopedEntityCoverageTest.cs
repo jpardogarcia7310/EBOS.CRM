@@ -1,5 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using EBOS.CRM.Domain.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.ApiTests.Domain;
@@ -11,7 +10,7 @@ public class TenantScopedEntityCoverageTest
     {
         var assembly = typeof(Address).Assembly;
         var entityTypes = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract)
+            .Where(t => t is { IsClass: true, IsAbstract: false })
             .Where(t => string.Equals(t.Namespace, "EBOS.CRM.Domain.Entities.CRM", StringComparison.Ordinal))
             .ToList();
 

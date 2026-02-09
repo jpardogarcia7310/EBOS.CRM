@@ -3,7 +3,6 @@ using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Services.Commands;
 using EBOS.CRM.Application.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Pipelines;

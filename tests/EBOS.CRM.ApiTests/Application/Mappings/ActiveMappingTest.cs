@@ -6,14 +6,9 @@ using MapsterMapper;
 
 namespace EBOS.CRM.ApiTests.Application.Mappings;
 
-public class ActiveMappingTest : IClassFixture<MapperFixture>
+public class ActiveMappingTest(MapperFixture fixture) : IClassFixture<MapperFixture>
 {
-    private readonly IMapper _mapper;
-
-    public ActiveMappingTest(MapperFixture fixture)
-    {
-        _mapper = fixture.Mapper;
-    }
+    private readonly IMapper _mapper = fixture.Mapper;
 
     [Theory]
     [InlineData(false, true)]

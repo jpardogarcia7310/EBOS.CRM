@@ -27,8 +27,13 @@ public class TenantResolutionMiddlewareTest
     [Fact]
     public async Task Invoke_ResolvesTenant_FromSubdomain()
     {
-        var context = new DefaultHttpContext();
-        context.Request.Host = new HostString("tenant42.api.domain");
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Host = new HostString("tenant42.api.domain")
+            }
+        };
         var options = Microsoft.Extensions.Options.Options.Create(new TenantResolutionOptions
         {
             EnableHeader = false,
@@ -83,8 +88,13 @@ public class TenantResolutionMiddlewareTest
     [Fact]
     public async Task Invoke_DoesNotResolve_When_SubdomainInvalid()
     {
-        var context = new DefaultHttpContext();
-        context.Request.Host = new HostString("tenantx.api.domain");
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Host = new HostString("tenantx.api.domain")
+            }
+        };
         var options = Microsoft.Extensions.Options.Options.Create(new TenantResolutionOptions
         {
             EnableHeader = false,
@@ -101,8 +111,13 @@ public class TenantResolutionMiddlewareTest
     [Fact]
     public async Task Invoke_DoesNotResolve_When_Localhost()
     {
-        var context = new DefaultHttpContext();
-        context.Request.Host = new HostString("localhost");
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Host = new HostString("localhost")
+            }
+        };
         var options = Microsoft.Extensions.Options.Options.Create(new TenantResolutionOptions
         {
             EnableHeader = false,

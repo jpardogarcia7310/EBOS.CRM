@@ -4,7 +4,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.EBOS;
 
 public class AddressTypeEntityFactoryTest
 {
-    public static AddressType CreateValidAddressType(string code = "HOME", string description = "Home")
+    private static AddressType CreateValidAddressType(string code = "HOME", string description = "Home")
     {
         return new AddressType
         {

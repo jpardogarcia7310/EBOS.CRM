@@ -4,7 +4,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.EBOS;
 
 public class IdentificationTypeEntityFactoryTest
 {
-    public static IdentificationType CreateValidIdentificationType(string code = "DNI", string description = "Documento")
+    private static IdentificationType CreateValidIdentificationType(string code = "DNI", string description = "Documento")
     {
         return new IdentificationType
         {

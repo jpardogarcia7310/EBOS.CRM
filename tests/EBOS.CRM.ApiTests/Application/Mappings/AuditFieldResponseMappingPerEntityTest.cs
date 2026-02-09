@@ -6,15 +6,10 @@ using MapsterMapper;
 
 namespace EBOS.CRM.ApiTests.Application.Mappings;
 
-public class AuditFieldResponseMappingPerEntityTest : IClassFixture<MapperFixture>
+public class AuditFieldResponseMappingPerEntityTest(MapperFixture fixture) : IClassFixture<MapperFixture>
 {
     private static readonly string[] AuditFields = ["CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy"];
-    private readonly IMapper _mapper;
-
-    public AuditFieldResponseMappingPerEntityTest(MapperFixture fixture)
-    {
-        _mapper = fixture.Mapper;
-    }
+    private readonly IMapper _mapper = fixture.Mapper;
 
     [Fact]
     public void Address_Response_Does_Not_Expose_AuditFields()

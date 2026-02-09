@@ -6,14 +6,9 @@ using MapsterMapper;
 
 namespace EBOS.CRM.ApiTests.Application.Mappings;
 
-public class AuditFieldMappingTest : IClassFixture<MapperFixture>
+public class AuditFieldMappingTest(MapperFixture fixture) : IClassFixture<MapperFixture>
 {
-    private readonly IMapper _mapper;
-
-    public AuditFieldMappingTest(MapperFixture fixture)
-    {
-        _mapper = fixture.Mapper;
-    }
+    private readonly IMapper _mapper = fixture.Mapper;
 
     [Fact]
     public void UpdateCustomerRequest_DoesNotOverwrite_AuditFields()

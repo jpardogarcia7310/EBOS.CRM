@@ -43,8 +43,13 @@ public class TenantRequirementMiddlewareTest(CustomWebApplicationFactory<Program
             return Task.CompletedTask;
         });
 
-        var context = new DefaultHttpContext();
-        context.Request.Path = "/health";
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Path = "/health"
+            }
+        };
 
         var currentUserMock = new Mock<ICurrentUserContext>();
         currentUserMock.SetupGet(x => x.TenantId).Returns(0);
@@ -64,8 +69,13 @@ public class TenantRequirementMiddlewareTest(CustomWebApplicationFactory<Program
             return Task.CompletedTask;
         });
 
-        var context = new DefaultHttpContext();
-        context.Request.Path = "/swagger/index.html";
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Path = "/swagger/index.html"
+            }
+        };
 
         var currentUserMock = new Mock<ICurrentUserContext>();
         currentUserMock.SetupGet(x => x.TenantId).Returns(0);
@@ -85,9 +95,14 @@ public class TenantRequirementMiddlewareTest(CustomWebApplicationFactory<Program
             return Task.CompletedTask;
         });
 
-        var context = new DefaultHttpContext();
-        context.Request.Path = $"/api/v{_version}/Country";
-        context.Request.Method = HttpMethods.Options;
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Path = $"/api/v{_version}/Country",
+                Method = HttpMethods.Options
+            }
+        };
 
         var currentUserMock = new Mock<ICurrentUserContext>();
         currentUserMock.SetupGet(x => x.TenantId).Returns(0);

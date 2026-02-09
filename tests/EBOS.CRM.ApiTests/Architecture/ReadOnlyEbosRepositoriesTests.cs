@@ -1,5 +1,4 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using FluentAssertions;
 using System.Reflection;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;

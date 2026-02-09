@@ -12,7 +12,6 @@ public class TenantIsolationOptionsValidationTests
     {
         var configuration = BuildConfiguration();
         var optionsSection = configuration.GetSection(TenantIsolationOptions.SectionName);
-        var minDepth = optionsSection.GetValue<int>(nameof(TenantIsolationOptions.MinTraversalDepth));
         var maxDepth = optionsSection.GetValue<int>(nameof(TenantIsolationOptions.MaxTraversalDepth));
         var invalidDepth = maxDepth + 1;
 

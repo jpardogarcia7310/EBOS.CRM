@@ -1,7 +1,6 @@
 using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.EBOS.Statuses.Queries.GetAllStatuses;
 using EBOS.CRM.Domain.Entities;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
@@ -56,14 +55,13 @@ public class GetAllStatusesQueryHandlerTest
     {
         // Arrange
         var entities = new List<Status>();
-        var dtos = new List<StatusResponse>();
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<StatusResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<StatusResponse>());
 
         var query = new GetAllStatusesQuery();
 

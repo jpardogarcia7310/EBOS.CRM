@@ -9,21 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EBOS.CRM.ApiTests.Host;
 
-public class ProgramPipelineWiringTest : IClassFixture<ProgramPipelineWiringTest.PipelineWebApplicationFactory>
+public class ProgramPipelineWiringTest(ProgramPipelineWiringTest.PipelineWebApplicationFactory factory)
+    : IClassFixture<ProgramPipelineWiringTest.PipelineWebApplicationFactory>
 {
-    private readonly PipelineWebApplicationFactory _factory;
-    private readonly string _version;
-
-    public ProgramPipelineWiringTest(PipelineWebApplicationFactory factory)
-    {
-        _factory = factory;
-        _version = ApiVersionHelper.GetLatestVersion(factory, "Country");
-    }
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Country");
 
     [Fact]
     public async Task TenantRequirement_Returns_400_When_No_Header_And_No_Subdomain()
     {
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
 
         var response = await client.GetAsync($"/api/v{_version}/Country");
@@ -34,7 +28,7 @@ public class ProgramPipelineWiringTest : IClassFixture<ProgramPipelineWiringTest
     [Fact]
     public async Task TenantRequirement_Allows_When_Header_Present()
     {
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
         client.DefaultRequestHeaders.Add(HeaderNames.TenantId, "7");
 
@@ -46,7 +40,7 @@ public class ProgramPipelineWiringTest : IClassFixture<ProgramPipelineWiringTest
     [Fact]
     public async Task TenantResolution_Allows_When_Subdomain_Present()
     {
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v{_version}/Country");
@@ -60,7 +54,7 @@ public class ProgramPipelineWiringTest : IClassFixture<ProgramPipelineWiringTest
     [Fact]
     public async Task TenantResolution_Uses_Subdomain_When_Header_Invalid()
     {
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v{_version}/Country");

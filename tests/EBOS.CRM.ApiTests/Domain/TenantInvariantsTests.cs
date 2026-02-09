@@ -1,4 +1,3 @@
-using EBOS.CRM.Domain.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 using FluentAssertions;

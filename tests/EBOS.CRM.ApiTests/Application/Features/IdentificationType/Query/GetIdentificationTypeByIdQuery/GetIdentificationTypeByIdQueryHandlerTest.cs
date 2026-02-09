@@ -1,7 +1,6 @@
 using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using IdentificationTypeEntity = EBOS.CRM.Domain.Entities.IdentificationType;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;

@@ -4,7 +4,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.EBOS;
 
 public class StatusEntityFactoryTest
 {
-    public static Status CreateValidCountry(string description = "Active")
+    private static Status CreateValidCountry(string description = "Active")
     {
         return new Status
         {
