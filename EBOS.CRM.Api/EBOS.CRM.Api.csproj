@@ -23,6 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Versioning" Version="2.0.0" />
   </ItemGroup>
@@ -30,6 +31,10 @@
   <ItemGroup>
     <ProjectReference Include="..\EBOS.CRM.Application\EBOS.CRM.Application.csproj" />
     <ProjectReference Include="..\EBOS.CRM.Infrastructure\EBOS.CRM.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\EBOS\" />
   </ItemGroup>
 
 </Project>

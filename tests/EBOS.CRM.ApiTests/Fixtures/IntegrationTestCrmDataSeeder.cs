@@ -244,6 +244,57 @@ public static class IntegrationTestCrmDataSeeder
         }
 
         context.SaveChanges();
+
+        if (!context.TenantConfigurations.Any())
+        {
+            context.TenantConfigurations.AddRange(
+                new TenantConfiguration
+                {
+                    TenantId = 1,
+                    Key = "limits.maxUsers",
+                    ValueJson = "{\"value\":25}",
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = 1
+                },
+                new TenantConfiguration
+                {
+                    TenantId = 1,
+                    Key = "features.beta",
+                    ValueJson = "{\"enabled\":false}",
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = 1
+                });
+        }
+
+        if (!context.TenantQuotas.Any())
+        {
+            context.TenantQuotas.Add(
+                new TenantQuota
+                {
+                    TenantId = 1,
+                    Metric = "users",
+                    Limit = 100,
+                    Unit = "count",
+                    EffectiveFrom = DateTime.UtcNow.AddDays(-1)
+                });
+        }
+
+        if (!context.TenantUsageMetrics.Any())
+        {
+            context.TenantUsageMetrics.Add(
+                new TenantUsageMetric
+                {
+                    TenantId = 1,
+                    Metric = "api.calls",
+                    Value = 250,
+                    Unit = "count",
+                    PeriodStart = DateTime.UtcNow.AddDays(-7),
+                    PeriodEnd = DateTime.UtcNow,
+                    Source = "gateway"
+                });
+        }
+
+        context.SaveChanges();
     }
 }
 

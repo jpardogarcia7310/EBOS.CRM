@@ -22,10 +22,10 @@ Legend:
 - [ ] Enterprise: Access Auditing (Medium / Medium)
 
 2) Multi-tenant & Governance
-- [ ] MVP: TenantId in entities + global filters (High / High)
-- [ ] Enterprise: Schema/DB isolation (High / High)
-- [ ] Enterprise: Config per tenant (fields, layouts, rules) (High / High)
-- [ ] Best: Metrics/quota/billing per tenant (Medium / High)
+- [x] MVP: TenantId in entities + global filters (High / High)
+- [x] Enterprise: Schema/DB isolation (High / High)
+- [x] Enterprise: Config per tenant (fields, layouts, rules) (High / High)
+- [x] Best: Metrics/quota/billing per tenant (Medium / High)
 
 3) Customer 360 (Core CRM)
 - [ ] MVP: Contactos y roles dentro de cuentas (Alto / Medio)
@@ -76,7 +76,7 @@ Legend:
 Milestone 1 — Foundation (Security + Multi-tenant base)
 - [ ] JWT/OIDC Auth + UseAuthentication — M
 - [ ] Basic RBAC per module — M
-- [ ] TenantId + global filters in EF — L
+- [x] TenantId + global filters in EF — L
 - [ ] Access Auditing — M
 - [ ] Health checks — S
 

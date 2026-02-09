@@ -15,7 +15,6 @@ public class AddTaxInformationAddressCommandHandlerTest
 {
     private readonly Mock<ITaxInformationAddressRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly AddTaxInformationAddressCommandHandler _handler;
 
@@ -23,11 +22,11 @@ public class AddTaxInformationAddressCommandHandlerTest
     {
         _repositoryMock = new Mock<ITaxInformationAddressRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
                 It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
@@ -37,7 +36,7 @@ public class AddTaxInformationAddressCommandHandlerTest
         _handler = new AddTaxInformationAddressCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object,
+            currentUserMock.Object,
             _mapperMock.Object);
     }
 
@@ -79,6 +78,7 @@ public class AddTaxInformationAddressCommandHandlerTest
     }
 
     private static AddTaxInformationAddressRequest BuildAddRequest() => new(
+            TenantId: 1,
             TaxInformationId: 1,
             AddressId: 1,
             IsPrimary: true,

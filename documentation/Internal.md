@@ -8,10 +8,6 @@ This document describes folders, namespaces, and responsibilities in EBOS.CRM.Ap
 EBOS.CRM.Api
 |
 |-- Controllers
-|   |-- AddressType
-|   |   `-- AddressTypeController.cs
-|   |-- Country
-|   |   `-- CountryController.cs
 |   |-- CRM
 |   |   |-- Address
 |   |   |   `-- AddressController.cs
@@ -37,10 +33,21 @@ EBOS.CRM.Api
 |   |   |   `-- TaxInformationController.cs
 |   |   `-- TaxInformationAddress
 |   |       `-- TaxInformationAddressController.cs
-|   |-- IdentificationType
-|   |   `-- IdentificationTypeController.cs
-|   `-- Status
-|       `-- StatusController.cs
+|   `-- EBOS
+|       |-- AddressType
+|       |   `-- AddressTypeController.cs
+|       |-- Country
+|       |   `-- CountryController.cs
+|       |-- IdentificationType
+|       |   `-- IdentificationTypeController.cs
+|       |-- Status
+|       |   `-- StatusController.cs
+|       |-- TenantConfiguration
+|       |   `-- TenantConfigurationController.cs
+|       |-- TenantQuota
+|       |   `-- TenantQuotaController.cs
+|       `-- TenantUsageMetric
+|           `-- TenantUsageMetricController.cs
 |
 |-- Extensions
 |   |-- ApiBehaviorConfig.cs
@@ -133,6 +140,7 @@ EBOS.CRM.Api
 ### EBOS.CRM.Api.Controllers
 - Domain-focused API controllers.
 - CRM controllers live under Controllers/CRM and share the same route pattern.
+- EBOS controllers live under Controllers/EBOS and are read-only or governance endpoints.
 - All routes are singular and versioned: /api/v{version}/{Controller}
 - Usage examples:
   - GET /api/v1/Country

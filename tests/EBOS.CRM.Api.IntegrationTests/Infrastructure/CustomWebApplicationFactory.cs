@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
+using EBOS.CRM.Api.Constants;
+using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
 
@@ -16,6 +19,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     private readonly bool _useTestcontainers;
     private readonly IContainer? _sqlContainer;
     private readonly string? _connectionString;
+    private readonly string _inMemoryDbName;
 
     private const string SaPassword = "StrongP@ssw0rd2025!";
 
@@ -25,6 +29,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Environment.GetEnvironmentVariable("USE_TESTCONTAINERS"),
             "true",
             StringComparison.OrdinalIgnoreCase);
+        _inMemoryDbName = $"IntegrationTestsDb-{Guid.NewGuid():N}";
 
         if (_useTestcontainers)
         {
@@ -76,6 +81,20 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        var solutionRoot = FindSolutionRoot(AppContext.BaseDirectory);
+        if (!string.IsNullOrWhiteSpace(solutionRoot))
+        {
+            builder.UseContentRoot(solutionRoot);
+        }
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AuditService:Enabled"] = "false"
+            });
+        });
+
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(
@@ -94,7 +113,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 services.AddDbContext<CrmDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("IntegrationTestsDb");
+                    options.UseInMemoryDatabase(_inMemoryDbName);
                     options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
                 });
             }
@@ -102,11 +121,24 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
+            var normalizer = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Application.Services.Interfaces.ILookupNormalizationService>();
+            normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedIdentificationTypesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedStatusesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantConfigurationsAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantQuotasAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedTenantUsageMetricsAsync(db).GetAwaiter().GetResult();
+            normalizer.NormalizeAsync().GetAwaiter().GetResult();
         });
+    }
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
+        client.DefaultRequestHeaders.Add(HeaderNames.TenantId, "1");
+        base.ConfigureClient(client);
     }
 
     public override async ValueTask DisposeAsync()
@@ -138,6 +170,23 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 await Task.Delay(delayMs);
             }
         }
+    }
+
+    private static string? FindSolutionRoot(string baseDirectory)
+    {
+        var current = new DirectoryInfo(baseDirectory);
+        while (current != null)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "EBOS.CRM.slnx")) ||
+                File.Exists(Path.Combine(current.FullName, "EBOS.CRM.sln")))
+            {
+                return current.FullName;
+            }
+
+            current = current.Parent;
+        }
+
+        return null;
     }
 }
 

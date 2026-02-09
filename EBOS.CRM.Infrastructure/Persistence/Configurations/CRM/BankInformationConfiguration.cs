@@ -42,5 +42,8 @@ public class BankInformationConfiguration : IEntityTypeConfiguration<BankInforma
             .WithOne(c => c.BankInformation)
             .HasForeignKey<BankInformation>(bi => bi.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(bi => bi.TenantId)
+            .HasDatabaseName("IX_BankInformation_TenantId");
     }
 }

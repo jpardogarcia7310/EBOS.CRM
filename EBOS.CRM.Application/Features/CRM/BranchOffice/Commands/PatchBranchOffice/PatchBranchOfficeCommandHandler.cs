@@ -58,6 +58,7 @@ public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository,
 
         return new BranchOfficeResponse(
             entity.Id,
+            entity.TenantId,
             entity.Name,
             entity.PhoneNumber,
             entity.CorporateCustomerId,

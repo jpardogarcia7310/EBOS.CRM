@@ -16,7 +16,7 @@ public class AddIndividualCustomerCommandHandler(IIndividualCustomerRepository r
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.IndividualCustomerRequest ?? throw new ArgumentNullException(nameof(request.IndividualCustomerRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.IndividualCustomer>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.IndividualCustomer>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
+using EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
@@ -10,7 +10,7 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     [Fact]
     public void Validate_PositiveId_Passes()
     {
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         var result = _validator.TestValidate(query);
 
@@ -20,7 +20,7 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     [Fact]
     public void Validate_ZeroId_FailsWithCodeAndMessage()
     {
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
 
         var result = _validator.TestValidate(query);
 
@@ -32,7 +32,7 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     [Fact]
     public void Validate_NegativeId_FailsWithCodeAndMessage()
     {
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(-5);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(-5);
 
         var result = _validator.TestValidate(query);
 
@@ -44,8 +44,8 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     [Fact]
     public void Validate_MultipleCalls_AreStateless()
     {
-        var queryValid = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(10);
-        var queryInvalid = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
+        var queryValid = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(10);
+        var queryInvalid = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
 
         var resultValid = _validator.TestValidate(queryValid);
         var resultInvalid = _validator.TestValidate(queryInvalid);
@@ -59,10 +59,10 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     {
         var queries = new[]
         {
-            new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1),
-            new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0),
-            new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(-1),
-            new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(5)
+            new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1),
+            new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0),
+            new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(-1),
+            new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(5)
         };
 
         Parallel.ForEach(queries, query =>

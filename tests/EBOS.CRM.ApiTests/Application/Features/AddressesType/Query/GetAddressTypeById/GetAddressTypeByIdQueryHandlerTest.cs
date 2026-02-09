@@ -1,7 +1,8 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
+using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAddressTypeById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -123,5 +124,6 @@ public class GetAddressTypeByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<AddressTypeResponse>(It.IsAny<AddressType>()), Times.Never);
     }
 }
+
 
 

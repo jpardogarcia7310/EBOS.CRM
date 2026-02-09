@@ -1,6 +1,7 @@
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
 
 public record AddBranchOfficeAddressRequest(
+    long TenantId,
     long BranchOfficeId,
     long AddressId,
     bool IsPrimary,

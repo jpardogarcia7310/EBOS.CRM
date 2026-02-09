@@ -42,6 +42,11 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.HasIndex(c => new { c.StatusId, c.CreatedAt })
             .HasDatabaseName("IX_Customer_Status_CreatedAt");
+        builder.HasIndex(c => c.TenantId)
+            .HasDatabaseName("IX_Customer_TenantId");
+        builder.HasIndex(c => new { c.TenantId, c.Code })
+            .IsUnique()
+            .HasDatabaseName("UX_Customer_TenantId_Code");
 
         builder.HasOne(c => c.Status)
             .WithMany(s => s.Customers)

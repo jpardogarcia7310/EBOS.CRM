@@ -22,7 +22,7 @@ public static class ApiVersionHelper
 
             if (!string.IsNullOrWhiteSpace(groupName))
             {
-                return groupName!.TrimStart('v', 'V');
+                return groupName.TrimStart('v', 'V');
             }
         }
 

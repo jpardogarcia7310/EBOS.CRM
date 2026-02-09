@@ -4,17 +4,10 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class IndividualCustomerEntityFactoryTest
 {
-    public static IndividualCustomer CreateValidIndividualCustomer(
-        string code = "IND-001",
-        string email = "ind@example.com",
-        string phone = "123",
-        DateTime? createdAt = null,
-        long statusId = 1,
-        string firstName = "John",
-        string lastName = "Doe",
-        DateTime? birthDate = null,
-        string? identificationNumber = "1234567890",
-        long identificationTypeId = 1)
+    private static IndividualCustomer CreateValidIndividualCustomer(string code = "IND-001",
+        string email = "ind@example.com", string phone = "123", DateTime? createdAt = null, long statusId = 1,
+        string firstName = "John", string lastName = "Doe", DateTime? birthDate = null,
+        string? identificationNumber = "1234567890", long identificationTypeId = 1)
     {
         return new IndividualCustomer
         {

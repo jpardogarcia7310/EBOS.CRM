@@ -1,7 +1,7 @@
 using System.Globalization;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Domain.Entities.CRM;
+using global::EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 
 namespace EBOS.CRM.Application.Mappings.CRM;
@@ -13,6 +13,7 @@ public class MappingAddress : IRegister
         // Address -> AddressResponse
         config.NewConfig<Address, AddressResponse>()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -36,6 +37,7 @@ public class MappingAddress : IRegister
         // AddressResponse -> Address
         config.NewConfig<AddressResponse, Address>()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -59,6 +61,7 @@ public class MappingAddress : IRegister
 
         // AddAddressRequest -> Address
         config.NewConfig<AddAddressRequest, Address>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -75,6 +78,10 @@ public class MappingAddress : IRegister
             .Map(dest => dest.AddressTypeId, src => src.AddressTypeId)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Country)
             .Ignore(dest => dest.AddressType)
             .Ignore(dest => dest.CustomerAddresses)
@@ -83,6 +90,7 @@ public class MappingAddress : IRegister
 
         // UpdateAddressRequest -> Address
         config.NewConfig<UpdateAddressRequest, Address>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Street, src => src.Street)
             .Map(dest => dest.ExternalNumber, src => src.ExternalNumber)
             .Map(dest => dest.InternalNumber, src => src.InternalNumber)
@@ -98,6 +106,10 @@ public class MappingAddress : IRegister
             .Map(dest => dest.CountryId, src => src.CountryId)
             .Map(dest => dest.AddressTypeId, src => src.AddressTypeId)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.Country)
             .Ignore(dest => dest.AddressType)

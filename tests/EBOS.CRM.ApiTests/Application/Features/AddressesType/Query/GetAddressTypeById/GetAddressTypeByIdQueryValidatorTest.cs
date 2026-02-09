@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAddressTypeById;
+using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAddressTypeById;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.AddressesType.Query.GetAddressTypeById;

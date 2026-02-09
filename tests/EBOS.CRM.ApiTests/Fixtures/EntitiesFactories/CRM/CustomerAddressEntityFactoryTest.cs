@@ -4,13 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class CustomerAddressEntityFactoryTest
 {
-    public static CustomerAddress CreateValidCustomerAddress(
-        long customerId = 1,
-        long addressId = 1,
-        bool isPrimary = true,
-        DateTime? validFrom = null,
-        DateTime? validTo = null,
-        bool isCurrent = true)
+    private static CustomerAddress CreateValidCustomerAddress(long customerId = 1, long addressId = 1,
+        bool isPrimary = true, DateTime? validFrom = null, DateTime? validTo = null, bool isCurrent = true)
     {
         return new CustomerAddress
         {

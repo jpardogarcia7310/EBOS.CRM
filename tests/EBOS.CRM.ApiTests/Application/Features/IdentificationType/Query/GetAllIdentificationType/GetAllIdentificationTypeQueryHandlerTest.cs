@@ -1,6 +1,6 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.IdentificationType.Query.GetAllIdentificationType;
-using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetAllIdentificationType;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using IdentificationTypeEntity = EBOS.CRM.Domain.Entities.IdentificationType;
 using MapsterMapper;
 using Moq;
@@ -55,14 +55,13 @@ public class GetAllIdentificationTypeQueryHandlerTest
     {
         // Arrange
         var entities = new List<IdentificationTypeEntity>();
-        var dtos = new List<IdentificationTypeResponse>();
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<IdentificationTypeResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<IdentificationTypeResponse>());
 
         var query = new GetAllIdentificationTypeQuery();
 

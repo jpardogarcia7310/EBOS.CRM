@@ -4,9 +4,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class CreditAccountEntityFactoryTest
 {
-    public static CreditAccount CreateValidCreditAccount(
-        decimal maxAmount = 1000m,
-        decimal usedAmount = 100m,
+    private static CreditAccount CreateValidCreditAccount(decimal maxAmount = 1000m, decimal usedAmount = 100m,
         long customerId = 1)
     {
         return new CreditAccount

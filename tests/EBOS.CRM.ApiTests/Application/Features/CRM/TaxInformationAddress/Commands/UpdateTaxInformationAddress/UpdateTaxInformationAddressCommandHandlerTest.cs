@@ -98,6 +98,7 @@ public class UpdateTaxInformationAddressCommandHandlerTest
     }
 
     private static UpdateTaxInformationAddressRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             TaxInformationId: 1,
             AddressId: 1,
             IsPrimary: true,

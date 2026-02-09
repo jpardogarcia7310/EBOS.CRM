@@ -1,9 +1,12 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class TaxInformation : ErasableEntity
+public class TaxInformation : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public string TaxName { get; set; } = null!;
     public string TaxIdentificationNumber { get; set; } = null!;
     public DateTime CreatedAt { get; set; }

@@ -8,6 +8,11 @@ Definición de alcance Enterprise (Ventas, Servicio, Marketing), con un roadmap 
 - Servicio: Casos/tickets, SLA, colas y escalamiento, base de conocimiento, omnicanal (email/chat/voz), métricas.
 - Marketing: Segmentación dinámica, campañas multicanal, journeys, scoring, consentimientos/opt-out, atribución.
 
+## Notas de organización del código
+
+- Las features de esquema EBOS viven en `EBOS.CRM.Application/Features/EBOS/`.
+- Las features de esquema CRM viven en `EBOS.CRM.Application/Features/CRM/`.
+
 ## Checklist por módulo (niveles + impacto/esfuerzo)
 
 Leyenda:

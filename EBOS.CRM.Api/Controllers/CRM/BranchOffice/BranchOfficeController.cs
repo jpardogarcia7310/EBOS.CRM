@@ -1,3 +1,4 @@
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
@@ -8,16 +9,12 @@ using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOffice;
-
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class BranchOfficeController(IMediator mediator) : ControllerBase
 {
     #region Commands
     [HttpPost]
@@ -28,7 +25,6 @@ public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedR
     {
         return Ok(await mediator.Send(new AddBranchOfficeCommand(request), cancellationToken));
     }
-
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(BranchOfficeResponse), StatusCodes.Status200OK)]
@@ -39,17 +35,10 @@ public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedR
         var dto = await mediator.Send(new UpdateBranchOfficeCommand(id, request), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -58,18 +47,11 @@ public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedR
         var deleted = await mediator.Send(new DeleteBranchOfficeCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok();
     }
     #endregion
-
     #region Queries
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(BranchOfficeResponse), StatusCodes.Status200OK)]
@@ -81,14 +63,8 @@ public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedR
         var dto = await mediator.Send(new GetBranchOfficeByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok(dto);
     }
     /// <summary>
@@ -109,38 +85,12 @@ public class BranchOfficeController(IMediator mediator, IStringLocalizer<SharedR
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var result = await mediator.Send(new GetAllBranchOfficesQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

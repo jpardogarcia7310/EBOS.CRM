@@ -53,6 +53,8 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
             .HasDatabaseName("IX_CreditTransaction_Date_Account");
         builder.HasIndex(ct => new { ct.CreditAccountId, ct.Date })
             .HasDatabaseName("IX_CreditTransaction_Account_Date");
+        builder.HasIndex(ct => ct.TenantId)
+            .HasDatabaseName("IX_CreditTransaction_TenantId");
 
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)

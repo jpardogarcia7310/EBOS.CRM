@@ -1,7 +1,8 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.AddressesType.Query.GetAllAddressesType;
+using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAllAddressesType;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -112,3 +113,4 @@ public class GetAllAddressesTypeQueryHandlerTest
         Assert.Null(result.Items.First().Code);
     }
 }
+

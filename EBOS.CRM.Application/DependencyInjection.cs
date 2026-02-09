@@ -2,6 +2,7 @@ using System.Reflection;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using EBOS.CRM.Application.Services.Commands;
 
 namespace EBOS.CRM.Application;
 
@@ -14,6 +15,9 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+
+        services.AddOptions<CommandExecutionOptions>();
+        services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
 
         return services;
     }

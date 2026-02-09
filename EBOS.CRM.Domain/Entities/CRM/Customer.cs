@@ -1,9 +1,13 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class Customer : ErasableEntity
+public class Customer : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public string Code { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;

@@ -98,6 +98,7 @@ public class UpdateCreditAccountCommandHandlerTest
     }
 
     private static UpdateCreditAccountRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Id: 1,
             MaxAmount: 1000m,
             UsedAmount: 100m,

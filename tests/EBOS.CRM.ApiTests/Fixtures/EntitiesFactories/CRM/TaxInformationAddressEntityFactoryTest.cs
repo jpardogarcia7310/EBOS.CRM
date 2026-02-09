@@ -5,13 +5,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class TaxInformationAddressEntityFactoryTest
 {
-    public static TaxInformationAddress CreateValidTaxInformationAddress(
-        long taxInformationId = 1,
-        long addressId = 1,
-        bool isPrimary = true,
-        DateTime? validFrom = null,
-        DateTime? validTo = null,
-        bool isCurrent = true)
+    private static TaxInformationAddress CreateValidTaxInformationAddress(long taxInformationId = 1, long addressId = 1,
+        bool isPrimary = true, DateTime? validFrom = null, DateTime? validTo = null, bool isCurrent = true)
     {
         return new TaxInformationAddress
         {

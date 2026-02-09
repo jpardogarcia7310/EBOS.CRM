@@ -39,6 +39,8 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
 
         builder.HasIndex(ca => new { ca.CustomerId, ca.IsCurrent, ca.IsPrimary })
             .HasDatabaseName("IX_CustomerAddress_Current_Primary");
+        builder.HasIndex(ca => ca.TenantId)
+            .HasDatabaseName("IX_CustomerAddress_TenantId");
 
         builder.ToTable("CustomerAddresses", "CRM", ca =>
         {

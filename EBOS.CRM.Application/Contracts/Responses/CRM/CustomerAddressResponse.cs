@@ -2,6 +2,7 @@ namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record CustomerAddressResponse(
     long Id,
+    long TenantId,
     long CustomerId,
     long AddressId,
     bool IsPrimary,

@@ -2,6 +2,7 @@ namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record AddressResponse(
     long Id,
+    long TenantId,
     string Street,
     string ExternalNumber,
     string? InternalNumber,

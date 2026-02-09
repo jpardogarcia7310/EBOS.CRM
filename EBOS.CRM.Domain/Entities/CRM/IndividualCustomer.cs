@@ -1,3 +1,5 @@
+using EBOS.CRM.Domain.Entities;
+
 namespace EBOS.CRM.Domain.Entities.CRM;
 
 public sealed class IndividualCustomer : Customer

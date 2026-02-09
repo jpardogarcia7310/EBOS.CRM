@@ -1,3 +1,4 @@
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
@@ -8,16 +9,12 @@ using EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetAllCreditTr
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.CRM.CreditTransaction;
-
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class CreditTransactionController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class CreditTransactionController(IMediator mediator) : ControllerBase
 {
     #region Commands
     [HttpPost]
@@ -28,7 +25,6 @@ public class CreditTransactionController(IMediator mediator, IStringLocalizer<Sh
     {
         return Ok(await mediator.Send(new AddCreditTransactionCommand(request), cancellationToken));
     }
-
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CreditTransactionResponse), StatusCodes.Status200OK)]
@@ -39,17 +35,10 @@ public class CreditTransactionController(IMediator mediator, IStringLocalizer<Sh
         var dto = await mediator.Send(new UpdateCreditTransactionCommand(id, request), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"CreditTransaction with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CreditTransaction with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -58,18 +47,11 @@ public class CreditTransactionController(IMediator mediator, IStringLocalizer<Sh
         var deleted = await mediator.Send(new DeleteCreditTransactionCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"CreditTransaction with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CreditTransaction with id {id} not found."));
         }
-
         return Ok();
     }
     #endregion
-
     #region Queries
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(CreditTransactionResponse), StatusCodes.Status200OK)]
@@ -81,14 +63,8 @@ public class CreditTransactionController(IMediator mediator, IStringLocalizer<Sh
         var dto = await mediator.Send(new GetCreditTransactionByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"CreditTransaction with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CreditTransaction with id {id} not found."));
         }
-
         return Ok(dto);
     }
     /// <summary>
@@ -109,38 +85,12 @@ public class CreditTransactionController(IMediator mediator, IStringLocalizer<Sh
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var result = await mediator.Send(new GetAllCreditTransactionsQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

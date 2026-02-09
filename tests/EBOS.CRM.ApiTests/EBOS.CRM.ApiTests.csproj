@@ -7,6 +7,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <GenerateMvcTestManifest>false</GenerateMvcTestManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,9 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\AddressType\" />
+    <Folder Include="Application\Features\EBOS\" />
     <Folder Include="Controllers\CRM\Address\" />
-    <Folder Include="Controllers\IdentificationType\" />
   </ItemGroup>
 
 </Project>

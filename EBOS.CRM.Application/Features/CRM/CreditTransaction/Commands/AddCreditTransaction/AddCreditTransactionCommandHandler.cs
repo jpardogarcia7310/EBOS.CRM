@@ -16,7 +16,7 @@ public class AddCreditTransactionCommandHandler(ICreditTransactionRepository rep
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.CreditTransactionRequest ?? throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

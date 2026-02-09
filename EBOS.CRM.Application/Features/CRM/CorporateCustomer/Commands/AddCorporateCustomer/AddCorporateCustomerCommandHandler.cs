@@ -16,7 +16,7 @@ public class AddCorporateCustomerCommandHandler(ICorporateCustomerRepository rep
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.CorporateCustomerRequest ?? throw new ArgumentNullException(nameof(request.CorporateCustomerRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CorporateCustomer>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

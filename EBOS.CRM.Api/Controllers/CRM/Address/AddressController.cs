@@ -1,3 +1,4 @@
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
@@ -8,16 +9,12 @@ using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
-
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class AddressController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class AddressController(IMediator mediator) : ControllerBase
 {
     /// <summary>
     /// Creates a new address.
@@ -34,7 +31,6 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
     {
         return Ok(await mediator.Send(new AddAddressCommand(request), cancellationToken));
     }
-
     /// <summary>
     /// Updates an address by id.
     /// </summary>
@@ -53,17 +49,10 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         var dto = await mediator.Send(new UpdateAddressCommand(id, request), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     /// <summary>
     /// Deletes an address by id.
     /// </summary>
@@ -79,17 +68,10 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         var deleted = await mediator.Send(new DeleteAddressCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok();
     }
-
     /// <summary>
     /// Gets an address by id.
     /// </summary>
@@ -108,17 +90,10 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         var dto = await mediator.Send(new GetAddressByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     /// <summary>
     /// Returns all resources (paginated).
     /// </summary>
@@ -137,34 +112,11 @@ public class AddressController(IMediator mediator, IStringLocalizer<SharedResour
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var result = await mediator.Send(new GetAllAddressesQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

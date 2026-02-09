@@ -39,5 +39,7 @@ public class BranchOfficeAddressConfiguration : IEntityTypeConfiguration<BranchO
 
         builder.HasIndex(ba => new { ba.BranchOfficeId, ba.IsCurrent, ba.IsPrimary })
             .HasDatabaseName("IX_BranchOfficeAddress_Current_Primary");
+        builder.HasIndex(ba => ba.TenantId)
+            .HasDatabaseName("IX_BranchOfficeAddress_TenantId");
     }
 }
