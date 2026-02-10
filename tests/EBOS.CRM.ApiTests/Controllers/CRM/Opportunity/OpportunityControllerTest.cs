@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.ApiTests.Fixtures;
@@ -45,5 +46,39 @@ public class OpportunityControllerTest(CustomWebApplicationFactory<Program> fact
 
         var response = await _client.GetAsync($"/api/v{_version}/Opportunity/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task WinOpportunity_ReturnsUpdatedOpportunity()
+    {
+        var id = await ControllerTestHelper.GetFirstIdAsync<OpportunityResponse>(
+            _client, $"/api/v{_version}/Opportunity", x => x.Id);
+        var stageId = await ControllerTestHelper.GetFirstIdAsync<OpportunityStageResponse>(
+            _client, $"/api/v{_version}/OpportunityStage", x => x.Id);
+
+        var request = new WinOpportunityRequest(1, stageId, "Won in tests");
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Opportunity/{id}/win", request);
+        response.EnsureSuccessStatusCode();
+
+        var dto = await response.Content.ReadFromJsonAsync<OpportunityResponse>();
+        Assert.NotNull(dto);
+        Assert.Equal(id, dto.Id);
+    }
+
+    [Fact]
+    public async Task LossOpportunity_ReturnsUpdatedOpportunity()
+    {
+        var id = await ControllerTestHelper.GetFirstIdAsync<OpportunityResponse>(
+            _client, $"/api/v{_version}/Opportunity", x => x.Id);
+        var stageId = await ControllerTestHelper.GetFirstIdAsync<OpportunityStageResponse>(
+            _client, $"/api/v{_version}/OpportunityStage", x => x.Id);
+
+        var request = new LossOpportunityRequest(1, stageId, "Lost in tests");
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Opportunity/{id}/loss", request);
+        response.EnsureSuccessStatusCode();
+
+        var dto = await response.Content.ReadFromJsonAsync<OpportunityResponse>();
+        Assert.NotNull(dto);
+        Assert.Equal(id, dto.Id);
     }
 }

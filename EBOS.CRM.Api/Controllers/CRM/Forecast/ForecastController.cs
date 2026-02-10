@@ -8,7 +8,7 @@ namespace EBOS.CRM.Api.Controllers.CRM.Forecast;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route(ApiRouteTemplates.Versioned)]
+[Route("api/v{version:apiVersion}")]
 [Produces("application/json")]
 public class ForecastController(IMediator mediator) : ControllerBase
 {

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.ApiTests.Fixtures;
@@ -45,5 +46,35 @@ public class QuoteControllerTest(CustomWebApplicationFactory<Program> factory) :
 
         var response = await _client.GetAsync($"/api/v{_version}/Quote/{id + 9999}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ApproveQuote_ReturnsUpdatedQuote()
+    {
+        var id = await ControllerTestHelper.GetFirstIdAsync<QuoteResponse>(
+            _client, $"/api/v{_version}/Quote", x => x.Id);
+
+        var request = new ApproveQuoteRequest(1, "Approved in tests", null);
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Quote/{id}/approve", request);
+        response.EnsureSuccessStatusCode();
+
+        var dto = await response.Content.ReadFromJsonAsync<QuoteResponse>();
+        Assert.NotNull(dto);
+        Assert.Equal("Approved", dto.Status);
+    }
+
+    [Fact]
+    public async Task RejectQuote_ReturnsUpdatedQuote()
+    {
+        var id = await ControllerTestHelper.GetFirstIdAsync<QuoteResponse>(
+            _client, $"/api/v{_version}/Quote", x => x.Id);
+
+        var request = new RejectQuoteRequest(1, "Rejected in tests", null);
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Quote/{id}/reject", request);
+        response.EnsureSuccessStatusCode();
+
+        var dto = await response.Content.ReadFromJsonAsync<QuoteResponse>();
+        Assert.NotNull(dto);
+        Assert.Equal("Rejected", dto.Status);
     }
 }

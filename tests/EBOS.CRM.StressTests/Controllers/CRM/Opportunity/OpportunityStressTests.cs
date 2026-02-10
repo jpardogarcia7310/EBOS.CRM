@@ -1,5 +1,8 @@
+using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.StressTests.Infrastructure;
 
 namespace EBOS.CRM.StressTests.Controllers.CRM.Opportunity;
@@ -37,5 +40,23 @@ public class OpportunityStressTests(CustomWebApplicationFactory<Program> factory
         var id = await StressEndpoints.GetFirstIdAsync(_client, _version, "Opportunity");
 
         await StressHelper.AssertNegativeStressAsync(_client, baseUrl, id);
+    }
+
+    [Fact]
+    public async Task Opportunity_WinLoss_ReturnsSuccess()
+    {
+        var id = await StressEndpoints.GetFirstIdAsync(_client, _version, "Opportunity");
+        var stageId = await StressEndpoints.GetFirstIdAsync(_client, _version, "OpportunityStage");
+
+        var winResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Opportunity/{id}/win",
+            new WinOpportunityRequest(1, stageId, "Win stress"));
+        winResponse.EnsureSuccessStatusCode();
+
+        var lossResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Opportunity/{id}/loss",
+            new LossOpportunityRequest(1, stageId, "Loss stress"));
+        lossResponse.EnsureSuccessStatusCode();
+
+        var dto = await lossResponse.Content.ReadFromJsonAsync<OpportunityResponse>();
+        Assert.NotNull(dto);
     }
 }
