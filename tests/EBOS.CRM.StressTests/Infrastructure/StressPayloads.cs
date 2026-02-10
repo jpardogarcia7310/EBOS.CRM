@@ -10,6 +10,10 @@ using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
 using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
 
@@ -332,6 +336,150 @@ public static class StressPayloads
                         BirthDate: new DateTime(1990, 5, 22),
                         IdentificationNumber: RandomDigits(10),
                         IdentificationTypeId: identificationTypeId)));
+            }
+            case "Lead":
+            {
+                return new StressPayloadFactories(
+                    Post: () => JsonContent.Create(new AddLeadRequest(
+                        TenantId,
+                        Source: "Web",
+                        Status: "New",
+                        OwnerUserId: 10,
+                        CompanyName: $"Acme {ShortCode()}",
+                        ContactName: "Jane Doe",
+                        Email: $"{ShortCode()}@example.com",
+                        Phone: "1234567890",
+                        EstimatedValue: 5000m,
+                        Notes: "Stress lead")),
+                    Put: id => JsonContent.Create(new UpdateLeadRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Source: "Referral",
+                        Status: "Qualified",
+                        OwnerUserId: 10,
+                        CompanyName: $"Acme {ShortCode()}",
+                        ContactName: "Jane Doe",
+                        Email: $"{ShortCode()}@example.com",
+                        Phone: "1234567890",
+                        EstimatedValue: 7000m,
+                        Notes: "Stress update")),
+                    Patch: id => JsonContent.Create(new UpdateLeadRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Source: "Event",
+                        Status: "Working",
+                        OwnerUserId: 10,
+                        CompanyName: $"Acme {ShortCode()}",
+                        ContactName: "Jane Doe",
+                        Email: $"{ShortCode()}@example.com",
+                        Phone: "1234567890",
+                        EstimatedValue: 9000m,
+                        Notes: "Stress patch")));
+            }
+            case "OpportunityStage":
+            {
+                var order = Random.Shared.Next(10, 1000);
+                return new StressPayloadFactories(
+                    Post: () => JsonContent.Create(new AddOpportunityStageRequest(
+                        TenantId,
+                        Name: $"Stage {ShortCode()}",
+                        Order: order,
+                        DefaultProbability: 0.2m,
+                        IsClosed: false,
+                        IsWon: false)),
+                    Put: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Name: $"Stage {ShortCode()}",
+                        Order: order + 1,
+                        DefaultProbability: 0.3m,
+                        IsClosed: false,
+                        IsWon: false)),
+                    Patch: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Name: $"Stage {ShortCode()}",
+                        Order: order + 2,
+                        DefaultProbability: 0.4m,
+                        IsClosed: false,
+                        IsWon: false)));
+            }
+            case "Opportunity":
+            {
+                var customerId = await GetIdAsync(client, version, "Customer");
+                var stageId = await GetIdAsync(client, version, "OpportunityStage");
+                return new StressPayloadFactories(
+                    Post: () => JsonContent.Create(new AddOpportunityRequest(
+                        TenantId,
+                        Name: $"Deal {ShortCode()}",
+                        StageId: stageId,
+                        OwnerUserId: 10,
+                        CustomerId: customerId,
+                        ExpectedCloseDate: DateTime.UtcNow.AddDays(30),
+                        Amount: 10000m,
+                        Probability: 0.5m,
+                        Source: "Stress",
+                        SourceLeadId: null)),
+                    Put: id => JsonContent.Create(new UpdateOpportunityRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Name: $"Deal {ShortCode()}",
+                        StageId: stageId,
+                        OwnerUserId: 10,
+                        CustomerId: customerId,
+                        ExpectedCloseDate: DateTime.UtcNow.AddDays(45),
+                        Amount: 12000m,
+                        Probability: 0.6m,
+                        Source: "Stress",
+                        SourceLeadId: null,
+                        CloseReason: null)),
+                    Patch: id => JsonContent.Create(new UpdateOpportunityRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        Name: $"Deal {ShortCode()}",
+                        StageId: stageId,
+                        OwnerUserId: 10,
+                        CustomerId: customerId,
+                        ExpectedCloseDate: DateTime.UtcNow.AddDays(60),
+                        Amount: 15000m,
+                        Probability: 0.7m,
+                        Source: "Stress",
+                        SourceLeadId: null,
+                        CloseReason: null)));
+            }
+            case "Quote":
+            {
+                var opportunityId = await GetIdAsync(client, version, "Opportunity");
+                return new StressPayloadFactories(
+                    Post: () => JsonContent.Create(new AddQuoteRequest(
+                        TenantId,
+                        OpportunityId: opportunityId,
+                        Status: "Draft",
+                        ReferenceNumber: $"Q-{ShortCode()}",
+                        SubtotalAmount: 10000m,
+                        DiscountAmount: 0m,
+                        TotalAmount: 10000m,
+                        Notes: "Stress quote")),
+                    Put: id => JsonContent.Create(new UpdateQuoteRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        OpportunityId: opportunityId,
+                        Status: "Sent",
+                        ReferenceNumber: $"Q-{ShortCode()}",
+                        SubtotalAmount: 12000m,
+                        DiscountAmount: 500m,
+                        TotalAmount: 11500m,
+                        Notes: "Stress update")),
+                    Patch: id => JsonContent.Create(new UpdateQuoteRequest(
+                        Id: id,
+                        TenantId: TenantId,
+                        OpportunityId: opportunityId,
+                        Status: "Approved",
+                        ReferenceNumber: $"Q-{ShortCode()}",
+                        SubtotalAmount: 13000m,
+                        DiscountAmount: 0m,
+                        TotalAmount: 13000m,
+                        Notes: "Stress patch")));
             }
             case "TaxInformation":
             {

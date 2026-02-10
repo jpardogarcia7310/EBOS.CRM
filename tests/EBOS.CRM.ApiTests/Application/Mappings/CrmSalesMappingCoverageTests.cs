@@ -2,6 +2,7 @@ using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
 using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using FluentAssertions;
@@ -73,6 +74,26 @@ public class CrmSalesMappingCoverageTests(MapperFixture fixture) : IClassFixture
         var response = _mapper.Map<OpportunityStageResponse>(entity);
         response.TenantId.Should().Be(1);
         response.Name.Should().Be("Prospecting");
+        response.Active.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Quote_Mapping_Covers_All_Fields()
+    {
+        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        var entity = _mapper.Map<Quote>(request);
+        entity.TenantId.Should().Be(1);
+        entity.OpportunityId.Should().Be(10);
+        entity.Status.Should().Be("Draft");
+        entity.ReferenceNumber.Should().Be("Q-1001");
+        entity.SubtotalAmount.Should().Be(1000m);
+        entity.DiscountAmount.Should().Be(50m);
+        entity.TotalAmount.Should().Be(950m);
+        entity.Notes.Should().Be("Notes");
+
+        var response = _mapper.Map<QuoteResponse>(entity);
+        response.TenantId.Should().Be(1);
+        response.OpportunityId.Should().Be(10);
         response.Active.Should().BeTrue();
     }
 }

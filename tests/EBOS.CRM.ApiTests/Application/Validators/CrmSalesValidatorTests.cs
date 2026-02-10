@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
 using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.AddLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.DisqualifyLead;
@@ -12,6 +13,8 @@ using EBOS.CRM.Application.Features.CRM.Opportunity.Commands.PatchOpportunitySta
 using EBOS.CRM.Application.Features.CRM.Opportunity.Commands.UpdateOpportunity;
 using EBOS.CRM.Application.Features.CRM.OpportunityStage.Commands.AddOpportunityStage;
 using EBOS.CRM.Application.Features.CRM.OpportunityStage.Commands.UpdateOpportunityStage;
+using EBOS.CRM.Application.Features.CRM.Quote.Commands.AddQuote;
+using EBOS.CRM.Application.Features.CRM.Quote.Commands.UpdateQuote;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Application.Validators;
@@ -200,6 +203,46 @@ public class CrmSalesValidatorTests
             .IsValid.Should().BeFalse();
         validator.Validate(new UpdateOpportunityStageCommand(5, request with { Name = Long(101) }))
             .IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AddQuote_Validates_All_Fields()
+    {
+        var validator = new AddQuoteCommandValidator();
+        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        validator.Validate(new AddQuoteCommand(request)).IsValid.Should().BeTrue();
+
+        validator.Validate(new AddQuoteCommand(request with { OpportunityId = 0 })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { Status = "" })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { Status = Long(51) })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { ReferenceNumber = Long(51) }))
+            .IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { SubtotalAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { DiscountAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { TotalAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { Notes = Long(2001) })).IsValid.Should().BeFalse();
+        validator.Validate(new AddQuoteCommand(request with { DiscountAmount = 2000m })).IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void UpdateQuote_Validates_All_Fields()
+    {
+        var validator = new UpdateQuoteCommandValidator();
+        var request = new UpdateQuoteRequest(5, 1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        validator.Validate(new UpdateQuoteCommand(5, request)).IsValid.Should().BeTrue();
+
+        validator.Validate(new UpdateQuoteCommand(0, request)).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { Id = 0 })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { OpportunityId = 0 })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { Status = "" })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { Status = Long(51) })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { ReferenceNumber = Long(51) }))
+            .IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { SubtotalAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { DiscountAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { TotalAmount = -1m })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { Notes = Long(2001) })).IsValid.Should().BeFalse();
+        validator.Validate(new UpdateQuoteCommand(5, request with { DiscountAmount = 2000m })).IsValid.Should().BeFalse();
     }
 
     private static string Long(int length) => new('X', length);
