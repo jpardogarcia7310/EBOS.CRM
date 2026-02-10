@@ -10,6 +10,10 @@ using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
 using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
 
@@ -365,6 +369,161 @@ public static class ConcurrencyPayloads
                             IdentificationTypeId: identificationTypeId)),
                         AllowDelete: true);
                 }),
+            "Lead" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: false,
+                UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddLeadRequest(
+                            TenantId,
+                            Source: "Web",
+                            Status: "New",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 5000m,
+                            Notes: "Concurrency lead")),
+                        Put: id => JsonContent.Create(new UpdateLeadRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Source: "Referral",
+                            Status: "Qualified",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 7000m,
+                            Notes: "Concurrency update")),
+                        Patch: id => JsonContent.Create(new UpdateLeadRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Source: "Event",
+                            Status: "Working",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 9000m,
+                            Notes: "Concurrency patch")),
+                        AllowDelete: false);
+                }),
+            "OpportunityStage" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var order = Random.Shared.Next(10, 1000);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddOpportunityStageRequest(
+                            TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order,
+                            DefaultProbability: 0.2m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        Put: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order + 1,
+                            DefaultProbability: 0.3m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        Patch: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order + 2,
+                            DefaultProbability: 0.4m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        AllowDelete: false);
+                }),
+            "Opportunity" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var customerId = await CreateCustomerAsync(client, version);
+                    var stageId = await CreateOpportunityStageAsync(client, version);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddOpportunityRequest(
+                            TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(30),
+                            Amount: 10000m,
+                            Probability: 0.5m,
+                            Source: "Concurrency",
+                            SourceLeadId: null)),
+                        Put: id => JsonContent.Create(new UpdateOpportunityRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(45),
+                            Amount: 12000m,
+                            Probability: 0.6m,
+                            Source: "Concurrency",
+                            SourceLeadId: null,
+                            CloseReason: null)),
+                        Patch: id => JsonContent.Create(new UpdateOpportunityRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(60),
+                            Amount: 15000m,
+                            Probability: 0.7m,
+                            Source: "Concurrency",
+                            SourceLeadId: null,
+                            CloseReason: null)),
+                        AllowDelete: false);
+                }),
+            "Quote" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: true, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var opportunityId = await CreateOpportunityAsync(client, version);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddQuoteRequest(
+                            TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Draft",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 10000m,
+                            DiscountAmount: 0m,
+                            TotalAmount: 10000m,
+                            ValidUntil: null,
+                            Notes: "Concurrency quote")),
+                        Put: id => JsonContent.Create(new UpdateQuoteRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Sent",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 12000m,
+                            DiscountAmount: 500m,
+                            TotalAmount: 11500m,
+                            ValidUntil: null,
+                            Notes: "Concurrency update")),
+                        Patch: id => JsonContent.Create(new UpdateQuoteRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Approved",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 13000m,
+                            DiscountAmount: 0m,
+                            TotalAmount: 13000m,
+                            ValidUntil: null,
+                            Notes: "Concurrency patch")),
+                        AllowDelete: true);
+                }),
             "TaxInformation" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: true,
                 UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
                 {
@@ -605,5 +764,40 @@ public static class ConcurrencyPayloads
         var taxInformationId = await CreateTaxInformationAsync(client, version);
         var addressId = await CreateAddressAsync(client, version);
         return (taxInformationId, addressId);
+    }
+
+    private static async Task<long> CreateOpportunityStageAsync(HttpClient client, string version)
+    {
+        var order = Random.Shared.Next(10, 1000);
+        var response = await client.PostAsync($"/api/v{version}/OpportunityStage", JsonContent.Create(
+            new AddOpportunityStageRequest(
+                TenantId,
+                Name: $"Stage {ShortCode()}",
+                Order: order,
+                DefaultProbability: 0.2m,
+                IsClosed: false,
+                IsWon: false)));
+
+        return await TryReadIdAsync(response);
+    }
+
+    private static async Task<long> CreateOpportunityAsync(HttpClient client, string version)
+    {
+        var customerId = await CreateCustomerAsync(client, version);
+        var stageId = await CreateOpportunityStageAsync(client, version);
+        var response = await client.PostAsync($"/api/v{version}/Opportunity", JsonContent.Create(
+            new AddOpportunityRequest(
+                TenantId,
+                Name: $"Deal {ShortCode()}",
+                StageId: stageId,
+                OwnerUserId: 10,
+                CustomerId: customerId,
+                ExpectedCloseDate: DateTime.UtcNow.AddDays(30),
+                Amount: 10000m,
+                Probability: 0.5m,
+                Source: "Concurrency",
+                SourceLeadId: null)));
+
+        return await TryReadIdAsync(response);
     }
 }

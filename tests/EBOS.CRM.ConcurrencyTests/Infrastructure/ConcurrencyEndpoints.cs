@@ -30,6 +30,10 @@ public static class ConcurrencyEndpoints
         new("Customer", "Customer", false),
         new("CustomerAddress", "CustomerAddress", false),
         new("IndividualCustomer", "IndividualCustomer", false),
+        new("Lead", "Lead", false),
+        new("Opportunity", "Opportunity", false),
+        new("OpportunityStage", "OpportunityStage", false),
+        new("Quote", "Quote", false),
         new("TaxInformation", "TaxInformation", false),
         new("TaxInformationAddress", "TaxInformationAddress", false)
     ];
@@ -56,6 +60,10 @@ public static class ConcurrencyEndpoints
             "Customer" => await ControllerTestHelper.GetFirstIdAsync<CustomerResponse>(client, url, x => x.Id),
             "CustomerAddress" => await ControllerTestHelper.GetFirstIdAsync<CustomerAddressResponse>(client, url, x => x.Id),
             "IndividualCustomer" => await ControllerTestHelper.GetFirstIdAsync<IndividualCustomerResponse>(client, url, x => x.Id),
+            "Lead" => await ControllerTestHelper.GetFirstIdAsync<LeadResponse>(client, url, x => x.Id),
+            "Opportunity" => await ControllerTestHelper.GetFirstIdAsync<OpportunityResponse>(client, url, x => x.Id),
+            "OpportunityStage" => await ControllerTestHelper.GetFirstIdAsync<OpportunityStageResponse>(client, url, x => x.Id),
+            "Quote" => await ControllerTestHelper.GetFirstIdAsync<QuoteResponse>(client, url, x => x.Id),
             "TaxInformation" => await ControllerTestHelper.GetFirstIdAsync<TaxInformationResponse>(client, url, x => x.Id),
             "TaxInformationAddress" => await ControllerTestHelper.GetFirstIdAsync<TaxInformationAddressResponse>(client, url, x => x.Id),
             _ => throw new InvalidOperationException($"No response type mapping for route {route}.")
