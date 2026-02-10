@@ -209,7 +209,7 @@ public class CrmSalesValidatorTests
     public void AddQuote_Validates_All_Fields()
     {
         var validator = new AddQuoteCommandValidator();
-        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, null, "Notes");
         validator.Validate(new AddQuoteCommand(request)).IsValid.Should().BeTrue();
 
         validator.Validate(new AddQuoteCommand(request with { OpportunityId = 0 })).IsValid.Should().BeFalse();
@@ -228,7 +228,7 @@ public class CrmSalesValidatorTests
     public void UpdateQuote_Validates_All_Fields()
     {
         var validator = new UpdateQuoteCommandValidator();
-        var request = new UpdateQuoteRequest(5, 1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        var request = new UpdateQuoteRequest(5, 1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, null, "Notes");
         validator.Validate(new UpdateQuoteCommand(5, request)).IsValid.Should().BeTrue();
 
         validator.Validate(new UpdateQuoteCommand(0, request)).IsValid.Should().BeFalse();

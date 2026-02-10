@@ -80,7 +80,7 @@ public class CrmSalesMappingCoverageTests(MapperFixture fixture) : IClassFixture
     [Fact]
     public void Quote_Mapping_Covers_All_Fields()
     {
-        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, "Notes");
+        var request = new AddQuoteRequest(1, 10, "Draft", "Q-1001", 1000m, 50m, 950m, null, "Notes");
         var entity = _mapper.Map<Quote>(request);
         entity.TenantId.Should().Be(1);
         entity.OpportunityId.Should().Be(10);

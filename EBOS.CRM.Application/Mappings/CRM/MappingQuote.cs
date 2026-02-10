@@ -1,6 +1,6 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using global::EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 
 namespace EBOS.CRM.Application.Mappings.CRM;
@@ -38,8 +38,8 @@ public class MappingQuote : IRegister
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
-            .Ignore(dest => dest.ValidUntil)
-            .Ignore(dest => dest.Opportunity!);
+            .Ignore(dest => dest.ValidUntil!)
+            .Ignore(dest => dest.Opportunity);
 
         config.NewConfig<UpdateQuoteRequest, Quote>()
             .Map(dest => dest.Id, src => src.Id)
@@ -56,8 +56,8 @@ public class MappingQuote : IRegister
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
-            .Ignore(dest => dest.ValidUntil)
+            .Ignore(dest => dest.ValidUntil!)
             .Ignore(dest => dest.Erased)
-            .Ignore(dest => dest.Opportunity!);
+            .Ignore(dest => dest.Opportunity);
     }
 }

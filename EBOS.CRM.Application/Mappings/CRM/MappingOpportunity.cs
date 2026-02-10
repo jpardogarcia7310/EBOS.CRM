@@ -1,6 +1,6 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using global::EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 
 namespace EBOS.CRM.Application.Mappings.CRM;
@@ -41,10 +41,10 @@ public class MappingOpportunity : IRegister
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
-            .Ignore(dest => dest.CloseReason)
+            .Ignore(dest => dest.CloseReason!)
             .Ignore(dest => dest.Stage)
             .Ignore(dest => dest.Customer)
-            .Ignore(dest => dest.SourceLead)
+            .Ignore(dest => dest.SourceLead!)
             .Ignore(dest => dest.Quotes);
 
         config.NewConfig<UpdateOpportunityRequest, Opportunity>()
@@ -67,7 +67,7 @@ public class MappingOpportunity : IRegister
             .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.Stage)
             .Ignore(dest => dest.Customer)
-            .Ignore(dest => dest.SourceLead)
+            .Ignore(dest => dest.SourceLead!)
             .Ignore(dest => dest.Quotes);
     }
 }
