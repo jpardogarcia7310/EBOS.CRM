@@ -25,7 +25,7 @@ public class TenantQuotaConcurrencyTests(ConcurrencyWebApplicationFactory<Progra
         var baseUrl = $"/api/v{_version}/TenantQuota";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "TenantQuota");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "TenantQuota");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

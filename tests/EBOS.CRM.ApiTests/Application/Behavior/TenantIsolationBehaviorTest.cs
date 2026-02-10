@@ -2,7 +2,6 @@ using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Services.Interfaces;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.ApiTests.Application.Behavior;
 
@@ -96,11 +95,11 @@ public class TenantIsolationBehaviorTest
     private static TenantIsolationBehavior<TestRequest, string> BuildBehavior(long tenantId, TenantIsolationOptions? options = null)
         => new(new TestTenantContext(tenantId),
             Microsoft.Extensions.Options.Options.Create(options ?? new TenantIsolationOptions
-        {
-            MinTraversalDepth = 1,
-            MaxTraversalDepth = 50,
-            TraversalDepth = 10
-        }));
+            {
+                MinTraversalDepth = 1,
+                MaxTraversalDepth = 50,
+                TraversalDepth = 10
+            }));
 
     private sealed class TestTenantContext(long tenantId) : ITenantContext
     {

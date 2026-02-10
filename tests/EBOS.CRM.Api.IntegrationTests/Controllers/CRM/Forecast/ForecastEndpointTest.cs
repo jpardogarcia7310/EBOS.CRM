@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+using EBOS.CRM.Api.IntegrationTests.TestUtils;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.Forecast;
@@ -8,7 +9,7 @@ public class ForecastEndpointTest(CustomWebApplicationFactory factory)
     : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = "2.0";
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Forecast");
 
     [Fact]
     public async Task Forecast_ReturnsSummary()

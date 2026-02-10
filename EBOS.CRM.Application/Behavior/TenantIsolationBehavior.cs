@@ -116,14 +116,14 @@ public class TenantIsolationBehavior<TRequest, TResponse>(ITenantContext tenantC
             case string:
                 yield break;
             case IEnumerable enumerable:
-            {
-                foreach (var item in enumerable)
                 {
-                    yield return item;
-                }
+                    foreach (var item in enumerable)
+                    {
+                        yield return item;
+                    }
 
-                yield break;
-            }
+                    yield break;
+                }
         }
 
         var properties = target.GetType()

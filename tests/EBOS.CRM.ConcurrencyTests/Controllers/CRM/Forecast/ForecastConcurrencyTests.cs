@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
+using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.ConcurrencyTests.Fixtures;
 
@@ -9,7 +10,7 @@ public class ForecastConcurrencyTests(ConcurrencyWebApplicationFactory<Program> 
     : IClassFixture<ConcurrencyWebApplicationFactory<Program>>
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private readonly string _version = "2.0";
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Forecast");
 
     [Fact]
     public async Task Forecast_Read_ReturnsSuccess()

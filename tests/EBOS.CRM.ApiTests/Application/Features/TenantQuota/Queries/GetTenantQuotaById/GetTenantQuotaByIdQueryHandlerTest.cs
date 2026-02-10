@@ -33,7 +33,7 @@ public class GetTenantQuotaByIdQueryHandlerTest
             EffectiveFrom = DateTime.UtcNow.AddDays(-1),
             EffectiveTo = null
         };
-        var dto = new TenantQuotaResponse(entity.Id, entity.TenantId, entity.Metric, entity.Limit, entity.Unit, 
+        var dto = new TenantQuotaResponse(entity.Id, entity.TenantId, entity.Metric, entity.Limit, entity.Unit,
             entity.EffectiveFrom, entity.EffectiveTo, true);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))

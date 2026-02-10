@@ -9,7 +9,7 @@ namespace EBOS.CRM.Application.Features.CRM.Opportunity.Queries.GetAllOpportunit
 public class GetAllOpportunitiesQueryHandler(IOpportunityRepository repository, IMapper mapper)
     : IRequestHandler<GetAllOpportunitiesQuery, PagedResult<OpportunityResponse>>
 {
-    public async Task<PagedResult<OpportunityResponse>> Handle(GetAllOpportunitiesQuery request, 
+    public async Task<PagedResult<OpportunityResponse>> Handle(GetAllOpportunitiesQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

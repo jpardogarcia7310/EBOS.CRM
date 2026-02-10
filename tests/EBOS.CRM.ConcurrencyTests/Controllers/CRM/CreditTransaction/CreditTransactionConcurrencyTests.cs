@@ -25,7 +25,7 @@ public class CreditTransactionConcurrencyTests(ConcurrencyWebApplicationFactory<
         var baseUrl = $"/api/v{_version}/CreditTransaction";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "CreditTransaction");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "CreditTransaction");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);
