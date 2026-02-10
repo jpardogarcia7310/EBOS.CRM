@@ -7,6 +7,7 @@ using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 using EBOS.CRM.Infrastructure.Services.Audit;
+using EBOS.CRM.Infrastructure.Services.CRM;
 using EBOS.CRM.Infrastructure.Services.Lookup;
 using Microsoft.Extensions.Configuration;
 
@@ -67,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<IOpportunityRepository, OpportunityRepository>();
         services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
         services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddScoped<ILeadDebtorCheckService, LeadDebtorCheckService>();
         services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
         services.AddScoped<ILookupSeedService, LookupSeedService>();
 
