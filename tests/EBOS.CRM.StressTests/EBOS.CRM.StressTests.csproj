@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateMvcTestManifest>false</GenerateMvcTestManifest>
     <RootNamespace>EBOS.CRM.StressTests</RootNamespace>
   </PropertyGroup>
 

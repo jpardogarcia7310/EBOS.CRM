@@ -137,7 +137,7 @@ public static class TestDataSeeder
             new Domain.Entities.CRM.OpportunityStage
             {
                 TenantId = 0,
-                Name = "Prospeccion",
+                Name = "Prospección",
                 Order = 1,
                 DefaultProbability = 0.1m,
                 IsClosed = false,
@@ -164,7 +164,7 @@ public static class TestDataSeeder
             new Domain.Entities.CRM.OpportunityStage
             {
                 TenantId = 0,
-                Name = "Negociacion",
+                Name = "Negociación",
                 Order = 4,
                 DefaultProbability = 0.7m,
                 IsClosed = false,
