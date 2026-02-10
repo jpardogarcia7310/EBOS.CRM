@@ -498,6 +498,7 @@ public static class ConcurrencyPayloads
                             SubtotalAmount: 10000m,
                             DiscountAmount: 0m,
                             TotalAmount: 10000m,
+                            ValidUntil: null,
                             Notes: "Concurrency quote")),
                         Put: id => JsonContent.Create(new UpdateQuoteRequest(
                             Id: id,
@@ -508,6 +509,7 @@ public static class ConcurrencyPayloads
                             SubtotalAmount: 12000m,
                             DiscountAmount: 500m,
                             TotalAmount: 11500m,
+                            ValidUntil: null,
                             Notes: "Concurrency update")),
                         Patch: id => JsonContent.Create(new UpdateQuoteRequest(
                             Id: id,
@@ -518,6 +520,7 @@ public static class ConcurrencyPayloads
                             SubtotalAmount: 13000m,
                             DiscountAmount: 0m,
                             TotalAmount: 13000m,
+                            ValidUntil: null,
                             Notes: "Concurrency patch")),
                         AllowDelete: true);
                 }),

@@ -459,6 +459,7 @@ public static class StressPayloads
                         SubtotalAmount: 10000m,
                         DiscountAmount: 0m,
                         TotalAmount: 10000m,
+                        ValidUntil: null,
                         Notes: "Stress quote")),
                     Put: id => JsonContent.Create(new UpdateQuoteRequest(
                         Id: id,
@@ -469,6 +470,7 @@ public static class StressPayloads
                         SubtotalAmount: 12000m,
                         DiscountAmount: 500m,
                         TotalAmount: 11500m,
+                        ValidUntil: null,
                         Notes: "Stress update")),
                     Patch: id => JsonContent.Create(new UpdateQuoteRequest(
                         Id: id,
@@ -479,6 +481,7 @@ public static class StressPayloads
                         SubtotalAmount: 13000m,
                         DiscountAmount: 0m,
                         TotalAmount: 13000m,
+                        ValidUntil: null,
                         Notes: "Stress patch")));
             }
             case "TaxInformation":

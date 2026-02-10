@@ -41,7 +41,7 @@ public class MappingLead : IRegister
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
-            .Ignore(dest => dest.ConvertedOpportunityId)
+            .Ignore(dest => dest.ConvertedOpportunityId!)
             .Ignore(dest => dest.ConvertedOpportunity!);
 
         config.NewConfig<UpdateLeadRequest, Lead>()
@@ -61,7 +61,7 @@ public class MappingLead : IRegister
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
-            .Ignore(dest => dest.ConvertedOpportunityId)
+            .Ignore(dest => dest.ConvertedOpportunityId!)
             .Ignore(dest => dest.ConvertedOpportunity!);
     }
 }
