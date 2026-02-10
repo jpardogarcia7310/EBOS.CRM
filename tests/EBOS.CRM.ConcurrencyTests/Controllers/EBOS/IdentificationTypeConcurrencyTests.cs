@@ -25,7 +25,7 @@ public class IdentificationTypeConcurrencyTests(ConcurrencyWebApplicationFactory
         var baseUrl = $"/api/v{_version}/IdentificationType";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "IdentificationType");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "IdentificationType");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

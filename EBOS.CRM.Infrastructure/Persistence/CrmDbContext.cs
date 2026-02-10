@@ -20,34 +20,37 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
     public long CurrentTenantId => _tenantId;
     // DbSets
-    public DbSet<Customer> Customers => Set<Customer>();
-    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
-    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
+    public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
     public DbSet<Address> Addresses => Set<Address>();
-    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
-    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
+    public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
+    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
+    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
+    public DbSet<Country> Countries => Set<Country>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
+    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
+    public DbSet<Lead> Leads => Set<Lead>();
+    public DbSet<Opportunity> Opportunities => Set<Opportunity>();
+    public DbSet<OpportunityStage> OpportunityStages => Set<OpportunityStage>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<Policy> Policies => Set<Policy>();
+    public DbSet<PolicyPermission> PolicyPermissions => Set<PolicyPermission>();
+    public DbSet<PolicyRole> PolicyRoles => Set<PolicyRole>();
+    public DbSet<PolicyRuleCondition> PolicyRuleConditions => Set<PolicyRuleCondition>();
+    public DbSet<PolicyRule> PolicyRules => Set<PolicyRule>();
+    public DbSet<Quote> Quotes => Set<Quote>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Status> Statuses => Set<Status>();
+    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
     public DbSet<TenantConfiguration> TenantConfigurations => Set<TenantConfiguration>();
     public DbSet<TenantQuota> TenantQuotas => Set<TenantQuota>();
     public DbSet<TenantUsageMetric> TenantUsageMetrics => Set<TenantUsageMetric>();
-    public DbSet<Status> Statuses => Set<Status>();
-    public DbSet<Country> Countries => Set<Country>();
-    public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
-    public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<User> Users => Set<User>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<Policy> Policies => Set<Policy>();
-    public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
-    public DbSet<PolicyRule> PolicyRules => Set<PolicyRule>();
-    public DbSet<PolicyRuleCondition> PolicyRuleConditions => Set<PolicyRuleCondition>();
-    public DbSet<PolicyRole> PolicyRoles => Set<PolicyRole>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-    public DbSet<PolicyPermission> PolicyPermissions => Set<PolicyPermission>();
-    public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

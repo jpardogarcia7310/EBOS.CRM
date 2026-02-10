@@ -6,7 +6,7 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 public class IdentificationTypeRepository(CrmDbContext context) : IIdentificationTypeRepository
 {
     private readonly DbSet<IdentificationType> _dbSet = context.Set<IdentificationType>();
-    
+
     #region Queries
     public Task<IdentificationType?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
         => _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
@@ -17,7 +17,7 @@ public class IdentificationTypeRepository(CrmDbContext context) : IIdentificatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<IdentificationType>> GetAllPagedAsync(int pageNumber, int pageSize, 
+    public async Task<IReadOnlyCollection<IdentificationType>> GetAllPagedAsync(int pageNumber, int pageSize,
         CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);

@@ -25,7 +25,7 @@ public class TenantUsageMetricConcurrencyTests(ConcurrencyWebApplicationFactory<
         var baseUrl = $"/api/v{_version}/TenantUsageMetric";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "TenantUsageMetric");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "TenantUsageMetric");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

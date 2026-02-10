@@ -25,7 +25,7 @@ public class CustomerConcurrencyTests(ConcurrencyWebApplicationFactory<Program> 
         var baseUrl = $"/api/v{_version}/Customer";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "Customer");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "Customer");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

@@ -126,6 +126,72 @@ public static class TestDataSeeder
         await db.SaveChangesAsync();
     }
 
+    public static async Task SeedOpportunityStagesAsync(CrmDbContext db)
+    {
+        if (await db.OpportunityStages.AnyAsync())
+        {
+            return;
+        }
+
+        db.OpportunityStages.AddRange(
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Prospección",
+                Order = 1,
+                DefaultProbability = 0.1m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Calificado",
+                Order = 2,
+                DefaultProbability = 0.3m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Propuesta",
+                Order = 3,
+                DefaultProbability = 0.5m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Negociación",
+                Order = 4,
+                DefaultProbability = 0.7m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Cerrado Ganado",
+                Order = 5,
+                DefaultProbability = 1.0m,
+                IsClosed = true,
+                IsWon = true
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Cerrado Perdido",
+                Order = 6,
+                DefaultProbability = 0.0m,
+                IsClosed = true,
+                IsWon = false
+            });
+
+        await db.SaveChangesAsync();
+    }
+
     public static async Task SeedTenantConfigurationsAsync(CrmDbContext db)
     {
         if (await db.TenantConfigurations.AnyAsync())

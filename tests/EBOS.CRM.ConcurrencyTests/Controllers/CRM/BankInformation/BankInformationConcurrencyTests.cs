@@ -25,7 +25,7 @@ public class BankInformationConcurrencyTests(ConcurrencyWebApplicationFactory<Pr
         var baseUrl = $"/api/v{_version}/BankInformation";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "BankInformation");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "BankInformation");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

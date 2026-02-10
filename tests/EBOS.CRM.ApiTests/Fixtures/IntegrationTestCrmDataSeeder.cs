@@ -245,6 +245,85 @@ public static class IntegrationTestCrmDataSeeder
 
         context.SaveChanges();
 
+        if (!context.OpportunityStages.Any())
+        {
+            context.OpportunityStages.AddRange(
+                new OpportunityStage
+                {
+                    TenantId = 1,
+                    Name = "Prospecting",
+                    Order = 1,
+                    DefaultProbability = 0.1m,
+                    IsClosed = false,
+                    IsWon = false
+                },
+                new OpportunityStage
+                {
+                    TenantId = 1,
+                    Name = "Qualified",
+                    Order = 2,
+                    DefaultProbability = 0.3m,
+                    IsClosed = false,
+                    IsWon = false
+                });
+        }
+
+        context.SaveChanges();
+
+        var stageId = context.OpportunityStages.Select(s => s.Id).First();
+
+        if (!context.Leads.Any())
+        {
+            context.Leads.Add(new Lead
+            {
+                TenantId = 1,
+                Source = "Web",
+                Status = "New",
+                OwnerUserId = 10,
+                CompanyName = "Contoso",
+                ContactName = "Jane Doe",
+                Email = "lead@contoso.com",
+                Phone = "1234567890",
+                EstimatedValue = 5000m,
+                Notes = "Seed lead"
+            });
+        }
+
+        if (!context.Opportunities.Any())
+        {
+            context.Opportunities.Add(new Opportunity
+            {
+                TenantId = 1,
+                Name = "Seed Opportunity",
+                StageId = stageId,
+                OwnerUserId = 10,
+                CustomerId = corporateCustomerId,
+                ExpectedCloseDate = DateTime.UtcNow.AddDays(30),
+                Amount = 10000m,
+                Probability = 0.5m,
+                Source = "Seed"
+            });
+        }
+
+        context.SaveChanges();
+
+        var opportunityId = context.Opportunities.Select(o => o.Id).First();
+
+        if (!context.Quotes.Any())
+        {
+            context.Quotes.Add(new Quote
+            {
+                TenantId = 1,
+                OpportunityId = opportunityId,
+                Status = "Draft",
+                ReferenceNumber = "Q-1001",
+                SubtotalAmount = 10000m,
+                DiscountAmount = 0m,
+                TotalAmount = 10000m,
+                Notes = "Seed quote"
+            });
+        }
+
         if (!context.TenantConfigurations.Any())
         {
             context.TenantConfigurations.AddRange(

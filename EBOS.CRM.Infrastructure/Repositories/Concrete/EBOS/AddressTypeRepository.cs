@@ -17,7 +17,7 @@ public class AddressTypeRepository(CrmDbContext context) : IAddressTypeRepositor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<AddressType>> GetAllPagedAsync(int pageNumber, int pageSize, 
+    public async Task<IReadOnlyCollection<AddressType>> GetAllPagedAsync(int pageNumber, int pageSize,
         CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);

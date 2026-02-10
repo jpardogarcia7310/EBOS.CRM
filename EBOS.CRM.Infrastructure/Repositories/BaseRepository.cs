@@ -79,6 +79,9 @@ public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where
         if (_currentTransaction != null)
             return;
 
+        if (!Context.Database.IsRelational())
+            return;
+
         _currentTransaction = await Context.Database.BeginTransactionAsync(cancellationToken);
     }
 

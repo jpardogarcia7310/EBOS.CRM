@@ -10,6 +10,10 @@ using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
 using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
 
@@ -28,7 +32,7 @@ public static class ConcurrencyPayloads
     private static readonly Dictionary<string, long> IdCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly SemaphoreSlim IdSemaphore = new(1, 1);
 
-    public static Task<ConcurrencyPayloadFactories> GetPayloadFactoriesAsync(HttpClient client, string version, 
+    public static Task<ConcurrencyPayloadFactories> GetPayloadFactoriesAsync(HttpClient client, string version,
         string entity)
     {
         var noWriteEntities = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -57,49 +61,49 @@ public static class ConcurrencyPayloads
                     var addressTypeId = await GetIdAsync(client, version, "AddressType");
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddAddressRequest(TenantId,
-                            Street: $"Concurrency St {ShortCode()}", 
-                            ExternalNumber: "1", 
+                            Street: $"Concurrency St {ShortCode()}",
+                            ExternalNumber: "1",
                             InternalNumber: "2B",
-                            BetweenStreet1: "Street A", 
-                            BetweenStreet2: "Street B", 
+                            BetweenStreet1: "Street A",
+                            BetweenStreet2: "Street B",
                             Neighbourhood: "Centro",
-                            City: "Madrid", 
-                            StateOrProvince: "Madrid", 
+                            City: "Madrid",
+                            StateOrProvince: "Madrid",
                             PostalCode: "28001",
                             GoogleMapsUrl: "https://maps.example.com/concurrency",
-                            Latitude: "40.0", 
+                            Latitude: "40.0",
                             Longitude: "-3.7",
-                            CountryId: countryId, 
+                            CountryId: countryId,
                             AddressTypeId: addressTypeId)),
                         Put: _ => JsonContent.Create(new UpdateAddressRequest(TenantId,
                             Street: $"Concurrency St {ShortCode()}",
                             ExternalNumber: "2",
                             InternalNumber: "3C",
-                            BetweenStreet1: "Street A", 
-                            BetweenStreet2: "Street B", 
+                            BetweenStreet1: "Street A",
+                            BetweenStreet2: "Street B",
                             Neighbourhood: "Centro",
-                            City: "Madrid", 
+                            City: "Madrid",
                             StateOrProvince: "Madrid",
                             PostalCode: "28002",
-                            GoogleMapsUrl: "https://maps.example.com/concurrency", 
+                            GoogleMapsUrl: "https://maps.example.com/concurrency",
                             Latitude: "40.1",
                             Longitude: "-3.6",
                             CountryId: countryId,
                             AddressTypeId: addressTypeId)),
                         Patch: _ => JsonContent.Create(new UpdateAddressRequest(TenantId,
                             Street: $"Concurrency St {ShortCode()}",
-                            ExternalNumber: "3", 
+                            ExternalNumber: "3",
                             InternalNumber: "4D",
-                            BetweenStreet1: "Street A", 
+                            BetweenStreet1: "Street A",
                             BetweenStreet2: "Street B",
                             Neighbourhood: "Centro",
-                            City: "Madrid", 
-                            StateOrProvince: "Madrid", 
+                            City: "Madrid",
+                            StateOrProvince: "Madrid",
                             PostalCode: "28003",
                             GoogleMapsUrl: "https://maps.example.com/concurrency",
-                            Latitude: "40.2", 
+                            Latitude: "40.2",
                             Longitude: "-3.5",
-                            CountryId: countryId, 
+                            CountryId: countryId,
                             AddressTypeId: addressTypeId)),
                         AllowDelete: true);
                 }),
@@ -109,16 +113,16 @@ public static class ConcurrencyPayloads
                     var customerId = await CreateCustomerAsync(client, version);
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddBankInformationRequest(
-                            TenantId, 
+                            TenantId,
                             Iban: GenerateIban(),
-                            Bic: "BBVAESMM", 
-                            BankName: "Banco Concurrency", 
+                            Bic: "BBVAESMM",
+                            BankName: "Banco Concurrency",
                             CustomerId: customerId)),
                         Put: _ => JsonContent.Create(new UpdateBankInformationRequest(
-                            TenantId, 
+                            TenantId,
                             Iban: GenerateIban(),
                             Bic: "SANTESMM",
-                            BankName: "Banco Concurrency 2", 
+                            BankName: "Banco Concurrency 2",
                             CustomerId: customerId)),
                         Patch: _ => JsonContent.Create(new UpdateBankInformationRequest(
                             TenantId,
@@ -135,11 +139,11 @@ public static class ConcurrencyPayloads
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddBranchOfficeRequest(
                             TenantId,
-                            Name: $"Branch {ShortCode()}", 
+                            Name: $"Branch {ShortCode()}",
                             PhoneNumber: "+34 911 000 000",
                             CorporateCustomerId: corporateCustomerId)),
                         Put: id => JsonContent.Create(new UpdateBranchOfficeRequest(
-                            Id: id, 
+                            Id: id,
                             TenantId: TenantId,
                             Name: $"Branch {ShortCode()}",
                             PhoneNumber: "+34 911 000 001",
@@ -148,7 +152,7 @@ public static class ConcurrencyPayloads
                             TenantId,
                             Name: $"Branch {ShortCode()}",
                             PhoneNumber: "+34 911 000 002",
-                            CorporateCustomerId: corporateCustomerId)), 
+                            CorporateCustomerId: corporateCustomerId)),
                         AllowDelete: true);
                 }),
             "BranchOfficeAddress" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
@@ -161,7 +165,7 @@ public static class ConcurrencyPayloads
                             BranchOfficeId: branchOfficeId,
                             AddressId: addressId,
                             IsPrimary: true,
-                            ValidFrom: DateTime.UtcNow.AddDays(-1), 
+                            ValidFrom: DateTime.UtcNow.AddDays(-1),
                             ValidTo: null,
                             IsCurrent: true)),
                         Put: _ => JsonContent.Create(new UpdateBranchOfficeAddressRequest(
@@ -169,7 +173,7 @@ public static class ConcurrencyPayloads
                             BranchOfficeId: branchOfficeId,
                             AddressId: addressId,
                             IsPrimary: true,
-                            ValidFrom: DateTime.UtcNow.AddDays(-2), 
+                            ValidFrom: DateTime.UtcNow.AddDays(-2),
                             ValidTo: null,
                             IsCurrent: true)),
                         Patch: _ => JsonContent.Create(new UpdateBranchOfficeAddressRequest(
@@ -188,29 +192,29 @@ public static class ConcurrencyPayloads
                     var statusId = await GetIdAsync(client, version, "Status");
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddCorporateCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 050",
                             StatusId: statusId,
-                            LegalName: $"Corp {ShortCode()}", 
+                            LegalName: $"Corp {ShortCode()}",
                             TaxIdentification: RandomDigits(10))),
                         Put: _ => JsonContent.Create(new UpdateCorporateCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 051",
                             StatusId: statusId,
-                            LegalName: $"Corp {ShortCode()}", 
+                            LegalName: $"Corp {ShortCode()}",
                             TaxIdentification: RandomDigits(10))),
                         Patch: _ => JsonContent.Create(new UpdateCorporateCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
-                            Email: $"{ShortCode()}@example.com", 
-                            Phone: "+34 600 000 052", 
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "+34 600 000 052",
                             StatusId: statusId,
-                            LegalName: $"Corp {ShortCode()}", 
-                            TaxIdentification: RandomDigits(10))), 
+                            LegalName: $"Corp {ShortCode()}",
+                            TaxIdentification: RandomDigits(10))),
                         AllowDelete: true);
                 }),
             "CreditAccount" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: true,
@@ -221,18 +225,18 @@ public static class ConcurrencyPayloads
                         Post: () => JsonContent.Create(new AddCreditAccountRequest(
                             TenantId,
                             MaxAmount: 10000m,
-                            UsedAmount: 100m, 
+                            UsedAmount: 100m,
                             CustomerId: customerId)),
                         Put: _ => JsonContent.Create(new UpdateCreditAccountRequest(
-                            Id: 0, 
+                            Id: 0,
                             TenantId: TenantId,
-                            MaxAmount: 15000m, 
-                            UsedAmount: 200m, 
+                            MaxAmount: 15000m,
+                            UsedAmount: 200m,
                             CustomerId: customerId)),
                         Patch: _ => JsonContent.Create(new PatchCreditAccountRequest(
                             TenantId,
                             MaxAmount: 20000m,
-                            UsedAmount: 300m, 
+                            UsedAmount: 300m,
                             CustomerId: customerId)),
                         AllowDelete: true);
                 }),
@@ -243,7 +247,7 @@ public static class ConcurrencyPayloads
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddCreditTransactionRequest(
                             TenantId,
-                            Date: DateTime.UtcNow.Date, 
+                            Date: DateTime.UtcNow.Date,
                             Amount: 500m,
                             Type: "Payment",
                             ExternalReference: ShortCode(),
@@ -251,19 +255,19 @@ public static class ConcurrencyPayloads
                             CreditAccountId: creditAccountId)),
                         Put: _ => JsonContent.Create(new UpdateCreditTransactionRequest(
                             TenantId,
-                            Date: DateTime.UtcNow.Date, 
-                            Amount: 600m, 
-                            Type: "Refund", 
+                            Date: DateTime.UtcNow.Date,
+                            Amount: 600m,
+                            Type: "Refund",
                             ExternalReference: ShortCode(),
-                            Comments: "Concurrency Update", 
+                            Comments: "Concurrency Update",
                             CreditAccountId: creditAccountId)),
                         Patch: _ => JsonContent.Create(new UpdateCreditTransactionRequest(
                             TenantId,
-                            Date: DateTime.UtcNow.Date, 
-                            Amount: 700m, 
+                            Date: DateTime.UtcNow.Date,
+                            Amount: 700m,
                             Type: "Adjust",
                             ExternalReference: ShortCode(),
-                            Comments: "Concurrency Patch", 
+                            Comments: "Concurrency Patch",
                             CreditAccountId: creditAccountId)),
                         AllowDelete: true);
                 }),
@@ -273,24 +277,24 @@ public static class ConcurrencyPayloads
                     var statusId = await GetIdAsync(client, version, "Status");
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
-                            Email: $"{ShortCode()}@example.com", 
+                            Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 010",
-                            StatusId: 
+                            StatusId:
                             statusId)),
                         Put: _ => JsonContent.Create(new UpdateCustomerRequest(
-                            Id: 0, 
+                            Id: 0,
                             TenantId: TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 011",
                             StatusId: statusId)),
                         Patch: _ => JsonContent.Create(new PatchCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
-                            Email: $"{ShortCode()}@example.com", 
-                            Phone: "+34 600 000 012", 
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "+34 600 000 012",
                             StatusId: statusId)),
                         AllowDelete: true);
                 }),
@@ -302,26 +306,26 @@ public static class ConcurrencyPayloads
                         Post: () => JsonContent.Create(new AddCustomerAddressRequest(
                             TenantId,
                             CustomerId: customerId,
-                            AddressId: addressId, 
-                            IsPrimary: true, 
+                            AddressId: addressId,
+                            IsPrimary: true,
                             ValidFrom: DateTime.UtcNow.AddDays(-1),
-                            ValidTo: null, 
+                            ValidTo: null,
                             IsCurrent: true)),
                         Put: _ => JsonContent.Create(new UpdateCustomerAddressRequest(
-                            TenantId, 
+                            TenantId,
                             CustomerId: customerId,
                             AddressId: addressId,
                             IsPrimary: true,
                             ValidFrom: DateTime.UtcNow.AddDays(-2),
-                            ValidTo: null, 
+                            ValidTo: null,
                             IsCurrent: true)),
                         Patch: _ => JsonContent.Create(new UpdateCustomerAddressRequest(
                             TenantId,
-                            CustomerId: customerId, 
+                            CustomerId: customerId,
                             AddressId: addressId,
                             IsPrimary: true,
-                            ValidFrom: DateTime.UtcNow.AddDays(-3), 
-                            ValidTo: null, 
+                            ValidFrom: DateTime.UtcNow.AddDays(-3),
+                            ValidTo: null,
                             IsCurrent: true)),
                         AllowDelete: true);
                 }),
@@ -334,35 +338,190 @@ public static class ConcurrencyPayloads
                         Post: () => JsonContent.Create(new AddIndividualCustomerRequest(
                             TenantId,
                             Code: ShortCode(),
-                            Email: $"{ShortCode()}@example.com", 
+                            Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 020",
                             StatusId: statusId,
                             FirstName: "Jane", LastName: "Doe",
                             BirthDate: new DateTime(1990, 5, 20),
-                            IdentificationNumber: RandomDigits(10), 
+                            IdentificationNumber: RandomDigits(10),
                             IdentificationTypeId: identificationTypeId)),
                         Put: _ => JsonContent.Create(new UpdateIndividualCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
-                            Email: $"{ShortCode()}@example.com", 
-                            Phone: "+34 600 000 021", 
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "+34 600 000 021",
                             StatusId: statusId,
                             FirstName: "Jane",
-                            LastName: "Doe", 
+                            LastName: "Doe",
                             BirthDate: new DateTime(1990, 5, 21),
                             IdentificationNumber: RandomDigits(10),
                             IdentificationTypeId: identificationTypeId)),
                         Patch: _ => JsonContent.Create(new UpdateIndividualCustomerRequest(
-                            TenantId, 
+                            TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
                             Phone: "+34 600 000 022",
                             StatusId: statusId,
-                            FirstName: "Jane", 
+                            FirstName: "Jane",
                             LastName: "Doe",
                             BirthDate: new DateTime(1990, 5, 22),
-                            IdentificationNumber: RandomDigits(10), 
+                            IdentificationNumber: RandomDigits(10),
                             IdentificationTypeId: identificationTypeId)),
+                        AllowDelete: true);
+                }),
+            "Lead" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: false,
+                UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddLeadRequest(
+                            TenantId,
+                            Source: "Web",
+                            Status: "New",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 5000m,
+                            Notes: "Concurrency lead")),
+                        Put: id => JsonContent.Create(new UpdateLeadRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Source: "Referral",
+                            Status: "Qualified",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 7000m,
+                            Notes: "Concurrency update")),
+                        Patch: id => JsonContent.Create(new UpdateLeadRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Source: "Event",
+                            Status: "Working",
+                            OwnerUserId: 10,
+                            CompanyName: $"Acme {ShortCode()}",
+                            ContactName: "Jane Doe",
+                            Email: $"{ShortCode()}@example.com",
+                            Phone: "1234567890",
+                            EstimatedValue: 9000m,
+                            Notes: "Concurrency patch")),
+                        AllowDelete: false);
+                }),
+            "OpportunityStage" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var order = Random.Shared.Next(10, 1000);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddOpportunityStageRequest(
+                            TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order,
+                            DefaultProbability: 0.2m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        Put: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order + 1,
+                            DefaultProbability: 0.3m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        Patch: id => JsonContent.Create(new UpdateOpportunityStageRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Stage {ShortCode()}",
+                            Order: order + 2,
+                            DefaultProbability: 0.4m,
+                            IsClosed: false,
+                            IsWon: false)),
+                        AllowDelete: false);
+                }),
+            "Opportunity" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var customerId = await CreateCustomerAsync(client, version);
+                    var stageId = await CreateOpportunityStageAsync(client, version);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddOpportunityRequest(
+                            TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(30),
+                            Amount: 10000m,
+                            Probability: 0.5m,
+                            Source: "Concurrency",
+                            SourceLeadId: null)),
+                        Put: id => JsonContent.Create(new UpdateOpportunityRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(45),
+                            Amount: 12000m,
+                            Probability: 0.6m,
+                            Source: "Concurrency",
+                            SourceLeadId: null,
+                            CloseReason: null)),
+                        Patch: id => JsonContent.Create(new UpdateOpportunityRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            Name: $"Deal {ShortCode()}",
+                            StageId: stageId,
+                            OwnerUserId: 10,
+                            CustomerId: customerId,
+                            ExpectedCloseDate: DateTime.UtcNow.AddDays(60),
+                            Amount: 15000m,
+                            Probability: 0.7m,
+                            Source: "Concurrency",
+                            SourceLeadId: null,
+                            CloseReason: null)),
+                        AllowDelete: false);
+                }),
+            "Quote" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
+                AllowDelete: true, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                {
+                    var opportunityId = await CreateOpportunityAsync(client, version);
+                    return new IsolatedWritePayloads(
+                        Post: () => JsonContent.Create(new AddQuoteRequest(
+                            TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Draft",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 10000m,
+                            DiscountAmount: 0m,
+                            TotalAmount: 10000m,
+                            ValidUntil: null,
+                            Notes: "Concurrency quote")),
+                        Put: id => JsonContent.Create(new UpdateQuoteRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Sent",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 12000m,
+                            DiscountAmount: 500m,
+                            TotalAmount: 11500m,
+                            ValidUntil: null,
+                            Notes: "Concurrency update")),
+                        Patch: id => JsonContent.Create(new UpdateQuoteRequest(
+                            Id: id,
+                            TenantId: TenantId,
+                            OpportunityId: opportunityId,
+                            Status: "Approved",
+                            ReferenceNumber: $"Q-{ShortCode()}",
+                            SubtotalAmount: 13000m,
+                            DiscountAmount: 0m,
+                            TotalAmount: 13000m,
+                            ValidUntil: null,
+                            Notes: "Concurrency patch")),
                         AllowDelete: true);
                 }),
             "TaxInformation" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: true,
@@ -372,7 +531,7 @@ public static class ConcurrencyPayloads
                     return new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddTaxInformationRequest(
                             TenantId,
-                            TaxName: $"Tax {ShortCode()}", 
+                            TaxName: $"Tax {ShortCode()}",
                             TaxIdentificationNumber: RandomDigits(10),
                             CustomerId: customerId)),
                         Put: _ => JsonContent.Create(new UpdateTaxInformationRequest(
@@ -384,9 +543,9 @@ public static class ConcurrencyPayloads
                         Patch: _ => JsonContent.Create(new UpdateTaxInformationRequest(
                             Id: 0,
                             TenantId: TenantId,
-                            TaxName: $"Tax {ShortCode()}", 
+                            TaxName: $"Tax {ShortCode()}",
                             TaxIdentificationNumber: RandomDigits(10),
-                            CustomerId: customerId)), 
+                            CustomerId: customerId)),
                         AllowDelete: true);
                 }),
             "TaxInformationAddress" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
@@ -400,26 +559,26 @@ public static class ConcurrencyPayloads
                             ValidFrom: DateTime.UtcNow.AddDays(-1), ValidTo: null, IsCurrent: true)),
                         Put: _ => JsonContent.Create(new UpdateTaxInformationAddressRequest(
                             TenantId,
-                            TaxInformationId: taxInformationId, 
+                            TaxInformationId: taxInformationId,
                             AddressId: addressId,
                             IsPrimary: true,
                             ValidFrom: DateTime.UtcNow.AddDays(-2),
-                            ValidTo: null, 
+                            ValidTo: null,
                             IsCurrent: true)),
                         Patch: _ => JsonContent.Create(new UpdateTaxInformationAddressRequest(
                             TenantId,
                             TaxInformationId: taxInformationId,
                             AddressId: addressId,
                             IsPrimary: true,
-                            ValidFrom: DateTime.UtcNow.AddDays(-3), 
-                            ValidTo: null, 
+                            ValidFrom: DateTime.UtcNow.AddDays(-3),
+                            ValidTo: null,
                             IsCurrent: true)),
                         AllowDelete: true);
                 }),
             _ => new ConcurrencyPayloadFactories(
                 Post: () => new StringContent("{}", Encoding.UTF8, "application/json"),
                 Put: _ => new StringContent("{}", Encoding.UTF8, "application/json"),
-                Patch: _ => new StringContent("{}", Encoding.UTF8, "application/json"), 
+                Patch: _ => new StringContent("{}", Encoding.UTF8, "application/json"),
                 AllowDelete: true,
                 UseIsolatedWrite: false)
         });
@@ -605,5 +764,40 @@ public static class ConcurrencyPayloads
         var taxInformationId = await CreateTaxInformationAsync(client, version);
         var addressId = await CreateAddressAsync(client, version);
         return (taxInformationId, addressId);
+    }
+
+    private static async Task<long> CreateOpportunityStageAsync(HttpClient client, string version)
+    {
+        var order = Random.Shared.Next(10, 1000);
+        var response = await client.PostAsync($"/api/v{version}/OpportunityStage", JsonContent.Create(
+            new AddOpportunityStageRequest(
+                TenantId,
+                Name: $"Stage {ShortCode()}",
+                Order: order,
+                DefaultProbability: 0.2m,
+                IsClosed: false,
+                IsWon: false)));
+
+        return await TryReadIdAsync(response);
+    }
+
+    private static async Task<long> CreateOpportunityAsync(HttpClient client, string version)
+    {
+        var customerId = await CreateCustomerAsync(client, version);
+        var stageId = await CreateOpportunityStageAsync(client, version);
+        var response = await client.PostAsync($"/api/v{version}/Opportunity", JsonContent.Create(
+            new AddOpportunityRequest(
+                TenantId,
+                Name: $"Deal {ShortCode()}",
+                StageId: stageId,
+                OwnerUserId: 10,
+                CustomerId: customerId,
+                ExpectedCloseDate: DateTime.UtcNow.AddDays(30),
+                Amount: 10000m,
+                Probability: 0.5m,
+                Source: "Concurrency",
+                SourceLeadId: null)));
+
+        return await TryReadIdAsync(response);
     }
 }
