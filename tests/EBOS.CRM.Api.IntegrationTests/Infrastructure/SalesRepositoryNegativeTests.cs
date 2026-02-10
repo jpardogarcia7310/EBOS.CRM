@@ -168,7 +168,7 @@ public class SalesRepositoryNegativeTests(CustomWebApplicationFactory factory) :
         var stage = new OpportunityStage
         {
             TenantId = 1,
-            Name = "Prospeccion",
+            Name = "Prospección",
             Order = 1,
             DefaultProbability = 0.1m,
             IsClosed = false,

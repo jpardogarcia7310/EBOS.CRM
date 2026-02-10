@@ -23,10 +23,10 @@ public class OpportunityStageSeedTests(CustomWebApplicationFactory factory) : IC
         var names = stages.Select(s => s.Name).ToList();
         names.Should().Contain(new[]
         {
-            "Prospeccion",
+            "Prospección",
             "Calificado",
             "Propuesta",
-            "Negociacion",
+            "Negociación",
             "Cerrado Ganado",
             "Cerrado Perdido"
         });
