@@ -1,10 +1,13 @@
 using System;
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class CustomerAddress : ErasableEntity
+public class CustomerAddress : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public long CustomerId { get; set; }
     public Customer Customer { get; set; } = null!;
 

@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
+using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetCountryById;
 using FluentValidation.TestHelper;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Countries.Queries.GetCountryById;

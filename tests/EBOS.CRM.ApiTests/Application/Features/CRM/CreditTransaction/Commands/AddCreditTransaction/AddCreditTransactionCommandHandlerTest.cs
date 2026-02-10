@@ -79,6 +79,7 @@ public class AddCreditTransactionCommandHandlerTest
     }
 
     private static AddCreditTransactionRequest BuildAddRequest() => new(
+            TenantId: 1,
             Date: DateTime.UtcNow,
             Amount: 50m,
             Type: "Consumption",

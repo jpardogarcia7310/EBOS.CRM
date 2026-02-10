@@ -63,10 +63,10 @@ public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditS
 
         return new CustomerResponse(
             entity.Id,
+            entity.TenantId,
             entity.Code,
             entity.Email,
             entity.Phone,
-            entity.CreatedAt,
             entity.StatusId,
             !entity.Erased);
     }

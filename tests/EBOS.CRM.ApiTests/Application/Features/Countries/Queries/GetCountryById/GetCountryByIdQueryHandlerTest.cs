@@ -1,7 +1,8 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.Countries.Queries.GetCountryById;
+using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetCountryById;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -148,5 +149,6 @@ public class GetCountryByIdQueryHandlerTest
         _mapperMock.Verify(m => m.Map<CountryResponse>(It.IsAny<Country>()), Times.Never);
     }
 }
+
 
 

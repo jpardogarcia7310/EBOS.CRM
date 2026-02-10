@@ -38,5 +38,8 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
             .WithOne(c => c.TaxInformation)
             .HasForeignKey<TaxInformation>(ti => ti.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(ti => ti.TenantId)
+            .HasDatabaseName("IX_TaxInformation_TenantId");
     }
 }

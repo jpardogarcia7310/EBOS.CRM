@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -22,7 +19,7 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
 
         var entityRequest = request.CustomerAddressRequest ?? 
                             throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

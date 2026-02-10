@@ -4,17 +4,14 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class PermissionEntityFactoryTest
 {
-    public static Permission CreateValidPermission(
-        string code = "crm.customer.read",
-        string name = "Read Customers",
-        string? description = "Allows reading customers",
-        bool isSystem = true)
+    private static Permission CreateValidPermission(string code = "CRM_READ", string name = "Read CRM",
+        bool isSystem = false)
     {
         return new Permission
         {
             Code = code,
             Name = name,
-            Description = description,
+            Description = "Test permission",
             IsSystem = isSystem
         };
     }
@@ -22,27 +19,21 @@ public class PermissionEntityFactoryTest
     [Fact]
     public void CreateValidPermission_Defaults_AreSet()
     {
-        var entity = CreateValidPermission();
+        var permission = CreateValidPermission();
 
-        Assert.NotNull(entity);
-        Assert.Equal("crm.customer.read", entity.Code);
-        Assert.Equal("Read Customers", entity.Name);
-        Assert.Equal("Allows reading customers", entity.Description);
-        Assert.True(entity.IsSystem);
+        Assert.NotNull(permission);
+        Assert.Equal("CRM_READ", permission.Code);
+        Assert.Equal("Read CRM", permission.Name);
+        Assert.False(permission.IsSystem);
     }
 
     [Fact]
     public void CreateValidPermission_CustomValues_AreApplied()
     {
-        var entity = CreateValidPermission(
-            code: "crm.customer.write",
-            name: "Write Customers",
-            description: "Allows writing customers",
-            isSystem: false);
+        var permission = CreateValidPermission(code: "CRM_WRITE", name: "Write CRM", isSystem: true);
 
-        Assert.Equal("crm.customer.write", entity.Code);
-        Assert.Equal("Write Customers", entity.Name);
-        Assert.Equal("Allows writing customers", entity.Description);
-        Assert.False(entity.IsSystem);
+        Assert.Equal("CRM_WRITE", permission.Code);
+        Assert.Equal("Write CRM", permission.Name);
+        Assert.True(permission.IsSystem);
     }
 }

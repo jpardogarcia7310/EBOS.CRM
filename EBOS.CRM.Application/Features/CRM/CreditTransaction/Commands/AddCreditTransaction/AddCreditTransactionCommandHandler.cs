@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -22,7 +19,7 @@ public class AddCreditTransactionCommandHandler(ICreditTransactionRepository rep
 
         var entityRequest = request.CreditTransactionRequest ?? 
                             throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

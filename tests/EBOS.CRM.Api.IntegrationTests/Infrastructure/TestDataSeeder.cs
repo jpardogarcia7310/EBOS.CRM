@@ -126,6 +126,142 @@ public static class TestDataSeeder
         await db.SaveChangesAsync();
     }
 
+    public static async Task SeedOpportunityStagesAsync(CrmDbContext db)
+    {
+        if (await db.OpportunityStages.AnyAsync())
+        {
+            return;
+        }
+
+        db.OpportunityStages.AddRange(
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Prospección",
+                Order = 1,
+                DefaultProbability = 0.1m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Calificado",
+                Order = 2,
+                DefaultProbability = 0.3m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Propuesta",
+                Order = 3,
+                DefaultProbability = 0.5m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Negociación",
+                Order = 4,
+                DefaultProbability = 0.7m,
+                IsClosed = false,
+                IsWon = false
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Cerrado Ganado",
+                Order = 5,
+                DefaultProbability = 1.0m,
+                IsClosed = true,
+                IsWon = true
+            },
+            new Domain.Entities.CRM.OpportunityStage
+            {
+                TenantId = 0,
+                Name = "Cerrado Perdido",
+                Order = 6,
+                DefaultProbability = 0.0m,
+                IsClosed = true,
+                IsWon = false
+            });
+
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task SeedTenantConfigurationsAsync(CrmDbContext db)
+    {
+        if (await db.TenantConfigurations.AnyAsync())
+        {
+            return;
+        }
+
+        db.TenantConfigurations.AddRange(
+            new Domain.Entities.CRM.TenantConfiguration
+            {
+                TenantId = 1,
+                Key = "limits.maxUsers",
+                ValueJson = "{\"value\":25}",
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = 1
+            },
+            new Domain.Entities.CRM.TenantConfiguration
+            {
+                TenantId = 1,
+                Key = "features.beta",
+                ValueJson = "{\"enabled\":false}",
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = 1
+            });
+
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task SeedTenantQuotasAsync(CrmDbContext db)
+    {
+        if (await db.TenantQuotas.AnyAsync())
+        {
+            return;
+        }
+
+        db.TenantQuotas.Add(
+            new Domain.Entities.CRM.TenantQuota
+            {
+                TenantId = 1,
+                Metric = "users",
+                Limit = 100,
+                Unit = "count",
+                EffectiveFrom = DateTime.UtcNow.AddDays(-1)
+            });
+
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task SeedTenantUsageMetricsAsync(CrmDbContext db)
+    {
+        if (await db.TenantUsageMetrics.AnyAsync())
+        {
+            return;
+        }
+
+        db.TenantUsageMetrics.Add(
+            new Domain.Entities.CRM.TenantUsageMetric
+            {
+                TenantId = 1,
+                Metric = "api.calls",
+                Value = 250,
+                Unit = "count",
+                PeriodStart = DateTime.UtcNow.AddDays(-7),
+                PeriodEnd = DateTime.UtcNow,
+                Source = "gateway"
+            });
+
+        await db.SaveChangesAsync();
+    }
+
     private static IEnumerable<string> ValidateSeedRow(string name, string a2, string a3, string num, string domain, string currencyCode)
     {
         if (string.IsNullOrWhiteSpace(name)) yield return "Name empty";
@@ -136,5 +272,6 @@ public static class TestDataSeeder
         if (string.IsNullOrWhiteSpace(currencyCode) || currencyCode.Length != 3) yield return "CurrencyCode must be 3 letters";
     }
 }
+
 
 

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +26,40 @@ public class BranchOfficeErrorHandlingTest(BranchOfficeErrorHandlingTest.Failing
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
         problem!.Status.Should().Be(500);
+    }
+
+    [Fact]
+    public async Task Add_Returns_500_WhenRepositoryFails()
+    {
+        var request = new AddBranchOfficeRequest(
+            TenantId: 1,
+            Name: "Branch A",
+            PhoneNumber: "+1 555 0101",
+            CorporateCustomerId: 1);
+
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/BranchOffice", request);
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public async Task Update_Returns_500_WhenRepositoryFails()
+    {
+        var request = new UpdateBranchOfficeRequest(
+            Id: 1,
+            TenantId: 1,
+            Name: "Branch A",
+            PhoneNumber: "+1 555 0101",
+            CorporateCustomerId: 1);
+
+        var response = await _client.PutAsJsonAsync($"/api/v{_version}/BranchOffice/1", request);
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public async Task Delete_Returns_500_WhenRepositoryFails()
+    {
+        var response = await _client.DeleteAsync($"/api/v{_version}/BranchOffice/1");
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }
 
     public sealed class FailingBranchOfficeFactory : CustomWebApplicationFactory

@@ -34,5 +34,7 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
 
         builder.HasIndex(bo => bo.CorporateCustomerId)
             .HasDatabaseName("IX_BranchOffice_CorporateCustomerId");
+        builder.HasIndex(bo => bo.TenantId)
+            .HasDatabaseName("IX_BranchOffice_TenantId");
     }
 }

@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,17 @@ public class CountryErrorHandlingTest(CountryErrorHandlingTest.FailingCountryFac
     public async Task GetAll_Returns_500_WhenRepositoryFails()
     {
         var response = await _client.GetAsync($"/api/v{_version}/Country");
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().NotBeNull();
+        problem!.Status.Should().Be(500);
+    }
+
+    [Fact]
+    public async Task GetById_Returns_500_WhenRepositoryFails()
+    {
+        var response = await _client.GetAsync($"/api/v{_version}/Country/1");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();

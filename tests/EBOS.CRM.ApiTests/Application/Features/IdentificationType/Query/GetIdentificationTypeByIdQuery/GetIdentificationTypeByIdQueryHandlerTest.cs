@@ -1,7 +1,7 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery;
+using EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery;
 using IdentificationTypeEntity = EBOS.CRM.Domain.Entities.IdentificationType;
-using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -30,7 +30,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
             .ReturnsAsync(entity);
         _mapperMock.Setup(m => m.Map<IdentificationTypeResponse>(entity)).Returns(dto);
 
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         var result = await _handler.Handle(query, CancellationToken.None);
 
@@ -46,7 +46,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>()))
             .ReturnsAsync((IdentificationTypeEntity?)null);
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(99);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(99);
 
         var result = await _handler.Handle(query, CancellationToken.None);
 
@@ -59,7 +59,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("DB error"));
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
     }
@@ -69,7 +69,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
     {
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         await Assert.ThrowsAsync<OperationCanceledException>(
             () => _handler.Handle(query, cts.Token));
@@ -84,7 +84,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
         _mapperMock.Setup(m => m.Map<IdentificationTypeResponse>(entity))
             .Throws(new InvalidOperationException("Mapping failed"));
 
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => _handler.Handle(query, CancellationToken.None));
@@ -93,7 +93,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
     [Fact]
     public async Task Handle_RepositoryCalledOnce_WithCorrectIdAndToken()
     {
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(42);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(42);
         _repositoryMock.Setup(r => r.GetByIdAsync(42, It.IsAny<CancellationToken>()))
             .ReturnsAsync((IdentificationTypeEntity?)null);
 
@@ -107,7 +107,7 @@ public class GetIdentificationTypeByIdQueryHandlerTest
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync((IdentificationTypeEntity?)null);
-        var query = new global::EBOS.CRM.Application.Features.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
+        var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
         var result = await _handler.Handle(query, CancellationToken.None);
 

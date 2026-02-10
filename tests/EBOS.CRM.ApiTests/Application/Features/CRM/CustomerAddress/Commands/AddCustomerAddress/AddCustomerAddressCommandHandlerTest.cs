@@ -79,6 +79,7 @@ public class AddCustomerAddressCommandHandlerTest
     }
 
     private static AddCustomerAddressRequest BuildAddRequest() => new(
+            TenantId: 1,
             CustomerId: 1,
             AddressId: 1,
             IsPrimary: true,

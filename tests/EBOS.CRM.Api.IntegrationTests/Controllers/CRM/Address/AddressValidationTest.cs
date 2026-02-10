@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
+using EBOS.CRM.IntegrationTests.Infrastructure;
 using FluentAssertions;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.Address;
@@ -24,6 +25,7 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
     public async Task Add_Returns_400_WhenRequestIsInvalid()
     {
         var request = new AddAddressRequest(
+            TenantId: 1,
             Street: "",
             ExternalNumber: "",
             InternalNumber: null,
@@ -48,6 +50,7 @@ public class AddressValidationTest(InMemoryAddressWebApplicationFactory factory)
     public async Task Update_Returns_400_WhenRequestIsInvalid()
     {
         var request = new UpdateAddressRequest(
+            TenantId: 1,
             Street: "",
             ExternalNumber: "",
             InternalNumber: null,

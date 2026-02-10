@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;
@@ -11,16 +9,13 @@ using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetAllIndivid
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.CRM.IndividualCustomer;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class IndividualCustomerController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class IndividualCustomerController(IMediator mediator) : ControllerBase
 {
     #region Commands
     [HttpPost]
@@ -32,7 +27,6 @@ public class IndividualCustomerController(IMediator mediator, IStringLocalizer<S
     {
         return Ok(await mediator.Send(new AddIndividualCustomerCommand(request), cancellationToken));
     }
-
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(IndividualCustomerResponse), StatusCodes.Status200OK)]
@@ -44,17 +38,10 @@ public class IndividualCustomerController(IMediator mediator, IStringLocalizer<S
             cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"IndividualCustomer with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"IndividualCustomer with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -63,18 +50,11 @@ public class IndividualCustomerController(IMediator mediator, IStringLocalizer<S
         var deleted = await mediator.Send(new DeleteIndividualCustomerCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"IndividualCustomer with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"IndividualCustomer with id {id} not found."));
         }
-
         return Ok();
     }
     #endregion
-
     #region Queries
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(IndividualCustomerResponse), StatusCodes.Status200OK)]
@@ -86,14 +66,8 @@ public class IndividualCustomerController(IMediator mediator, IStringLocalizer<S
         var dto = await mediator.Send(new GetIndividualCustomerByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"IndividualCustomer with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"IndividualCustomer with id {id} not found."));
         }
-
         return Ok(dto);
     }
     /// <summary>
@@ -115,39 +89,12 @@ public class IndividualCustomerController(IMediator mediator, IStringLocalizer<S
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        var result = await mediator.Send(new GetAllIndividualCustomersQuery(safePageNumber, safePageSize), 
-            cancellationToken);
+        var result = await mediator.Send(new GetAllIndividualCustomersQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

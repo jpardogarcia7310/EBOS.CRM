@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
 
@@ -84,6 +83,9 @@ public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_currentTransaction != null)
+            return;
+
+        if (!Context.Database.IsRelational())
             return;
 
         _currentTransaction = await Context.Database.BeginTransactionAsync(cancellationToken);

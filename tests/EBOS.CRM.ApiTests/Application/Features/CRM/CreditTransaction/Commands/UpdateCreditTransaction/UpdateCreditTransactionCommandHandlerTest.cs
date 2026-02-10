@@ -98,6 +98,7 @@ public class UpdateCreditTransactionCommandHandlerTest
     }
 
     private static UpdateCreditTransactionRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Date: DateTime.UtcNow,
             Amount: 50m,
             Type: "Consumption",

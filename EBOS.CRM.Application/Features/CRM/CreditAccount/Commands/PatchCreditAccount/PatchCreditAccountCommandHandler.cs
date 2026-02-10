@@ -62,6 +62,7 @@ public class PatchCreditAccountCommandHandler(ICreditAccountRepository repositor
 
         return new CreditAccountResponse(
             entity.Id,
+            entity.TenantId,
             entity.MaxAmount,
             entity.UsedAmount,
             entity.AvailableAmount,

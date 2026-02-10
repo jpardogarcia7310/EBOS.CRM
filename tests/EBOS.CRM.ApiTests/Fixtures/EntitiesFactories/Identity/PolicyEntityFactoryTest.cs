@@ -4,18 +4,14 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class PolicyEntityFactoryTest
 {
-    public static Policy CreateValidPolicy(
-        string code = "crm.customer.access",
-        string name = "Customer Access",
-        string? description = "Customer access policy",
-        bool isSystem = true,
-        bool isActive = true)
+    private static Policy CreateValidPolicy(string code = "CRM_DEFAULT", string name = "CRM Default",
+        bool isSystem = false, bool isActive = true)
     {
         return new Policy
         {
             Code = code,
             Name = name,
-            Description = description,
+            Description = "Test policy",
             IsSystem = isSystem,
             IsActive = isActive
         };
@@ -24,30 +20,23 @@ public class PolicyEntityFactoryTest
     [Fact]
     public void CreateValidPolicy_Defaults_AreSet()
     {
-        var entity = CreateValidPolicy();
+        var policy = CreateValidPolicy();
 
-        Assert.NotNull(entity);
-        Assert.Equal("crm.customer.access", entity.Code);
-        Assert.Equal("Customer Access", entity.Name);
-        Assert.Equal("Customer access policy", entity.Description);
-        Assert.True(entity.IsSystem);
-        Assert.True(entity.IsActive);
+        Assert.NotNull(policy);
+        Assert.Equal("CRM_DEFAULT", policy.Code);
+        Assert.Equal("CRM Default", policy.Name);
+        Assert.False(policy.IsSystem);
+        Assert.True(policy.IsActive);
     }
 
     [Fact]
     public void CreateValidPolicy_CustomValues_AreApplied()
     {
-        var entity = CreateValidPolicy(
-            code: "crm.customer.edit",
-            name: "Customer Edit",
-            description: "Edit customers",
-            isSystem: false,
-            isActive: false);
+        var policy = CreateValidPolicy(code: "CRM_ADMIN", name: "CRM Admin", isSystem: true, isActive: false);
 
-        Assert.Equal("crm.customer.edit", entity.Code);
-        Assert.Equal("Customer Edit", entity.Name);
-        Assert.Equal("Edit customers", entity.Description);
-        Assert.False(entity.IsSystem);
-        Assert.False(entity.IsActive);
+        Assert.Equal("CRM_ADMIN", policy.Code);
+        Assert.Equal("CRM Admin", policy.Name);
+        Assert.True(policy.IsSystem);
+        Assert.False(policy.IsActive);
     }
 }

@@ -4,13 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class AbacAttributeEntityFactoryTest
 {
-    public static AbacAttribute CreateValidAbacAttribute(
-        string code = "subject.department",
-        string name = "Department",
-        string category = "Subject",
-        string dataType = "String",
-        string? description = "User department",
-        bool isActive = true)
+    private static AbacAttribute CreateValidAbacAttribute(string code = "SUBJECT_ID", string name = "Subject Id",
+        string category = "Subject", string dataType = "String", bool isActive = true)
     {
         return new AbacAttribute
         {
@@ -18,7 +13,7 @@ public class AbacAttributeEntityFactoryTest
             Name = name,
             Category = category,
             DataType = dataType,
-            Description = description,
+            Description = "Test attribute",
             IsActive = isActive
         };
     }
@@ -26,33 +21,26 @@ public class AbacAttributeEntityFactoryTest
     [Fact]
     public void CreateValidAbacAttribute_Defaults_AreSet()
     {
-        var entity = CreateValidAbacAttribute();
+        var attribute = CreateValidAbacAttribute();
 
-        Assert.NotNull(entity);
-        Assert.Equal("subject.department", entity.Code);
-        Assert.Equal("Department", entity.Name);
-        Assert.Equal("Subject", entity.Category);
-        Assert.Equal("String", entity.DataType);
-        Assert.Equal("User department", entity.Description);
-        Assert.True(entity.IsActive);
+        Assert.NotNull(attribute);
+        Assert.Equal("SUBJECT_ID", attribute.Code);
+        Assert.Equal("Subject Id", attribute.Name);
+        Assert.Equal("Subject", attribute.Category);
+        Assert.Equal("String", attribute.DataType);
+        Assert.True(attribute.IsActive);
     }
 
     [Fact]
     public void CreateValidAbacAttribute_CustomValues_AreApplied()
     {
-        var entity = CreateValidAbacAttribute(
-            code: "resource.type",
-            name: "ResourceType",
-            category: "Resource",
-            dataType: "Number",
-            description: "Type code",
+        var attribute = CreateValidAbacAttribute(code: "ROLE", name: "Role", category: "Subject", dataType: "String",
             isActive: false);
 
-        Assert.Equal("resource.type", entity.Code);
-        Assert.Equal("ResourceType", entity.Name);
-        Assert.Equal("Resource", entity.Category);
-        Assert.Equal("Number", entity.DataType);
-        Assert.Equal("Type code", entity.Description);
-        Assert.False(entity.IsActive);
+        Assert.Equal("ROLE", attribute.Code);
+        Assert.Equal("Role", attribute.Name);
+        Assert.Equal("Subject", attribute.Category);
+        Assert.Equal("String", attribute.DataType);
+        Assert.False(attribute.IsActive);
     }
 }

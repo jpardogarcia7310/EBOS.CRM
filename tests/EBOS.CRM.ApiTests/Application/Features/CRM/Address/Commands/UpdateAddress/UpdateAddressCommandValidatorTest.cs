@@ -29,9 +29,29 @@ public class UpdateAddressCommandValidatorTest
     }
 
     [Fact]
+    public void Validate_NullRequest_Fails()
+    {
+        var command = new UpdateAddressCommand(1, null!);
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest);
+    }
+
+    [Fact]
     public void Validate_EmptyStreet_Fails()
     {
         var command = new UpdateAddressCommand(1, BuildValidRequest() with { Street = "" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Street);
+    }
+
+    [Fact]
+    public void Validate_StreetTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { Street = new string('a', 201) });
 
         var result = _validator.TestValidate(command);
 
@@ -49,9 +69,119 @@ public class UpdateAddressCommandValidatorTest
     }
 
     [Fact]
+    public void Validate_ExternalNumberTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { ExternalNumber = new string('a', 21) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.ExternalNumber);
+    }
+
+    [Fact]
+    public void Validate_InternalNumberTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { InternalNumber = new string('a', 21) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.InternalNumber);
+    }
+
+    [Fact]
+    public void Validate_BetweenStreet1TooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { BetweenStreet1 = new string('a', 201) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.BetweenStreet1);
+    }
+
+    [Fact]
+    public void Validate_BetweenStreet2TooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { BetweenStreet2 = new string('a', 201) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.BetweenStreet2);
+    }
+
+    [Fact]
+    public void Validate_NeighbourhoodTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { Neighbourhood = new string('a', 201) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Neighbourhood);
+    }
+
+    [Fact]
+    public void Validate_EmptyCity_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { City = "" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.City);
+    }
+
+    [Fact]
+    public void Validate_CityTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { City = new string('a', 151) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.City);
+    }
+
+    [Fact]
+    public void Validate_EmptyState_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { StateOrProvince = "" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.StateOrProvince);
+    }
+
+    [Fact]
+    public void Validate_StateTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { StateOrProvince = new string('a', 151) });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.StateOrProvince);
+    }
+
+    [Fact]
     public void Validate_ShortPostalCode_Fails()
     {
         var command = new UpdateAddressCommand(1, BuildValidRequest() with { PostalCode = "1" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.PostalCode);
+    }
+
+    [Fact]
+    public void Validate_EmptyPostalCode_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { PostalCode = "" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.PostalCode);
+    }
+
+    [Fact]
+    public void Validate_PostalCodeTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { PostalCode = new string('a', 21) });
 
         var result = _validator.TestValidate(command);
 
@@ -63,6 +193,16 @@ public class UpdateAddressCommandValidatorTest
     {
         var command = new UpdateAddressCommand(1,
             BuildValidRequest() with { GoogleMapsUrl = "https://example.com" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.GoogleMapsUrl);
+    }
+
+    [Fact]
+    public void Validate_GoogleMapsUrlTooLong_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { GoogleMapsUrl = $"https://maps.{new string('a', 490)}" });
 
         var result = _validator.TestValidate(command);
 
@@ -81,12 +221,32 @@ public class UpdateAddressCommandValidatorTest
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Latitude);
     }
 
+    [Fact]
+    public void Validate_NonNumericLatitude_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { Latitude = "nope" });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Latitude);
+    }
+
     [Theory]
     [InlineData("181")]
     [InlineData("-181")]
     public void Validate_InvalidLongitude_Fails(string value)
     {
         var command = new UpdateAddressCommand(1, BuildValidRequest() with { Longitude = value });
+
+        var result = _validator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Longitude);
+    }
+
+    [Fact]
+    public void Validate_NonNumericLongitude_Fails()
+    {
+        var command = new UpdateAddressCommand(1, BuildValidRequest() with { Longitude = "bad" });
 
         var result = _validator.TestValidate(command);
 
@@ -112,6 +272,7 @@ public class UpdateAddressCommandValidatorTest
     private static UpdateAddressCommand BuildValidCommand() => new(1, BuildValidRequest());
 
     private static UpdateAddressRequest BuildValidRequest() => new(
+            TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,

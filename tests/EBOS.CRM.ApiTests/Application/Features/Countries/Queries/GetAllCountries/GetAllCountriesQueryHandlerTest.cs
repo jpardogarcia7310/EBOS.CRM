@@ -1,7 +1,8 @@
 using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
+using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
 
@@ -183,3 +184,4 @@ public class GetAllCountriesQueryHandlerTest
             Times.Once);
     }
 }
+

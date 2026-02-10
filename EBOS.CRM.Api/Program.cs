@@ -1,32 +1,27 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Api.Extensions;
+using EBOS.CRM.Api.Filters;
+using EBOS.CRM.Api.HostedServices;
+using EBOS.CRM.Api.Infrastructure;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
-using EBOS.CRM.Api.Security;
-using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Services.Commands;
 using EBOS.CRM.Infrastructure;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-<<<<<<< features/Foundation/Security-&-IAM/API
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-=======
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Options;
-using System.Security.Claims;
->>>>>>> develop-Security&IAM
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -43,15 +38,51 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 // Application layer registrations
 services.AddApplication();
 builder.Services.AddApplicationMappings();
+services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+services.AddOptions<CommandExecutionOptions>()
+    .Bind(builder.Configuration.GetSection(CommandExecutionOptions.SectionName));
 
 // Infrastructure
 services.AddInfrastructure(builder.Configuration);
 
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ICurrentUserContext>());
+services.AddSingleton<ProblemDetailsFactory, CrmProblemDetailsFactory>();
+if (builder.Environment.IsDevelopment())
+{
+    services.AddHostedService<LookupSeedHostedService>();
+}
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
+services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
+services.AddOptions<TenantIsolationOptions>()
+    .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
+    .Validate(options => options.MinTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MinTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MaxTraversalDepth is >= 1 and <= 50,
+        "TenantIsolation:MaxTraversalDepth must be between 1 and 50.")
+    .Validate(options => options.MinTraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:MinTraversalDepth must be <= TenantIsolation:MaxTraversalDepth.")
+    .Validate(options =>
+            options.TraversalDepth >= options.MinTraversalDepth &&
+            options.TraversalDepth <= options.MaxTraversalDepth,
+        "TenantIsolation:TraversalDepth must be within the configured min/max range.")
+    .ValidateOnStart();
+
+services.AddOptions<MultiTenantOptions>()
+    .Bind(builder.Configuration.GetSection(MultiTenantOptions.SectionName))
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         !string.IsNullOrWhiteSpace(options.ConnectionStringTemplate),
+        "MultiTenant:ConnectionStringTemplate is required when Strategy is Database.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Database ||
+                         options.ConnectionStringTemplate!.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase),
+        "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.")
+    .Validate(options => options.Strategy != MultiTenantStrategy.Schema ||
+                         !string.IsNullOrWhiteSpace(options.SchemaPrefix),
+        "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
+    .ValidateOnStart();
 services.AddLocalization();
 
 var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
@@ -131,14 +162,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 services
     .AddControllers(options =>
     {
-<<<<<<< features/Foundation/Security-&-IAM/API
-        if (authOptions.Enabled)
-        {
-            options.Filters.Add(new AuthorizeFilter("ApiUser"));
-        }
-=======
-        options.Filters.Add<PolicyAuthorizationFilter>();
->>>>>>> develop-Security&IAM
+        options.Filters.Add<PaginationValidationFilter>();
     })
     .AddJsonOptions(opts =>
     {
@@ -283,6 +307,8 @@ catch (Exception ex)
 // Middleware pipeline
 app.UseCorrelationId();
 app.UseApiErrorHandling();
+app.UseTenantResolution();
+app.UseTenantRequirement();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -292,6 +318,7 @@ app.MapControllers();
 
 await app.RunAsync();
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public partial class Program
 {
     // Exposed for WebApplicationFactory in integration tests.

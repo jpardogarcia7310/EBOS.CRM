@@ -68,7 +68,7 @@ public class UpdateAddressCommandHandlerTest
             CountryId = 1,
             AddressTypeId = 1
         };
-        var response = new AddressResponse(1, "New", "2", null, null, null, null, "Quito", "Pichincha",
+        var response = new AddressResponse(1, 1, "New", "2", null, null, null, null, "Quito", "Pichincha",
             "EC17001", null, null, null, 1, 1, true);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
@@ -119,6 +119,7 @@ public class UpdateAddressCommandHandlerTest
     }
 
     private static UpdateAddressRequest BuildValidRequest() => new(
+            TenantId: 1,
         Street: "New",
         ExternalNumber: "2",
         InternalNumber: null,

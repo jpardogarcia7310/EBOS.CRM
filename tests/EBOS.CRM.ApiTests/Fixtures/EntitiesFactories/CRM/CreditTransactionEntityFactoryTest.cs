@@ -4,12 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class CreditTransactionEntityFactoryTest
 {
-    public static CreditTransaction CreateValidCreditTransaction(
-        DateTime? date = null,
-        decimal amount = 10m,
-        string type = "Consumption",
-        string? externalReference = "REF-1",
-        string? comments = "Test",
+    private static CreditTransaction CreateValidCreditTransaction(DateTime? date = null, decimal amount = 10m,
+        string type = "Consumption", string? externalReference = "REF-1", string? comments = "Test",
         long creditAccountId = 1)
     {
         return new CreditTransaction

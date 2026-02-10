@@ -244,6 +244,136 @@ public static class IntegrationTestCrmDataSeeder
         }
 
         context.SaveChanges();
+
+        if (!context.OpportunityStages.Any())
+        {
+            context.OpportunityStages.AddRange(
+                new OpportunityStage
+                {
+                    TenantId = 1,
+                    Name = "Prospecting",
+                    Order = 1,
+                    DefaultProbability = 0.1m,
+                    IsClosed = false,
+                    IsWon = false
+                },
+                new OpportunityStage
+                {
+                    TenantId = 1,
+                    Name = "Qualified",
+                    Order = 2,
+                    DefaultProbability = 0.3m,
+                    IsClosed = false,
+                    IsWon = false
+                });
+        }
+
+        context.SaveChanges();
+
+        var stageId = context.OpportunityStages.Select(s => s.Id).First();
+
+        if (!context.Leads.Any())
+        {
+            context.Leads.Add(new Lead
+            {
+                TenantId = 1,
+                Source = "Web",
+                Status = "New",
+                OwnerUserId = 10,
+                CompanyName = "Contoso",
+                ContactName = "Jane Doe",
+                Email = "lead@contoso.com",
+                Phone = "1234567890",
+                EstimatedValue = 5000m,
+                Notes = "Seed lead"
+            });
+        }
+
+        if (!context.Opportunities.Any())
+        {
+            context.Opportunities.Add(new Opportunity
+            {
+                TenantId = 1,
+                Name = "Seed Opportunity",
+                StageId = stageId,
+                OwnerUserId = 10,
+                CustomerId = corporateCustomerId,
+                ExpectedCloseDate = DateTime.UtcNow.AddDays(30),
+                Amount = 10000m,
+                Probability = 0.5m,
+                Source = "Seed"
+            });
+        }
+
+        context.SaveChanges();
+
+        var opportunityId = context.Opportunities.Select(o => o.Id).First();
+
+        if (!context.Quotes.Any())
+        {
+            context.Quotes.Add(new Quote
+            {
+                TenantId = 1,
+                OpportunityId = opportunityId,
+                Status = "Draft",
+                ReferenceNumber = "Q-1001",
+                SubtotalAmount = 10000m,
+                DiscountAmount = 0m,
+                TotalAmount = 10000m,
+                Notes = "Seed quote"
+            });
+        }
+
+        if (!context.TenantConfigurations.Any())
+        {
+            context.TenantConfigurations.AddRange(
+                new TenantConfiguration
+                {
+                    TenantId = 1,
+                    Key = "limits.maxUsers",
+                    ValueJson = "{\"value\":25}",
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = 1
+                },
+                new TenantConfiguration
+                {
+                    TenantId = 1,
+                    Key = "features.beta",
+                    ValueJson = "{\"enabled\":false}",
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = 1
+                });
+        }
+
+        if (!context.TenantQuotas.Any())
+        {
+            context.TenantQuotas.Add(
+                new TenantQuota
+                {
+                    TenantId = 1,
+                    Metric = "users",
+                    Limit = 100,
+                    Unit = "count",
+                    EffectiveFrom = DateTime.UtcNow.AddDays(-1)
+                });
+        }
+
+        if (!context.TenantUsageMetrics.Any())
+        {
+            context.TenantUsageMetrics.Add(
+                new TenantUsageMetric
+                {
+                    TenantId = 1,
+                    Metric = "api.calls",
+                    Value = 250,
+                    Unit = "count",
+                    PeriodStart = DateTime.UtcNow.AddDays(-7),
+                    PeriodEnd = DateTime.UtcNow,
+                    Source = "gateway"
+                });
+        }
+
+        context.SaveChanges();
     }
 }
 

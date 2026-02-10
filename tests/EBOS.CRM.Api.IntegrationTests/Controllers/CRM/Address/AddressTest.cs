@@ -4,6 +4,7 @@ using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
 using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.IntegrationTests.Infrastructure;
 using FluentAssertions;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.Address;
@@ -67,6 +68,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     public async Task Add_Returns_Address_WhenValid()
     {
         var request = new AddAddressRequest(
+            TenantId: 1,
             Street: "Second St",
             ExternalNumber: "45",
             InternalNumber: null,
@@ -95,6 +97,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     public async Task Update_Returns_Address_WhenValid()
     {
         var request = new UpdateAddressRequest(
+            TenantId: 1,
             Street: "Updated St",
             ExternalNumber: "777",
             InternalNumber: null,
@@ -123,6 +126,7 @@ public class AddressTest : IClassFixture<InMemoryAddressWebApplicationFactory>
     public async Task Update_Returns_404_WhenNotFound()
     {
         var request = new UpdateAddressRequest(
+            TenantId: 1,
             Street: "Updated St",
             ExternalNumber: "777",
             InternalNumber: null,

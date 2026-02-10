@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OpenApi.Models;
 
 namespace EBOS.CRM.Api.Swagger;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public sealed class ErrorResponsesOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)

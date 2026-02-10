@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.AddTaxInformationAddress;
@@ -11,16 +9,13 @@ using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Queries.GetAllTaxI
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Localization;
-using EBOS.CRM.Api.Resources;
-
 namespace EBOS.CRM.Api.Controllers.CRM.TaxInformationAddress;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class TaxInformationAddressController(IMediator mediator, IStringLocalizer<SharedResource> localizer) : ControllerBase
+public class TaxInformationAddressController(IMediator mediator) : ControllerBase
 {
     #region Commands
     [HttpPost]
@@ -32,7 +27,6 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
     {
         return Ok(await mediator.Send(new AddTaxInformationAddressCommand(request), cancellationToken));
     }
-
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TaxInformationAddressResponse), StatusCodes.Status200OK)]
@@ -44,17 +38,10 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
             cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"TaxInformationAddress with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"TaxInformationAddress with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -63,18 +50,11 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
         var deleted = await mediator.Send(new DeleteTaxInformationAddressCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"TaxInformationAddress with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"TaxInformationAddress with id {id} not found."));
         }
-
         return Ok();
     }
     #endregion
-
     #region Queries
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(TaxInformationAddressResponse), StatusCodes.Status200OK)]
@@ -87,14 +67,8 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
             cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"TaxInformationAddress with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"TaxInformationAddress with id {id} not found."));
         }
-
         return Ok(dto);
     }
     /// <summary>
@@ -116,39 +90,12 @@ public class TaxInformationAddressController(IMediator mediator, IStringLocalize
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        if (safePageSize > settings.MaxPageSize)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid pageSize",
-                Detail = localizer["InvalidPageSize", settings.MaxPageSize],
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        var result = await mediator.Send(new GetAllTaxInformationAddressesQuery(safePageNumber, safePageSize), 
-            cancellationToken);
+        var result = await mediator.Send(new GetAllTaxInformationAddressesQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
-
     #endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

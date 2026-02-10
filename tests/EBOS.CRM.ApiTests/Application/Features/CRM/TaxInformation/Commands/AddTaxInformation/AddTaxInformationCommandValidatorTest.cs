@@ -19,6 +19,7 @@ public class AddTaxInformationCommandValidatorTest
     }
 
     private static AddTaxInformationRequest BuildAddRequest() => new(
+            TenantId: 1,
             TaxName: "Tax",
             TaxIdentificationNumber: "TAX123",
             CustomerId: 1

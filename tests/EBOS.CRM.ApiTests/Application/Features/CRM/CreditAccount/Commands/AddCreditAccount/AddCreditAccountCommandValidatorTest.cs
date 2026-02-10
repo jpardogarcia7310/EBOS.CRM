@@ -19,6 +19,7 @@ public class AddCreditAccountCommandValidatorTest
     }
 
     private static AddCreditAccountRequest BuildAddRequest() => new(
+            TenantId: 1,
             MaxAmount: 1000m,
             UsedAmount: 100m,
             CustomerId: 1

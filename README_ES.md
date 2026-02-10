@@ -17,6 +17,18 @@ Este proyecto es **Software Libre**. Su objetivo es llegar a ser un stack CRM in
 - Versionado de API con ejemplos `v1` y `v2`.
 - Formato de errores Problem Details (RFC 7807).
 - Swagger UI con filtros y validaciones.
+- Base multi-tenant: modelo de dominio, validacion, middleware y aislamiento de datos.
+
+## Funcionalidades multi-tenant implementadas
+
+- Entidad Tenant y TenantId en agregados CRM.
+- Invariantes tenant-aware y enforcement en escritura.
+- Abstraccion de servicio de contexto de tenant.
+- Validacion para imponer aislamiento de tenant.
+- Filtros globales de EF Core por TenantId.
+- Estrategia configurable de aislamiento por esquema/BD.
+- Middleware de resolucion de tenant (header y subdominio).
+- Propagacion del contexto de tenant en el manejo de requests.
 
 ## Roadmap (futuro)
 
@@ -196,6 +208,27 @@ Los errores siguen `application/problem+json` (RFC 7807). Ejemplo:
       }
     ]
   }
+}
+```
+
+## Configuracion
+
+### Aislamiento de tenant
+
+`TenantIsolation:TraversalDepth` controla cuan profundo se recorre el grafo de request para validar el tenant.
+El rango permitido se configura con `TenantIsolation:MinTraversalDepth` y
+`TenantIsolation:MaxTraversalDepth`.
+
+- Rango: `1` a `50`
+- Default: `10`
+
+Ejemplo:
+
+```json
+"TenantIsolation": {
+  "MinTraversalDepth": 1,
+  "MaxTraversalDepth": 50,
+  "TraversalDepth": 10
 }
 ```
 

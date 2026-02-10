@@ -16,14 +16,13 @@ public class GetAllTaxInformationAddressesQueryHandlerTest
     {
         var handler = new GetAllTaxInformationAddressesQueryHandler(_repositoryMock.Object, _mapperMock.Object);
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress> { new() };
-        var dtos = new List<TaxInformationAddressResponse>();
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<TaxInformationAddressResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<TaxInformationAddressResponse>());
 
         var result = await handler.Handle(new GetAllTaxInformationAddressesQuery(), CancellationToken.None);
 

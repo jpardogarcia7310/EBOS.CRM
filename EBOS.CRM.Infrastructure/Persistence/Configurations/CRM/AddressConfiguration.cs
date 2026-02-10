@@ -80,6 +80,8 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasDatabaseName("IX_Address_City_State");
         builder.HasIndex(a => new { a.CountryId, a.City })
             .HasDatabaseName("IX_Address_Country_City");
+        builder.HasIndex(a => a.TenantId)
+            .HasDatabaseName("IX_Address_TenantId");
     }
 }
 

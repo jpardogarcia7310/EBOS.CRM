@@ -3,7 +3,7 @@ using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
 using FluentAssertions;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.CustomerAddress;
+namespace EBOS.CRM.IntegrationTests.Controllers.CRM.CustomerAddress;
 
 public class CustomerAddressConcurrencyTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

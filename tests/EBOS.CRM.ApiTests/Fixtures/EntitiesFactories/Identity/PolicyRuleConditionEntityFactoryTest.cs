@@ -4,19 +4,14 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class PolicyRuleConditionEntityFactoryTest
 {
-    public static PolicyRuleCondition CreateValidPolicyRuleCondition(
-        long policyRuleId = 1,
-        long attributeId = 2,
-        string op = "Equals",
-        string value = "Sales",
-        string valueType = "String",
-        bool isNegated = false)
+    private static PolicyRuleCondition CreateValidPolicyRuleCondition(long policyRuleId = 1, long attributeId = 2,
+        string @operator = "Equals", string value = "admin", string valueType = "String", bool isNegated = false)
     {
         return new PolicyRuleCondition
         {
             PolicyRuleId = policyRuleId,
             AttributeId = attributeId,
-            Operator = op,
+            Operator = @operator,
             Value = value,
             ValueType = valueType,
             IsNegated = isNegated
@@ -26,33 +21,28 @@ public class PolicyRuleConditionEntityFactoryTest
     [Fact]
     public void CreateValidPolicyRuleCondition_Defaults_AreSet()
     {
-        var entity = CreateValidPolicyRuleCondition();
+        var condition = CreateValidPolicyRuleCondition();
 
-        Assert.NotNull(entity);
-        Assert.Equal(1, entity.PolicyRuleId);
-        Assert.Equal(2, entity.AttributeId);
-        Assert.Equal("Equals", entity.Operator);
-        Assert.Equal("Sales", entity.Value);
-        Assert.Equal("String", entity.ValueType);
-        Assert.False(entity.IsNegated);
+        Assert.NotNull(condition);
+        Assert.Equal(1, condition.PolicyRuleId);
+        Assert.Equal(2, condition.AttributeId);
+        Assert.Equal("Equals", condition.Operator);
+        Assert.Equal("admin", condition.Value);
+        Assert.Equal("String", condition.ValueType);
+        Assert.False(condition.IsNegated);
     }
 
     [Fact]
     public void CreateValidPolicyRuleCondition_CustomValues_AreApplied()
     {
-        var entity = CreateValidPolicyRuleCondition(
-            policyRuleId: 10,
-            attributeId: 20,
-            op: "In",
-            value: "IT",
-            valueType: "String",
-            isNegated: true);
+        var condition = CreateValidPolicyRuleCondition(policyRuleId: 10, attributeId: 20, @operator: "Contains",
+            value: "sales", valueType: "String", isNegated: true);
 
-        Assert.Equal(10, entity.PolicyRuleId);
-        Assert.Equal(20, entity.AttributeId);
-        Assert.Equal("In", entity.Operator);
-        Assert.Equal("IT", entity.Value);
-        Assert.Equal("String", entity.ValueType);
-        Assert.True(entity.IsNegated);
+        Assert.Equal(10, condition.PolicyRuleId);
+        Assert.Equal(20, condition.AttributeId);
+        Assert.Equal("Contains", condition.Operator);
+        Assert.Equal("sales", condition.Value);
+        Assert.Equal("String", condition.ValueType);
+        Assert.True(condition.IsNegated);
     }
 }

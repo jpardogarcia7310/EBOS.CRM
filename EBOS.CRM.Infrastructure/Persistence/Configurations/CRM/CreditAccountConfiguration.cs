@@ -57,6 +57,8 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         // Index for FK: CreditAccount.CustomerId
         builder.HasIndex(c => c.CustomerId)
                .HasDatabaseName("IX_CreditAccount_CustomerId");
+        builder.HasIndex(c => c.TenantId)
+               .HasDatabaseName("IX_CreditAccount_TenantId");
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
         // FK: CreditTransactions.CreditAccountId

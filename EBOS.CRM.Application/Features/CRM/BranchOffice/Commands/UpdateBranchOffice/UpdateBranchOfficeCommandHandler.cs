@@ -39,7 +39,7 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOffice),
+                Entity: nameof(global::EBOS.CRM.Domain.Entities.CRM.BranchOffice),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

@@ -1,4 +1,4 @@
-using System;
+using EBOS.CRM.Domain.Entities;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 

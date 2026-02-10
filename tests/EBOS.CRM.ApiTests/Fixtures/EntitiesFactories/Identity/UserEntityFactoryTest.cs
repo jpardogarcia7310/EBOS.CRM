@@ -4,12 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class UserEntityFactoryTest
 {
-    public static User CreateValidUser(
-        string externalId = "ext-001",
-        string username = "jdoe",
-        string email = "jdoe@example.com",
-        string displayName = "John Doe",
-        bool isActive = true)
+    private static User CreateValidUser(string externalId = "ext-123", string username = "jdoe",
+        string email = "jdoe@example.com", string displayName = "John Doe", bool isActive = true)
     {
         return new User
         {
@@ -24,30 +20,26 @@ public class UserEntityFactoryTest
     [Fact]
     public void CreateValidUser_Defaults_AreSet()
     {
-        var entity = CreateValidUser();
+        var user = CreateValidUser();
 
-        Assert.NotNull(entity);
-        Assert.Equal("ext-001", entity.ExternalId);
-        Assert.Equal("jdoe", entity.Username);
-        Assert.Equal("jdoe@example.com", entity.Email);
-        Assert.Equal("John Doe", entity.DisplayName);
-        Assert.True(entity.IsActive);
+        Assert.NotNull(user);
+        Assert.Equal("ext-123", user.ExternalId);
+        Assert.Equal("jdoe", user.Username);
+        Assert.Equal("jdoe@example.com", user.Email);
+        Assert.Equal("John Doe", user.DisplayName);
+        Assert.True(user.IsActive);
     }
 
     [Fact]
     public void CreateValidUser_CustomValues_AreApplied()
     {
-        var entity = CreateValidUser(
-            externalId: "ext-002",
-            username: "asmith",
-            email: "asmith@example.com",
-            displayName: "Alice Smith",
-            isActive: false);
+        var user = CreateValidUser(externalId: "ext-456", username: "asmith", email: "asmith@example.com",
+            displayName: "Alice Smith", isActive: false);
 
-        Assert.Equal("ext-002", entity.ExternalId);
-        Assert.Equal("asmith", entity.Username);
-        Assert.Equal("asmith@example.com", entity.Email);
-        Assert.Equal("Alice Smith", entity.DisplayName);
-        Assert.False(entity.IsActive);
+        Assert.Equal("ext-456", user.ExternalId);
+        Assert.Equal("asmith", user.Username);
+        Assert.Equal("asmith@example.com", user.Email);
+        Assert.Equal("Alice Smith", user.DisplayName);
+        Assert.False(user.IsActive);
     }
 }

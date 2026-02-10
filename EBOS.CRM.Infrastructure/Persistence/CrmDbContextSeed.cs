@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
@@ -45,6 +46,10 @@ public static class CrmDbContextSeed
         if (!await context.IdentificationTypes.AnyAsync(cancellationToken))
         {
             await SeedIdentificationTypes(context, cancellationToken);
+        }
+        if (!await context.OpportunityStages.AnyAsync(cancellationToken))
+        {
+            await SeedOpportunityStages(context, cancellationToken);
         }
     }
 
@@ -1358,6 +1363,37 @@ public static class CrmDbContextSeed
         });
     }
 
+    private static async Task SeedOpportunityStages(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var stages = new List<OpportunityStage>
+        {
+            new() { TenantId = 0, Name = "Prospección", Order = 1, DefaultProbability = 0.1m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Calificado", Order = 2, DefaultProbability = 0.3m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Propuesta", Order = 3, DefaultProbability = 0.5m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Negociación", Order = 4, DefaultProbability = 0.7m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Cerrado Ganado", Order = 5, DefaultProbability = 1.0m, IsClosed = true, IsWon = true },
+            new() { TenantId = 0, Name = "Cerrado Perdido", Order = 6, DefaultProbability = 0.0m, IsClosed = true, IsWon = false }
+        };
+
+        var invalid = stages
+            .Select((s, i) => new { Index = i, Stage = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.Stage.Name) ||
+                x.Stage.DefaultProbability < 0 ||
+                x.Stage.DefaultProbability > 1)
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid OpportunityStages entries. Please validate the seed source.");
+        }
+
+        await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
+        {
+            await context.AddRangeAsync(stages, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        });
+    }
+
     private static async Task SaveChangesWithOptionalTransactionAsync(CrmDbContext context,
         CancellationToken cancellationToken, Func<Task> action)
     {
@@ -1380,4 +1416,5 @@ public static class CrmDbContextSeed
         }
     }
 }
+
 

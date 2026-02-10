@@ -4,18 +4,14 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.Identity;
 
 public class RoleEntityFactoryTest
 {
-    public static Role CreateValidRole(
-        string code = "admin",
-        string name = "Administrator",
-        string? description = "System administrator",
-        bool isSystem = true,
-        bool isActive = true)
+    private static Role CreateValidRole(string code = "CRM_USER", string name = "CRM User",
+        bool isSystem = false, bool isActive = true)
     {
         return new Role
         {
             Code = code,
             Name = name,
-            Description = description,
+            Description = "Test role",
             IsSystem = isSystem,
             IsActive = isActive
         };
@@ -24,30 +20,23 @@ public class RoleEntityFactoryTest
     [Fact]
     public void CreateValidRole_Defaults_AreSet()
     {
-        var entity = CreateValidRole();
+        var role = CreateValidRole();
 
-        Assert.NotNull(entity);
-        Assert.Equal("admin", entity.Code);
-        Assert.Equal("Administrator", entity.Name);
-        Assert.Equal("System administrator", entity.Description);
-        Assert.True(entity.IsSystem);
-        Assert.True(entity.IsActive);
+        Assert.NotNull(role);
+        Assert.Equal("CRM_USER", role.Code);
+        Assert.Equal("CRM User", role.Name);
+        Assert.False(role.IsSystem);
+        Assert.True(role.IsActive);
     }
 
     [Fact]
     public void CreateValidRole_CustomValues_AreApplied()
     {
-        var entity = CreateValidRole(
-            code: "user",
-            name: "User",
-            description: "Standard user",
-            isSystem: false,
-            isActive: false);
+        var role = CreateValidRole(code: "CRM_ADMIN", name: "CRM Admin", isSystem: true, isActive: false);
 
-        Assert.Equal("user", entity.Code);
-        Assert.Equal("User", entity.Name);
-        Assert.Equal("Standard user", entity.Description);
-        Assert.False(entity.IsSystem);
-        Assert.False(entity.IsActive);
+        Assert.Equal("CRM_ADMIN", role.Code);
+        Assert.Equal("CRM Admin", role.Name);
+        Assert.True(role.IsSystem);
+        Assert.False(role.IsActive);
     }
 }

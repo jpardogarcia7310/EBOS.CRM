@@ -1,3 +1,4 @@
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -7,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
+namespace EBOS.CRM.IntegrationTests.Infrastructure;
+using EBOS.CRM.Api.Constants;
 
 public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string _inMemoryDbName = $"InMemoryAddressTestsDb-{Guid.NewGuid():N}";
     public InMemoryAddressRepository Repository { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -27,7 +30,7 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
 
             services.AddDbContext<CrmDbContext>(options =>
             {
-                options.UseInMemoryDatabase("InMemoryAddressTestsDb");
+                options.UseInMemoryDatabase(_inMemoryDbName);
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
 
@@ -40,6 +43,17 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
 
             services.AddSingleton<IAddressRepository>(Repository);
 
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+            db.Database.EnsureCreated();
+            var normalizer = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Application.Services.Interfaces.ILookupNormalizationService>();
+            normalizer.NormalizeAsync().GetAwaiter().GetResult();
+            TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedIdentificationTypesAsync(db).GetAwaiter().GetResult();
+            TestDataSeeder.SeedStatusesAsync(db).GetAwaiter().GetResult();
+            normalizer.NormalizeAsync().GetAwaiter().GetResult();
+
             var currentUserDescriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(ICurrentUserContext));
             if (currentUserDescriptor != null)
@@ -49,6 +63,13 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
 
             services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
         });
+    }
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Remove(HeaderNames.TenantId);
+        client.DefaultRequestHeaders.Add(HeaderNames.TenantId, "1");
+        base.ConfigureClient(client);
     }
 }
 

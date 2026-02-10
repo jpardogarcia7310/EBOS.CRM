@@ -1,10 +1,12 @@
 ﻿using System;
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class BranchOfficeAddress : ErasableEntity
+public class BranchOfficeAddress : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     public long BranchOfficeId { get; set; }
     public BranchOffice BranchOffice { get; set; } = null!;
 
