@@ -1,5 +1,6 @@
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using FluentAssertions;

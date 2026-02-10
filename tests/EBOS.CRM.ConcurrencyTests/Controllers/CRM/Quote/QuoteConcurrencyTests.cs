@@ -1,5 +1,6 @@
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
+using EBOS.CRM.ConcurrencyTests.Fixtures;
 using EBOS.CRM.ConcurrencyTests.Infrastructure;
 
 namespace EBOS.CRM.ConcurrencyTests.Controllers.CRM.Quote;
@@ -16,15 +17,16 @@ public class QuoteConcurrencyTests(ConcurrencyWebApplicationFactory<Program> fac
         var baseUrl = $"/api/v{_version}/Quote";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "Quote");
 
-        await ConcurrencyHelper.AssertConcurrentReadsAsync(_client, baseUrl, id);
+        await ConcurrencyHelper.AssertReadConcurrencyAsync(_client, baseUrl, id);
     }
 
     [Fact]
     public async Task Quote_Concurrent_Writes_Work()
     {
         var baseUrl = $"/api/v{_version}/Quote";
+        var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "Quote");
         var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, "Quote");
 
-        await ConcurrencyHelper.AssertConcurrentWritesAsync(_client, baseUrl, payloads);
+        await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);
     }
 }
