@@ -63,6 +63,10 @@ public static class DependencyInjection
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
+        services.AddScoped<ILeadRepository, LeadRepository>();
+        services.AddScoped<IOpportunityRepository, OpportunityRepository>();
+        services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
+        services.AddScoped<IQuoteRepository, QuoteRepository>();
         services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
         services.AddScoped<ILookupSeedService, LookupSeedService>();
 

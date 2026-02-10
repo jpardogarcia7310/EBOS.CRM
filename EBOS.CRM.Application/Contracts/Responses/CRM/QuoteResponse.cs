@@ -1,6 +1,6 @@
 namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
-public record QuoteResponse(
+public sealed record QuoteResponse(
     long Id,
     long TenantId,
     long OpportunityId,
