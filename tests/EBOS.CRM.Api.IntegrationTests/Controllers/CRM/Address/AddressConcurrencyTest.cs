@@ -1,6 +1,7 @@
 using System.Net;
 using EBOS.CRM.Api.IntegrationTests.Infrastructure;
 using EBOS.CRM.Api.IntegrationTests.TestUtils;
+using EBOS.CRM.IntegrationTests.Infrastructure;
 using FluentAssertions;
 
 namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.Address;

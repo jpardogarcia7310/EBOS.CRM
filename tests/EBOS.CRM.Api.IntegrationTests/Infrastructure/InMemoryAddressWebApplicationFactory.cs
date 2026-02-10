@@ -1,5 +1,6 @@
+using EBOS.CRM.Api.IntegrationTests.Infrastructure;
+using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
-using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -7,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EBOS.CRM.Api.IntegrationTests.Infrastructure;
+namespace EBOS.CRM.IntegrationTests.Infrastructure;
+using EBOS.CRM.Api.Constants;
 
 public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory<Program>
 {
@@ -51,6 +53,15 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
             TestDataSeeder.SeedIdentificationTypesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedStatusesAsync(db).GetAwaiter().GetResult();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
+
+            var currentUserDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(ICurrentUserContext));
+            if (currentUserDescriptor != null)
+            {
+                services.Remove(currentUserDescriptor);
+            }
+
+            services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
         });
     }
 

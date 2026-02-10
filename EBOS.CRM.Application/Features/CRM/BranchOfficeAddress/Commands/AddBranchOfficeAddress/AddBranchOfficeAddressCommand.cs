@@ -4,7 +4,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.AddBranchOfficeAddress;
 
-public record AddBranchOfficeAddressCommand(AddBranchOfficeAddressRequest BranchOfficeAddressRequest) : IRequest<BranchOfficeAddressResponse>;
+public record AddBranchOfficeAddressCommand(AddBranchOfficeAddressRequest BranchOfficeAddressRequest) : 
+    IRequest<BranchOfficeAddressResponse>;
 
 
 

@@ -1,8 +1,10 @@
 using System.Reflection;
 using Mapster;
 using MapsterMapper;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Application.Services.Commands;
+using EBOS.CRM.Application.Behavior;
 
 namespace EBOS.CRM.Application;
 
@@ -15,6 +17,8 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CurrentUserContextBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PolicyAuthorizationBehavior<,>));
 
         services.AddOptions<CommandExecutionOptions>();
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();

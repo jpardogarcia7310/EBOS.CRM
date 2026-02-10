@@ -38,6 +38,10 @@ public class MappingCreditAccount : IRegister
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Customer)
             .Ignore(dest => dest.CreditTransactions);
     }

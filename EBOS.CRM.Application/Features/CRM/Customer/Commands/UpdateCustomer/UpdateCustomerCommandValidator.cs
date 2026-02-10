@@ -10,8 +10,9 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
         RuleFor(x => x.CustomerRequest).NotNull();
         When(x => x.CustomerRequest != null, () =>
         {
-            RuleFor(x => x.CustomerRequest.Code).NotEmpty(); RuleFor(x => x.CustomerRequest.Email).NotEmpty(); RuleFor(x => x.CustomerRequest.Phone).NotEmpty();
-
+            RuleFor(x => x.CustomerRequest.Code).NotEmpty(); 
+            RuleFor(x => x.CustomerRequest.Email).NotEmpty(); 
+            RuleFor(x => x.CustomerRequest.Phone).NotEmpty();
             RuleFor(x => x.CustomerRequest.StatusId).GreaterThan(0);
         });
     }

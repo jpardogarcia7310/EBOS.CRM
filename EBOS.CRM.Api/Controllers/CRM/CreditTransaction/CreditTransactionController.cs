@@ -22,7 +22,8 @@ public class CreditTransactionController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(CreditTransactionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCreditTransactionRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddCreditTransactionRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCreditTransactionCommand(request), cancellationToken));
     }
@@ -33,7 +34,8 @@ public class CreditTransactionController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateCreditTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateCreditTransactionCommand(id, request), cancellationToken);
+        var dto = await mediator.Send(new UpdateCreditTransactionCommand(id, request),
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CreditTransaction with id {id} not found."));
@@ -81,7 +83,8 @@ public class CreditTransactionController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<CreditTransactionResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);

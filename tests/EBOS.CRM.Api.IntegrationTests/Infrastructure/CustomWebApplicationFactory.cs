@@ -1,8 +1,10 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using EBOS.CRM.Infrastructure.Persistence;
+using EBOS.CRM.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -132,6 +134,18 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             TestDataSeeder.SeedTenantQuotasAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedTenantUsageMetricsAsync(db).GetAwaiter().GetResult();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
+        });
+
+        builder.ConfigureTestServices(services =>
+        {
+            var currentUserDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(ICurrentUserContext));
+            if (currentUserDescriptor != null)
+            {
+                services.Remove(currentUserDescriptor);
+            }
+
+            services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
         });
     }
 

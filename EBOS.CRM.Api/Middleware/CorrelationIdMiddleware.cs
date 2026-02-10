@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace EBOS.CRM.Api.Middleware;
 
 public sealed class CorrelationIdMiddleware(RequestDelegate next)

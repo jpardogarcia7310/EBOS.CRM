@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -10,7 +13,8 @@ namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.PatchBranchOff
 public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchBranchOfficeCommand, BranchOfficeResponse?>
 {
-    public async Task<BranchOfficeResponse?> Handle(PatchBranchOfficeCommand request, CancellationToken cancellationToken)
+    public async Task<BranchOfficeResponse?> Handle(PatchBranchOfficeCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

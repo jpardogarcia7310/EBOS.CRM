@@ -7,6 +7,8 @@
     <File Path="documentation/Code of conduct.md" />
     <File Path="documentation/Roadmap.md" />
     <File Path="documentation/Roadmap_ES.md" />
+    <File Path="documentation/Authentication_Oidc.md" />
+    <File Path="documentation/Authentication_Oidc_ES.md" />
   </Folder>
   <Folder Name="/documentation/Features/">
     <File Path="documentation/Features/Features.md" />
@@ -22,6 +24,8 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="README_ES.md" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
   </Folder>
   <Folder Name="/source/">

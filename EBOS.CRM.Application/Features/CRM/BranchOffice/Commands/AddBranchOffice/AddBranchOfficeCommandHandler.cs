@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -15,7 +18,8 @@ public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, I
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entityRequest = request.BranchOfficeRequest ?? 
+                            throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);

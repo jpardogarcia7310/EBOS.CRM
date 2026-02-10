@@ -4,4 +4,5 @@ public sealed record PatchTaxInformationRequest(
     long TenantId,
     string? TaxName,
     string? TaxIdentificationNumber,
-    long? CustomerId);
+    long? CustomerId
+);

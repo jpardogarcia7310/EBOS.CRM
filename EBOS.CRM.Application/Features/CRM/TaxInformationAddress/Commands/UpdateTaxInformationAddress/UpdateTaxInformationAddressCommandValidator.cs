@@ -8,9 +8,8 @@ public class UpdateTaxInformationAddressCommandValidator : AbstractValidator<Upd
     {
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.TaxInformationAddressRequest).NotNull();
-
-
-        RuleFor(x => x.TaxInformationAddressRequest.TaxInformationId).GreaterThan(0); RuleFor(x => x.TaxInformationAddressRequest.AddressId).GreaterThan(0);
+        RuleFor(x => x.TaxInformationAddressRequest.TaxInformationId).GreaterThan(0); 
+        RuleFor(x => x.TaxInformationAddressRequest.AddressId).GreaterThan(0);
     }
 }
 

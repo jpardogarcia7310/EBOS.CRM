@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Responses;
 using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
@@ -13,7 +16,8 @@ public class GetIdentificationTypeByIdQueryHandler(IIdentificationTypeRepository
                                                                  throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeByIdQuery request, CancellationToken cancellationToken)
+    public async Task<IdentificationTypeResponse?> Handle(GetIdentificationTypeByIdQuery request,
+        CancellationToken cancellationToken)
     {
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();

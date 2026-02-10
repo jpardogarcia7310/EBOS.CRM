@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
 
 public record UpdateCreditTransactionRequest(

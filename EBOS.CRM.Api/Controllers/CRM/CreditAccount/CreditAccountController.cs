@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetAllCreditAccoun
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.CreditAccount;
 
 [ApiController]
@@ -22,7 +23,8 @@ public class CreditAccountController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(CreditAccountResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCreditAccountRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddCreditAccountRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCreditAccountCommand(request), cancellationToken));
     }
@@ -81,7 +83,8 @@ public class CreditAccountController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<CreditAccountResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);

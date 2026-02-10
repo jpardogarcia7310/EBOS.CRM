@@ -5,4 +5,5 @@ public sealed record UpdateBranchOfficeRequest(
     long TenantId,
     string Name,
     string PhoneNumber,
-    long CorporateCustomerId);
+    long CorporateCustomerId
+);

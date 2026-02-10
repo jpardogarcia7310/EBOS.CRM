@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -11,11 +14,13 @@ namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOf
 public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
 {
-    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request, CancellationToken cancellationToken)
+    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entityRequest = request.BranchOfficeRequest ??
+                            throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

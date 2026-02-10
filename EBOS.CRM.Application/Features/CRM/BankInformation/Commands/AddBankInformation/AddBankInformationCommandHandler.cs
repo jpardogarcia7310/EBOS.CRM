@@ -9,14 +9,17 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
 
 public class AddBankInformationCommandHandler(IBankInformationRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddBankInformationCommand, BankInformationResponse>
+    ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<AddBankInformationCommand, BankInformationResponse>
 {
-    public async Task<BankInformationResponse> Handle(AddBankInformationCommand request, CancellationToken cancellationToken)
+    public async Task<BankInformationResponse> Handle(AddBankInformationCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BankInformationRequest ?? throw new ArgumentNullException(nameof(request.BankInformationRequest));
-        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
+        var entityRequest = request.BankInformationRequest ??
+                            throw new ArgumentNullException(nameof(request.BankInformationRequest));
+         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

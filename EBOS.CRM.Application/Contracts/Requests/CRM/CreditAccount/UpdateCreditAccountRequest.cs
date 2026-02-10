@@ -5,4 +5,5 @@ public sealed record UpdateCreditAccountRequest(
     long TenantId,
     decimal MaxAmount,
     decimal UsedAmount,
-    long CustomerId);
+    long CustomerId
+);

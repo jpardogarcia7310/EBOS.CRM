@@ -16,4 +16,4 @@ public record AddAddressRequest(
     string? Longitude,
     long CountryId,
     long AddressTypeId
-    );
+);

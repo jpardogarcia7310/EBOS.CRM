@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
@@ -8,10 +11,12 @@ namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetIndivi
 public class GetIndividualCustomerByIdQueryHandler(IIndividualCustomerRepository repository, IMapper mapper)
     : IRequestHandler<GetIndividualCustomerByIdQuery, IndividualCustomerResponse?>
 {
-    private readonly IIndividualCustomerRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IIndividualCustomerRepository _repository = repository ?? 
+                                                                 throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<IndividualCustomerResponse?> Handle(GetIndividualCustomerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<IndividualCustomerResponse?> Handle(GetIndividualCustomerByIdQuery request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

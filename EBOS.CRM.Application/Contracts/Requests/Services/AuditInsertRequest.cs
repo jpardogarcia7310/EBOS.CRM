@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Requests.Services;
 
 public sealed record AuditInsertRequest(
@@ -8,4 +10,5 @@ public sealed record AuditInsertRequest(
     long RegisterId,
     string? OldValues,
     string? NewValues,
-    string CorrelationId);
+    string CorrelationId
+    );

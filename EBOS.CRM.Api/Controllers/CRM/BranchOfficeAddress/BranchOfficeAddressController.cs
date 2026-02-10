@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Queries.GetAllBranch
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOfficeAddress;
 
 [ApiController]
@@ -22,7 +23,8 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(BranchOfficeAddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddBranchOfficeAddressRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddBranchOfficeAddressRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddBranchOfficeAddressCommand(request), cancellationToken));
     }
@@ -33,7 +35,8 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateBranchOfficeAddressRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateBranchOfficeAddressCommand(id, request), cancellationToken);
+        var dto = await mediator.Send(new UpdateBranchOfficeAddressCommand(id, request), 
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOfficeAddress with id {id} not found."));
@@ -61,7 +64,8 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
     {
-        var dto = await mediator.Send(new GetBranchOfficeAddressByIdQuery(id), cancellationToken);
+        var dto = await mediator.Send(new GetBranchOfficeAddressByIdQuery(id),
+            cancellationToken);
         if (dto is null)
         {
             return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOfficeAddress with id {id} not found."));
@@ -81,12 +85,14 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<BranchOfficeAddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        var result = await mediator.Send(new GetAllBranchOfficeAddressesQuery(safePageNumber, safePageSize), cancellationToken);
+         var result = await mediator.Send(new GetAllBranchOfficeAddressesQuery(safePageNumber, safePageSize), 
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

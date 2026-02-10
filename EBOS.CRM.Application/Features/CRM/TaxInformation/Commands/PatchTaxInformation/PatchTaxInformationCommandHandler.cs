@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -10,7 +13,8 @@ namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInfo
 public class PatchTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchTaxInformationCommand, TaxInformationResponse?>
 {
-    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request, CancellationToken cancellationToken)
+    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

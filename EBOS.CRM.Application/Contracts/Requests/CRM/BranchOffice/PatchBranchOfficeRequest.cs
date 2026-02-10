@@ -4,4 +4,5 @@ public sealed record PatchBranchOfficeRequest(
     long TenantId,
     string? Name,
     string? PhoneNumber,
-    long? CorporateCustomerId);
+    long? CorporateCustomerId
+);

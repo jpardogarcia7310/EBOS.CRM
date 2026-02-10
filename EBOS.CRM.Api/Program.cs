@@ -1,10 +1,13 @@
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
+using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Api.Extensions;
+using EBOS.CRM.Api.Filters;
+using EBOS.CRM.Api.HostedServices;
+using EBOS.CRM.Api.Infrastructure;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
-using EBOS.CRM.Api.Infrastructure;
-using EBOS.CRM.Api.HostedServices;
-using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
@@ -14,9 +17,11 @@ using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -50,6 +55,7 @@ if (builder.Environment.IsDevelopment())
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
     .Bind(builder.Configuration.GetSection(TenantIsolationOptions.SectionName))
@@ -79,6 +85,76 @@ services.AddOptions<MultiTenantOptions>()
     .ValidateOnStart();
 services.AddLocalization();
 
+var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
+    .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
+
+services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        // To enable EBOS.Auth, set UseAuthority=true and fill Authority/Audience in config.
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.Authority))
+        {
+            options.Authority = authOptions.Authority;
+        }
+
+        if (authOptions.UseAuthority && !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))
+        {
+            options.MetadataAddress = authOptions.MetadataAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(authOptions.Audience))
+        {
+            options.Audience = authOptions.Audience;
+        }
+
+        options.RequireHttpsMetadata = authOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = authOptions.ValidateIssuer,
+            ValidateAudience = authOptions.ValidateAudience,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = !string.IsNullOrWhiteSpace(authOptions.SigningKey)
+                                       || (authOptions.UseAuthority &&
+                                           (!string.IsNullOrWhiteSpace(authOptions.Authority) ||
+                                            !string.IsNullOrWhiteSpace(authOptions.MetadataAddress))),
+            NameClaimType = authOptions.NameClaimType,
+            RoleClaimType = authOptions.RoleClaimType,
+            ClockSkew = TimeSpan.FromSeconds(authOptions.ClockSkewSeconds)
+        };
+
+        if (!string.IsNullOrWhiteSpace(authOptions.ValidIssuer))
+        {
+            options.TokenValidationParameters.ValidIssuer = authOptions.ValidIssuer;
+        }
+
+        if (authOptions.ValidIssuers is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidIssuers = authOptions.ValidIssuers;
+        }
+
+        if (authOptions.ValidAudiences is { Length: > 0 })
+        {
+            options.TokenValidationParameters.ValidAudiences = authOptions.ValidAudiences;
+        }
+
+        // For local dev without EBOS.Auth, keep UseAuthority=false and set SigningKey.
+        if (!string.IsNullOrWhiteSpace(authOptions.SigningKey))
+        {
+            options.TokenValidationParameters.IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authOptions.SigningKey));
+        }
+    });
+
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiUser", policy =>
+        policy.RequireAuthenticatedUser());
+});
+
 // Register FluentValidation validators (from Application assembly)
 builder.Services.AddValidatorsFromAssembly(typeof(IAssemblyMarker).Assembly);
 
@@ -105,6 +181,58 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 // Register the configuration that creates a SwaggerDoc per version and filters by GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var oidcOptions = builder.Configuration.GetSection(OidcOptions.SectionName).Get<OidcOptions>() ?? new OidcOptions();
+
+        if (!string.IsNullOrWhiteSpace(oidcOptions.Authority))
+        {
+            options.Authority = oidcOptions.Authority;
+        }
+
+        if (!string.IsNullOrWhiteSpace(oidcOptions.MetadataAddress))
+        {
+            options.MetadataAddress = oidcOptions.MetadataAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(oidcOptions.Audience))
+        {
+            options.Audience = oidcOptions.Audience;
+        }
+
+        options.RequireHttpsMetadata = oidcOptions.RequireHttpsMetadata;
+        if (oidcOptions.BackchannelTimeoutSeconds > 0)
+        {
+            options.BackchannelTimeout = TimeSpan.FromSeconds(oidcOptions.BackchannelTimeoutSeconds);
+        }
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = (oidcOptions.ValidIssuers?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Authority),
+            ValidateAudience = (oidcOptions.ValidAudiences?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Audience),
+            ValidIssuers = oidcOptions.ValidIssuers,
+            ValidAudiences = oidcOptions.ValidAudiences,
+            ClockSkew = TimeSpan.FromSeconds(oidcOptions.ClockSkewSeconds),
+            RoleClaimType = ClaimTypes.Role
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.Principal?.Identity is ClaimsIdentity identity)
+                {
+                    ClaimsMapping.MapClaimValues(identity, oidcOptions.RoleClaimType, ClaimTypes.Role);
+                    ClaimsMapping.MapClaimValues(identity, oidcOptions.PermissionClaimType, "permission");
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -184,6 +312,7 @@ app.UseTenantRequirement();
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

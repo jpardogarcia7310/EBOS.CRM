@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Services.Audit;
 
 public sealed record AuditRecord(
@@ -9,4 +11,5 @@ public sealed record AuditRecord(
     long RegisterId,
     string? OldValues,
     string? NewValues,
-    string CorrelationId);
+    string CorrelationId
+);

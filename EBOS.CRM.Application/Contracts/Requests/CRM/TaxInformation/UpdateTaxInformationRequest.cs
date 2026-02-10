@@ -5,4 +5,5 @@ public sealed record UpdateTaxInformationRequest(
     long TenantId,
     string TaxName,
     string TaxIdentificationNumber,
-    long CustomerId);
+    long CustomerId
+);

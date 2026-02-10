@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.Core.Primitives.Interfaces;
 
 namespace EBOS.CRM.Infrastructure.Repositories;
@@ -52,7 +57,8 @@ public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where
             .ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public virtual async Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize, 
+        CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Interfaces;

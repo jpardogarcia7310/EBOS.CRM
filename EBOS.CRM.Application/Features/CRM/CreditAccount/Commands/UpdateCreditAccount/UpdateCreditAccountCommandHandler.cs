@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -9,13 +12,16 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccount;
 
 public class UpdateCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateCreditAccountCommand, CreditAccountResponse?>
+    ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<UpdateCreditAccountCommand, CreditAccountResponse?>
 {
-    public async Task<CreditAccountResponse?> Handle(UpdateCreditAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CreditAccountResponse?> Handle(UpdateCreditAccountCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CreditAccountRequest ?? throw new ArgumentNullException(nameof(request.CreditAccountRequest));
+        var entityRequest = request.CreditAccountRequest ?? 
+                            throw new ArgumentNullException(nameof(request.CreditAccountRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

@@ -22,7 +22,8 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCustomerRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddCustomerRequest request, 
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCustomerCommand(request), cancellationToken));
     }
@@ -81,7 +82,8 @@ public class CustomerController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<CustomerResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);

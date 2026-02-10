@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Services.Audit;
 using EBOS.CRM.Application.Services.Interfaces;
@@ -6,8 +9,9 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.DeleteTaxInformationAddress;
 
-public class DeleteTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<DeleteTaxInformationAddressCommand, bool>
+public class DeleteTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository, 
+    IAuditService auditService, ICurrentUserContext currentUser) : 
+    IRequestHandler<DeleteTaxInformationAddressCommand, bool>
 {
     public async Task<bool> Handle(DeleteTaxInformationAddressCommand request, CancellationToken cancellationToken)
     {

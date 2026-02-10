@@ -1,3 +1,5 @@
+using System;
+
 namespace EBOS.CRM.Application.Contracts.Responses.CRM;
 
 public record BranchOfficeAddressResponse(

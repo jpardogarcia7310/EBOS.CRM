@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Audit;
@@ -10,7 +13,8 @@ namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.PatchCreditAc
 public class PatchCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchCreditAccountCommand, CreditAccountResponse?>
 {
-    public async Task<CreditAccountResponse?> Handle(PatchCreditAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CreditAccountResponse?> Handle(PatchCreditAccountCommand request, 
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
