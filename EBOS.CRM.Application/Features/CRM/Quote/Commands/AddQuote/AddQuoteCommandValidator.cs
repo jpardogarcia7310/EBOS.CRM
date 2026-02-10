@@ -17,8 +17,8 @@ public class AddQuoteCommandValidator : AbstractValidator<AddQuoteCommand>
             RuleFor(x => x.QuoteRequest.DiscountAmount).GreaterThanOrEqualTo(0);
             RuleFor(x => x.QuoteRequest.TotalAmount).GreaterThanOrEqualTo(0);
             RuleFor(x => x.QuoteRequest.Notes).MaximumLength(2000);
-            RuleFor(x => x.QuoteRequest.DiscountAmount)
-                .LessThanOrEqualTo(x => x.QuoteRequest.SubtotalAmount);
+            RuleFor(x => x.QuoteRequest.Status).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.QuoteRequest.DiscountAmount).LessThanOrEqualTo(x => x.QuoteRequest.SubtotalAmount);
         });
     }
 }
