@@ -15,9 +15,12 @@ public class DeleteQuoteCommandHandler(IQuoteRepository repository, IAuditServic
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
+        {
             return false;
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
+
         await repository.BeginTransactionAsync(cancellationToken);
 
         try

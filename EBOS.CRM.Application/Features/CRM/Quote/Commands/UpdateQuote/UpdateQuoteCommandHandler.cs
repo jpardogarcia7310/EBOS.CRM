@@ -18,7 +18,9 @@ public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditServic
         var entityRequest = request.QuoteRequest ?? throw new ArgumentNullException(nameof(request.QuoteRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
+        {
             return null;
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);

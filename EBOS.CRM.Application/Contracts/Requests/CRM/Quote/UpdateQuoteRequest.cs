@@ -9,5 +9,6 @@ public sealed record UpdateQuoteRequest(
     decimal SubtotalAmount,
     decimal DiscountAmount,
     decimal TotalAmount,
+    DateTime? ValidUntil,
     string? Notes
 );

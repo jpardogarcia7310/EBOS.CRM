@@ -13,6 +13,6 @@ public class GetQuoteByIdQueryHandler(IQuoteRepository repository, IMapper mappe
         cancellationToken.ThrowIfCancellationRequested();
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
-        return entity == null ? null : mapper.Map<QuoteResponse>(entity);
+        return entity is null ? null : mapper.Map<QuoteResponse>(entity);
     }
 }

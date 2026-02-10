@@ -18,6 +18,7 @@ public class MappingQuote : IRegister
             .Map(dest => dest.SubtotalAmount, src => src.SubtotalAmount)
             .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
             .Map(dest => dest.TotalAmount, src => src.TotalAmount)
+            .Map(dest => dest.ValidUntil, src => src.ValidUntil)
             .Map(dest => dest.Notes, src => src.Notes)
             .Map(dest => dest.Active, src => !src.Erased);
 
@@ -29,6 +30,7 @@ public class MappingQuote : IRegister
             .Map(dest => dest.SubtotalAmount, src => src.SubtotalAmount)
             .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
             .Map(dest => dest.TotalAmount, src => src.TotalAmount)
+            .Map(dest => dest.ValidUntil, src => src.ValidUntil)
             .Map(dest => dest.Notes, src => src.Notes)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
@@ -48,6 +50,7 @@ public class MappingQuote : IRegister
             .Map(dest => dest.SubtotalAmount, src => src.SubtotalAmount)
             .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
             .Map(dest => dest.TotalAmount, src => src.TotalAmount)
+            .Map(dest => dest.ValidUntil, src => src.ValidUntil)
             .Map(dest => dest.Notes, src => src.Notes)
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)

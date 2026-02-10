@@ -9,6 +9,7 @@ public sealed record QuoteResponse(
     decimal SubtotalAmount,
     decimal DiscountAmount,
     decimal TotalAmount,
+    DateTime? ValidUntil,
     string? Notes,
     bool Active
 );
