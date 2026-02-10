@@ -1,5 +1,7 @@
+using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.ConcurrencyTests.Fixtures;
 using EBOS.CRM.ConcurrencyTests.Infrastructure;
 
@@ -28,5 +30,13 @@ public class LeadConcurrencyTests(ConcurrencyWebApplicationFactory<Program> fact
         var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, "Lead");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);
+    }
+
+    [Fact]
+    public async Task Lead_DebtorCheck_ReturnsSuccess()
+    {
+        var request = new LeadDebtorCheckRequest(1, "lead@contoso.com", "1234567890", null, "Jane Doe");
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Lead/debtor-check", request);
+        response.EnsureSuccessStatusCode();
     }
 }

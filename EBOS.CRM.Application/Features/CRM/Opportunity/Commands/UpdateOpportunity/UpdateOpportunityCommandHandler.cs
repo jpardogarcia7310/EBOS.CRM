@@ -9,15 +9,15 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.UpdateOpportunity;
 
 public class UpdateOpportunityCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) 
+    ICurrentUserContext currentUser, IMapper mapper)
     : IRequestHandler<UpdateOpportunityCommand, OpportunityResponse?>
 {
-    public async Task<OpportunityResponse?> Handle(UpdateOpportunityCommand request, 
+    public async Task<OpportunityResponse?> Handle(UpdateOpportunityCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.OpportunityRequest ?? 
+        var entityRequest = request.OpportunityRequest ??
                             throw new ArgumentNullException(nameof(request.OpportunityRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)

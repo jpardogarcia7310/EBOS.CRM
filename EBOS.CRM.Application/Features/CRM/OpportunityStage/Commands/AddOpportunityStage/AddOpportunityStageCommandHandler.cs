@@ -9,10 +9,10 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.OpportunityStage.Commands.AddOpportunityStage;
 
 public class AddOpportunityStageCommandHandler(IOpportunityStageRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) 
+    ICurrentUserContext currentUser, IMapper mapper)
     : IRequestHandler<AddOpportunityStageCommand, OpportunityStageResponse>
 {
-    public async Task<OpportunityStageResponse> Handle(AddOpportunityStageCommand request, 
+    public async Task<OpportunityStageResponse> Handle(AddOpportunityStageCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

@@ -10,6 +10,7 @@ using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
 namespace EBOS.CRM.Api.Controllers.CRM.CustomerAddress;
+
 [ApiController]
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]

@@ -66,6 +66,46 @@ public class OpportunityController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    [HttpPost("{id:long}/win")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(OpportunityResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> WinAsync([FromRoute] long id, [FromBody] WinOpportunityRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var dto = await mediator.Send(new CloseOpportunityCommand(id,
+            new CloseOpportunityRequest(request.TenantId, request.StageId, true, request.CloseReason)),
+            cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Opportunity with id {id} not found."));
+        }
+
+        return Ok(dto);
+    }
+
+    [HttpPost("{id:long}/loss")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(OpportunityResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> LossAsync([FromRoute] long id, [FromBody] LossOpportunityRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var dto = await mediator.Send(new CloseOpportunityCommand(id,
+            new CloseOpportunityRequest(request.TenantId, request.StageId, false, request.CloseReason)),
+            cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Opportunity with id {id} not found."));
+        }
+
+        return Ok(dto);
+    }
+
     [HttpPost("{id:long}/stage")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(OpportunityResponse), StatusCodes.Status200OK)]

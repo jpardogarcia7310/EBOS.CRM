@@ -10,7 +10,7 @@ namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.PatchOpportunit
 public class PatchOpportunityStageCommandHandler(IOpportunityRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchOpportunityStageCommand, OpportunityResponse?>
 {
-    public async Task<OpportunityResponse?> Handle(PatchOpportunityStageCommand request, 
+    public async Task<OpportunityResponse?> Handle(PatchOpportunityStageCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

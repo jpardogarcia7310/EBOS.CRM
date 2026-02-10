@@ -15,7 +15,7 @@ public class AddOpportunityCommandHandler(IOpportunityRepository repository, IAu
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.OpportunityRequest ?? 
+        var entityRequest = request.OpportunityRequest ??
                             throw new ArgumentNullException(nameof(request.OpportunityRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Opportunity>(entityRequest);
 

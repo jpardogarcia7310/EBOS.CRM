@@ -25,7 +25,7 @@ public class TenantConfigurationConcurrencyTests(ConcurrencyWebApplicationFactor
         var baseUrl = $"/api/v{_version}/TenantConfiguration";
         var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "TenantConfiguration");
 
-        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, 
+        var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version,
             "TenantConfiguration");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);

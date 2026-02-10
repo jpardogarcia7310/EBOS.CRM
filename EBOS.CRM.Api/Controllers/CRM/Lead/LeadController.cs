@@ -6,6 +6,7 @@ using EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.DisqualifyLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.QualifyLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.UpdateLead;
+using EBOS.CRM.Application.Features.CRM.Lead.Queries.CheckLeadDebtor;
 using EBOS.CRM.Application.Features.CRM.Lead.Queries.GetAllLeads;
 using EBOS.CRM.Application.Features.CRM.Lead.Queries.GetLeadById;
 using EBOS.CRM.Api.Options;
@@ -100,6 +101,34 @@ public class LeadController(IMediator mediator) : ControllerBase
         }
 
         return Ok(dto);
+    }
+
+    [HttpGet("{id:long}/conversion")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(LeadConversionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetConversionAsync([FromRoute] long id,
+        CancellationToken cancellationToken = default)
+    {
+        var lead = await mediator.Send(new GetLeadByIdQuery(id), cancellationToken);
+        if (lead is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Lead with id {id} not found."));
+        }
+
+        return Ok(new LeadConversionResponse(lead.Id, lead.ConvertedOpportunityId, lead.Status));
+    }
+
+    [HttpPost("debtor-check")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(LeadDebtorCheckResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CheckDebtorAsync([FromBody] LeadDebtorCheckRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new CheckLeadDebtorQuery(request), cancellationToken);
+        return Ok(result);
     }
     #endregion
 

@@ -1,5 +1,8 @@
+using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
+using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.ConcurrencyTests.Fixtures;
 using EBOS.CRM.ConcurrencyTests.Infrastructure;
 
@@ -28,5 +31,22 @@ public class QuoteConcurrencyTests(ConcurrencyWebApplicationFactory<Program> fac
         var payloads = await ConcurrencyPayloads.GetPayloadFactoriesAsync(_client, _version, "Quote");
 
         await ConcurrencyHelper.AssertWriteConcurrencyAsync(_client, baseUrl, id, payloads);
+    }
+
+    [Fact]
+    public async Task Quote_ApproveReject_ReturnsSuccess()
+    {
+        var id = await ConcurrencyEndpoints.GetFirstIdAsync(_client, _version, "Quote");
+
+        var approveResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Quote/{id}/approve",
+            new ApproveQuoteRequest(1, "Approve concurrency", null));
+        approveResponse.EnsureSuccessStatusCode();
+
+        var rejectResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Quote/{id}/reject",
+            new RejectQuoteRequest(1, "Reject concurrency", null));
+        rejectResponse.EnsureSuccessStatusCode();
+
+        var dto = await rejectResponse.Content.ReadFromJsonAsync<QuoteResponse>();
+        Assert.NotNull(dto);
     }
 }

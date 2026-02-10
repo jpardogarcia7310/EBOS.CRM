@@ -1,5 +1,7 @@
+using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
+using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.StressTests.Infrastructure;
 
 namespace EBOS.CRM.StressTests.Controllers.CRM.Lead;
@@ -37,5 +39,13 @@ public class LeadStressTests(CustomWebApplicationFactory<Program> factory)
         var id = await StressEndpoints.GetFirstIdAsync(_client, _version, "Lead");
 
         await StressHelper.AssertNegativeStressAsync(_client, baseUrl, id);
+    }
+
+    [Fact]
+    public async Task Lead_DebtorCheck_ReturnsSuccess()
+    {
+        var request = new LeadDebtorCheckRequest(1, "lead@contoso.com", "1234567890", null, "Jane Doe");
+        var response = await _client.PostAsJsonAsync($"/api/v{_version}/Lead/debtor-check", request);
+        response.EnsureSuccessStatusCode();
     }
 }

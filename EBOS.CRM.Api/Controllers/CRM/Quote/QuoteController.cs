@@ -46,6 +46,84 @@ public class QuoteController(IMediator mediator) : ControllerBase
         return Ok(dto);
     }
 
+    [HttpPost("{id:long}/approve")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(QuoteResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ApproveAsync([FromRoute] long id, [FromBody] ApproveQuoteRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await mediator.Send(new GetQuoteByIdQuery(id), cancellationToken);
+        if (existing is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Quote with id {id} not found."));
+        }
+
+        var status = string.IsNullOrWhiteSpace(request.Status) ? "Approved" : request.Status;
+        var updateRequest = new UpdateQuoteRequest(
+            existing.Id,
+            request.TenantId,
+            existing.OpportunityId,
+            status,
+            existing.ReferenceNumber,
+            existing.SubtotalAmount,
+            existing.DiscountAmount,
+            existing.TotalAmount,
+            existing.ValidUntil,
+            request.Notes ?? existing.Notes);
+
+        var dto = await mediator.Send(new UpdateQuoteCommand(id, updateRequest), cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Quote with id {id} not found."));
+        }
+
+        return Ok(dto);
+    }
+
+    [HttpPost("{id:long}/reject")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(QuoteResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RejectAsync([FromRoute] long id, [FromBody] RejectQuoteRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await mediator.Send(new GetQuoteByIdQuery(id), cancellationToken);
+        if (existing is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Quote with id {id} not found."));
+        }
+
+        var status = string.IsNullOrWhiteSpace(request.Status) ? "Rejected" : request.Status;
+        var updateRequest = new UpdateQuoteRequest(
+            existing.Id,
+            request.TenantId,
+            existing.OpportunityId,
+            status,
+            existing.ReferenceNumber,
+            existing.SubtotalAmount,
+            existing.DiscountAmount,
+            existing.TotalAmount,
+            existing.ValidUntil,
+            request.Notes ?? existing.Notes);
+
+        var dto = await mediator.Send(new UpdateQuoteCommand(id, updateRequest), cancellationToken);
+        if (dto is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext,
+                statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle,
+                detail: $"Quote with id {id} not found."));
+        }
+
+        return Ok(dto);
+    }
+
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

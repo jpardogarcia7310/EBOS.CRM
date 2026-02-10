@@ -25,7 +25,7 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
 
         if (lead.ConvertedOpportunityId.HasValue)
         {
-            var existing = await opportunityRepository.GetByIdAsync(lead.ConvertedOpportunityId.Value, 
+            var existing = await opportunityRepository.GetByIdAsync(lead.ConvertedOpportunityId.Value,
                 cancellationToken);
             return existing is null ? null : mapper.Map<OpportunityResponse>(existing);
         }

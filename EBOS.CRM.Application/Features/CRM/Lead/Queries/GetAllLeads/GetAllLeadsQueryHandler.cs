@@ -13,7 +13,7 @@ public class GetAllLeadsQueryHandler(ILeadRepository repository, IMapper mapper)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await repository.GetAllPagedAsync(request.PageNumber, request.PageSize, 
+        var entities = await repository.GetAllPagedAsync(request.PageNumber, request.PageSize,
             cancellationToken);
         var items = mapper.Map<IReadOnlyCollection<LeadResponse>>(entities);
         var total = await repository.CountAsync(cancellationToken);
