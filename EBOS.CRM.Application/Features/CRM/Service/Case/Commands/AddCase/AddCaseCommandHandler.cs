@@ -40,7 +40,6 @@ public class AddCaseCommandHandler(
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Case>(entityRequest);
-        entity.SetStatus(entityRequest.Status);
         entity.SetPriority(entityRequest.Priority);
 
         var dueAt = entityRequest.DueAt ?? sla.CalculateDueAt(DateTime.UtcNow);
