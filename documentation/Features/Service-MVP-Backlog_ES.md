@@ -1,13 +1,13 @@
 # Backlog tecnico Service MVP
 
-Trabajo concreto alineado con la estructura local (Clean Architecture, modulo Service en `EBOS.CRM.*`).
+Trabajo concreto alineado con la estructura local (Clean Architecture, módulo Service en `EBOS.CRM.*`).
 Derivado de los issues #60, #81, #82, #83, #84.
 
 ## Alcance del MVP
 
 - Gestion de casos (crear, actualizar, cerrar, reabrir).
 - Seguimiento de SLA (objetivos, chequeo de incumplimiento).
-- Asignacion a colas (reglas de ruteo, reasignacion manual).
+- Asignación a colas (reglas de ruteo, reasignación manual).
 
 ## Domain (EBOS.CRM.Domain)
 
@@ -125,7 +125,7 @@ Seguir el layout de CRM:
 ## Infrastructure (EBOS.CRM.Infrastructure)
 
 - Configuraciones EF Core para Case, Sla, Queue.
-- Repositorios e inyeccion en DI.
+- Repositorios e inyección en DI.
 - Update de `CrmDbContext` y migrations.
 
 ## Tests (tests/EBOS.CRM.ApiTests)
@@ -134,7 +134,7 @@ Seguir el layout de CRM:
 
 - Ciclo de vida de Case e invariants.
 - Calculo de SLA y chequeo de breach.
-- Activacion de Queue.
+- Activación de Queue.
 
 ### Application tests
 
@@ -144,7 +144,7 @@ Seguir el layout de CRM:
 
 ### Controller tests
 
-- CRUD y payloads invalidos.
+- CRUD y payloads inválidos.
 - Endpoints de close/reopen/assign.
 
 ### Integration tests
