@@ -37,9 +37,9 @@ public class MappingCase : IRegister
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)
-            .Ignore(dest => dest.UpdatedAt)
-            .Ignore(dest => dest.UpdatedBy)
-            .Ignore(dest => dest.ClosedAt)
+            .Map(dest => dest.UpdatedAt, src => (DateTime?)null)
+            .Map(dest => dest.UpdatedBy, src => (long?)null)
+            .Map(dest => dest.ClosedAt, src => (DateTime?)null)
             .Ignore(dest => dest.Queue)
             .Ignore(dest => dest.Sla);
 
@@ -56,9 +56,9 @@ public class MappingCase : IRegister
             .Map(dest => dest.DueAt, src => src.DueAt)
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)
-            .Ignore(dest => dest.UpdatedAt)
-            .Ignore(dest => dest.UpdatedBy)
-            .Ignore(dest => dest.ClosedAt)
+            .Map(dest => dest.UpdatedAt, src => (DateTime?)null)
+            .Map(dest => dest.UpdatedBy, src => (long?)null)
+            .Map(dest => dest.ClosedAt, src => (DateTime?)null)
             .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.Queue)
             .Ignore(dest => dest.Sla);
