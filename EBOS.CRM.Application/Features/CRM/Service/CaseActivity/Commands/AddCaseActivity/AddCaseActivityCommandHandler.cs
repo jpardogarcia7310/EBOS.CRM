@@ -26,6 +26,10 @@ public class AddCaseActivityCommandHandler(
         {
             throw new InvalidOperationException("Case tenant mismatch.");
         }
+        if (caseEntity.ClosedAt.HasValue)
+        {
+            throw new InvalidOperationException("Cannot add activities to a closed case.");
+        }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CaseActivity>(entityRequest);
 
