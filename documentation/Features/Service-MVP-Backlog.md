@@ -9,6 +9,67 @@ Derived from issues #60, #81, #82, #83, #84 scopes.
 - SLA tracking (targets, breach checks).
 - Queue assignment (routing rules, manual reassign).
 
+## Why this milestone helps the CRM (layer by layer)
+
+### Domain value
+
+- Adds the minimum business vocabulary to deliver support: Case, Sla, Queue.
+- Enables consistent lifecycle rules (open/close/reopen) and SLA due dates.
+
+**Pros**
+- Clear ownership and states for service operations.
+- Reusable invariants for future automation.
+
+**Cons**
+- Requires disciplined data entry to stay reliable.
+
+### Application value
+
+- Encodes workflows (case lifecycle, SLA checks, queue assignment rules).
+- Centralizes validation and tenant isolation.
+
+**Pros**
+- Predictable behavior across API, tests, and UI.
+- Easier to evolve rules without touching controllers.
+
+**Cons**
+- More handler/validator surface to maintain.
+
+### API value
+
+- Exposes endpoints to create/manage cases, SLAs, and queues.
+- Enables integration with UI or external systems.
+
+**Pros**
+- Fast enablement for support dashboards.
+- Consistent patterns with existing CRM controllers.
+
+**Cons**
+- Additional endpoints to version and document.
+
+### Infrastructure value
+
+- Persists service data with EF mappings + migrations.
+- Provides repositories for Service entities.
+
+**Pros**
+- Reliable storage and query performance.
+- Consistent DI and data access patterns.
+
+**Cons**
+- Migration overhead and schema evolution to manage.
+
+### Testing value
+
+- Verifies lifecycle rules, SLA behavior, and assignment workflows.
+
+**Pros**
+- Reduces regressions when business rules grow.
+- Confidence for future automation and reporting.
+
+**Cons**
+- More test coverage to keep up to date.
+
 ## Domain (EBOS.CRM.Domain)
 
 ### Aggregates and entities
