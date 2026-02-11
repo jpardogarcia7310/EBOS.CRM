@@ -99,5 +99,47 @@ public static class PermissionKeys
         public const string TaxInformationAddressUpdate = "Crm.TaxInformationAddress.Update";
         public const string TaxInformationAddressDelete = "Crm.TaxInformationAddress.Delete";
         public const string TaxInformationAddressPatch = "Crm.TaxInformationAddress.Patch";
+
+        public const string LeadRead = "Crm.Lead.Read";
+        public const string LeadCreate = "Crm.Lead.Create";
+        public const string LeadUpdate = "Crm.Lead.Update";
+        public const string LeadDelete = "Crm.Lead.Delete";
+        public const string LeadPatch = "Crm.Lead.Patch";
+
+        public const string OpportunityRead = "Crm.Opportunity.Read";
+        public const string OpportunityCreate = "Crm.Opportunity.Create";
+        public const string OpportunityUpdate = "Crm.Opportunity.Update";
+        public const string OpportunityDelete = "Crm.Opportunity.Delete";
+        public const string OpportunityPatch = "Crm.Opportunity.Patch";
+
+        public const string OpportunityStageRead = "Crm.OpportunityStage.Read";
+        public const string OpportunityStageCreate = "Crm.OpportunityStage.Create";
+        public const string OpportunityStageUpdate = "Crm.OpportunityStage.Update";
+        public const string OpportunityStageDelete = "Crm.OpportunityStage.Delete";
+        public const string OpportunityStagePatch = "Crm.OpportunityStage.Patch";
+
+        public const string QuoteRead = "Crm.Quote.Read";
+        public const string QuoteCreate = "Crm.Quote.Create";
+        public const string QuoteUpdate = "Crm.Quote.Update";
+        public const string QuoteDelete = "Crm.Quote.Delete";
+        public const string QuotePatch = "Crm.Quote.Patch";
+
+        public const string CaseRead = "Crm.Case.Read";
+        public const string CaseCreate = "Crm.Case.Create";
+        public const string CaseUpdate = "Crm.Case.Update";
+        public const string CaseDelete = "Crm.Case.Delete";
+        public const string CasePatch = "Crm.Case.Patch";
+
+        public const string SlaRead = "Crm.Sla.Read";
+        public const string SlaCreate = "Crm.Sla.Create";
+        public const string SlaUpdate = "Crm.Sla.Update";
+        public const string SlaDelete = "Crm.Sla.Delete";
+        public const string SlaPatch = "Crm.Sla.Patch";
+
+        public const string QueueRead = "Crm.Queue.Read";
+        public const string QueueCreate = "Crm.Queue.Create";
+        public const string QueueUpdate = "Crm.Queue.Update";
+        public const string QueueDelete = "Crm.Queue.Delete";
+        public const string QueuePatch = "Crm.Queue.Patch";
     }
 }
