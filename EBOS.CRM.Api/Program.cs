@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using EBOS.CRM.Api.Authentication;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Api.HostedServices;

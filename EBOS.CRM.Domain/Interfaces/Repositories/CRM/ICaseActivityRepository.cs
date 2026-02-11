@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
 

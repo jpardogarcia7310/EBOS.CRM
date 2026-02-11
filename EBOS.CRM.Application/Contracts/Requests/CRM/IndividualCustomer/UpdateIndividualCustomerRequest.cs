@@ -1,5 +1,3 @@
-using System;
-
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
 
 public record UpdateIndividualCustomerRequest(

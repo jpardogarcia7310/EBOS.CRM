@@ -1,6 +1,6 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
-using global::EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 
 namespace EBOS.CRM.Application.Mappings.CRM;

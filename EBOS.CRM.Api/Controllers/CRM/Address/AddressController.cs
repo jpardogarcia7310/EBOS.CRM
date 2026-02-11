@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
 [ApiController]

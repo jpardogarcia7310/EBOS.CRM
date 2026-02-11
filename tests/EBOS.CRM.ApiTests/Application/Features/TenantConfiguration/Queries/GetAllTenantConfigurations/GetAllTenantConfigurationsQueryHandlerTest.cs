@@ -1,9 +1,10 @@
 using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.TenantConfiguration.Queries.GetAllTenantConfigurations;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
-using TenantConfigurationEntity = EBOS.CRM.Domain.Entities.CRM.TenantConfiguration;
+using TenantConfigurationEntity = EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration;
 
 namespace EBOS.CRM.ApiTests.Application.Features.TenantConfiguration.Queries.GetAllTenantConfigurations;
 

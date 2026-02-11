@@ -108,7 +108,7 @@ public class LeadControllerTest(CustomWebApplicationFactory<Program> factory) :
         var morosoStatus = db.Statuses.FirstOrDefault(s => s.Description == "Moroso");
         if (morosoStatus == null)
         {
-            morosoStatus = new global::EBOS.CRM.Domain.Entities.Status { Description = "Moroso" };
+            morosoStatus = new global::EBOS.CRM.Domain.Entities.EBOS.Status { Description = "Moroso" };
             db.Statuses.Add(morosoStatus);
             db.SaveChanges();
         }

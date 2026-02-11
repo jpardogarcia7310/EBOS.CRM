@@ -1,5 +1,6 @@
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.EBOS;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,4 +1,4 @@
-using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities.EBOS;
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.EBOS;
 

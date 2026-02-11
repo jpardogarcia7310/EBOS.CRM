@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.TenantQuota.Queries.GetTenantQuotaById;
-using TenantQuotaEntity = EBOS.CRM.Domain.Entities.CRM.TenantQuota;
+using TenantQuotaEntity = EBOS.CRM.Domain.Entities.EBOS.TenantQuota;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;

@@ -1,5 +1,3 @@
-using EBOS.CRM.Api.Middleware;
-
 namespace EBOS.CRM.Api.Extensions;
 
 public static class TenantResolutionExtensions

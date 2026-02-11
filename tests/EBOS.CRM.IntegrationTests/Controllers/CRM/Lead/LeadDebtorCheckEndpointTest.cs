@@ -36,7 +36,7 @@ public class LeadDebtorCheckEndpointTest(CustomWebApplicationFactory factory)
         var moroso = db.Statuses.FirstOrDefault(s => s.Description == "Moroso");
         if (moroso == null)
         {
-            moroso = new global::EBOS.CRM.Domain.Entities.Status { Description = "Moroso" };
+            moroso = new global::EBOS.CRM.Domain.Entities.EBOS.Status { Description = "Moroso" };
             db.Statuses.Add(moroso);
             db.SaveChanges();
         }

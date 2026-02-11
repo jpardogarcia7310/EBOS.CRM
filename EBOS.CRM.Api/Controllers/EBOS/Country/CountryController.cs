@@ -1,6 +1,7 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetCountryById;
 using MediatR;

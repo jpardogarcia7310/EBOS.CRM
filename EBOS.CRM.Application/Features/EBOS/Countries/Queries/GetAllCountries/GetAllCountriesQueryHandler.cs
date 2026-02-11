@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using MapsterMapper;
 using MediatR;
 using EBOS.CRM.Application.Contracts.Responses.Common;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -103,12 +104,12 @@ public class IdentificationTypeEndpointTest(CustomWebApplicationFactory factory)
         var code2 = $"JD{Guid.NewGuid():N}"[..5].ToUpperInvariant();
 
         db.IdentificationTypes.AddRange(
-            new Domain.Entities.IdentificationType
+            new Domain.Entities.EBOS.IdentificationType
             {
                 Code = code1,
                 Description = $"Desc-{code1}"
             },
-            new Domain.Entities.IdentificationType
+            new Domain.Entities.EBOS.IdentificationType
             {
                 Code = code2,
                 Description = $"Desc-{code2}"

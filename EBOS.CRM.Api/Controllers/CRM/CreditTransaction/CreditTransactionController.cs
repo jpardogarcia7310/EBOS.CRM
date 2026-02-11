@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetAllCreditTr
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.CreditTransaction;
 
 [ApiController]

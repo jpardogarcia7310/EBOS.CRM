@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 
 namespace EBOS.CRM.ApiTests.Controllers.EBOS.TenantConfiguration;
 

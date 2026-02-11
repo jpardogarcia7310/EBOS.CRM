@@ -1,5 +1,3 @@
-using System;
-
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
 
 public record AddTaxInformationAddressRequest(

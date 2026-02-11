@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.Application.Services.Interfaces;

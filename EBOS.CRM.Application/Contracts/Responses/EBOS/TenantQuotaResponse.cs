@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Contracts.Responses.CRM;
+namespace EBOS.CRM.Application.Contracts.Responses.EBOS;
 
 public record TenantQuotaResponse(
     long Id,

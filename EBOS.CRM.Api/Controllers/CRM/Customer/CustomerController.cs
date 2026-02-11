@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.Customer.Queries.GetAllCustomers;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.Customer;
 
 [ApiController]

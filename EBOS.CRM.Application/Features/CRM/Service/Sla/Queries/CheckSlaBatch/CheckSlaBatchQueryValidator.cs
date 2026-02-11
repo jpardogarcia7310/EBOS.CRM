@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckSlaBatch;
 using FluentValidation;
 
 namespace EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckSlaBatch;

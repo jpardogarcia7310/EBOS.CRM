@@ -1,5 +1,3 @@
-using System;
-
 namespace EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
 
 public record AddCustomerRequest(

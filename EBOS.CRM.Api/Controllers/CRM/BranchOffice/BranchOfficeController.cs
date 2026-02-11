@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
@@ -12,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOffice;
 
 [ApiController]

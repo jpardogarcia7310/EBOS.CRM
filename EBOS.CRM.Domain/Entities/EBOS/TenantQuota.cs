@@ -1,8 +1,7 @@
 using EBOS.Core.Primitives;
-using EBOS.CRM.Domain.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
-namespace EBOS.CRM.Domain.Entities.CRM;
+namespace EBOS.CRM.Domain.Entities.EBOS;
 
 public class TenantQuota : ErasableEntity, ITenantScopedEntity
 {

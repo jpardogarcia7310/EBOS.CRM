@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -115,7 +116,7 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
         var a3Code2 = $"XB{Guid.NewGuid():N}"[..3].ToUpperInvariant();
 
         db.Countries.AddRange(
-            new Domain.Entities.Country
+            new Domain.Entities.EBOS.Country
             {
                 Name = $"Country-{a2Code1}",
                 Iso31661A2Code = a2Code1,
@@ -126,7 +127,7 @@ public class CountryEndpointTest(CustomWebApplicationFactory factory) : IClassFi
                 CurrencyCode = "XCU",
                 InternationalPhoneCode = "+901"
             },
-            new Domain.Entities.Country
+            new Domain.Entities.EBOS.Country
             {
                 Name = $"Country-{a2Code2}",
                 Iso31661A2Code = a2Code2,

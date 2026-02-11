@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -66,7 +67,7 @@ public class TenantQuotaEndpointTest(CustomWebApplicationFactory factory) : ICla
         var metric2 = $"api.{Guid.NewGuid():N}"[..10];
 
         db.TenantQuotas.AddRange(
-            new Domain.Entities.CRM.TenantQuota
+            new Domain.Entities.EBOS.TenantQuota
             {
                 TenantId = 1,
                 Metric = metric1,
@@ -74,7 +75,7 @@ public class TenantQuotaEndpointTest(CustomWebApplicationFactory factory) : ICla
                 Unit = "count",
                 EffectiveFrom = DateTime.UtcNow.AddDays(-1)
             },
-            new Domain.Entities.CRM.TenantQuota
+            new Domain.Entities.EBOS.TenantQuota
             {
                 TenantId = 1,
                 Metric = metric2,

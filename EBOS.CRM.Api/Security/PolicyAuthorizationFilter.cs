@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text;

@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Application.Contracts.Responses.EBOS;
 
 namespace EBOS.CRM.IntegrationTests.TestUtils;
 
