@@ -1,3 +1,4 @@
+using System;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -18,4 +19,44 @@ public class Sla : ErasableEntity, ITenantScopedEntity
     public long? UpdatedBy { get; set; }
 
     public ICollection<Case> Cases { get; set; } = new List<Case>();
+
+    public bool IsActiveAt(DateTime date)
+    {
+        if (!IsActive)
+        {
+            return false;
+        }
+
+        if (ActiveFrom.HasValue && date < ActiveFrom.Value)
+        {
+            return false;
+        }
+
+        if (ActiveTo.HasValue && date > ActiveTo.Value)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public DateTime CalculateDueAt(DateTime start)
+    {
+        if (TargetMinutes <= 0)
+        {
+            throw new InvalidOperationException("TargetMinutes must be greater than zero.");
+        }
+
+        return start.AddMinutes(TargetMinutes);
+    }
+
+    public bool IsBreached(DateTime now, DateTime? dueAt)
+    {
+        if (!dueAt.HasValue)
+        {
+            return false;
+        }
+
+        return now > dueAt.Value;
+    }
 }

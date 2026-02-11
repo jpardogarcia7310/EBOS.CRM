@@ -16,4 +16,14 @@ public class Queue : ErasableEntity, ITenantScopedEntity
     public long? UpdatedBy { get; set; }
 
     public ICollection<Case> Cases { get; set; } = new List<Case>();
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
 }
