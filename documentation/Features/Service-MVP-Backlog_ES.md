@@ -1,0 +1,153 @@
+# Backlog tecnico Service MVP
+
+Trabajo concreto alineado con la estructura local (Clean Architecture, modulo Service en `EBOS.CRM.*`).
+Derivado de los issues #60, #81, #82, #83, #84.
+
+## Alcance del MVP
+
+- Gestion de casos (crear, actualizar, cerrar, reabrir).
+- Seguimiento de SLA (objetivos, chequeo de incumplimiento).
+- Asignacion a colas (reglas de ruteo, reasignacion manual).
+
+## Domain (EBOS.CRM.Domain)
+
+### Aggregates y entities
+
+- Case
+  - Fields: Id, TenantId, Title, Description, Status, Priority, OwnerUserId, QueueId, SlaId, DueAt, ClosedAt, CreatedAt, UpdatedAt.
+  - Behavior: Open, UpdateDetails, AssignQueue, AssignOwner, Close, Reopen.
+- Sla
+  - Fields: Id, TenantId, Name, TargetMinutes, WarningMinutes, ActiveFrom, ActiveTo, IsActive.
+  - Behavior: IsActiveAt(date), CalculateDueAt(start), IsBreached(now, dueAt).
+- Queue
+  - Fields: Id, TenantId, Name, Code, IsActive, DefaultOwnerUserId.
+  - Behavior: Activate, Deactivate.
+
+### Interfaces (Repositories)
+
+- `ICaseRepository`
+- `ISlaRepository`
+- `IQueueRepository`
+
+### Invariants
+
+- TenantId requerido en todos los aggregates.
+- Case debe referenciar Queue y Sla existentes (tenant-scoped).
+- Solo casos abiertos pueden cerrarse; solo casos cerrados pueden reabrirse.
+- DueAt se calcula por SLA; el check usa la hora actual.
+
+## Application (EBOS.CRM.Application)
+
+### Contracts (Requests/Responses)
+
+- Requests:
+  - Case: AddCaseRequest, UpdateCaseRequest, CloseCaseRequest, ReopenCaseRequest, AssignCaseQueueRequest, AssignCaseOwnerRequest.
+  - Sla: AddSlaRequest, UpdateSlaRequest, ToggleSlaRequest.
+  - Queue: AddQueueRequest, UpdateQueueRequest, ToggleQueueRequest, AssignQueueDefaultOwnerRequest.
+  - SLA checks: CheckCaseSlaRequest (caseId, now).
+- Responses:
+  - CaseResponse, SlaResponse, QueueResponse, SlaCheckResponse.
+
+### Features (Commands/Queries)
+
+Estructura igual a CRM, por ejemplo `Features/CRM/Service/...`:
+
+- `Features/CRM/Service/Case/Commands/AddCase`
+- `Features/CRM/Service/Case/Commands/UpdateCase`
+- `Features/CRM/Service/Case/Commands/CloseCase`
+- `Features/CRM/Service/Case/Commands/ReopenCase`
+- `Features/CRM/Service/Case/Commands/AssignCaseQueue`
+- `Features/CRM/Service/Case/Commands/AssignCaseOwner`
+- `Features/CRM/Service/Case/Queries/GetCaseById`
+- `Features/CRM/Service/Case/Queries/GetAllCases`
+
+- `Features/CRM/Service/Sla/Commands/AddSla`
+- `Features/CRM/Service/Sla/Commands/UpdateSla`
+- `Features/CRM/Service/Sla/Commands/ToggleSla`
+- `Features/CRM/Service/Sla/Queries/GetSlaById`
+- `Features/CRM/Service/Sla/Queries/GetAllSlas`
+- `Features/CRM/Service/Sla/Queries/CheckCaseSla`
+
+- `Features/CRM/Service/Queue/Commands/AddQueue`
+- `Features/CRM/Service/Queue/Commands/UpdateQueue`
+- `Features/CRM/Service/Queue/Commands/ToggleQueue`
+- `Features/CRM/Service/Queue/Commands/AssignQueueDefaultOwner`
+- `Features/CRM/Service/Queue/Queries/GetQueueById`
+- `Features/CRM/Service/Queue/Queries/GetAllQueues`
+
+### Mapping
+
+- `Mappings/CRM/MappingCase`
+- `Mappings/CRM/MappingSla`
+- `Mappings/CRM/MappingQueue`
+
+### Validation
+
+- FluentValidation por request.
+- Aislamiento por tenant y referencias requeridas.
+
+## API (EBOS.CRM.Api)
+
+### Controllers
+
+Seguir el layout de CRM:
+
+- `Controllers/CRM/Service/Case/CaseController`
+- `Controllers/CRM/Service/Sla/SlaController`
+- `Controllers/CRM/Service/Queue/QueueController`
+
+### Endpoints (v1)
+
+- Cases
+  - `GET /api/v1/Case`
+  - `GET /api/v1/Case/{id}`
+  - `POST /api/v1/Case`
+  - `PUT /api/v1/Case/{id}`
+  - `PATCH /api/v1/Case/{id}/close`
+  - `PATCH /api/v1/Case/{id}/reopen`
+  - `PATCH /api/v1/Case/{id}/queue`
+  - `PATCH /api/v1/Case/{id}/owner`
+- SLAs
+  - `GET /api/v1/Sla`
+  - `GET /api/v1/Sla/{id}`
+  - `POST /api/v1/Sla`
+  - `PUT /api/v1/Sla/{id}`
+  - `PATCH /api/v1/Sla/{id}/toggle`
+  - `GET /api/v1/Sla/{id}/check?now=...&caseId=...`
+- Queues
+  - `GET /api/v1/Queue`
+  - `GET /api/v1/Queue/{id}`
+  - `POST /api/v1/Queue`
+  - `PUT /api/v1/Queue/{id}`
+  - `PATCH /api/v1/Queue/{id}/toggle`
+  - `PATCH /api/v1/Queue/{id}/default-owner`
+
+## Infrastructure (EBOS.CRM.Infrastructure)
+
+- Configuraciones EF Core para Case, Sla, Queue.
+- Repositorios e inyeccion en DI.
+- Update de `CrmDbContext` y migrations.
+
+## Tests (tests/EBOS.CRM.ApiTests)
+
+### Domain tests
+
+- Ciclo de vida de Case e invariants.
+- Calculo de SLA y chequeo de breach.
+- Activacion de Queue.
+
+### Application tests
+
+- Command handlers: success y errores.
+- Validaciones por referencias y tenant.
+- Query de SLA devuelve el estado esperado.
+
+### Controller tests
+
+- CRUD y payloads invalidos.
+- Endpoints de close/reopen/assign.
+
+### Integration tests
+
+- Caso end-to-end con queue + SLA.
+- Aislamiento por tenant en cases, SLAs, queues.
