@@ -17,12 +17,12 @@ public class GetAllTaxInformationAddressesQueryHandler(ITaxInformationAddressRep
                                                                     throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<PagedResult<TaxInformationAddressResponse>> Handle(GetAllTaxInformationAddressesQuery request, 
+    public async Task<PagedResult<TaxInformationAddressResponse>> Handle(GetAllTaxInformationAddressesQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, 
+        var entities = await _repository.GetAllPagedAsync(request.PageNumber,
             request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<TaxInformationAddressResponse>>(entities);
         var total = await _repository.CountAsync(cancellationToken);

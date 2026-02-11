@@ -12,10 +12,10 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
 
 public class UpdateCorporateCustomerCommandHandler(ICorporateCustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : 
+    ICurrentUserContext currentUser, IMapper mapper) :
     IRequestHandler<UpdateCorporateCustomerCommand, CorporateCustomerResponse?>
 {
-    public async Task<CorporateCustomerResponse?> Handle(UpdateCorporateCustomerCommand request, 
+    public async Task<CorporateCustomerResponse?> Handle(UpdateCorporateCustomerCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

@@ -13,11 +13,11 @@ namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetAllCorp
 public class GetAllCorporateCustomersQueryHandler(ICorporateCustomerRepository repository, IMapper mapper)
     : IRequestHandler<GetAllCorporateCustomersQuery, PagedResult<CorporateCustomerResponse>>
 {
-    private readonly ICorporateCustomerRepository _repository = repository ?? 
+    private readonly ICorporateCustomerRepository _repository = repository ??
                                                                 throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<PagedResult<CorporateCustomerResponse>> Handle(GetAllCorporateCustomersQuery request, 
+    public async Task<PagedResult<CorporateCustomerResponse>> Handle(GetAllCorporateCustomersQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

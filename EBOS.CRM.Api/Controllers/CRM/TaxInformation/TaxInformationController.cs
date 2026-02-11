@@ -22,7 +22,7 @@ public class TaxInformationController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(TaxInformationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationRequest request, 
+    public async Task<IActionResult> AddAsync([FromBody] AddTaxInformationRequest request,
         CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddTaxInformationCommand(request), cancellationToken));
@@ -34,7 +34,7 @@ public class TaxInformationController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateTaxInformationRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateTaxInformationCommand(id, request), 
+        var dto = await mediator.Send(new UpdateTaxInformationCommand(id, request),
             cancellationToken);
         if (dto is null)
         {
@@ -83,7 +83,7 @@ public class TaxInformationController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<TaxInformationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;

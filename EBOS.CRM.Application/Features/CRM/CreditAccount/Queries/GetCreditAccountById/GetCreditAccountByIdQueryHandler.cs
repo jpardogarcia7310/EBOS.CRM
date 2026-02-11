@@ -11,11 +11,11 @@ namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetCreditAccou
 public class GetCreditAccountByIdQueryHandler(ICreditAccountRepository repository, IMapper mapper)
     : IRequestHandler<GetCreditAccountByIdQuery, CreditAccountResponse?>
 {
-    private readonly ICreditAccountRepository _repository = repository ?? 
+    private readonly ICreditAccountRepository _repository = repository ??
                                                             throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<CreditAccountResponse?> Handle(GetCreditAccountByIdQuery request, 
+    public async Task<CreditAccountResponse?> Handle(GetCreditAccountByIdQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

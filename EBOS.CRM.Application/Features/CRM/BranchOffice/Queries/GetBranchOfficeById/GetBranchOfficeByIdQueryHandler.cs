@@ -15,7 +15,7 @@ public class GetBranchOfficeByIdQueryHandler(IBranchOfficeRepository repository,
                                                            throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<BranchOfficeResponse?> Handle(GetBranchOfficeByIdQuery request, 
+    public async Task<BranchOfficeResponse?> Handle(GetBranchOfficeByIdQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

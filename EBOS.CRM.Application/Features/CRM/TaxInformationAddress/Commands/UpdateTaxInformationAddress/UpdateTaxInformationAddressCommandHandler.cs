@@ -11,16 +11,16 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.UpdateTaxInformationAddress;
 
-public class UpdateTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository, 
-    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) : 
+public class UpdateTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository,
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) :
     IRequestHandler<UpdateTaxInformationAddressCommand, TaxInformationAddressResponse?>
 {
-    public async Task<TaxInformationAddressResponse?> Handle(UpdateTaxInformationAddressCommand request, 
+    public async Task<TaxInformationAddressResponse?> Handle(UpdateTaxInformationAddressCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.TaxInformationAddressRequest ?? 
+        var entityRequest = request.TaxInformationAddressRequest ??
                             throw new ArgumentNullException(nameof(request.TaxInformationAddressRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)

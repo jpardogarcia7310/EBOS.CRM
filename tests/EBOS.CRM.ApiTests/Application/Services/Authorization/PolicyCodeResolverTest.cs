@@ -1,5 +1,5 @@
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
-using EBOS.CRM.Application.Features.Countries.Queries.GetAllCountries;
+using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;
 using EBOS.CRM.Application.Services.Authorization;
 
 namespace EBOS.CRM.ApiTests.Application.Services.Authorization;
@@ -19,6 +19,6 @@ public class PolicyCodeResolverTest
     {
         var code = PolicyCodeResolver.Resolve(typeof(GetAllCountriesQuery));
 
-        Assert.Equal("countries.country.read", code);
+        Assert.Equal("ebos.country.read", code);
     }
 }

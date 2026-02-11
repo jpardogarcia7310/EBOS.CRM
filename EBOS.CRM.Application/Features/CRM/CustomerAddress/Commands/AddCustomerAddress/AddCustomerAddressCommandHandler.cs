@@ -12,12 +12,12 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
     ICurrentUserContext currentUser, IMapper mapper) :
     IRequestHandler<AddCustomerAddressCommand, CustomerAddressResponse>
 {
-    public async Task<CustomerAddressResponse> Handle(AddCustomerAddressCommand request, 
+    public async Task<CustomerAddressResponse> Handle(AddCustomerAddressCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CustomerAddressRequest ?? 
+        var entityRequest = request.CustomerAddressRequest ??
                             throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
 

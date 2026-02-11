@@ -57,7 +57,7 @@ public class BaseRepository<T>(CrmDbContext context) : IPagedRepository<T> where
             .ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize, 
+    public virtual async Task<IReadOnlyCollection<T>> GetAllPagedAsync(int pageNumber, int pageSize,
         CancellationToken cancellationToken = default)
     {
         var safePageNumber = Math.Max(1, pageNumber);

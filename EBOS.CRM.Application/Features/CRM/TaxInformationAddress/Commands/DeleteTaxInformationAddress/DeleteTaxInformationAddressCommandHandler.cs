@@ -9,8 +9,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.DeleteTaxInformationAddress;
 
-public class DeleteTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository, 
-    IAuditService auditService, ICurrentUserContext currentUser) : 
+public class DeleteTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository,
+    IAuditService auditService, ICurrentUserContext currentUser) :
     IRequestHandler<DeleteTaxInformationAddressCommand, bool>
 {
     public async Task<bool> Handle(DeleteTaxInformationAddressCommand request, CancellationToken cancellationToken)

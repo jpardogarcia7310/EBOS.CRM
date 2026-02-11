@@ -10,14 +10,8 @@ namespace EBOS.CRM.ApiTests.Application.Behavior;
 
 public class PolicyAuthorizationBehaviorTest
 {
-    private readonly Mock<ICurrentUserContext> _currentUser;
-    private readonly Mock<IPolicyService> _policyService;
-
-    public PolicyAuthorizationBehaviorTest()
-    {
-        _currentUser = new Mock<ICurrentUserContext>();
-        _policyService = new Mock<IPolicyService>();
-    }
+    private readonly Mock<ICurrentUserContext> _currentUser = new();
+    private readonly Mock<IPolicyService> _policyService = new();
 
     [Fact]
     public async Task Handle_ResolvesPolicy_AndCallsService()
@@ -72,6 +66,7 @@ public class PolicyAuthorizationBehaviorTest
     }
 
     private static AddAddressRequest BuildRequest() => new(
+        TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,

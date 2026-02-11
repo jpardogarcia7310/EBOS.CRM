@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using EBOS.CRM.Application.Services.Interfaces;
@@ -6,7 +5,6 @@ using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.Identity;
-using EBOS.CRM.Domain.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
@@ -14,12 +12,11 @@ using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 namespace EBOS.CRM.Infrastructure.Persistence;
 
 public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null,
-        IOptions<MultiTenantOptions>? multiTenantOptions = null)
-    : DbContext(options)
+        IOptions<MultiTenantOptions>? multiTenantOptions = null) : DbContext(options)
 {
-    private readonly long _tenantId = tenantContext?.TenantId ?? 0;
     private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
-    public long CurrentTenantId => _tenantId;
+    public long CurrentTenantId { get; } = tenantContext?.TenantId ?? 0;
+
     // DbSets
     public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
     public DbSet<Address> Addresses => Set<Address>();
@@ -50,6 +47,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<TenantConfiguration> TenantConfigurations => Set<TenantConfiguration>();
     public DbSet<TenantQuota> TenantQuotas => Set<TenantQuota>();
     public DbSet<TenantUsageMetric> TenantUsageMetrics => Set<TenantUsageMetric>();
+    public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
 
@@ -117,12 +115,12 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     private void ApplyTenantSchema(ModelBuilder modelBuilder)
     {
-        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || _tenantId <= 0)
+        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || CurrentTenantId <= 0)
         {
             return;
         }
 
-        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{_tenantId}";
+        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{CurrentTenantId}";
         var targets = new HashSet<string>(_multiTenantOptions.SchemaTargets, StringComparer.OrdinalIgnoreCase);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -189,7 +187,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     private void EnforceTenantInvariant()
     {
-        if (_tenantId <= 0)
+        if (CurrentTenantId <= 0)
         {
             return;
         }
@@ -203,10 +201,10 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
             }
 
             var tenantValue = tenantScoped.TenantId;
-            if (tenantValue > 0 && tenantValue != _tenantId)
+            if (tenantValue > 0 && tenantValue != CurrentTenantId)
             {
                 throw new InvalidOperationException(
-                    $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {_tenantId}.");
+                    $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {CurrentTenantId}.");
             }
 
             if (entry.State != EntityState.Added && tenantValue <= 0)
@@ -218,7 +216,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     private void ApplyTenantIdToAddedEntities()
     {
-        if (_tenantId <= 0)
+        if (CurrentTenantId <= 0)
         {
             return;
         }
@@ -233,16 +231,16 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
             if (tenantScoped.TenantId > 0)
             {
-                if (tenantScoped.TenantId != _tenantId)
+                if (tenantScoped.TenantId != CurrentTenantId)
                 {
                     throw new InvalidOperationException(
-                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantScoped.TenantId} != {_tenantId}.");
+                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantScoped.TenantId} != {CurrentTenantId}.");
                 }
 
                 continue;
             }
 
-            tenantScoped.TenantId = _tenantId;
+            tenantScoped.TenantId = CurrentTenantId;
         }
     }
 }

@@ -35,9 +35,9 @@
     <Project Path="EBOS.CRM.Infrastructure/EBOS.CRM.Infrastructure.csproj" Id="87da3024-eb11-41d6-8937-a0b2862b76c8" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/EBOS.CRM.Api.IntegrationTests/EBOS.CRM.Api.IntegrationTests.csproj" />
     <Project Path="tests/EBOS.CRM.ApiTests/EBOS.CRM.ApiTests.csproj" Id="be986542-7412-4716-8286-ac592b08df3b" />
     <Project Path="tests/EBOS.CRM.ConcurrencyTests/EBOS.CRM.ConcurrencyTests.csproj" />
+    <Project Path="tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj" />
     <Project Path="tests/EBOS.CRM.StressTests/EBOS.CRM.StressTests.csproj" />
   </Folder>
 </Solution>

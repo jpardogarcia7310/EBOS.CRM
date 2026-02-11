@@ -12,15 +12,15 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.UpdateTaxInformation;
 
 public class UpdateTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : 
+    ICurrentUserContext currentUser, IMapper mapper) :
     IRequestHandler<UpdateTaxInformationCommand, TaxInformationResponse?>
 {
-    public async Task<TaxInformationResponse?> Handle(UpdateTaxInformationCommand request, 
+    public async Task<TaxInformationResponse?> Handle(UpdateTaxInformationCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.TaxInformationRequest ?? 
+        var entityRequest = request.TaxInformationRequest ??
                             throw new ArgumentNullException(nameof(request.TaxInformationRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)

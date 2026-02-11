@@ -182,58 +182,6 @@ services.AddSwaggerGen();
 // Register the configuration that creates a SwaggerDoc per version and filters by GroupName
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var oidcOptions = builder.Configuration.GetSection(OidcOptions.SectionName).Get<OidcOptions>() ?? new OidcOptions();
-
-        if (!string.IsNullOrWhiteSpace(oidcOptions.Authority))
-        {
-            options.Authority = oidcOptions.Authority;
-        }
-
-        if (!string.IsNullOrWhiteSpace(oidcOptions.MetadataAddress))
-        {
-            options.MetadataAddress = oidcOptions.MetadataAddress;
-        }
-
-        if (!string.IsNullOrWhiteSpace(oidcOptions.Audience))
-        {
-            options.Audience = oidcOptions.Audience;
-        }
-
-        options.RequireHttpsMetadata = oidcOptions.RequireHttpsMetadata;
-        if (oidcOptions.BackchannelTimeoutSeconds > 0)
-        {
-            options.BackchannelTimeout = TimeSpan.FromSeconds(oidcOptions.BackchannelTimeoutSeconds);
-        }
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = (oidcOptions.ValidIssuers?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Authority),
-            ValidateAudience = (oidcOptions.ValidAudiences?.Length ?? 0) > 0 || !string.IsNullOrWhiteSpace(oidcOptions.Audience),
-            ValidIssuers = oidcOptions.ValidIssuers,
-            ValidAudiences = oidcOptions.ValidAudiences,
-            ClockSkew = TimeSpan.FromSeconds(oidcOptions.ClockSkewSeconds),
-            RoleClaimType = ClaimTypes.Role
-        };
-
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                if (context.Principal?.Identity is ClaimsIdentity identity)
-                {
-                    ClaimsMapping.MapClaimValues(identity, oidcOptions.RoleClaimType, ClaimTypes.Role);
-                    ClaimsMapping.MapClaimValues(identity, oidcOptions.PermissionClaimType, "permission");
-                }
-
-                return Task.CompletedTask;
-            }
-        };
-    });
-services.AddAuthorization();
-
 var app = builder.Build();
 
 #if DEBUG

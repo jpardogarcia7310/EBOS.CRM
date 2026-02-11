@@ -23,7 +23,7 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(BranchOfficeAddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddBranchOfficeAddressRequest request, 
+    public async Task<IActionResult> AddAsync([FromBody] AddBranchOfficeAddressRequest request,
         CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddBranchOfficeAddressCommand(request), cancellationToken));
@@ -35,7 +35,7 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateBranchOfficeAddressRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateBranchOfficeAddressCommand(id, request), 
+        var dto = await mediator.Send(new UpdateBranchOfficeAddressCommand(id, request),
             cancellationToken);
         if (dto is null)
         {
@@ -85,14 +85,14 @@ public class BranchOfficeAddressController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<BranchOfficeAddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-         var result = await mediator.Send(new GetAllBranchOfficeAddressesQuery(safePageNumber, safePageSize), 
-            cancellationToken);
+        var result = await mediator.Send(new GetAllBranchOfficeAddressesQuery(safePageNumber, safePageSize),
+           cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

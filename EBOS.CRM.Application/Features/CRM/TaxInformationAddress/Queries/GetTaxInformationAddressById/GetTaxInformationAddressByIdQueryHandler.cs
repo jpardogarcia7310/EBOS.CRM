@@ -15,7 +15,7 @@ public class GetTaxInformationAddressByIdQueryHandler(ITaxInformationAddressRepo
                                                                     throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<TaxInformationAddressResponse?> Handle(GetTaxInformationAddressByIdQuery request, 
+    public async Task<TaxInformationAddressResponse?> Handle(GetTaxInformationAddressByIdQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

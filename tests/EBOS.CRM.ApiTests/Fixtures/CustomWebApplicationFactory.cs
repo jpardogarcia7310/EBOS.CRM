@@ -74,7 +74,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 
     private sealed class TestCurrentUserContext : ICurrentUserContext
     {
-        public long UserId => 0;
+        public long UserId => 1;
         public long TenantId => 1;
         public string CorrelationId => Guid.NewGuid().ToString("D");
     }

@@ -5,7 +5,9 @@ using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace EBOS.CRM.ConcurrencyTests.Fixtures;
 
@@ -25,6 +27,15 @@ public sealed class ConcurrencyWebApplicationFactory<TProgram> : WebApplicationF
     {
         _masterConnection.Open();
         ConfigureConnection(_masterConnection);
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AuditService:Enabled"] = "false",
+                ["Authentication:Enabled"] = "false"
+            });
+        });
 
         builder.ConfigureServices(services =>
         {
@@ -94,7 +105,7 @@ public sealed class ConcurrencyWebApplicationFactory<TProgram> : WebApplicationF
 
     private sealed class TestCurrentUserContext : ICurrentUserContext
     {
-        public long UserId => 0;
+        public long UserId => 1;
         public long TenantId => 1;
         public string CorrelationId => Guid.NewGuid().ToString("D");
     }

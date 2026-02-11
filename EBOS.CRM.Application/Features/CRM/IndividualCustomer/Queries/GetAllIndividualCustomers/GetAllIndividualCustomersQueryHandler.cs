@@ -13,16 +13,16 @@ namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetAllInd
 public class GetAllIndividualCustomersQueryHandler(IIndividualCustomerRepository repository, IMapper mapper)
     : IRequestHandler<GetAllIndividualCustomersQuery, PagedResult<IndividualCustomerResponse>>
 {
-    private readonly IIndividualCustomerRepository _repository = repository ?? 
+    private readonly IIndividualCustomerRepository _repository = repository ??
                                                                  throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<PagedResult<IndividualCustomerResponse>> Handle(GetAllIndividualCustomersQuery request, 
+    public async Task<PagedResult<IndividualCustomerResponse>> Handle(GetAllIndividualCustomersQuery request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, 
+        var entities = await _repository.GetAllPagedAsync(request.PageNumber,
             request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<IndividualCustomerResponse>>(entities);
         var total = await _repository.CountAsync(cancellationToken);

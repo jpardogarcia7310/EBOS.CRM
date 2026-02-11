@@ -7,7 +7,7 @@ namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
 public interface IBranchOfficeAddressRepository : IPagedRepository<BranchOfficeAddress>, IUnitOfWork
 {
-    Task<BranchOfficeAddress?> GetCurrentPrimaryAsync(long branchOfficeId, 
+    Task<BranchOfficeAddress?> GetCurrentPrimaryAsync(long branchOfficeId,
         CancellationToken cancellationToken = default);
 }
 

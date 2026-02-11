@@ -13,7 +13,7 @@ public sealed class AuthorizeUserQueryHandler(IAuthorizationService authorizatio
     public Task<AuthorizeUserResponse> Handle(AuthorizeUserQuery request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         return _authorizationService.AuthorizeAsync(request.Request, cancellationToken);
     }
 }

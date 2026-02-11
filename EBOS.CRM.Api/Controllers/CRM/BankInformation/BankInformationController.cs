@@ -23,7 +23,7 @@ public class BankInformationController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(BankInformationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddBankInformationRequest request, 
+    public async Task<IActionResult> AddAsync([FromBody] AddBankInformationRequest request,
         CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddBankInformationCommand(request), cancellationToken));
@@ -84,13 +84,13 @@ public class BankInformationController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<BankInformationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        var result = await mediator.Send(new GetAllBankInformationsQuery(safePageNumber, safePageSize), 
+        var result = await mediator.Send(new GetAllBankInformationsQuery(safePageNumber, safePageSize),
             cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);

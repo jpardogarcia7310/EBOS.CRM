@@ -11,12 +11,12 @@ namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInform
 public class AddTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddTaxInformationCommand, TaxInformationResponse>
 {
-    public async Task<TaxInformationResponse> Handle(AddTaxInformationCommand request, 
+    public async Task<TaxInformationResponse> Handle(AddTaxInformationCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.TaxInformationRequest ?? 
+        var entityRequest = request.TaxInformationRequest ??
                             throw new ArgumentNullException(nameof(request.TaxInformationRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.TaxInformation>(entityRequest);
 

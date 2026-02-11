@@ -1,23 +1,16 @@
 using EBOS.CRM.Application.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Infrastructure.Services.Security;
 
-public sealed class PolicyService : IPolicyService
+public sealed class PolicyService(CrmDbContext context, IConfiguration configuration, IMemoryCache cache)
+    : IPolicyService
 {
     private const string AuthEnabledKey = "Authentication:Enabled";
-    private readonly CrmDbContext _context;
-    private readonly IConfiguration _configuration;
-    private readonly IMemoryCache _cache;
-
-    public PolicyService(CrmDbContext context, IConfiguration configuration, IMemoryCache cache)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-    }
+    private readonly CrmDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+    private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+    private readonly IMemoryCache _cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
     public async Task EnsureAuthorizedAsync(long userId, string policyCode,
         CancellationToken cancellationToken = default)

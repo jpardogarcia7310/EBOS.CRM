@@ -14,7 +14,7 @@ namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOf
 public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
 {
-    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request, 
+    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

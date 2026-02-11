@@ -13,7 +13,7 @@ namespace EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetAllBankIn
 public class GetAllBankInformationsQueryHandler(IBankInformationRepository repository, IMapper mapper)
     : IRequestHandler<GetAllBankInformationsQuery, PagedResult<BankInformationResponse>>
 {
-    private readonly IBankInformationRepository _repository = repository ?? 
+    private readonly IBankInformationRepository _repository = repository ??
                                                               throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -22,7 +22,7 @@ public class GetAllBankInformationsQueryHandler(IBankInformationRepository repos
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, 
+        var entities = await _repository.GetAllPagedAsync(request.PageNumber,
             request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<BankInformationResponse>>(entities);
         var total = await _repository.CountAsync(cancellationToken);

@@ -18,7 +18,7 @@ public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, I
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeRequest ?? 
+        var entityRequest = request.BranchOfficeRequest ??
                             throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entityRequest);
 

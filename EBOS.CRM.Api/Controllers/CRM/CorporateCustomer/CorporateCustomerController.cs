@@ -22,7 +22,7 @@ public class CorporateCustomerController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(CorporateCustomerResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCorporateCustomerRequest request, 
+    public async Task<IActionResult> AddAsync([FromBody] AddCorporateCustomerRequest request,
         CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCorporateCustomerCommand(request), cancellationToken));
@@ -34,7 +34,7 @@ public class CorporateCustomerController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateCorporateCustomerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var dto = await mediator.Send(new UpdateCorporateCustomerCommand(id, request), 
+        var dto = await mediator.Send(new UpdateCorporateCustomerCommand(id, request),
             cancellationToken);
         if (dto is null)
         {
@@ -88,7 +88,7 @@ public class CorporateCustomerController(IMediator mediator) : ControllerBase
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
-        var result = await mediator.Send(new GetAllCorporateCustomersQuery(safePageNumber, safePageSize), 
+        var result = await mediator.Send(new GetAllCorporateCustomersQuery(safePageNumber, safePageSize),
             cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);

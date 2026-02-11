@@ -30,7 +30,7 @@ public sealed class CurrentUserContextBehavior<TRequest, TResponse>(ICurrentUser
             return false;
         }
 
-        return !ns.Contains(".Features.Security.", StringComparison.Ordinal) && 
+        return !ns.Contains(".Features.Security.", StringComparison.Ordinal) &&
                ns.Contains(".Commands.", StringComparison.Ordinal);
     }
 }

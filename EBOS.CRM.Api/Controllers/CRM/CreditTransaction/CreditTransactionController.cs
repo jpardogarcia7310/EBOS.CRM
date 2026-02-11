@@ -22,7 +22,7 @@ public class CreditTransactionController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(CreditTransactionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddCreditTransactionRequest request, 
+    public async Task<IActionResult> AddAsync([FromBody] AddCreditTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddCreditTransactionCommand(request), cancellationToken));
@@ -83,7 +83,7 @@ public class CreditTransactionController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<CreditTransactionResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions, 
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var settings = paginationOptions.Value;

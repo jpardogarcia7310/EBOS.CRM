@@ -30,7 +30,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
                 .GroupBy(e => e.PropertyName ?? string.Empty)
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Select(e => 
+                    g => g.Select(e =>
                         e.ErrorMessage ?? "Invalid value").ToArray()
                 );
 
@@ -42,7 +42,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
                     {
                         message = e.ErrorMessage ?? "Invalid value",
                         code = string.IsNullOrWhiteSpace(e.ErrorCode)
-                            ? ComputeStableCode(e.PropertyName ?? string.Empty, 
+                            ? ComputeStableCode(e.PropertyName ?? string.Empty,
                                 e.ErrorMessage ?? "Invalid value") : e.ErrorCode
                     }).ToArray()
                 );

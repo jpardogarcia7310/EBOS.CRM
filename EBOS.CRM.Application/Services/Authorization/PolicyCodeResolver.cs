@@ -21,7 +21,7 @@ public static class PolicyCodeResolver
     private static string ResolveAction(string typeName)
     {
         var returnValue = "read";
-        
+
         if (typeName.StartsWith("Add", StringComparison.Ordinal))
         {
             returnValue = "create";
@@ -65,30 +65,21 @@ public static class PolicyCodeResolver
         var moduleSegment = segments[featureIndex + 1];
         var resourceSegment = moduleSegment;
 
-        var crmModuleSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "CRM",
-            "Countries",
-            "Statuses",
-            "IdentificationType",
-            "AddressesType",
-            "AddressType"
-        };
-
-        var module = crmModuleSegments.Contains(moduleSegment)
-            ? "crm"
-            : ToKebabCase(moduleSegment);
-
-        if (string.Equals(moduleSegment, "CRM", StringComparison.OrdinalIgnoreCase) &&
-            featureIndex + 2 < segments.Length)
+        if (featureIndex + 2 < segments.Length && !IsFlowSegment(segments[featureIndex + 2]))
         {
             resourceSegment = segments[featureIndex + 2];
         }
+
+        var module = ToKebabCase(moduleSegment);
 
         var resource = ToKebabCase(Singularize(resourceSegment));
 
         return (module, resource);
     }
+
+    private static bool IsFlowSegment(string segment)
+        => segment.Equals("Commands", StringComparison.OrdinalIgnoreCase) ||
+           segment.Equals("Queries", StringComparison.OrdinalIgnoreCase);
 
     private static string Singularize(string value)
     {

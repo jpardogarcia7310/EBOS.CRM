@@ -10,7 +10,7 @@ public class UpdateBranchOfficeCommandValidator : AbstractValidator<UpdateBranch
         RuleFor(x => x.BranchOfficeRequest).NotNull();
         When(x => x.BranchOfficeRequest != null, () =>
         {
-            RuleFor(x => x.BranchOfficeRequest.Name).NotEmpty(); 
+            RuleFor(x => x.BranchOfficeRequest.Name).NotEmpty();
             RuleFor(x => x.BranchOfficeRequest.PhoneNumber).NotEmpty();
             RuleFor(x => x.BranchOfficeRequest.CorporateCustomerId).GreaterThan(0);
         });

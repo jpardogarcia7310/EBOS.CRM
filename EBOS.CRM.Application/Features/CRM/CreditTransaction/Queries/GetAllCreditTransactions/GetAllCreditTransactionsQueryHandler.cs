@@ -13,7 +13,7 @@ namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetAllCred
 public class GetAllCreditTransactionsQueryHandler(ICreditTransactionRepository repository, IMapper mapper)
     : IRequestHandler<GetAllCreditTransactionsQuery, PagedResult<CreditTransactionResponse>>
 {
-    private readonly ICreditTransactionRepository _repository = repository ?? 
+    private readonly ICreditTransactionRepository _repository = repository ??
                                                                 throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -22,7 +22,7 @@ public class GetAllCreditTransactionsQueryHandler(ICreditTransactionRepository r
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, 
+        var entities = await _repository.GetAllPagedAsync(request.PageNumber,
             request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<CreditTransactionResponse>>(entities);
         var total = await _repository.CountAsync(cancellationToken);

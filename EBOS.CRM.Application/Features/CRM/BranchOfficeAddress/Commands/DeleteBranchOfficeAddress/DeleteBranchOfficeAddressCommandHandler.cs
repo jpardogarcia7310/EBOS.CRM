@@ -9,8 +9,8 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.DeleteBranchOfficeAddress;
 
-public class DeleteBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository, 
-    IAuditService auditService, ICurrentUserContext currentUser) : 
+public class DeleteBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository,
+    IAuditService auditService, ICurrentUserContext currentUser) :
     IRequestHandler<DeleteBranchOfficeAddressCommand, bool>
 {
     public async Task<bool> Handle(DeleteBranchOfficeAddressCommand request, CancellationToken cancellationToken)

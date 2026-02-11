@@ -11,12 +11,12 @@ namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.AddCreditAcco
 public class AddCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddCreditAccountCommand, CreditAccountResponse>
 {
-    public async Task<CreditAccountResponse> Handle(AddCreditAccountCommand request, 
+    public async Task<CreditAccountResponse> Handle(AddCreditAccountCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CreditAccountRequest ?? 
+        var entityRequest = request.CreditAccountRequest ??
                             throw new ArgumentNullException(nameof(request.CreditAccountRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CreditAccount>(entityRequest);
 

@@ -11,12 +11,7 @@ namespace EBOS.CRM.ApiTests.Application.Behavior;
 
 public class CurrentUserContextBehaviorTest
 {
-    private readonly Mock<ICurrentUserContext> _currentUser;
-
-    public CurrentUserContextBehaviorTest()
-    {
-        _currentUser = new Mock<ICurrentUserContext>();
-    }
+    private readonly Mock<ICurrentUserContext> _currentUser = new();
 
     [Fact]
     public async Task Handle_CommandWithoutUser_ThrowsUnauthorized()
@@ -94,6 +89,7 @@ public class CurrentUserContextBehaviorTest
     }
 
     private static AddAddressRequest BuildRequest() => new(
+        TenantId: 1,
         Street: "Main St",
         ExternalNumber: "123",
         InternalNumber: null,
