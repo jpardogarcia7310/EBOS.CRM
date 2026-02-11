@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="..\..\..\..\..\..\Users\juan.pardogarcia\.nuget\packages\ebos.core\1.6.4\contentFiles\any\net8.0\Logo_EBOS_128.png" />
+    <Folder Include="Interfaces\Services\" />
   </ItemGroup>
 
 </Project>

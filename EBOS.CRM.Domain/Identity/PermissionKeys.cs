@@ -141,5 +141,11 @@ public static class PermissionKeys
         public const string QueueUpdate = "Crm.Queue.Update";
         public const string QueueDelete = "Crm.Queue.Delete";
         public const string QueuePatch = "Crm.Queue.Patch";
+
+        public const string CaseActivityRead = "Crm.CaseActivity.Read";
+        public const string CaseActivityCreate = "Crm.CaseActivity.Create";
+        public const string CaseActivityUpdate = "Crm.CaseActivity.Update";
+        public const string CaseActivityDelete = "Crm.CaseActivity.Delete";
+        public const string CaseActivityPatch = "Crm.CaseActivity.Patch";
     }
 }

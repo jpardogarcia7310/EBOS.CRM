@@ -1,4 +1,3 @@
-using System;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -34,6 +33,8 @@ public class Case : ErasableEntity, ITenantScopedEntity
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
+
+    public ICollection<CaseActivity> Activities { get; set; } = new List<CaseActivity>();
 
     public void AssignQueue(long queueId)
     {

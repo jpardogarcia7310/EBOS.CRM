@@ -1,4 +1,3 @@
-using System;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 

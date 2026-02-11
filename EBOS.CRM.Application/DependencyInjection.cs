@@ -5,6 +5,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Application.Services.Commands;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Services.CRM;
+using EBOS.CRM.Application.Services.Interfaces;
 
 namespace EBOS.CRM.Application;
 
@@ -21,7 +24,10 @@ public static class DependencyInjection
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PolicyAuthorizationBehavior<,>));
 
         services.AddOptions<CommandExecutionOptions>();
+        services.AddOptions<CaseWorkflowOptions>();
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
+        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
+        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
 
         return services;
     }

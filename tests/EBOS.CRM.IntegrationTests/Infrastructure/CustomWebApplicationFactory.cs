@@ -3,6 +3,7 @@ using DotNet.Testcontainers.Containers;
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -146,6 +147,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             }
 
             services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                    options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.SchemeName, _ => { });
         });
     }
 

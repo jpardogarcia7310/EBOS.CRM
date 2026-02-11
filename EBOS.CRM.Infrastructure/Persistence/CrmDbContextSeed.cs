@@ -175,7 +175,11 @@ public static class CrmDbContextSeed
             "customer-address",
             "individual-customer",
             "tax-information",
-            "tax-information-address"
+            "tax-information-address",
+            "case",
+            "sla",
+            "queue",
+            "case-activity"
         };
 
         var actions = new[] { "read", "create", "update", "delete" };

@@ -141,5 +141,11 @@ public static class PolicyKeys
         public const string QueueUpdate = "Policy.Crm.Queue.Update";
         public const string QueueDelete = "Policy.Crm.Queue.Delete";
         public const string QueuePatch = "Policy.Crm.Queue.Patch";
+
+        public const string CaseActivityRead = "Policy.Crm.CaseActivity.Read";
+        public const string CaseActivityCreate = "Policy.Crm.CaseActivity.Create";
+        public const string CaseActivityUpdate = "Policy.Crm.CaseActivity.Update";
+        public const string CaseActivityDelete = "Policy.Crm.CaseActivity.Delete";
+        public const string CaseActivityPatch = "Policy.Crm.CaseActivity.Patch";
     }
 }

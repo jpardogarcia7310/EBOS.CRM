@@ -53,6 +53,8 @@ public static class DependencyInjection
         services.AddScoped<IBankInformationRepository, BankInformationRepository>();
         services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
+        services.AddScoped<ICaseActivityRepository, CaseActivityRepository>();
+        services.AddScoped<ICaseRepository, CaseRepository>();
         services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
         services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
@@ -64,7 +66,9 @@ public static class DependencyInjection
         services.AddScoped<ILeadRepository, LeadRepository>();
         services.AddScoped<IOpportunityRepository, OpportunityRepository>();
         services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
+        services.AddScoped<IQueueRepository, QueueRepository>();
         services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddScoped<ISlaRepository, SlaRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<ITaxInformationAddressRepository, TaxInformationAddressRepository>();
         services.AddScoped<ITaxInformationRepository, TaxInformationRepository>();
