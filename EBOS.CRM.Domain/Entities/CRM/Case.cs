@@ -34,6 +34,8 @@ public class Case : ErasableEntity, ITenantScopedEntity
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
 
+    public ICollection<CaseActivity> Activities { get; set; } = new List<CaseActivity>();
+
     public void AssignQueue(long queueId)
     {
         if (queueId <= 0)

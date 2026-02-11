@@ -32,6 +32,10 @@ public class AssignCaseQueueCommandHandler(
         {
             throw new InvalidOperationException("Queue is not active.");
         }
+        if (queue.TenantId != entity.TenantId)
+        {
+            throw new InvalidOperationException("Queue tenant mismatch.");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
         entity.AssignQueue(entityRequest.QueueId);

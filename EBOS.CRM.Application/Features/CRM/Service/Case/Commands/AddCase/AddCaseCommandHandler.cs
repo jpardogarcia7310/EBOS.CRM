@@ -27,9 +27,17 @@ public class AddCaseCommandHandler(
         {
             throw new InvalidOperationException("Queue is not active.");
         }
+        if (queue.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("Queue tenant mismatch.");
+        }
 
         var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
             ?? throw new InvalidOperationException("SLA not found.");
+        if (sla.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("SLA tenant mismatch.");
+        }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Case>(entityRequest);
         entity.SetStatus(entityRequest.Status);

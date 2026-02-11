@@ -23,6 +23,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
     public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
+    public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
     public DbSet<Case> Cases => Set<Case>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
     public DbSet<Country> Countries => Set<Country>();

@@ -27,10 +27,19 @@ public class UpdateCaseCommandHandler(
             return null;
         }
 
-        _ = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
+        var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
             ?? throw new InvalidOperationException("Queue not found.");
-        _ = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
+        if (queue.TenantId != entity.TenantId)
+        {
+            throw new InvalidOperationException("Queue tenant mismatch.");
+        }
+
+        var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
             ?? throw new InvalidOperationException("SLA not found.");
+        if (sla.TenantId != entity.TenantId)
+        {
+            throw new InvalidOperationException("SLA tenant mismatch.");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
         var currentStatus = entity.Status;
