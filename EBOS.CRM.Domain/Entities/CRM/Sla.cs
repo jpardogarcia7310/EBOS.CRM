@@ -50,6 +50,27 @@ public class Sla : ErasableEntity, ITenantScopedEntity
         return start.AddMinutes(TargetMinutes);
     }
 
+    public void ValidateWarningMinutes()
+    {
+        if (WarningMinutes.HasValue && WarningMinutes.Value < 0)
+        {
+            throw new InvalidOperationException("WarningMinutes cannot be negative.");
+        }
+
+        if (WarningMinutes.HasValue && WarningMinutes.Value > TargetMinutes)
+        {
+            throw new InvalidOperationException("WarningMinutes cannot exceed TargetMinutes.");
+        }
+    }
+
+    public void ValidateActiveRange()
+    {
+        if (ActiveFrom.HasValue && ActiveTo.HasValue && ActiveFrom.Value > ActiveTo.Value)
+        {
+            throw new InvalidOperationException("ActiveFrom cannot be later than ActiveTo.");
+        }
+    }
+
     public bool IsBreached(DateTime now, DateTime? dueAt)
     {
         if (!dueAt.HasValue)
