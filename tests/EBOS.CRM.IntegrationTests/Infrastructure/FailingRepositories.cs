@@ -1091,6 +1091,322 @@ public sealed class FailingAddressRepository : IAddressRepository
     }
 }
 
+public sealed class FailingLeadRepository : ILeadRepository
+{
+    public Task AddAsync(Lead entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AddRangeAsync(IEnumerable<Lead> entities, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AttachAsync(Lead entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task UpdateAsync(Lead entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task DeleteAsync(Lead entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<Lead?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Lead>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Lead>> GetAllPagedAsync(int pageNumber, int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public IQueryable<Lead> AsQueryable(bool includeErased = false)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task EndTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task RollbackAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+}
+
+public sealed class FailingOpportunityRepository : IOpportunityRepository
+{
+    public Task AddAsync(Opportunity entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AddRangeAsync(IEnumerable<Opportunity> entities, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AttachAsync(Opportunity entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task UpdateAsync(Opportunity entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task DeleteAsync(Opportunity entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<Opportunity?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Opportunity>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Opportunity>> GetAllPagedAsync(int pageNumber, int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public IQueryable<Opportunity> AsQueryable(bool includeErased = false)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task EndTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task RollbackAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+}
+
+public sealed class FailingOpportunityStageRepository : IOpportunityStageRepository
+{
+    public Task AddAsync(OpportunityStage entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AddRangeAsync(IEnumerable<OpportunityStage> entities, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AttachAsync(OpportunityStage entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task UpdateAsync(OpportunityStage entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task DeleteAsync(OpportunityStage entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<OpportunityStage?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<OpportunityStage>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<OpportunityStage>> GetAllPagedAsync(int pageNumber, int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public IQueryable<OpportunityStage> AsQueryable(bool includeErased = false)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task EndTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task RollbackAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+}
+
+public sealed class FailingQuoteRepository : IQuoteRepository
+{
+    public Task AddAsync(Quote entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AddRangeAsync(IEnumerable<Quote> entities, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task AttachAsync(Quote entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task UpdateAsync(Quote entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task DeleteAsync(Quote entity, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<Quote?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Quote>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<Quote>> GetAllPagedAsync(int pageNumber, int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public IQueryable<Quote> AsQueryable(bool includeErased = false)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task EndTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task RollbackAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+}
+
 
 
 
