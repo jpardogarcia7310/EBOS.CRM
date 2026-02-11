@@ -43,6 +43,8 @@ services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavi
 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 services.AddOptions<CommandExecutionOptions>()
     .Bind(builder.Configuration.GetSection(CommandExecutionOptions.SectionName));
+services.AddOptions<CaseWorkflowOptions>()
+    .Bind(builder.Configuration.GetSection(CaseWorkflowOptions.SectionName));
 
 // Infrastructure
 services.AddInfrastructure(builder.Configuration);

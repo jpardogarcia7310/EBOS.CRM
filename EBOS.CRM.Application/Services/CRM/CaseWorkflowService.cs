@@ -1,16 +1,21 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Application.Services.CRM;
 
-public sealed class CaseWorkflowService(ICaseActivityRepository activityRepository) : ICaseWorkflowService
+public sealed class CaseWorkflowService(
+    ICaseActivityRepository activityRepository,
+    IOptions<CaseWorkflowOptions> options) : ICaseWorkflowService
 {
     private readonly ICaseActivityRepository _activityRepository = activityRepository
         ?? throw new ArgumentNullException(nameof(activityRepository));
+    private readonly CaseWorkflowOptions _options = options?.Value ?? new CaseWorkflowOptions();
 
     public async Task EnsureCanTransitionAsync(Case entity, string nextStatus, CancellationToken cancellationToken = default)
     {
@@ -18,7 +23,8 @@ public sealed class CaseWorkflowService(ICaseActivityRepository activityReposito
 
         if (string.Equals(nextStatus, Case.StatusClosed, StringComparison.OrdinalIgnoreCase))
         {
-            if (await _activityRepository.HasOpenByCaseIdAsync(entity.Id, cancellationToken))
+            if (!_options.AllowCloseWithOpenActivities &&
+                await _activityRepository.HasOpenByCaseIdAsync(entity.Id, cancellationToken))
             {
                 throw new InvalidOperationException("Case has open activities and cannot be closed.");
             }

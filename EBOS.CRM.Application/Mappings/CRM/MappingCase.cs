@@ -40,6 +40,7 @@ public class MappingCase : IRegister
             .Map(dest => dest.UpdatedAt, src => (DateTime?)null)
             .Map(dest => dest.UpdatedBy, src => (long?)null)
             .Map(dest => dest.ClosedAt, src => (DateTime?)null)
+            .Ignore(dest => dest.Activities)
             .Ignore(dest => dest.Queue)
             .Ignore(dest => dest.Sla);
 
@@ -60,6 +61,7 @@ public class MappingCase : IRegister
             .Map(dest => dest.UpdatedBy, src => (long?)null)
             .Map(dest => dest.ClosedAt, src => (DateTime?)null)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.Activities)
             .Ignore(dest => dest.Queue)
             .Ignore(dest => dest.Sla);
     }
