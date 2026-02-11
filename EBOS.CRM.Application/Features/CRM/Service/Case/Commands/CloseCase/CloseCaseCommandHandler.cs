@@ -10,7 +10,7 @@ namespace EBOS.CRM.Application.Features.CRM.Service.Case.Commands.CloseCase;
 
 public class CloseCaseCommandHandler(
     ICaseRepository repository,
-    ICaseActivityRepository activityRepository,
+    ICaseWorkflowService workflowService,
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper) : IRequestHandler<CloseCaseCommand, CaseResponse?>
@@ -26,13 +26,9 @@ public class CloseCaseCommandHandler(
             return null;
         }
 
-        if (await activityRepository.HasOpenByCaseIdAsync(entity.Id, cancellationToken))
-        {
-            throw new InvalidOperationException("Case has open activities and cannot be closed.");
-        }
-
         var oldValues = AuditSerialization.Serialize(entity);
-        entity.Close(entityRequest.ClosedAt);
+        await workflowService.ApplyStatusChangeAsync(entity, Domain.Entities.CRM.Case.StatusClosed,
+            entityRequest.ClosedAt, cancellationToken);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

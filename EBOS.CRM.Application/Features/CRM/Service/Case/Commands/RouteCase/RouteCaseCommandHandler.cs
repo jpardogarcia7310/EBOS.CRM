@@ -6,18 +6,16 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
 
-namespace EBOS.CRM.Application.Features.CRM.Service.Case.Commands.UpdateCase;
+namespace EBOS.CRM.Application.Features.CRM.Service.Case.Commands.RouteCase;
 
-public class UpdateCaseCommandHandler(
+public sealed class RouteCaseCommandHandler(
     ICaseRepository repository,
-    IQueueRepository queueRepository,
-    ISlaRepository slaRepository,
-    ICaseWorkflowService workflowService,
+    ICaseRoutingService routingService,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<UpdateCaseCommand, CaseResponse?>
+    IMapper mapper) : IRequestHandler<RouteCaseCommand, CaseResponse?>
 {
-    public async Task<CaseResponse?> Handle(UpdateCaseCommand request, CancellationToken cancellationToken)
+    public async Task<CaseResponse?> Handle(RouteCaseCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -30,39 +28,21 @@ public class UpdateCaseCommandHandler(
 
         if (entity.ClosedAt.HasValue)
         {
-            if (entityRequest.QueueId != entity.QueueId || entityRequest.SlaId != entity.SlaId)
-            {
-                throw new InvalidOperationException("Cannot change SLA or Queue for a closed case.");
-            }
-        }
-
-        var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
-            ?? throw new InvalidOperationException("Queue not found.");
-        if (queue.TenantId != entity.TenantId)
-        {
-            throw new InvalidOperationException("Queue tenant mismatch.");
-        }
-
-        var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
-            ?? throw new InvalidOperationException("SLA not found.");
-        if (sla.TenantId != entity.TenantId)
-        {
-            throw new InvalidOperationException("SLA tenant mismatch.");
+            throw new InvalidOperationException("Cannot route a closed case.");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        var currentStatus = entity.Status;
+        var route = await routingService.RouteAsync(entity, entityRequest.Force, cancellationToken);
 
-        mapper.Map(entityRequest, entity);
-
-        if (!string.Equals(currentStatus, entityRequest.Status, StringComparison.OrdinalIgnoreCase))
+        if (route.QueueId != entity.QueueId)
         {
-            entity.Status = currentStatus;
-            await workflowService.ApplyStatusChangeAsync(entity, entityRequest.Status, DateTime.UtcNow, cancellationToken);
+            entity.AssignQueue(route.QueueId);
         }
 
-        entity.SetPriority(entityRequest.Priority);
-        entity.UpdateDueAt(entityRequest.DueAt);
+        if (route.OwnerUserId.HasValue && (entity.OwnerUserId <= 0 || entityRequest.Force))
+        {
+            entity.AssignOwner(route.OwnerUserId.Value);
+        }
 
         await repository.BeginTransactionAsync(cancellationToken);
 

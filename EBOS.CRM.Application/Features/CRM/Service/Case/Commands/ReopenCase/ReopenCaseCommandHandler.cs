@@ -10,6 +10,7 @@ namespace EBOS.CRM.Application.Features.CRM.Service.Case.Commands.ReopenCase;
 
 public class ReopenCaseCommandHandler(
     ICaseRepository repository,
+    ICaseWorkflowService workflowService,
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper) : IRequestHandler<ReopenCaseCommand, CaseResponse?>
@@ -25,7 +26,8 @@ public class ReopenCaseCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        entity.Reopen();
+        await workflowService.ApplyStatusChangeAsync(entity, Domain.Entities.CRM.Case.StatusReopened,
+            DateTime.UtcNow, cancellationToken);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
