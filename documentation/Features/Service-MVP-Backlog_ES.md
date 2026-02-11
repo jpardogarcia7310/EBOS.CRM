@@ -9,6 +9,67 @@ Derivado de los issues #60, #81, #82, #83, #84.
 - Seguimiento de SLA (objetivos, chequeo de incumplimiento).
 - Asignación a colas (reglas de ruteo, reasignación manual).
 
+## Para que sirve este milestone en el CRM (capa por capa)
+
+### Valor en Domain
+
+- Agrega el vocabulario minimo de servicio: Case, Sla, Queue.
+- Define reglas de ciclo de vida y calculo de vencimientos por SLA.
+
+**Pros**
+- Estados y ownership claros para operacion.
+- Invariants reutilizables para automatizaciones futuras.
+
+**Contras**
+- Requiere disciplina en la carga de datos.
+
+### Valor en Application
+
+- Implementa workflows (ciclo de vida, chequeos SLA, asignacion a cola).
+- Centraliza validacion y aislamiento por tenant.
+
+**Pros**
+- Comportamiento consistente entre API, tests y UI.
+- Facil de evolucionar sin tocar controladores.
+
+**Contras**
+- Mas handlers/validators que mantener.
+
+### Valor en API
+
+- Expone endpoints para casos, SLAs y colas.
+- Habilita integraciones con UI o sistemas externos.
+
+**Pros**
+- Permite habilitar rapido dashboards de soporte.
+- Patrones consistentes con el resto de CRM.
+
+**Contras**
+- Mas endpoints para versionar y documentar.
+
+### Valor en Infrastructure
+
+- Persistencia con EF mappings + migrations.
+- Repositorios para entidades de Service.
+
+**Pros**
+- Almacenamiento confiable y consultas eficientes.
+- Patrones de DI y data access consistentes.
+
+**Contras**
+- Overhead de migrations y evolucion de esquema.
+
+### Valor en Tests
+
+- Verifica reglas de ciclo de vida, SLA y asignaciones.
+
+**Pros**
+- Reduce regresiones al crecer reglas de negocio.
+- Confianza para automatizacion y reporting.
+
+**Contras**
+- Mas cobertura a mantener.
+
 ## Domain (EBOS.CRM.Domain)
 
 ### Aggregates y entities
