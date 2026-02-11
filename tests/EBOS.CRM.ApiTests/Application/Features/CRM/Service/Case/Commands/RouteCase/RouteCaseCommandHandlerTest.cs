@@ -7,6 +7,7 @@ using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using Moq;
+using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Service.Case.Commands.RouteCase;
 
@@ -46,13 +47,13 @@ public class RouteCaseCommandHandlerTest
     [Fact]
     public async Task Handle_WhenRouteIsReturned_UpdatesCaseAndAudits()
     {
-        var entity = new Case
+        var entity = new CaseEntity
         {
             Id = 5,
             TenantId = 1,
             Title = "Case",
-            Status = Case.StatusOpen,
-            Priority = Case.PriorityLow,
+            Status = CaseEntity.StatusOpen,
+            Priority = CaseEntity.PriorityLow,
             QueueId = 1,
             OwnerUserId = 0
         };
@@ -83,13 +84,13 @@ public class RouteCaseCommandHandlerTest
     [Fact]
     public async Task Handle_WhenCaseIsClosed_Throws()
     {
-        var entity = new Case
+        var entity = new CaseEntity
         {
             Id = 6,
             TenantId = 1,
             Title = "Case",
-            Status = Case.StatusClosed,
-            Priority = Case.PriorityLow,
+            Status = CaseEntity.StatusClosed,
+            Priority = CaseEntity.PriorityLow,
             QueueId = 1,
             OwnerUserId = 1,
             ClosedAt = DateTime.UtcNow
@@ -101,6 +102,6 @@ public class RouteCaseCommandHandlerTest
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _handler.Handle(new RouteCaseCommand(entity.Id, new RouteCaseRequest()), CancellationToken.None));
 
-        _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Case>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CaseEntity>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

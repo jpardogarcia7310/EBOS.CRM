@@ -3,7 +3,7 @@ using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;
 
 namespace EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckSlaBatch;
 
@@ -19,24 +19,27 @@ public sealed class CheckSlaBatchQueryHandler(
         var safePageNumber = Math.Max(1, payload.PageNumber);
         var safePageSize = Math.Max(1, payload.PageSize);
 
-        var query = caseRepository.AsQueryable()
-            .Where(c => c.TenantId == payload.TenantId && c.DueAt != null && c.Status != Case.StatusClosed);
-
-        var total = await query.CountAsync(cancellationToken);
-        var cases = await query
+        var casesAll = await caseRepository.GetAllAsync(cancellationToken);
+        var filteredCases = casesAll
+            .Where(c => c.TenantId == payload.TenantId && c.DueAt != null && c.Status != CaseEntity.StatusClosed)
             .OrderBy(c => c.Id)
+            .ToList();
+
+        var total = filteredCases.Count;
+        var cases = filteredCases
             .Skip((safePageNumber - 1) * safePageSize)
             .Take(safePageSize)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var slaIds = cases
             .Select(c => c.SlaId)
             .Distinct()
             .ToList();
 
-        var slas = await slaRepository.AsQueryable()
+        var slasAll = await slaRepository.GetAllAsync(cancellationToken);
+        var slas = slasAll
             .Where(s => slaIds.Contains(s.Id))
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var slaMap = slas.ToDictionary(s => s.Id);
         var now = payload.Now;
