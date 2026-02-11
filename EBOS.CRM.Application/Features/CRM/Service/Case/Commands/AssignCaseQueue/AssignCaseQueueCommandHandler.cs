@@ -26,6 +26,11 @@ public class AssignCaseQueueCommandHandler(
             return null;
         }
 
+        if (entity.ClosedAt.HasValue)
+        {
+            throw new InvalidOperationException("Cannot change queue for a closed case.");
+        }
+
         var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
             ?? throw new InvalidOperationException("Queue not found.");
         if (!queue.IsActive)

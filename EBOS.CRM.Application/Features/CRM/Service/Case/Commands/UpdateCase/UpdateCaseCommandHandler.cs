@@ -27,6 +27,14 @@ public class UpdateCaseCommandHandler(
             return null;
         }
 
+        if (entity.ClosedAt.HasValue)
+        {
+            if (entityRequest.QueueId != entity.QueueId || entityRequest.SlaId != entity.SlaId)
+            {
+                throw new InvalidOperationException("Cannot change SLA or Queue for a closed case.");
+            }
+        }
+
         var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
             ?? throw new InvalidOperationException("Queue not found.");
         if (queue.TenantId != entity.TenantId)
