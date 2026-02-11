@@ -12,6 +12,7 @@ using EBOS.CRM.Application;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Services.Commands;
+using EBOS.CRM.Domain.Identity;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -153,6 +154,26 @@ services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiUser", policy =>
         policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseCreate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseUpdate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseDelete, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CasePatch, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.SlaRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.SlaCreate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.SlaUpdate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.SlaDelete, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.SlaPatch, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.QueueRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.QueueCreate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.QueueUpdate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.QueueDelete, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.QueuePatch, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseActivityRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseActivityCreate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseActivityUpdate, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseActivityDelete, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CaseActivityPatch, policy => policy.RequireAuthenticatedUser());
 });
 
 // Register FluentValidation validators (from Application assembly)

@@ -1,5 +1,5 @@
-using EBOS.CRM.Domain.Entities.CRM;
 using FluentValidation;
+using CaseActivityEntity = EBOS.CRM.Domain.Entities.CRM.CaseActivity;
 
 namespace EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.UpdateCaseActivity;
 
@@ -19,10 +19,10 @@ public class UpdateCaseActivityCommandValidator : AbstractValidator<UpdateCaseAc
             RuleFor(x => x.ActivityRequest.Description).MaximumLength(2000);
             RuleFor(x => x.ActivityRequest.Status)
                 .NotEmpty().MaximumLength(50)
-                .Must(status => status is CaseActivity.StatusOpen
-                    or CaseActivity.StatusInProgress
-                    or CaseActivity.StatusCompleted
-                    or CaseActivity.StatusCancelled);
+                .Must(status => status is CaseActivityEntity.StatusOpen
+                    or CaseActivityEntity.StatusInProgress
+                    or CaseActivityEntity.StatusCompleted
+                    or CaseActivityEntity.StatusCancelled);
         });
     }
 }
