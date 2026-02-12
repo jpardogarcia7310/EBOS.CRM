@@ -124,7 +124,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
-            var normalizer = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Application.Services.Interfaces.ILookupNormalizationService>();
+            var normalizer = scope.ServiceProvider.GetRequiredService<ILookupNormalizationService>();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();

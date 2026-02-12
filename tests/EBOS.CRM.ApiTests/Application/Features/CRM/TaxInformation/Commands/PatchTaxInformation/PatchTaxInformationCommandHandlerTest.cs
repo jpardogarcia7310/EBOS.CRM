@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInformation;
 using EBOS.CRM.Application.Services.Interfaces;
@@ -23,7 +24,7 @@ public class PatchTaxInformationCommandHandlerTest
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 

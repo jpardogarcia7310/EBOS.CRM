@@ -2,7 +2,6 @@ using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
 
 namespace EBOS.CRM.Infrastructure.Services.CRM;
 

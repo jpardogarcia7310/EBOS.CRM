@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.Application.Services.CRM;
 
