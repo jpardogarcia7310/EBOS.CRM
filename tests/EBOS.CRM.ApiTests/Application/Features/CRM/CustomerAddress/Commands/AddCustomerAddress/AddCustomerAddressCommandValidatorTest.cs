@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
 using EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddress;
 using FluentValidation.TestHelper;
 

@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Entities.CRM;
 
-namespace EBOS.CRM.Domain.Entities;
+namespace EBOS.CRM.Domain.Entities.EBOS;
 
 public class AddressType : BaseEntity
 {

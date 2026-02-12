@@ -1,6 +1,6 @@
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;
-using EBOS.CRM.Application.Services.Authorization;
+using EBOS.CRM.Application.Shared.Authorization;
 
 namespace EBOS.CRM.ApiTests.Application.Services.Authorization;
 

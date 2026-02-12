@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.DeleteTaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.UpdateTaxInformation;
@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformat
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.TaxInformation;
 
 [ApiController]

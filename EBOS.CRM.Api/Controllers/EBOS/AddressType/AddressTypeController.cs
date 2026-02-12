@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
-using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAddressTypeById;
 using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAllAddressesType;
 using MediatR;

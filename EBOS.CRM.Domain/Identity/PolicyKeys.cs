@@ -99,5 +99,53 @@ public static class PolicyKeys
         public const string TaxInformationAddressUpdate = "Policy.Crm.TaxInformationAddress.Update";
         public const string TaxInformationAddressDelete = "Policy.Crm.TaxInformationAddress.Delete";
         public const string TaxInformationAddressPatch = "Policy.Crm.TaxInformationAddress.Patch";
+
+        public const string LeadRead = "Policy.Crm.Lead.Read";
+        public const string LeadCreate = "Policy.Crm.Lead.Create";
+        public const string LeadUpdate = "Policy.Crm.Lead.Update";
+        public const string LeadDelete = "Policy.Crm.Lead.Delete";
+        public const string LeadPatch = "Policy.Crm.Lead.Patch";
+
+        public const string OpportunityRead = "Policy.Crm.Opportunity.Read";
+        public const string OpportunityCreate = "Policy.Crm.Opportunity.Create";
+        public const string OpportunityUpdate = "Policy.Crm.Opportunity.Update";
+        public const string OpportunityDelete = "Policy.Crm.Opportunity.Delete";
+        public const string OpportunityPatch = "Policy.Crm.Opportunity.Patch";
+
+        public const string OpportunityStageRead = "Policy.Crm.OpportunityStage.Read";
+        public const string OpportunityStageCreate = "Policy.Crm.OpportunityStage.Create";
+        public const string OpportunityStageUpdate = "Policy.Crm.OpportunityStage.Update";
+        public const string OpportunityStageDelete = "Policy.Crm.OpportunityStage.Delete";
+        public const string OpportunityStagePatch = "Policy.Crm.OpportunityStage.Patch";
+
+        public const string QuoteRead = "Policy.Crm.Quote.Read";
+        public const string QuoteCreate = "Policy.Crm.Quote.Create";
+        public const string QuoteUpdate = "Policy.Crm.Quote.Update";
+        public const string QuoteDelete = "Policy.Crm.Quote.Delete";
+        public const string QuotePatch = "Policy.Crm.Quote.Patch";
+
+        public const string CaseRead = "Policy.Crm.Case.Read";
+        public const string CaseCreate = "Policy.Crm.Case.Create";
+        public const string CaseUpdate = "Policy.Crm.Case.Update";
+        public const string CaseDelete = "Policy.Crm.Case.Delete";
+        public const string CasePatch = "Policy.Crm.Case.Patch";
+
+        public const string SlaRead = "Policy.Crm.Sla.Read";
+        public const string SlaCreate = "Policy.Crm.Sla.Create";
+        public const string SlaUpdate = "Policy.Crm.Sla.Update";
+        public const string SlaDelete = "Policy.Crm.Sla.Delete";
+        public const string SlaPatch = "Policy.Crm.Sla.Patch";
+
+        public const string QueueRead = "Policy.Crm.Queue.Read";
+        public const string QueueCreate = "Policy.Crm.Queue.Create";
+        public const string QueueUpdate = "Policy.Crm.Queue.Update";
+        public const string QueueDelete = "Policy.Crm.Queue.Delete";
+        public const string QueuePatch = "Policy.Crm.Queue.Patch";
+
+        public const string CaseActivityRead = "Policy.Crm.CaseActivity.Read";
+        public const string CaseActivityCreate = "Policy.Crm.CaseActivity.Create";
+        public const string CaseActivityUpdate = "Policy.Crm.CaseActivity.Update";
+        public const string CaseActivityDelete = "Policy.Crm.CaseActivity.Delete";
+        public const string CaseActivityPatch = "Policy.Crm.CaseActivity.Patch";
     }
 }

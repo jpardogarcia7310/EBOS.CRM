@@ -4,11 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Identity\" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
@@ -19,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EBOS.CRM.Contracts\EBOS.CRM.Contracts.csproj" />
     <ProjectReference Include="..\EBOS.CRM.Domain\EBOS.CRM.Domain.csproj" />
   </ItemGroup>
 

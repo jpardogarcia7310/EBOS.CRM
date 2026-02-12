@@ -1,8 +1,7 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Options;
-using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 using EBOS.CRM.Infrastructure.Services.Audit;
@@ -46,6 +45,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IPolicyService, PolicyService>();
+        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
+        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAddressRepository, AddressRepository>();
@@ -53,6 +54,8 @@ public static class DependencyInjection
         services.AddScoped<IBankInformationRepository, BankInformationRepository>();
         services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
+        services.AddScoped<ICaseActivityRepository, CaseActivityRepository>();
+        services.AddScoped<ICaseRepository, CaseRepository>();
         services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
         services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
@@ -64,7 +67,9 @@ public static class DependencyInjection
         services.AddScoped<ILeadRepository, LeadRepository>();
         services.AddScoped<IOpportunityRepository, OpportunityRepository>();
         services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
+        services.AddScoped<IQueueRepository, QueueRepository>();
         services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddScoped<ISlaRepository, SlaRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<ITaxInformationAddressRepository, TaxInformationAddressRepository>();
         services.AddScoped<ITaxInformationRepository, TaxInformationRepository>();

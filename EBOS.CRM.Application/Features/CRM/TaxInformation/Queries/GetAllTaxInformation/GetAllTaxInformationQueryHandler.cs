@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
-using EBOS.CRM.Application.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.Common;
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformation;
 

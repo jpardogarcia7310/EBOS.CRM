@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Opportunity.Commands.AddOpportunity;
 using EBOS.CRM.Application.Features.CRM.Opportunity.Commands.CloseOpportunity;
 using EBOS.CRM.Application.Features.CRM.Opportunity.Commands.PatchOpportunityStage;

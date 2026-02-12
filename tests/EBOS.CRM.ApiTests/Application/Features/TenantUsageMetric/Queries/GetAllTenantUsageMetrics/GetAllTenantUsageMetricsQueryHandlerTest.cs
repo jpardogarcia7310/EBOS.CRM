@@ -1,6 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.TenantUsageMetric.Queries.GetAllTenantUsageMetrics;
-using TenantUsageMetricEntity = EBOS.CRM.Domain.Entities.CRM.TenantUsageMetric;
+using TenantUsageMetricEntity = EBOS.CRM.Domain.Entities.EBOS.TenantUsageMetric;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-
 namespace EBOS.CRM.Api.Extensions;
 
 public static class CorrelationIdExtensions

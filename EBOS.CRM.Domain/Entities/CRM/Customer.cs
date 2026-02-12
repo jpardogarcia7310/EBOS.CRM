@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;

@@ -1,23 +1,23 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM;
+namespace EBOS.CRM.IntegrationTests.Controllers.CRM;
 
 public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
@@ -36,7 +36,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         var created = await addResponse.Content.ReadFromJsonAsync<CustomerResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{version}/Customer/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{version}/Customer/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -56,7 +56,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         var created = await addResponse.Content.ReadFromJsonAsync<AddressResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{version}/Address/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{version}/Address/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -75,7 +75,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         var created = await addResponse.Content.ReadFromJsonAsync<CorporateCustomerResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{version}/CorporateCustomer/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{version}/CorporateCustomer/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -95,7 +95,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         var created = await addResponse.Content.ReadFromJsonAsync<IndividualCustomerResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{version}/IndividualCustomer/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{version}/IndividualCustomer/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -116,12 +116,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         corp.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice",
-            new AddBranchOfficeRequest(1, "Branch A", "123", corp!.Id));
+            new AddBranchOfficeRequest(1, "Branch A", "123", corp.Id));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{branchVersion}/BranchOffice/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{branchVersion}/BranchOffice/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -146,7 +146,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         corp.Should().NotBeNull();
 
         var branchResponse = await client1.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice",
-            new AddBranchOfficeRequest(1, "Branch A", "123", corp!.Id));
+            new AddBranchOfficeRequest(1, "Branch A", "123", corp.Id));
         branchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var branch = await branchResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
         branch.Should().NotBeNull();
@@ -159,12 +159,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         address.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{boaVersion}/BranchOfficeAddress",
-            new AddBranchOfficeAddressRequest(1, branch!.Id, address!.Id, true, DateTime.UtcNow.Date, null, true));
+            new AddBranchOfficeAddressRequest(1, branch.Id, address.Id, true, DateTime.UtcNow.Date, null, true));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<BranchOfficeAddressResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{boaVersion}/BranchOfficeAddress/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{boaVersion}/BranchOfficeAddress/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -184,12 +184,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         customer.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{bankVersion}/BankInformation",
-            new AddBankInformationRequest(1, "ES1200000000000000000000", "BANKESMM", "Bank", customer!.Id));
+            new AddBankInformationRequest(1, "ES1200000000000000000000", "BANKESMM", "Bank", customer.Id));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<BankInformationResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{bankVersion}/BankInformation/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{bankVersion}/BankInformation/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -209,12 +209,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         customer.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{creditVersion}/CreditAccount",
-            new AddCreditAccountRequest(1, 1000m, 0m, customer!.Id));
+            new AddCreditAccountRequest(1, 1000m, 0m, customer.Id));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{creditVersion}/CreditAccount/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{creditVersion}/CreditAccount/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -235,18 +235,18 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         customer.Should().NotBeNull();
 
         var creditResponse = await client1.PostAsJsonAsync($"/api/v{creditVersion}/CreditAccount",
-            new AddCreditAccountRequest(1, 1000m, 0m, customer!.Id));
+            new AddCreditAccountRequest(1, 1000m, 0m, customer.Id));
         creditResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var credit = await creditResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
         credit.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{transactionVersion}/CreditTransaction",
-            new AddCreditTransactionRequest(1, DateTime.UtcNow, 10m, "Consumption", "ORD-1", "Test", credit!.Id));
+            new AddCreditTransactionRequest(1, DateTime.UtcNow, 10m, "Consumption", "ORD-1", "Test", credit.Id));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<CreditTransactionResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{transactionVersion}/CreditTransaction/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{transactionVersion}/CreditTransaction/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -276,12 +276,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         address.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{customerAddressVersion}/CustomerAddress",
-            new AddCustomerAddressRequest(1, customer!.Id, address!.Id, true, DateTime.UtcNow.Date, null, true));
+            new AddCustomerAddressRequest(1, customer.Id, address.Id, true, DateTime.UtcNow.Date, null, true));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<CustomerAddressResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{customerAddressVersion}/CustomerAddress/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{customerAddressVersion}/CustomerAddress/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -301,12 +301,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         customer.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation",
-            new AddTaxInformationRequest(1, "IVA", "TAX123", customer!.Id));
+            new AddTaxInformationRequest(1, "IVA", "TAX123", customer.Id));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{taxVersion}/TaxInformation/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{taxVersion}/TaxInformation/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -330,7 +330,7 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         customer.Should().NotBeNull();
 
         var taxResponse = await client1.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation",
-            new AddTaxInformationRequest(1, "IVA", "TAX123", customer!.Id));
+            new AddTaxInformationRequest(1, "IVA", "TAX123", customer.Id));
         taxResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tax = await taxResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
         tax.Should().NotBeNull();
@@ -343,12 +343,12 @@ public class TenantIsolationDeleteMismatchTest(CustomWebApplicationFactory facto
         address.Should().NotBeNull();
 
         var addResponse = await client1.PostAsJsonAsync($"/api/v{taxAddressVersion}/TaxInformationAddress",
-            new AddTaxInformationAddressRequest(1, tax!.Id, address!.Id, true, DateTime.UtcNow.Date, null, true));
+            new AddTaxInformationAddressRequest(1, tax.Id, address.Id, true, DateTime.UtcNow.Date, null, true));
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var created = await addResponse.Content.ReadFromJsonAsync<TaxInformationAddressResponse>();
         created.Should().NotBeNull();
 
-        var response = await client2.DeleteAsync($"/api/v{taxAddressVersion}/TaxInformationAddress/{created!.Id}");
+        var response = await client2.DeleteAsync($"/api/v{taxAddressVersion}/TaxInformationAddress/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

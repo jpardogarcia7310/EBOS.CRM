@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.AddBranchOfficeAddress;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.DeleteBranchOfficeAddress;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.UpdateBranchOfficeAddress;

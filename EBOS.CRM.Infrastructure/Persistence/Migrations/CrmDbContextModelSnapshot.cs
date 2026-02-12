@@ -356,6 +356,85 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("BranchOfficeAddresses", "CRM");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Case", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("OwnerUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("QueueId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SlaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QueueId")
+                        .HasDatabaseName("IX_Case_QueueId");
+
+                    b.HasIndex("SlaId")
+                        .HasDatabaseName("IX_Case_SlaId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Case_TenantId");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("IX_Case_Status_CreatedAt");
+
+                    b.ToTable("Cases", "CRM");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CreditAccount", b =>
                 {
                     b.Property<long>("Id")
@@ -855,6 +934,62 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Queue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DefaultOwnerUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Queue_TenantId");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Queue_TenantId_Code");
+
+                    b.ToTable("Queues", "CRM");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Quote", b =>
                 {
                     b.Property<long>("Id")
@@ -936,6 +1071,71 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_Quote_Subtotal_NonNegative", "[SubtotalAmount] >= 0");
 
                             t.HasCheckConstraint("CK_Quote_Total_NonNegative", "[TotalAmount] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Sla", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ActiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ActiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("TargetMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("WarningMinutes")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Sla_TenantId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Sla_TenantId_Name");
+
+                    b.ToTable("Slas", "CRM", t =>
+                        {
+                            t.HasCheckConstraint("CK_Sla_TargetMinutes_Positive", "[TargetMinutes] > 0");
+
+                            t.HasCheckConstraint("CK_Sla_WarningMinutes_NonNegative", "[WarningMinutes] IS NULL OR [WarningMinutes] >= 0");
                         });
                 });
 
@@ -2114,6 +2314,25 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("BranchOffice");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Case", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Queue", "Queue")
+                        .WithMany("Cases")
+                        .HasForeignKey("QueueId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Sla", "Sla")
+                        .WithMany("Cases")
+                        .HasForeignKey("SlaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Queue");
+
+                    b.Navigation("Sla");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CreditAccount", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", "Customer")
@@ -2419,6 +2638,16 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.OpportunityStage", b =>
                 {
                     b.Navigation("Opportunities");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Queue", b =>
+                {
+                    b.Navigation("Cases");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Sla", b =>
+                {
+                    b.Navigation("Cases");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.TaxInformation", b =>

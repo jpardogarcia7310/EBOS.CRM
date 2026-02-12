@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.AddLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.DisqualifyLead;

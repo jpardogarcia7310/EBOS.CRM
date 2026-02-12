@@ -1,13 +1,74 @@
 # Backlog tecnico Service MVP
 
-Trabajo concreto alineado con la estructura local (Clean Architecture, modulo Service en `EBOS.CRM.*`).
+Trabajo concreto alineado con la estructura local (Clean Architecture, módulo Service en `EBOS.CRM.*`).
 Derivado de los issues #60, #81, #82, #83, #84.
 
 ## Alcance del MVP
 
 - Gestion de casos (crear, actualizar, cerrar, reabrir).
 - Seguimiento de SLA (objetivos, chequeo de incumplimiento).
-- Asignacion a colas (reglas de ruteo, reasignacion manual).
+- Asignación a colas (reglas de ruteo, reasignación manual).
+
+## Para que sirve este milestone en el CRM (capa por capa)
+
+### Valor en Domain
+
+- Agrega el vocabulario minimo de servicio: Case, Sla, Queue.
+- Define reglas de ciclo de vida y calculo de vencimientos por SLA.
+
+**Pros**
+- Estados y ownership claros para operacion.
+- Invariants reutilizables para automatizaciones futuras.
+
+**Contras**
+- Requiere disciplina en la carga de datos.
+
+### Valor en Application
+
+- Implementa workflows (ciclo de vida, chequeos SLA, asignacion a cola).
+- Centraliza validacion y aislamiento por tenant.
+
+**Pros**
+- Comportamiento consistente entre API, tests y UI.
+- Facil de evolucionar sin tocar controladores.
+
+**Contras**
+- Mas handlers/validators que mantener.
+
+### Valor en API
+
+- Expone endpoints para casos, SLAs y colas.
+- Habilita integraciones con UI o sistemas externos.
+
+**Pros**
+- Permite habilitar rapido dashboards de soporte.
+- Patrones consistentes con el resto de CRM.
+
+**Contras**
+- Mas endpoints para versionar y documentar.
+
+### Valor en Infrastructure
+
+- Persistencia con EF mappings + migrations.
+- Repositorios para entidades de Service.
+
+**Pros**
+- Almacenamiento confiable y consultas eficientes.
+- Patrones de DI y data access consistentes.
+
+**Contras**
+- Overhead de migrations y evolucion de esquema.
+
+### Valor en Tests
+
+- Verifica reglas de ciclo de vida, SLA y asignaciones.
+
+**Pros**
+- Reduce regresiones al crecer reglas de negocio.
+- Confianza para automatizacion y reporting.
+
+**Contras**
+- Mas cobertura a mantener.
 
 ## Domain (EBOS.CRM.Domain)
 
@@ -44,7 +105,8 @@ Derivado de los issues #60, #81, #82, #83, #84.
   - Case: AddCaseRequest, UpdateCaseRequest, CloseCaseRequest, ReopenCaseRequest, AssignCaseQueueRequest, AssignCaseOwnerRequest.
   - Sla: AddSlaRequest, UpdateSlaRequest, ToggleSlaRequest.
   - Queue: AddQueueRequest, UpdateQueueRequest, ToggleQueueRequest, AssignQueueDefaultOwnerRequest.
-  - SLA checks: CheckCaseSlaRequest (caseId, now).
+- SLA checks: CheckCaseSlaRequest (caseId, now).
+  - Multi-tenant: todos los requests deben incluir TenantId cuando aplique el aggregate.
 - Responses:
   - CaseResponse, SlaResponse, QueueResponse, SlaCheckResponse.
 
@@ -113,7 +175,7 @@ Seguir el layout de CRM:
   - `POST /api/v1/Sla`
   - `PUT /api/v1/Sla/{id}`
   - `PATCH /api/v1/Sla/{id}/toggle`
-  - `GET /api/v1/Sla/{id}/check?now=...&caseId=...`
+  - `GET /api/v1/Sla/{id}/check?tenantId=...&caseId=...&now=...`
 - Queues
   - `GET /api/v1/Queue`
   - `GET /api/v1/Queue/{id}`
@@ -125,7 +187,7 @@ Seguir el layout de CRM:
 ## Infrastructure (EBOS.CRM.Infrastructure)
 
 - Configuraciones EF Core para Case, Sla, Queue.
-- Repositorios e inyeccion en DI.
+- Repositorios e inyección en DI.
 - Update de `CrmDbContext` y migrations.
 
 ## Tests (tests/EBOS.CRM.ApiTests)
@@ -134,7 +196,7 @@ Seguir el layout de CRM:
 
 - Ciclo de vida de Case e invariants.
 - Calculo de SLA y chequeo de breach.
-- Activacion de Queue.
+- Activación de Queue.
 
 ### Application tests
 
@@ -144,7 +206,7 @@ Seguir el layout de CRM:
 
 ### Controller tests
 
-- CRUD y payloads invalidos.
+- CRUD y payloads inválidos.
 - Endpoints de close/reopen/assign.
 
 ### Integration tests

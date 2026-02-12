@@ -1,12 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.EBOS.TenantUsageMetric;
+namespace EBOS.CRM.IntegrationTests.Controllers.EBOS.TenantUsageMetric;
 
 public class TenantUsageMetricEndpointTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
@@ -38,7 +38,7 @@ public class TenantUsageMetricEndpointTest(CustomWebApplicationFactory factory) 
 
         var item = await response.Content.ReadFromJsonAsync<TenantUsageMetricResponse>();
         item.Should().NotBeNull();
-        item!.Id.Should().Be(targetId);
+        item.Id.Should().Be(targetId);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class TenantUsageMetricEndpointTest(CustomWebApplicationFactory factory) 
         var metric2 = $"storage.{Guid.NewGuid():N}"[..10];
 
         db.TenantUsageMetrics.AddRange(
-            new Domain.Entities.CRM.TenantUsageMetric
+            new Domain.Entities.EBOS.TenantUsageMetric
             {
                 TenantId = 1,
                 Metric = metric1,
@@ -76,7 +76,7 @@ public class TenantUsageMetricEndpointTest(CustomWebApplicationFactory factory) 
                 PeriodEnd = DateTime.UtcNow,
                 Source = "gateway"
             },
-            new Domain.Entities.CRM.TenantUsageMetric
+            new Domain.Entities.EBOS.TenantUsageMetric
             {
                 TenantId = 1,
                 Metric = metric2,

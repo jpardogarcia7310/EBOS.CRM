@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -200,7 +201,7 @@ public static class TestDataSeeder
         }
 
         db.TenantConfigurations.AddRange(
-            new Domain.Entities.CRM.TenantConfiguration
+            new TenantConfiguration
             {
                 TenantId = 1,
                 Key = "limits.maxUsers",
@@ -208,7 +209,7 @@ public static class TestDataSeeder
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = 1
             },
-            new Domain.Entities.CRM.TenantConfiguration
+            new TenantConfiguration
             {
                 TenantId = 1,
                 Key = "features.beta",
@@ -228,7 +229,7 @@ public static class TestDataSeeder
         }
 
         db.TenantQuotas.Add(
-            new Domain.Entities.CRM.TenantQuota
+            new TenantQuota
             {
                 TenantId = 1,
                 Metric = "users",
@@ -248,7 +249,7 @@ public static class TestDataSeeder
         }
 
         db.TenantUsageMetrics.Add(
-            new Domain.Entities.CRM.TenantUsageMetric
+            new TenantUsageMetric
             {
                 TenantId = 1,
                 Metric = "api.calls",

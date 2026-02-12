@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.UpdateTaxInformationAddress;
 using FluentValidation.TestHelper;
 

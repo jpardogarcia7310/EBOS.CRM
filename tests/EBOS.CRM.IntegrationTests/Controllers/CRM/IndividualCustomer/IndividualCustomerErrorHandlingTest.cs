@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
@@ -27,7 +27,7 @@ public class IndividualCustomerErrorHandlingTest(
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem.Should().NotBeNull();
-        problem!.Status.Should().Be(500);
+        problem.Status.Should().Be(500);
     }
 
     [Fact]

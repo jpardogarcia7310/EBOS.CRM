@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
 using EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.DeleteCreditTransaction;
 using EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.UpdateCreditTransaction;
@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.CreditTransaction.Queries.GetAllCreditTr
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.CreditTransaction;
 
 [ApiController]

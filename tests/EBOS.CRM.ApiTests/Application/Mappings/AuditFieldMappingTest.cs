@@ -1,6 +1,9 @@
 using EBOS.CRM.ApiTests.Fixtures;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Domain.Entities.CRM;
 using MapsterMapper;
 
@@ -90,7 +93,7 @@ public class AuditFieldMappingTest(MapperFixture fixture) : IClassFixture<Mapper
             UpdatedBy = 22
         };
 
-        var request = new EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation.UpdateBankInformationRequest(
+        var request = new UpdateBankInformationRequest(
             TenantId: 2,
             Iban: "IBAN",
             Bic: "BIC",
@@ -118,7 +121,7 @@ public class AuditFieldMappingTest(MapperFixture fixture) : IClassFixture<Mapper
             UpdatedBy = 23
         };
 
-        var request = new EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice.UpdateBranchOfficeRequest(
+        var request = new UpdateBranchOfficeRequest(
             Id: 1,
             TenantId: 2,
             Name: "Branch",
@@ -146,7 +149,7 @@ public class AuditFieldMappingTest(MapperFixture fixture) : IClassFixture<Mapper
             UpdatedBy = 24
         };
 
-        var request = new EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount.UpdateCreditAccountRequest(
+        var request = new UpdateCreditAccountRequest(
             Id: 1,
             TenantId: 2,
             MaxAmount: 100,

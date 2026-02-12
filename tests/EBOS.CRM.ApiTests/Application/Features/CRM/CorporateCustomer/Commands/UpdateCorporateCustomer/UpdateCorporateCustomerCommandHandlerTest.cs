@@ -1,10 +1,11 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using Moq;
 using CRMCorporateCustomer = EBOS.CRM.Domain.Entities.CRM.CorporateCustomer;
@@ -29,7 +30,7 @@ public class UpdateCorporateCustomerCommandHandlerTest
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 
@@ -51,7 +52,7 @@ public class UpdateCorporateCustomerCommandHandlerTest
         Assert.Null(result);
         _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CRMCorporateCustomer>(), It.IsAny<CancellationToken>()), Times.Never);
         _auditServiceMock.Verify(a => a.InsertAuditAsync(
-            It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+            It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -74,7 +75,7 @@ public class UpdateCorporateCustomerCommandHandlerTest
         _repositoryMock.Verify(r => r.UpdateAsync(entity, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _auditServiceMock.Verify(a => a.InsertAuditAsync(
-            It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+            It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }

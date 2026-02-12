@@ -1,8 +1,9 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -123,7 +124,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
-            var normalizer = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Application.Services.Interfaces.ILookupNormalizationService>();
+            var normalizer = scope.ServiceProvider.GetRequiredService<ILookupNormalizationService>();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();
@@ -146,6 +147,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             }
 
             services.AddScoped<ICurrentUserContext, TestCurrentUserContext>();
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                    options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.SchemeName, _ => { });
         });
     }
 

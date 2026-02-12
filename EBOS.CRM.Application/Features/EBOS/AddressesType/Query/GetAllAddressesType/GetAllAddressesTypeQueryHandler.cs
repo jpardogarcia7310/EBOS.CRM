@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.Common;
-using EBOS.CRM.Domain.Interfaces.Repositories;
+using EBOS.CRM.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using MediatR;

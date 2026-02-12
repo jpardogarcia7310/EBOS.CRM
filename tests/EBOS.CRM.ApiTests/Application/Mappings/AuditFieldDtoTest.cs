@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Application.Mappings;

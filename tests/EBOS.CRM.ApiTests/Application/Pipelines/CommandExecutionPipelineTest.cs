@@ -1,7 +1,8 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Services.Commands;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Application.Shared.Commands;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
@@ -21,7 +22,7 @@ public class CommandExecutionPipelineTest
 
         auditService.Setup(a => a.InsertAuditAsync(It.IsAny<AuditInsertRequest>(), It.IsAny<CancellationToken>()))
             .Callback(() => auditCalls++)
-            .ReturnsAsync(new EBOS.CRM.Application.Contracts.Responses.Services.AuditInsertResponse(true, 1));
+            .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         var response = await pipeline.ExecuteAsync(
             unitOfWork.Object,
@@ -111,7 +112,7 @@ public class CommandExecutionPipelineTest
             .Returns(Task.CompletedTask);
         auditService.InSequence(sequence)
             .Setup(a => a.InsertAuditAsync(It.IsAny<AuditInsertRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new EBOS.CRM.Application.Contracts.Responses.Services.AuditInsertResponse(true, 1));
+            .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         await pipeline.ExecuteAsync(
             unitOfWork.Object,

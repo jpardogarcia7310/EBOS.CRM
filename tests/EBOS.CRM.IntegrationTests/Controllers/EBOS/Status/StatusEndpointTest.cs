@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -101,11 +101,11 @@ public class StatusEndpointTest(CustomWebApplicationFactory factory) : IClassFix
         var desc2 = $"Status-{Guid.NewGuid():N}";
 
         db.Statuses.AddRange(
-            new Domain.Entities.Status
+            new Domain.Entities.EBOS.Status
             {
                 Description = desc1
             },
-            new Domain.Entities.Status
+            new Domain.Entities.EBOS.Status
             {
                 Description = desc2
             });

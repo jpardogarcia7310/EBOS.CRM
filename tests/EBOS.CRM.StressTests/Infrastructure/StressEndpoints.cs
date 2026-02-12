@@ -1,6 +1,6 @@
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.EBOS;
 
 namespace EBOS.CRM.StressTests.Infrastructure;
 

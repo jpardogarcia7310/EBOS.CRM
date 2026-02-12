@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.DeleteAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
 [ApiController]

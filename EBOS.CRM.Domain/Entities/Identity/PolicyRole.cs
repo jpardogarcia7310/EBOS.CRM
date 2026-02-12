@@ -1,4 +1,3 @@
-using System;
 using EBOS.Core.Primitives;
 
 namespace EBOS.CRM.Domain.Entities.Identity;

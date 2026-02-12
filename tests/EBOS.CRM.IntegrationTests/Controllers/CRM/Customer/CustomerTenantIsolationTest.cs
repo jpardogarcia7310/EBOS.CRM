@@ -1,25 +1,20 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.Customer;
 
-public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFactory>
+public class CustomerTenantIsolationTest(CustomWebApplicationFactory factory)
+    : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly string _version;
-
-    public CustomerTenantIsolationTest(CustomWebApplicationFactory factory)
-    {
-        _factory = factory;
-        _version = ApiVersionHelper.GetLatestVersion(factory, "Customer");
-    }
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "Customer");
 
     [Fact]
     public async Task GetAll_Filters_By_Tenant_Header()
@@ -28,7 +23,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
         var codeTenant2 = $"C2-{Guid.NewGuid():N}";
         var erasedCode = SeedCustomers(codeTenant1, codeTenant2, out var _);
 
-        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(_factory, 1);
+        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(factory, 1);
         var response1 = await clientTenant1.GetAsync($"/api/v{_version}/Customer");
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant1 = await response1.Content.ReadItemsAsync<CustomerResponse>();
@@ -37,7 +32,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
         itemsTenant1.Should().NotContain(i => i.Code == codeTenant2);
         itemsTenant1.Should().NotContain(i => i.Code == erasedCode);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response2 = await clientTenant2.GetAsync($"/api/v{_version}/Customer");
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant2 = await response2.Content.ReadItemsAsync<CustomerResponse>();
@@ -53,7 +48,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
         var codeTenant2 = $"C2-{Guid.NewGuid():N}";
         SeedCustomers(codeTenant1, codeTenant2, out var ids);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response = await clientTenant2.GetAsync($"/api/v{_version}/Customer/{ids.Tenant1Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -66,7 +61,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
         var codeTenant2 = $"C2-{Guid.NewGuid():N}";
         SeedCustomers(codeTenant1, codeTenant2, out _);
 
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v{_version}/Customer");
         request.Headers.Add("X-Tenant-Id", "1");
         request.Headers.Host = "tenant2.api.domain";
@@ -87,7 +82,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
         var codeTenant2 = $"C2-{Guid.NewGuid():N}";
         SeedCustomers(codeTenant1, codeTenant2, out _);
 
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Remove("X-Tenant-Id");
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v{_version}/Customer");
         request.Headers.Host = "tenant2.api.domain";
@@ -104,10 +99,10 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
     [Fact]
     public async Task Add_Returns_400_When_TenantId_Missing_In_Request()
     {
-        var client = HttpClientFactory.CreateClientWithTenant(_factory, 5);
-        var statusId = await LookupHelper.GetStatusIdAsync(client, ApiVersionHelper.GetLatestVersion(_factory, "Status"));
+        var client = HttpClientFactory.CreateClientWithTenant(factory, 5);
+        var statusId = await LookupHelper.GetStatusIdAsync(client, ApiVersionHelper.GetLatestVersion(factory, "Status"));
 
-        var addRequest = new global::EBOS.CRM.Application.Contracts.Requests.CRM.Customer.AddCustomerRequest(
+        var addRequest = new AddCustomerRequest(
             TenantId: 0,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"auto{Guid.NewGuid():N}@example.com",
@@ -120,7 +115,7 @@ public class CustomerTenantIsolationTest : IClassFixture<CustomWebApplicationFac
 
     private string SeedCustomers(string codeTenant1, string codeTenant2, out (long Tenant1Id, long Tenant2Id) ids)
     {
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
         var statusId = db.Statuses.Select(s => s.Id).First();
         var erasedCode = $"CE-{Guid.NewGuid():N}";

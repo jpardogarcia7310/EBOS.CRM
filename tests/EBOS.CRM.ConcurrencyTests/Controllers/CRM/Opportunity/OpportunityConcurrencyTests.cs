@@ -1,8 +1,7 @@
 using System.Net.Http.Json;
-using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ConcurrencyTests.Fixtures;
 using EBOS.CRM.ConcurrencyTests.Infrastructure;
 

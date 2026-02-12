@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
 using EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
 using FluentValidation.TestHelper;
 

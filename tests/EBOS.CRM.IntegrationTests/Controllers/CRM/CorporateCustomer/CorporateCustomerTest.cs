@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -61,7 +61,7 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
             TaxIdentification: "B99999999");
 
         var updateResponse =
-            await _client.PutAsJsonAsync($"/api/v{_version}/CorporateCustomer/{created!.Id}", updateRequest);
+            await _client.PutAsJsonAsync($"/api/v{_version}/CorporateCustomer/{created.Id}", updateRequest);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var deleteResponse = await _client.DeleteAsync($"/api/v{_version}/CorporateCustomer/{created.Id}");

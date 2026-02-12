@@ -1,5 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses.Security;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Security;
+using EBOS.CRM.Contracts.Responses.Security;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.Security.Authorization.Queries.AuthorizeUser;
@@ -10,10 +11,14 @@ public sealed class AuthorizeUserQueryHandler(IAuthorizationService authorizatio
     private readonly IAuthorizationService _authorizationService = authorizationService
         ?? throw new ArgumentNullException(nameof(authorizationService));
 
-    public Task<AuthorizeUserResponse> Handle(AuthorizeUserQuery request, CancellationToken cancellationToken)
+    public async Task<AuthorizeUserResponse> Handle(AuthorizeUserQuery request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return _authorizationService.AuthorizeAsync(request.Request, cancellationToken);
+        var payload = request.Request;
+        var serviceRequest = new AuthorizeUserRequest(payload.UserId, payload.PolicyCode);
+        var serviceResponse = await _authorizationService.AuthorizeAsync(serviceRequest, cancellationToken);
+
+        return new AuthorizeUserResponse(serviceResponse.IsAuthorized);
     }
 }

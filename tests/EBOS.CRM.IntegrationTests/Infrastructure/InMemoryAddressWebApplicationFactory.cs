@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.IntegrationTests.Infrastructure;
 
@@ -55,7 +55,7 @@ public sealed class InMemoryAddressWebApplicationFactory : WebApplicationFactory
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
             db.Database.EnsureCreated();
-            var normalizer = scope.ServiceProvider.GetRequiredService<EBOS.CRM.Application.Services.Interfaces.ILookupNormalizationService>();
+            var normalizer = scope.ServiceProvider.GetRequiredService<ILookupNormalizationService>();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();
             TestDataSeeder.SeedAddressTypesAsync(db).GetAwaiter().GetResult();

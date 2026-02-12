@@ -1,5 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses.Security;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Security;
+using EBOS.CRM.Contracts.Responses.Security;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.Security.Authentication.Commands.AuthenticateUser;
@@ -10,11 +11,29 @@ public sealed class AuthenticateUserCommandHandler(IAuthenticationService authen
     private readonly IAuthenticationService _authenticationService = authenticationService
         ?? throw new ArgumentNullException(nameof(authenticationService));
 
-    public Task<AuthenticatedUserResponse> Handle(
-        AuthenticateUserCommand request,
+    public async Task<AuthenticatedUserResponse> Handle(AuthenticateUserCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return _authenticationService.AuthenticateAsync(request.Request, cancellationToken);
+
+        var payload = request.Request;
+        var serviceRequest = new AuthenticateUserRequest(
+            payload.ExternalId,
+            payload.Username,
+            payload.Email,
+            payload.DisplayName,
+            payload.IsActive);
+
+        var serviceResponse = await _authenticationService.AuthenticateAsync(serviceRequest, cancellationToken);
+
+        return new AuthenticatedUserResponse(
+            serviceResponse.UserId,
+            serviceResponse.ExternalId,
+            serviceResponse.Username,
+            serviceResponse.Email,
+            serviceResponse.DisplayName,
+            serviceResponse.IsActive,
+            serviceResponse.Roles,
+            serviceResponse.Permissions);
     }
 }

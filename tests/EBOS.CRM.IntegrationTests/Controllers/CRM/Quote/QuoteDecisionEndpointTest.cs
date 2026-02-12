@@ -1,12 +1,11 @@
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Quote;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM.Quote;
+namespace EBOS.CRM.IntegrationTests.Controllers.CRM.Quote;
 
 public class QuoteDecisionEndpointTest(CustomWebApplicationFactory factory)
     : IClassFixture<CustomWebApplicationFactory>

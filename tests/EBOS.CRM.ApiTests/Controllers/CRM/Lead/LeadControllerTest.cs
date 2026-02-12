@@ -1,10 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.ApiTests.Fixtures;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -108,7 +107,7 @@ public class LeadControllerTest(CustomWebApplicationFactory<Program> factory) :
         var morosoStatus = db.Statuses.FirstOrDefault(s => s.Description == "Moroso");
         if (morosoStatus == null)
         {
-            morosoStatus = new global::EBOS.CRM.Domain.Entities.Status { Description = "Moroso" };
+            morosoStatus = new global::EBOS.CRM.Domain.Entities.EBOS.Status { Description = "Moroso" };
             db.Statuses.Add(morosoStatus);
             db.SaveChanges();
         }

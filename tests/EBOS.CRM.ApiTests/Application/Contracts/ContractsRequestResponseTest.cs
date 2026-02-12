@@ -1,5 +1,5 @@
 using System.Reflection;
-using EBOS.CRM.Application.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.Common;
 
 namespace EBOS.CRM.ApiTests.Application.Contracts;
 
@@ -11,7 +11,7 @@ public class ContractsRequestResponseTest
     [Fact]
     public void Requests_CanBeConstructed_WithSampleValues()
     {
-        var requestTypes = GetContractTypes("EBOS.CRM.Application.Contracts.Requests");
+        var requestTypes = GetContractTypes("EBOS.CRM.Contracts.Requests");
 
         Assert.NotEmpty(requestTypes);
 
@@ -27,7 +27,7 @@ public class ContractsRequestResponseTest
     [Fact]
     public void Responses_CanBeConstructed_WithSampleValues()
     {
-        var responseTypes = GetContractTypes("EBOS.CRM.Application.Contracts.Responses");
+        var responseTypes = GetContractTypes("EBOS.CRM.Contracts.Responses");
 
         Assert.NotEmpty(responseTypes);
 

@@ -1,7 +1,6 @@
-using System;
 using EBOS.Core.Primitives;
 
-namespace EBOS.CRM.Domain.Entities;
+namespace EBOS.CRM.Domain.Entities.EBOS;
 
 public class Country : BaseEntity
 {

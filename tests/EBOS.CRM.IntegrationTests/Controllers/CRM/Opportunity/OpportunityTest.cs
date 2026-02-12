@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;

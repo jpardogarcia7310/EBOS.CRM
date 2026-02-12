@@ -1,8 +1,8 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.Models;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -98,5 +98,3 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             => Task.FromResult<IReadOnlyCollection<AuditRecord>>(Array.Empty<AuditRecord>());
     }
 }
-
-

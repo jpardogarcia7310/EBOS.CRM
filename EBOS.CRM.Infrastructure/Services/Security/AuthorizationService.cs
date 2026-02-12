@@ -1,17 +1,12 @@
-using EBOS.CRM.Application.Contracts.Requests.Security;
-using EBOS.CRM.Application.Contracts.Responses.Security;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Security;
+using EBOS.CRM.Contracts.Responses.Security;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.Infrastructure.Services.Security;
 
-public sealed class AuthorizationService : IAuthorizationService
+public sealed class AuthorizationService(IPolicyService policyService) : IAuthorizationService
 {
-    private readonly IPolicyService _policyService;
-
-    public AuthorizationService(IPolicyService policyService)
-    {
-        _policyService = policyService ?? throw new ArgumentNullException(nameof(policyService));
-    }
+    private readonly IPolicyService _policyService = policyService ?? throw new ArgumentNullException(nameof(policyService));
 
     public async Task<AuthorizeUserResponse> AuthorizeAsync(AuthorizeUserRequest request,
         CancellationToken cancellationToken = default)

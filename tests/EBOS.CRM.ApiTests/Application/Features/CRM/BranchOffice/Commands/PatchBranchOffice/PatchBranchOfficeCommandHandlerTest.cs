@@ -1,8 +1,9 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Responses.Services;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.PatchBranchOffice;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMBranchOffice = EBOS.CRM.Domain.Entities.CRM.BranchOffice;
 
@@ -11,26 +12,25 @@ namespace EBOS.CRM.ApiTests.Application.Features.CRM.BranchOffice.Commands.Patch
 public class PatchBranchOfficeCommandHandlerTest
 {
     private readonly Mock<IBranchOfficeRepository> _repositoryMock;
-    private readonly Mock<IAuditService> _auditServiceMock;
     private readonly PatchBranchOfficeCommandHandler _handler;
 
     public PatchBranchOfficeCommandHandlerTest()
     {
         _repositoryMock = new Mock<IBranchOfficeRepository>();
-        _auditServiceMock = new Mock<IAuditService>();
+        var auditServiceMock = new Mock<IAuditService>();
         var currentUserMock = new Mock<ICurrentUserContext>();
 
         currentUserMock.SetupGet(x => x.UserId).Returns(1);
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
-        _auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+        auditServiceMock.Setup(a => a.InsertAuditAsync(
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         _handler = new PatchBranchOfficeCommandHandler(
             _repositoryMock.Object,
-            _auditServiceMock.Object,
+            auditServiceMock.Object,
             currentUserMock.Object);
     }
 

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -102,7 +102,7 @@ public class AddressTypeEndpointTest(CustomWebApplicationFactory factory) : ICla
         var code2 = $"BT{Guid.NewGuid():N}"[..5].ToUpperInvariant();
 
         db.AddressTypes.AddRange(
-            new Domain.Entities.AddressType
+            new Domain.Entities.EBOS.AddressType
             {
                 Code = code1,
                 Description = $"Desc-{code1}",
@@ -110,7 +110,7 @@ public class AddressTypeEndpointTest(CustomWebApplicationFactory factory) : ICla
                 AllowsMultiple = true,
                 RequiresPrimary = false
             },
-            new Domain.Entities.AddressType
+            new Domain.Entities.EBOS.AddressType
             {
                 Code = code2,
                 Description = $"Desc-{code2}",

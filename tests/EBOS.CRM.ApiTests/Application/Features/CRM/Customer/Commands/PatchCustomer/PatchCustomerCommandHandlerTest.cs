@@ -1,8 +1,9 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.Services;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
 
@@ -23,7 +24,7 @@ public class PatchCustomerCommandHandlerTest
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 

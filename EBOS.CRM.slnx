@@ -33,6 +33,7 @@
   <Folder Name="/source/">
     <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" Id="b94674de-a33b-4841-b1af-7cfbd17e3871" />
     <Project Path="EBOS.CRM.Application/EBOS.CRM.Application.csproj" Id="50f27c0c-df4e-42fd-b7e3-1626584a71ac" />
+    <Project Path="EBOS.CRM.Contracts/EBOS.CRM.Contracts.csproj" />
     <Project Path="EBOS.CRM.Domain/EBOS.CRM.Domain.csproj" Id="4bcb3304-c991-474f-8e08-c52a33e7beeb" />
     <Project Path="EBOS.CRM.Infrastructure/EBOS.CRM.Infrastructure.csproj" Id="87da3024-eb11-41d6-8937-a0b2862b76c8" />
   </Folder>

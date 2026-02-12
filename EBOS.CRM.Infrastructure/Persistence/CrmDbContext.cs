@@ -1,11 +1,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Entities.Identity;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 
@@ -23,6 +24,8 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
     public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
+    public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
+    public DbSet<Case> Cases => Set<Case>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
@@ -39,9 +42,11 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<PolicyRole> PolicyRoles => Set<PolicyRole>();
     public DbSet<PolicyRuleCondition> PolicyRuleConditions => Set<PolicyRuleCondition>();
     public DbSet<PolicyRule> PolicyRules => Set<PolicyRule>();
+    public DbSet<Queue> Queues => Set<Queue>();
     public DbSet<Quote> Quotes => Set<Quote>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Sla> Slas => Set<Sla>();
     public DbSet<Status> Statuses => Set<Status>();
     public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
     public DbSet<TenantConfiguration> TenantConfigurations => Set<TenantConfiguration>();

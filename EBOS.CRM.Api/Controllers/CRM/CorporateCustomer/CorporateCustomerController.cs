@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.DeleteCorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
@@ -9,6 +9,7 @@ using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Queries.GetAllCorporat
 using MediatR;
 using EBOS.CRM.Api.Options;
 using Microsoft.Extensions.Options;
+
 namespace EBOS.CRM.Api.Controllers.CRM.CorporateCustomer;
 
 [ApiController]
