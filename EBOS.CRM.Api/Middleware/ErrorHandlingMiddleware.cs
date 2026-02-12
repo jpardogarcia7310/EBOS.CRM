@@ -40,7 +40,8 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
                         message = e.ErrorMessage ?? "Invalid value",
                         code = string.IsNullOrWhiteSpace(e.ErrorCode)
                             ? ComputeStableCode(e.PropertyName ?? string.Empty,
-                                e.ErrorMessage ?? "Invalid value") : e.ErrorCode
+                                e.ErrorMessage ?? "Invalid value") : e.ErrorCode,
+                        meta = e.CustomState
                     }).ToArray()
                 );
 

@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.AddCaseActivity;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.DeleteCaseActivity;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.UpdateCaseActivity;
+using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Queries.GetCaseActivitiesByCaseId;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Queries.GetAllCaseActivities;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Queries.GetCaseActivityById;
 using EBOS.CRM.Domain.Identity;
@@ -102,6 +103,27 @@ public class CaseActivityController(IMediator mediator) : ControllerBase
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
         var result = await mediator.Send(new GetAllCaseActivitiesQuery(safePageNumber, safePageSize), cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
+    }
+
+    [Authorize(Policy = PolicyKeys.Crm.CaseActivityRead)]
+    [HttpGet("by-case/{caseId:long}")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CaseActivityResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetByCaseIdAsync([FromRoute] long caseId,
+        [FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50,
+        [FromQuery] string? status = null, [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null,
+        CancellationToken cancellationToken = default)
+    {
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        var result = await mediator.Send(
+            new GetCaseActivitiesByCaseIdQuery(caseId, safePageNumber, safePageSize, status, from, to),
+            cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }

@@ -13,6 +13,60 @@ namespace EBOS.CRM.IntegrationTests.Infrastructure;
 public class SalesRepositoryNegativeTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
     [Fact]
+    public async Task Lead_Save_Succeeds_When_TenantId_Matches()
+    {
+        using var scope = factory.Services.CreateScope();
+        var context = CreateTenantContext(scope.ServiceProvider, 1);
+        var repository = new LeadRepository(context);
+
+        var lead = new Lead
+        {
+            TenantId = 1,
+            Source = "Web",
+            Status = "New",
+            OwnerUserId = 1,
+            CompanyName = "Acme Corp",
+            ContactName = "Jane Doe",
+            Email = "jane.doe@acme.test",
+            Phone = "1234567890"
+        };
+
+        await repository.AddAsync(lead);
+        await repository.SaveChangesAsync();
+
+        var saved = await repository.GetByIdAsync(lead.Id);
+        saved.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Opportunity_Save_Succeeds_When_TenantId_Matches_And_Dependencies_Exist()
+    {
+        using var scope = factory.Services.CreateScope();
+        var context = CreateTenantContext(scope.ServiceProvider, 1);
+        var repository = new OpportunityRepository(context);
+
+        var customerId = await EnsureCustomerAsync(context);
+        var stageId = await EnsureStageAsync(context);
+
+        var opportunity = new Opportunity
+        {
+            TenantId = 1,
+            Name = "Upgrade Plan",
+            StageId = stageId,
+            OwnerUserId = 1,
+            CustomerId = customerId,
+            Amount = 1000m,
+            Probability = 0.5m
+        };
+
+        await repository.AddAsync(opportunity);
+        await repository.SaveChangesAsync();
+
+        var saved = await repository.GetByIdAsync(opportunity.Id);
+        saved.Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task Lead_Save_Throws_When_TenantId_Mismatch()
     {
         using var scope = factory.Services.CreateScope();

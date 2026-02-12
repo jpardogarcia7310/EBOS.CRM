@@ -20,7 +20,7 @@ public class ForecastErrorHandlingTest(ForecastErrorHandlingTest.FailingForecast
     [Fact]
     public async Task GetSummary_Returns_500_WhenRepositoryFails()
     {
-        var response = await _client.GetAsync($"/api/v{_version}/forecast");
+        var response = await _client.GetAsync($"/api/v{_version}/forecast?tenantId=1");
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();

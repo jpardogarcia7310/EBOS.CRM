@@ -4,6 +4,7 @@ using EBOS.CRM.Application.Features.CRM.Service.Sla.Commands.AddSla;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Commands.ToggleSla;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Commands.UpdateSla;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckCaseSla;
+using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckSlaBatch;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.GetAllSlas;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.GetSlaById;
 using EBOS.CRM.Contracts.Requests.CRM.Service.Sla;
@@ -134,6 +135,24 @@ public class SlaController(IMediator mediator) : ControllerBase
         }
 
         return Ok(dto);
+    }
+
+    [Authorize(Policy = PolicyKeys.Crm.SlaRead)]
+    [HttpGet("check-batch")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<SlaCheckResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CheckBatchAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromQuery] long tenantId, [FromQuery] DateTime? now,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        var request = new CheckSlaBatchRequest(tenantId, now ?? DateTime.UtcNow, safePageNumber, safePageSize);
+        var result = await mediator.Send(new CheckSlaBatchQuery(request), cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
     }
     #endregion
 }
