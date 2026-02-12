@@ -105,7 +105,8 @@ Derivado de los issues #60, #81, #82, #83, #84.
   - Case: AddCaseRequest, UpdateCaseRequest, CloseCaseRequest, ReopenCaseRequest, AssignCaseQueueRequest, AssignCaseOwnerRequest.
   - Sla: AddSlaRequest, UpdateSlaRequest, ToggleSlaRequest.
   - Queue: AddQueueRequest, UpdateQueueRequest, ToggleQueueRequest, AssignQueueDefaultOwnerRequest.
-  - SLA checks: CheckCaseSlaRequest (caseId, now).
+- SLA checks: CheckCaseSlaRequest (caseId, now).
+  - Multi-tenant: todos los requests deben incluir TenantId cuando aplique el aggregate.
 - Responses:
   - CaseResponse, SlaResponse, QueueResponse, SlaCheckResponse.
 
@@ -174,7 +175,7 @@ Seguir el layout de CRM:
   - `POST /api/v1/Sla`
   - `PUT /api/v1/Sla/{id}`
   - `PATCH /api/v1/Sla/{id}/toggle`
-  - `GET /api/v1/Sla/{id}/check?now=...&caseId=...`
+  - `GET /api/v1/Sla/{id}/check?tenantId=...&caseId=...&now=...`
 - Queues
   - `GET /api/v1/Queue`
   - `GET /api/v1/Queue/{id}`

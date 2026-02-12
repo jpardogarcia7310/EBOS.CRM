@@ -8,5 +8,10 @@ public sealed class RouteCaseCommandValidator : AbstractValidator<RouteCaseComma
     {
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.CaseRequest).NotNull();
+
+        When(x => x.CaseRequest != null, () =>
+        {
+            RuleFor(x => x.CaseRequest.TenantId).GreaterThan(0);
+        });
     }
 }
