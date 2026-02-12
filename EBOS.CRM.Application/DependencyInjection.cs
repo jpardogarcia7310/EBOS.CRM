@@ -3,7 +3,7 @@ using Mapster;
 using MapsterMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using EBOS.CRM.Application.Services.Commands;
+using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 

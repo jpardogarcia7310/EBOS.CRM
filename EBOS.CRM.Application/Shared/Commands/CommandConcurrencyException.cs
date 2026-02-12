@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Services.Commands;
+namespace EBOS.CRM.Application.Shared.Commands;
 
 public sealed class CommandConcurrencyException(string message, Exception? innerException = null)
     : Exception(message, innerException)

@@ -4,7 +4,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.Models;
-using AuditServiceUnavailableException = EBOS.CRM.Application.Services.Audit.AuditServiceUnavailableException;
+using AuditServiceUnavailableException = EBOS.CRM.Infrastructure.Services.Audit.AuditServiceUnavailableException;
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 

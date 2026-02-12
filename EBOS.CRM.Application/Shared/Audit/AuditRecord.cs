@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Services.Audit;
+namespace EBOS.CRM.Application.Shared.Audit;
 
 public sealed record AuditRecord(
     long Id,

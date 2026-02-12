@@ -3,7 +3,7 @@ using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace EBOS.CRM.Application.Services.Commands;
+namespace EBOS.CRM.Application.Shared.Commands;
 
 public sealed class CommandExecutionPipeline(
     IAuditService auditService,

@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Application.Services.Audit;
+namespace EBOS.CRM.Application.Shared.Audit;
 
 public static class AuditActions
 {

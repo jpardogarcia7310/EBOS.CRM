@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace EBOS.CRM.Application.Services.Authorization;
+namespace EBOS.CRM.Application.Shared.Authorization;
 
 public static class PolicyCodeResolver
 {

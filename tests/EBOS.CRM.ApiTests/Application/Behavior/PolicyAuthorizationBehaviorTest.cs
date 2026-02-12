@@ -1,7 +1,7 @@
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
-using EBOS.CRM.Application.Services.Authorization;
+using EBOS.CRM.Application.Shared.Authorization;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
 using Moq;
