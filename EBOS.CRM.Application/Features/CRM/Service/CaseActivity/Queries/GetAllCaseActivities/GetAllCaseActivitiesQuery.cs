@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.Common;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Queries.GetAllCaseActivities;

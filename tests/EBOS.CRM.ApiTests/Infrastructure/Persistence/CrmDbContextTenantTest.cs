@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

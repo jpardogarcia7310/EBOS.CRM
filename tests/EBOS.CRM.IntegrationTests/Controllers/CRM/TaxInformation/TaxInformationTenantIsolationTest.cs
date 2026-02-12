@@ -1,25 +1,19 @@
 using System.Net;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMTaxInformation = global::EBOS.CRM.Domain.Entities.CRM.TaxInformation;
+using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMTaxInformation = EBOS.CRM.Domain.Entities.CRM.TaxInformation;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.TaxInformation;
 
-public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicationFactory>
+public class TaxInformationTenantIsolationTest(CustomWebApplicationFactory factory)
+    : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly string _version;
-
-    public TaxInformationTenantIsolationTest(CustomWebApplicationFactory factory)
-    {
-        _factory = factory;
-        _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformation");
-    }
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformation");
 
     [Fact]
     public async Task GetAll_Filters_By_Tenant_Header()
@@ -28,7 +22,7 @@ public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicat
         var taxName2 = $"TaxName-{Guid.NewGuid():N}";
         var erasedTaxName = SeedTaxInformation(taxName1, taxName2, out var _);
 
-        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(_factory, 1);
+        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(factory, 1);
         var response1 = await clientTenant1.GetAsync($"/api/v{_version}/TaxInformation");
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant1 = await response1.Content.ReadItemsAsync<TaxInformationResponse>();
@@ -36,7 +30,7 @@ public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicat
         itemsTenant1.Should().NotContain(i => i.TaxName == taxName2);
         itemsTenant1.Should().NotContain(i => i.TaxName == erasedTaxName);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response2 = await clientTenant2.GetAsync($"/api/v{_version}/TaxInformation");
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant2 = await response2.Content.ReadItemsAsync<TaxInformationResponse>();
@@ -51,7 +45,7 @@ public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicat
         var taxName2 = $"TaxName-{Guid.NewGuid():N}";
         SeedTaxInformation(taxName1, taxName2, out var ids);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response = await clientTenant2.GetAsync($"/api/v{_version}/TaxInformation/{ids.Tenant1Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -59,7 +53,7 @@ public class TaxInformationTenantIsolationTest : IClassFixture<CustomWebApplicat
 
     private string SeedTaxInformation(string taxName1, string taxName2, out (long Tenant1Id, long Tenant2Id) ids)
     {
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
         var statusId = db.Statuses.Select(s => s.Id).First();
         var erasedTaxName = $"TaxName-Erased-{Guid.NewGuid():N}";

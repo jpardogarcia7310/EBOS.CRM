@@ -1,9 +1,9 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.PatchCreditAccount;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMCreditAccount = EBOS.CRM.Domain.Entities.CRM.CreditAccount;
 
@@ -12,26 +12,25 @@ namespace EBOS.CRM.ApiTests.Application.Features.CRM.CreditAccount.Commands.Patc
 public class PatchCreditAccountCommandHandlerTest
 {
     private readonly Mock<ICreditAccountRepository> _repositoryMock;
-    private readonly Mock<IAuditService> _auditServiceMock;
     private readonly PatchCreditAccountCommandHandler _handler;
 
     public PatchCreditAccountCommandHandlerTest()
     {
         _repositoryMock = new Mock<ICreditAccountRepository>();
-        _auditServiceMock = new Mock<IAuditService>();
+        var auditServiceMock = new Mock<IAuditService>();
         var currentUserMock = new Mock<ICurrentUserContext>();
 
         currentUserMock.SetupGet(x => x.UserId).Returns(1);
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
-        _auditServiceMock.Setup(a => a.InsertAuditAsync(
+        auditServiceMock.Setup(a => a.InsertAuditAsync(
                 It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         _handler = new PatchCreditAccountCommandHandler(
             _repositoryMock.Object,
-            _auditServiceMock.Object,
+            auditServiceMock.Object,
             currentUserMock.Object);
     }
 

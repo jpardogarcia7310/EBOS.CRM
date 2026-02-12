@@ -1,5 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.TenantQuota.Queries.GetAllTenantQuotas;
 using TenantQuotaEntity = EBOS.CRM.Domain.Entities.EBOS.TenantQuota;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;

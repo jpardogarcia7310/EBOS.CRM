@@ -1,34 +1,28 @@
 using System.Net;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMAddress = global::EBOS.CRM.Domain.Entities.CRM.Address;
-using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMTaxInformation = global::EBOS.CRM.Domain.Entities.CRM.TaxInformation;
-using CRMTaxInformationAddress = global::EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress;
+using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
+using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMTaxInformation = EBOS.CRM.Domain.Entities.CRM.TaxInformation;
+using CRMTaxInformationAddress = EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.TaxInformationAddress;
 
-public class TaxInformationAddressTenantIsolationTest : IClassFixture<CustomWebApplicationFactory>
+public class TaxInformationAddressTenantIsolationTest(CustomWebApplicationFactory factory)
+    : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly string _version;
-
-    public TaxInformationAddressTenantIsolationTest(CustomWebApplicationFactory factory)
-    {
-        _factory = factory;
-        _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformationAddress");
-    }
+    private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "TaxInformationAddress");
 
     [Fact]
     public async Task GetAll_Filters_By_Tenant_Header()
     {
         SeedTaxInformationAddresses(out var data);
 
-        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(_factory, 1);
+        var clientTenant1 = HttpClientFactory.CreateClientWithTenant(factory, 1);
         var response1 = await clientTenant1.GetAsync($"/api/v{_version}/TaxInformationAddress");
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant1 = await response1.Content.ReadItemsAsync<TaxInformationAddressResponse>();
@@ -36,7 +30,7 @@ public class TaxInformationAddressTenantIsolationTest : IClassFixture<CustomWebA
         itemsTenant1.Should().NotContain(i => i.AddressId == data.Address2Id);
         itemsTenant1.Should().NotContain(i => i.AddressId == data.ErasedAddressId);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response2 = await clientTenant2.GetAsync($"/api/v{_version}/TaxInformationAddress");
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
         var itemsTenant2 = await response2.Content.ReadItemsAsync<TaxInformationAddressResponse>();
@@ -49,7 +43,7 @@ public class TaxInformationAddressTenantIsolationTest : IClassFixture<CustomWebA
     {
         SeedTaxInformationAddresses(out var data);
 
-        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
+        var clientTenant2 = HttpClientFactory.CreateClientWithTenant(factory, 2);
         var response = await clientTenant2.GetAsync($"/api/v{_version}/TaxInformationAddress/{data.TaxInformationAddress1Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -57,7 +51,7 @@ public class TaxInformationAddressTenantIsolationTest : IClassFixture<CustomWebA
 
     private void SeedTaxInformationAddresses(out (long TaxInformationAddress1Id, long TaxInformationAddress2Id, long Address1Id, long Address2Id, long ErasedAddressId) data)
     {
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
         var statusId = db.Statuses.Select(s => s.Id).First();
         var countryId = db.Countries.Select(c => c.Id).First();

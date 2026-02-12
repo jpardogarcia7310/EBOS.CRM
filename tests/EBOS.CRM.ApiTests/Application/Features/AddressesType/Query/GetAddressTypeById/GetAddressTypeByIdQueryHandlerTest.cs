@@ -1,9 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAddressTypeById;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.EBOS;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;

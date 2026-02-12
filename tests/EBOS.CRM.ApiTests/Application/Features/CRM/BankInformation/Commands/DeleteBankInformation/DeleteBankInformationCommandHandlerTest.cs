@@ -1,8 +1,8 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.DeleteBankInformation;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMBankInformation = EBOS.CRM.Domain.Entities.CRM.BankInformation;
 
@@ -12,17 +12,16 @@ public class DeleteBankInformationCommandHandlerTest
 {
     private readonly Mock<IBankInformationRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly DeleteBankInformationCommandHandler _handler;
 
     public DeleteBankInformationCommandHandlerTest()
     {
         _repositoryMock = new Mock<IBankInformationRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
                 It.IsAny<AuditInsertRequest>(),
@@ -32,7 +31,7 @@ public class DeleteBankInformationCommandHandlerTest
         _handler = new DeleteBankInformationCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object);
+            currentUserMock.Object);
     }
 
     [Fact]

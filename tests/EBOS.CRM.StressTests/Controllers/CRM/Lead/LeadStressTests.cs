@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.StressTests.Infrastructure;
 
 namespace EBOS.CRM.StressTests.Controllers.CRM.Lead;

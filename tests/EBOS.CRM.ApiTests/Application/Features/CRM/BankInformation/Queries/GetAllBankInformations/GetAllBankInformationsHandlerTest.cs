@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetAllBankInformations;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
@@ -16,14 +16,13 @@ public class GetAllBankInformationsQueryHandlerTest
     {
         var handler = new GetAllBankInformationsQueryHandler(_repositoryMock.Object, _mapperMock.Object);
         var entities = new List<EBOS.CRM.Domain.Entities.CRM.BankInformation> { new() };
-        var dtos = new List<BankInformationResponse>();
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<BankInformationResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<BankInformationResponse>());
 
         var result = await handler.Handle(new GetAllBankInformationsQuery(), CancellationToken.None);
 

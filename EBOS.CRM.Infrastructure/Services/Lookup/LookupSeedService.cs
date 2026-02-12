@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.Infrastructure.Services.Lookup;
 

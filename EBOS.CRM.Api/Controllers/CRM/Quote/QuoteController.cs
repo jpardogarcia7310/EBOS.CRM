@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Quote;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Quote.Commands.AddQuote;
 using EBOS.CRM.Application.Features.CRM.Quote.Commands.DeleteQuote;
 using EBOS.CRM.Application.Features.CRM.Quote.Commands.UpdateQuote;

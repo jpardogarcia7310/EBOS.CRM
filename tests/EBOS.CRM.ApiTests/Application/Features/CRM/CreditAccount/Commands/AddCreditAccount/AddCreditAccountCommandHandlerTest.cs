@@ -1,11 +1,11 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.AddCreditAccount;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using Moq;
 using CRMCreditAccount = EBOS.CRM.Domain.Entities.CRM.CreditAccount;
@@ -16,7 +16,6 @@ public class AddCreditAccountCommandHandlerTest
 {
     private readonly Mock<ICreditAccountRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly AddCreditAccountCommandHandler _handler;
 
@@ -24,11 +23,11 @@ public class AddCreditAccountCommandHandlerTest
     {
         _repositoryMock = new Mock<ICreditAccountRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
                 It.IsAny<AuditInsertRequest>(),
@@ -38,7 +37,7 @@ public class AddCreditAccountCommandHandlerTest
         _handler = new AddCreditAccountCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object,
+            currentUserMock.Object,
             _mapperMock.Object);
     }
 

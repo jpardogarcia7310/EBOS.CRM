@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.ConcurrencyTests.Fixtures;
 using EBOS.CRM.ConcurrencyTests.Infrastructure;
 

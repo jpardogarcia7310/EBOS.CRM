@@ -1,6 +1,5 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Case;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Case;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Commands.UpdateCase;
-using EBOS.CRM.Domain.Entities.CRM;
 using FluentValidation.TestHelper;
 using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;
 
@@ -28,7 +27,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.Status);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Status);
     }
 
     [Fact]
@@ -39,7 +38,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.Priority);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Priority);
     }
 
     [Fact]
@@ -50,7 +49,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.Title);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Title);
     }
 
     [Fact]
@@ -61,7 +60,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.QueueId);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.QueueId);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.SlaId);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.SlaId);
     }
 
     [Fact]
@@ -83,7 +82,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.OwnerUserId);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.OwnerUserId);
     }
 
     [Fact]
@@ -94,7 +93,7 @@ public class UpdateCaseCommandValidatorTest
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.CaseRequest!.Description);
+        result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Description);
     }
 
     [Fact]

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EBOS.CRM.Contracts\EBOS.CRM.Contracts.csproj" />
     <ProjectReference Include="..\EBOS.CRM.Domain\EBOS.CRM.Domain.csproj" />
   </ItemGroup>
 

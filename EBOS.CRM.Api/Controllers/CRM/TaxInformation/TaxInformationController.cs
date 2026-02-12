@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.DeleteTaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.UpdateTaxInformation;

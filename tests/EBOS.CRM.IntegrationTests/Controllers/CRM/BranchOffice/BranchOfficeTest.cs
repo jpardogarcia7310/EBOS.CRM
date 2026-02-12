@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -51,7 +51,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
         created.Should().NotBeNull();
 
         var updateRequest = new UpdateBranchOfficeRequest(
-            Id: created!.Id,
+            Id: created.Id,
             TenantId: 1,
             Name: "HQ Updated",
             PhoneNumber: "+34 911 999 000",
@@ -83,7 +83,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
 
         var created = await response.Content.ReadFromJsonAsync<CorporateCustomerResponse>();
         created.Should().NotBeNull();
-        return created!.Id;
+        return created.Id;
     }
 }
 

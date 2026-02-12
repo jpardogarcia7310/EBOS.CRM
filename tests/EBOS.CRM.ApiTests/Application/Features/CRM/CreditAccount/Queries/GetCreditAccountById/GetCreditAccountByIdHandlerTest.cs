@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Queries.GetCreditAccountById;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using Moq;

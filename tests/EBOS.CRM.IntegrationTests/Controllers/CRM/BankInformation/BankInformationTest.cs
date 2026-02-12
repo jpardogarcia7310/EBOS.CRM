@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -59,7 +59,7 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
             CustomerId: customerId);
 
         var updateResponse =
-            await _client.PutAsJsonAsync($"/api/v{_version}/BankInformation/{created!.Id}", updateRequest);
+            await _client.PutAsJsonAsync($"/api/v{_version}/BankInformation/{created.Id}", updateRequest);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var deleteResponse = await _client.DeleteAsync($"/api/v{_version}/BankInformation/{created.Id}");
@@ -82,7 +82,7 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
 
         var created = await response.Content.ReadFromJsonAsync<CustomerResponse>();
         created.Should().NotBeNull();
-        return created!.Id;
+        return created.Id;
     }
 }
 

@@ -1,5 +1,5 @@
 using EBOS.CRM.Application.Options;
-using EBOS.CRM.Application.Services.CRM;
+using EBOS.CRM.Infrastructure.Services.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using Moq;

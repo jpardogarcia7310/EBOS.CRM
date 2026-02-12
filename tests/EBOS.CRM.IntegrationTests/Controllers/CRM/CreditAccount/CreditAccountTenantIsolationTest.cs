@@ -1,12 +1,12 @@
 using System.Net;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMCreditAccount = global::EBOS.CRM.Domain.Entities.CRM.CreditAccount;
+using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMCreditAccount = EBOS.CRM.Domain.Entities.CRM.CreditAccount;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.CreditAccount;
 

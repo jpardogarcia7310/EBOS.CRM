@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.DeleteCustomer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;

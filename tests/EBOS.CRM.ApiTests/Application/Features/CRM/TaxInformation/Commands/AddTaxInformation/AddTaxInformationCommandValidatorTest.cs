@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 using FluentValidation.TestHelper;
 

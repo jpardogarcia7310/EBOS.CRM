@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;
 using FluentValidation.TestHelper;
 

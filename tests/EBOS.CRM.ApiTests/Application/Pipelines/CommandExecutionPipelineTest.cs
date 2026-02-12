@@ -1,8 +1,8 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
-using EBOS.CRM.Application.Services.Commands;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Application.Shared.Commands;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 

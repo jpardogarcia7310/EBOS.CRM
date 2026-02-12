@@ -1,5 +1,5 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace EBOS.CRM.IntegrationTests.Infrastructure;

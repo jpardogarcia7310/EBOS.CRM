@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Case;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Sla;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Case;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Sla;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckCaseSla;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -78,11 +78,11 @@ public class CaseQueueSlaEndToEndTest : IClassFixture<CustomWebApplicationFactor
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var result = await mediator.Send(new CheckCaseSlaQuery(new CheckCaseSlaRequest(
             TenantId: 1,
-            CaseId: created!.Id,
+            CaseId: created.Id,
             Now: DateTime.UtcNow)));
 
         result.Should().NotBeNull();
-        result!.IsBreached.Should().BeTrue();
+        result.IsBreached.Should().BeTrue();
         result.IsActive.Should().BeTrue();
     }
 
