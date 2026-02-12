@@ -36,6 +36,27 @@ public class Case : ErasableEntity, ITenantScopedEntity
 
     public ICollection<CaseActivity> Activities { get; set; } = new List<CaseActivity>();
 
+    public void Open()
+    {
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            throw new InvalidOperationException("Case is already initialized.");
+        }
+
+        Status = StatusOpen;
+    }
+
+    public void UpdateDetails(string title, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            throw new InvalidOperationException("Title is required.");
+        }
+
+        Title = title;
+        Description = description;
+    }
+
     public void AssignQueue(long queueId)
     {
         if (queueId <= 0)

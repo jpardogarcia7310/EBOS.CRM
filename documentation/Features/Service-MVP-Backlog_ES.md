@@ -126,8 +126,10 @@ Estructura igual a CRM, por ejemplo `Features/CRM/Service/...`:
 - `Features/CRM/Service/Case/Commands/ReopenCase`
 - `Features/CRM/Service/Case/Commands/AssignCaseQueue`
 - `Features/CRM/Service/Case/Commands/AssignCaseOwner`
+- `Features/CRM/Service/Case/Commands/AssignCaseSla`
 - `Features/CRM/Service/Case/Queries/GetCaseById`
 - `Features/CRM/Service/Case/Queries/GetAllCases`
+- `Features/CRM/Service/Case/Commands/DeleteCase`
 
 - `Features/CRM/Service/CaseActivity/Commands/AddCaseActivity`
 - `Features/CRM/Service/CaseActivity/Commands/UpdateCaseActivity`
