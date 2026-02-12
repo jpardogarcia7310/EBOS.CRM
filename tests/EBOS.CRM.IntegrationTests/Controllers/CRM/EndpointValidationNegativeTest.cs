@@ -1,22 +1,22 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM;
+namespace EBOS.CRM.IntegrationTests.Controllers.CRM;
 
 public class EndpointValidationNegativeTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

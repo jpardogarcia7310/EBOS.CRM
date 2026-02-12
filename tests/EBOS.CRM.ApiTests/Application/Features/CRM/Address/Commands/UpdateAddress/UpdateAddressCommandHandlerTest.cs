@@ -1,10 +1,10 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Contracts.Responses.Services;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using Moq;
 using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
@@ -15,7 +15,6 @@ public class UpdateAddressCommandHandlerTest
 {
     private readonly Mock<IAddressRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly UpdateAddressCommandHandler _handler;
 
@@ -23,11 +22,11 @@ public class UpdateAddressCommandHandlerTest
     {
         _repositoryMock = new Mock<IAddressRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
@@ -36,7 +35,7 @@ public class UpdateAddressCommandHandlerTest
         _handler = new UpdateAddressCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object,
+            currentUserMock.Object,
             _mapperMock.Object);
     }
 

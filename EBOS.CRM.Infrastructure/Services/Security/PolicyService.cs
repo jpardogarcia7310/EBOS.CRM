@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 

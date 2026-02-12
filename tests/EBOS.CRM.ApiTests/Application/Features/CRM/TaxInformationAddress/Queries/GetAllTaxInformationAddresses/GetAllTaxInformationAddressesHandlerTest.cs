@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Queries.GetAllTaxInformationAddresses;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;

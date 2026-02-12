@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Case;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Case;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Commands.CloseCase;
 using FluentValidation.TestHelper;
 

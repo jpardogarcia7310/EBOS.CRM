@@ -2,7 +2,7 @@ using System.Net;
 using EBOS.CRM.Api.Middleware;
 using EBOS.CRM.ApiTests.Fixtures;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Moq;
 

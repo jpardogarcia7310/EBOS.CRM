@@ -1,5 +1,5 @@
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

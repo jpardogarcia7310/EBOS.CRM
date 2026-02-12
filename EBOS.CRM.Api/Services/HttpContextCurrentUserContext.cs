@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.Api.Services;
 

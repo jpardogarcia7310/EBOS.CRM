@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;

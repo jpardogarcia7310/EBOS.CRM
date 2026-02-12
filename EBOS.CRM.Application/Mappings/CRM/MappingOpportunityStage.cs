@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
 

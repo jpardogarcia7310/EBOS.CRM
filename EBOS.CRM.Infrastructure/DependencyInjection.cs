@@ -1,6 +1,6 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
@@ -45,6 +45,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IPolicyService, PolicyService>();
+        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
+        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAddressRepository, AddressRepository>();

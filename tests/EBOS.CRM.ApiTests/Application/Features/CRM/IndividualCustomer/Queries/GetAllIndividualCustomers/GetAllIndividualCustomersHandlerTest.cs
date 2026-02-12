@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetAllIndividualCustomers;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;

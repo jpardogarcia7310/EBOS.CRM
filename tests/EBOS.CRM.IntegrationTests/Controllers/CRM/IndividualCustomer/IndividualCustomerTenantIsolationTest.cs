@@ -1,11 +1,11 @@
 using System.Net;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMIndividualCustomer = global::EBOS.CRM.Domain.Entities.CRM.IndividualCustomer;
+using CRMIndividualCustomer = EBOS.CRM.Domain.Entities.CRM.IndividualCustomer;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.IndividualCustomer;
 

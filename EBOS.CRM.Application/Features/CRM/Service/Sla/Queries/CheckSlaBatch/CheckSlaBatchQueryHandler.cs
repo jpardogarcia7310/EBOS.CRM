@@ -1,6 +1,5 @@
-using EBOS.CRM.Application.Contracts.Responses.Common;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
 using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;

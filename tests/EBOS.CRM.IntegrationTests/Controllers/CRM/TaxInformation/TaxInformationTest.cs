@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -51,7 +51,7 @@ public class TaxInformationTest(CustomWebApplicationFactory factory) : IClassFix
         created.Should().NotBeNull();
 
         var updateRequest = new UpdateTaxInformationRequest(
-            Id: created!.Id,
+            Id: created.Id,
             TenantId: 1,
             TaxName: "IVA Updated",
             TaxIdentificationNumber: "ESB87654321",
@@ -81,7 +81,7 @@ public class TaxInformationTest(CustomWebApplicationFactory factory) : IClassFix
 
         var created = await response.Content.ReadFromJsonAsync<CustomerResponse>();
         created.Should().NotBeNull();
-        return created!.Id;
+        return created.Id;
     }
 }
 

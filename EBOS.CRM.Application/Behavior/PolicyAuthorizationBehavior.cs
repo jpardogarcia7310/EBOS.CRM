@@ -1,5 +1,5 @@
 using EBOS.CRM.Application.Services.Authorization;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
 
 namespace EBOS.CRM.Application.Behavior;

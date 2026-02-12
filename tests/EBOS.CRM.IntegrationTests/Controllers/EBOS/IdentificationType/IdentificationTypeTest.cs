@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -32,7 +31,7 @@ public class IdentificationTypeTest(CustomWebApplicationFactory factory) : IClas
 
         var item = await response.Content.ReadFromJsonAsync<IdentificationTypeResponse>();
         item.Should().NotBeNull();
-        item!.Description.Should().NotBeNullOrEmpty();
+        item.Description.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

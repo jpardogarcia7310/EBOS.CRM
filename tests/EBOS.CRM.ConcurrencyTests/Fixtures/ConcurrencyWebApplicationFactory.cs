@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.ApiTests.Fixtures;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;

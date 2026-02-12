@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;

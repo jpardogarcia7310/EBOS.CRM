@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
@@ -177,7 +178,7 @@ public class SalesRepositoryNegativeTests(CustomWebApplicationFactory factory) :
         return stage.Id;
     }
 
-    private sealed class TestTenantContext(long tenantId) : EBOS.CRM.Application.Services.Interfaces.ITenantContext
+    private sealed class TestTenantContext(long tenantId) : ITenantContext
     {
         public long TenantId { get; } = tenantId;
     }

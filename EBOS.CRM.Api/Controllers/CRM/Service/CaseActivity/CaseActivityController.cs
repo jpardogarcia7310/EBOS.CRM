@@ -1,7 +1,7 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.CaseActivity;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Service.CaseActivity;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.AddCaseActivity;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.DeleteCaseActivity;
 using EBOS.CRM.Application.Features.CRM.Service.CaseActivity.Commands.UpdateCaseActivity;

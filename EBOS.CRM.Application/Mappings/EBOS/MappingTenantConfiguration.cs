@@ -1,5 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
-using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Entities.EBOS;
 using Mapster;
 

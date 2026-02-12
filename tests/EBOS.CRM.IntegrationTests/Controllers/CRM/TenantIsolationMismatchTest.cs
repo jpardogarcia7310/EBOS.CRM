@@ -1,23 +1,23 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 
-namespace EBOS.CRM.Api.IntegrationTests.Controllers.CRM;
+namespace EBOS.CRM.IntegrationTests.Controllers.CRM;
 
 public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
@@ -70,7 +70,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Phone: null,
             StatusId: null);
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{version}/Customer/{created!.Id}")
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{version}/Customer/{created.Id}")
         {
             Content = JsonContent.Create(patchRequest)
         };
@@ -101,7 +101,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
         created.Should().NotBeNull();
 
         var updateRequest = new UpdateCustomerRequest(
-            Id: created!.Id,
+            Id: created.Id,
             TenantId: 2,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"user{Guid.NewGuid():N}@example.com",
@@ -193,7 +193,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             CountryId: countryId,
             AddressTypeId: addressTypeId);
 
-        var response = await client.PutAsJsonAsync($"/api/v{version}/Address/{address!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{version}/Address/{address.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -250,7 +250,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             LegalName: "Corp SA",
             TaxIdentification: "TAX999");
 
-        var response = await client.PutAsJsonAsync($"/api/v{version}/CorporateCustomer/{corp!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{version}/CorporateCustomer/{corp.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -320,7 +320,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             IdentificationNumber: "ID999",
             IdentificationTypeId: idTypeId);
 
-        var response = await client.PutAsJsonAsync($"/api/v{version}/IndividualCustomer/{person!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{version}/IndividualCustomer/{person.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -352,7 +352,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 2,
             Name: "Branch A",
             PhoneNumber: "123",
-            CorporateCustomerId: corp!.Id);
+            CorporateCustomerId: corp.Id);
 
         var response = await client.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice", request);
 
@@ -385,14 +385,14 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             Name: "Branch A",
             PhoneNumber: "123",
-            CorporateCustomerId: corp!.Id);
+            CorporateCustomerId: corp.Id);
         var branchResponse = await client.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice", branchRequest);
         branchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var branch = await branchResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
         branch.Should().NotBeNull();
 
         var updateRequest = new UpdateBranchOfficeRequest(
-            Id: branch!.Id,
+            Id: branch.Id,
             TenantId: 2,
             Name: "Branch B",
             PhoneNumber: "999",
@@ -430,7 +430,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             Name: "Branch A",
             PhoneNumber: "123",
-            CorporateCustomerId: corp!.Id);
+            CorporateCustomerId: corp.Id);
         var branchResponse = await client.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice", branchRequest);
         branchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var branch = await branchResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
@@ -442,7 +442,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             PhoneNumber: null,
             CorporateCustomerId: null);
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{branchVersion}/BranchOffice/{branch!.Id}")
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{branchVersion}/BranchOffice/{branch.Id}")
         {
             Content = JsonContent.Create(patchRequest)
         };
@@ -486,7 +486,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             Name: "Branch A",
             PhoneNumber: "123",
-            CorporateCustomerId: corp!.Id);
+            CorporateCustomerId: corp.Id);
         var branchResponse = await client.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice", branchRequest);
         branchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var branch = await branchResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
@@ -515,8 +515,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var request = new AddBranchOfficeAddressRequest(
             TenantId: 2,
-            BranchOfficeId: branch!.Id,
-            AddressId: address!.Id,
+            BranchOfficeId: branch.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -560,7 +560,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             Name: "Branch A",
             PhoneNumber: "123",
-            CorporateCustomerId: corp!.Id);
+            CorporateCustomerId: corp.Id);
         var branchResponse = await client.PostAsJsonAsync($"/api/v{branchVersion}/BranchOffice", branchRequest);
         branchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var branch = await branchResponse.Content.ReadFromJsonAsync<BranchOfficeResponse>();
@@ -589,8 +589,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var addRequest = new AddBranchOfficeAddressRequest(
             TenantId: 1,
-            BranchOfficeId: branch!.Id,
-            AddressId: address!.Id,
+            BranchOfficeId: branch.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -609,7 +609,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             ValidTo: null,
             IsCurrent: true);
 
-        var response = await client.PutAsJsonAsync($"/api/v{boaVersion}/BranchOfficeAddress/{boa!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{boaVersion}/BranchOfficeAddress/{boa.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -639,7 +639,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Iban: "ES1200000000000000000000",
             Bic: "BANKESMM",
             BankName: "Bank",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
 
         var response = await client.PostAsJsonAsync($"/api/v{bankVersion}/BankInformation", request);
 
@@ -671,7 +671,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Iban: "ES1200000000000000000000",
             Bic: "BANKESMM",
             BankName: "Bank",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var addResponse = await client.PostAsJsonAsync($"/api/v{bankVersion}/BankInformation", addRequest);
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var bank = await addResponse.Content.ReadFromJsonAsync<BankInformationResponse>();
@@ -684,7 +684,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             BankName: "Bank",
             CustomerId: customer.Id);
 
-        var response = await client.PutAsJsonAsync($"/api/v{bankVersion}/BankInformation/{bank!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{bankVersion}/BankInformation/{bank.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -713,7 +713,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 2,
             MaxAmount: 1000m,
             UsedAmount: 0m,
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
 
         var response = await client.PostAsJsonAsync($"/api/v{creditVersion}/CreditAccount", request);
 
@@ -744,14 +744,14 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             MaxAmount: 1000m,
             UsedAmount: 0m,
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var creditResponse = await client.PostAsJsonAsync($"/api/v{creditVersion}/CreditAccount", addCredit);
         creditResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var creditAccount = await creditResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
         creditAccount.Should().NotBeNull();
 
         var updateRequest = new UpdateCreditAccountRequest(
-            Id: creditAccount!.Id,
+            Id: creditAccount.Id,
             TenantId: 2,
             MaxAmount: 900m,
             UsedAmount: 10m,
@@ -786,7 +786,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             MaxAmount: 1000m,
             UsedAmount: 0m,
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var creditResponse = await client.PostAsJsonAsync($"/api/v{creditVersion}/CreditAccount", addCredit);
         creditResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var creditAccount = await creditResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
@@ -798,7 +798,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             UsedAmount: null,
             CustomerId: null);
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{creditVersion}/CreditAccount/{creditAccount!.Id}")
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{creditVersion}/CreditAccount/{creditAccount.Id}")
         {
             Content = JsonContent.Create(patchRequest)
         };
@@ -833,7 +833,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             MaxAmount: 1000m,
             UsedAmount: 0m,
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var creditResponse = await client.PostAsJsonAsync($"/api/v{creditAccountVersion}/CreditAccount", addCredit);
         creditResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var creditAccount = await creditResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
@@ -846,7 +846,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Type: "Consumption",
             ExternalReference: "ORD-1",
             Comments: "Test",
-            CreditAccountId: creditAccount!.Id);
+            CreditAccountId: creditAccount.Id);
 
         var response = await client.PostAsJsonAsync($"/api/v{creditTransactionVersion}/CreditTransaction", request);
 
@@ -878,7 +878,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             MaxAmount: 1000m,
             UsedAmount: 0m,
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var creditResponse = await client.PostAsJsonAsync($"/api/v{creditAccountVersion}/CreditAccount", addCredit);
         creditResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var creditAccount = await creditResponse.Content.ReadFromJsonAsync<CreditAccountResponse>();
@@ -891,7 +891,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Type: "Consumption",
             ExternalReference: "ORD-1",
             Comments: "Test",
-            CreditAccountId: creditAccount!.Id);
+            CreditAccountId: creditAccount.Id);
         var addResponse = await client.PostAsJsonAsync($"/api/v{creditTransactionVersion}/CreditTransaction", addRequest);
         addResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var transaction = await addResponse.Content.ReadFromJsonAsync<CreditTransactionResponse>();
@@ -906,7 +906,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             Comments: "Update",
             CreditAccountId: creditAccount.Id);
 
-        var response = await client.PutAsJsonAsync($"/api/v{creditTransactionVersion}/CreditTransaction/{transaction!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{creditTransactionVersion}/CreditTransaction/{transaction.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -960,8 +960,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var request = new AddCustomerAddressRequest(
             TenantId: 2,
-            CustomerId: customer!.Id,
-            AddressId: address!.Id,
+            CustomerId: customer.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -1021,8 +1021,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var addRequest = new AddCustomerAddressRequest(
             TenantId: 1,
-            CustomerId: customer!.Id,
-            AddressId: address!.Id,
+            CustomerId: customer.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -1041,7 +1041,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             ValidTo: null,
             IsCurrent: true);
 
-        var response = await client.PutAsJsonAsync($"/api/v{customerAddressVersion}/CustomerAddress/{customerAddress!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{customerAddressVersion}/CustomerAddress/{customerAddress.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -1070,7 +1070,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 2,
             TaxName: "IVA",
             TaxIdentificationNumber: "TAX123",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
 
         var response = await client.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation", request);
 
@@ -1101,7 +1101,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             TaxName: "IVA",
             TaxIdentificationNumber: "TAX123",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var taxResponse = await client.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation", addTax);
         taxResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tax = await taxResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
@@ -1113,7 +1113,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TaxIdentificationNumber: null,
             CustomerId: null);
 
-        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{taxVersion}/TaxInformation/{tax!.Id}")
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/v{taxVersion}/TaxInformation/{tax.Id}")
         {
             Content = JsonContent.Create(patchRequest)
         };
@@ -1147,14 +1147,14 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             TaxName: "IVA",
             TaxIdentificationNumber: "TAX123",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var taxResponse = await client.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation", addTax);
         taxResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tax = await taxResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
         tax.Should().NotBeNull();
 
         var updateRequest = new UpdateTaxInformationRequest(
-            Id: tax!.Id,
+            Id: tax.Id,
             TenantId: 2,
             TaxName: "IVA2",
             TaxIdentificationNumber: "TAX124",
@@ -1195,7 +1195,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             TaxName: "IVA",
             TaxIdentificationNumber: "TAX123",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var taxResponse = await client.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation", addTax);
         taxResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tax = await taxResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
@@ -1224,8 +1224,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var request = new AddTaxInformationAddressRequest(
             TenantId: 2,
-            TaxInformationId: tax!.Id,
-            AddressId: address!.Id,
+            TaxInformationId: tax.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -1267,7 +1267,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             TenantId: 1,
             TaxName: "IVA",
             TaxIdentificationNumber: "TAX123",
-            CustomerId: customer!.Id);
+            CustomerId: customer.Id);
         var taxResponse = await client.PostAsJsonAsync($"/api/v{taxVersion}/TaxInformation", addTax);
         taxResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var tax = await taxResponse.Content.ReadFromJsonAsync<TaxInformationResponse>();
@@ -1296,8 +1296,8 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
 
         var addRequest = new AddTaxInformationAddressRequest(
             TenantId: 1,
-            TaxInformationId: tax!.Id,
-            AddressId: address!.Id,
+            TaxInformationId: tax.Id,
+            AddressId: address.Id,
             IsPrimary: true,
             ValidFrom: DateTime.UtcNow.Date,
             ValidTo: null,
@@ -1316,7 +1316,7 @@ public class TenantIsolationMismatchTest(CustomWebApplicationFactory factory) : 
             ValidTo: null,
             IsCurrent: true);
 
-        var response = await client.PutAsJsonAsync($"/api/v{taxAddressVersion}/TaxInformationAddress/{taxAddress!.Id}", updateRequest);
+        var response = await client.PutAsJsonAsync($"/api/v{taxAddressVersion}/TaxInformationAddress/{taxAddress.Id}", updateRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }

@@ -1,5 +1,5 @@
 using EBOS.CRM.ApiTests.Fixtures;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using FluentAssertions;
 using MapsterMapper;

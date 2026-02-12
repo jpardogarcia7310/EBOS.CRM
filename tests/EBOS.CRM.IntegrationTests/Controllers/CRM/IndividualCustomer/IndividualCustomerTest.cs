@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -70,7 +70,7 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
             IdentificationTypeId: identificationTypeId);
 
         var updateResponse =
-            await _client.PutAsJsonAsync($"/api/v{_version}/IndividualCustomer/{created!.Id}", updateRequest);
+            await _client.PutAsJsonAsync($"/api/v{_version}/IndividualCustomer/{created.Id}", updateRequest);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var deleteResponse = await _client.DeleteAsync($"/api/v{_version}/IndividualCustomer/{created.Id}");

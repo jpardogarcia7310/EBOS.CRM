@@ -1,4 +1,3 @@
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Domain.Interfaces.Services;
 
 namespace EBOS.CRM.IntegrationTests.Infrastructure;
 

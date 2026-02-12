@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccount;
 using FluentValidation.TestHelper;
 

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -50,7 +50,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
         created.Should().NotBeNull();
 
         var updateRequest = new UpdateCustomerRequest(
-            Id: created!.Id,
+            Id: created.Id,
             TenantId: 1,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"user{Guid.NewGuid():N}@example.com",

@@ -1,9 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAllAddressesType;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.EBOS;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
@@ -58,14 +55,13 @@ public class GetAllAddressesTypeQueryHandlerTest
     {
         // Arrange
         var entities = new List<AddressType>();
-        var dtos = new List<AddressTypeResponse>();
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<AddressTypeResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<AddressTypeResponse>());
 
         var query = new GetAllAddressesTypeQuery();
 

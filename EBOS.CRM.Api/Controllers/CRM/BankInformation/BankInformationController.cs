@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.DeleteBankInformation;
 using EBOS.CRM.Application.Features.CRM.BankInformation.Commands.UpdateBankInformation;

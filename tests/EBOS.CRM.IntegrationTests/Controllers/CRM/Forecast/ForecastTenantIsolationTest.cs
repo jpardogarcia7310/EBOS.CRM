@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
@@ -23,7 +23,7 @@ public class ForecastTenantIsolationTest(CustomWebApplicationFactory factory) : 
         response1.EnsureSuccessStatusCode();
         var summary1 = await response1.Content.ReadFromJsonAsync<ForecastSummaryResponse>();
         summary1.Should().NotBeNull();
-        summary1!.TotalAmount.Should().Be(1000m);
+        summary1.TotalAmount.Should().Be(1000m);
         summary1.WeightedAmount.Should().Be(500m);
 
         var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
@@ -31,7 +31,7 @@ public class ForecastTenantIsolationTest(CustomWebApplicationFactory factory) : 
         response2.EnsureSuccessStatusCode();
         var summary2 = await response2.Content.ReadFromJsonAsync<ForecastSummaryResponse>();
         summary2.Should().NotBeNull();
-        summary2!.TotalAmount.Should().Be(800m);
+        summary2.TotalAmount.Should().Be(800m);
         summary2.WeightedAmount.Should().Be(400m);
     }
 

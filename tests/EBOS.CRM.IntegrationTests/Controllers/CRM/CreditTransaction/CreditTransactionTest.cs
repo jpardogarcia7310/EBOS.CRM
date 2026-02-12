@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
@@ -65,7 +65,7 @@ public class CreditTransactionTest(CustomWebApplicationFactory factory) : IClass
             CreditAccountId: creditAccountId);
 
         var updateResponse =
-            await _client.PutAsJsonAsync($"/api/v{_version}/CreditTransaction/{created!.Id}", updateRequest);
+            await _client.PutAsJsonAsync($"/api/v{_version}/CreditTransaction/{created.Id}", updateRequest);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var deleteResponse = await _client.DeleteAsync($"/api/v{_version}/CreditTransaction/{created.Id}");
@@ -87,7 +87,7 @@ public class CreditTransactionTest(CustomWebApplicationFactory factory) : IClass
 
         var created = await response.Content.ReadFromJsonAsync<CreditAccountResponse>();
         created.Should().NotBeNull();
-        return created!.Id;
+        return created.Id;
     }
 
     private async Task<long> CreateCustomerAsync()
@@ -106,7 +106,7 @@ public class CreditTransactionTest(CustomWebApplicationFactory factory) : IClass
 
         var created = await response.Content.ReadFromJsonAsync<CustomerResponse>();
         created.Should().NotBeNull();
-        return created!.Id;
+        return created.Id;
     }
 }
 

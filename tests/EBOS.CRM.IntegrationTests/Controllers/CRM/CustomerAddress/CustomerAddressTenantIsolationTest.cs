@@ -1,13 +1,13 @@
 using System.Net;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using CRMAddress = global::EBOS.CRM.Domain.Entities.CRM.Address;
-using CRMCustomer = global::EBOS.CRM.Domain.Entities.CRM.Customer;
-using CRMCustomerAddress = global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress;
+using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
+using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
+using CRMCustomerAddress = EBOS.CRM.Domain.Entities.CRM.CustomerAddress;
 
 namespace EBOS.CRM.IntegrationTests.Controllers.CRM.CustomerAddress;
 

@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
 using FluentValidation.TestHelper;
 

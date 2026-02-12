@@ -1,21 +1,21 @@
 using System.Net.Http.Json;
 using System.Text;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BankInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CorporateCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
-using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Contracts.Requests.CRM.Quote;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
 
 namespace EBOS.CRM.ConcurrencyTests.Infrastructure;
 
@@ -370,9 +370,9 @@ public static class ConcurrencyPayloads
                         AllowDelete: true);
                 }),
             "Lead" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null, AllowDelete: false,
-                UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                UseIsolatedWrite: true, IsolatedWriteFactory: () =>
                 {
-                    return new IsolatedWritePayloads(
+                    return Task.FromResult(new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddLeadRequest(
                             TenantId,
                             Source: "Web",
@@ -408,13 +408,13 @@ public static class ConcurrencyPayloads
                             Phone: "1234567890",
                             EstimatedValue: 9000m,
                             Notes: "Concurrency patch")),
-                        AllowDelete: false);
+                        AllowDelete: false));
                 }),
             "OpportunityStage" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
-                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>
+                AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: () =>
                 {
                     var order = Random.Shared.Next(10, 1000);
-                    return new IsolatedWritePayloads(
+                    return Task.FromResult(new IsolatedWritePayloads(
                         Post: () => JsonContent.Create(new AddOpportunityStageRequest(
                             TenantId,
                             Name: $"Stage {ShortCode()}",
@@ -438,7 +438,7 @@ public static class ConcurrencyPayloads
                             DefaultProbability: 0.4m,
                             IsClosed: false,
                             IsWon: false)),
-                        AllowDelete: false);
+                        AllowDelete: false));
                 }),
             "Opportunity" => new ConcurrencyPayloadFactories(Post: null, Put: null, Patch: null,
                 AllowDelete: false, UseIsolatedWrite: true, IsolatedWriteFactory: async () =>

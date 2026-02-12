@@ -1,9 +1,6 @@
-using EBOS.CRM.Application.Contracts.Responses;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetCountryById;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.EBOS;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using Moq;
@@ -108,7 +105,7 @@ public class GetCountryByIdQueryHandlerTest
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
                        .ReturnsAsync(country);
 
-        // Simulamos que el mapper de Mapster falla
+        // We simulate that the Mapster mapper fails
         _mapperMock.Setup(m => m.Map<CountryResponse>(country))
                    .Throws(new InvalidOperationException("Mapping failed"));
 

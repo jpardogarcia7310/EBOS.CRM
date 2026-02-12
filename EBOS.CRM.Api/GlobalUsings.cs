@@ -7,6 +7,5 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.AspNetCore.Mvc.Versioning;
 global using Microsoft.AspNetCore.Mvc.ApiExplorer;
 global using Swashbuckle.AspNetCore.SwaggerGen;
-global using EBOS.CRM.Application.Services.Interfaces;
 global using EBOS.CRM.Api.Middleware;
 global using EBOS.CRM.Api.Helpers;

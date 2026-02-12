@@ -1,7 +1,7 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Lead;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Opportunity;
-using EBOS.CRM.Application.Contracts.Requests.CRM.OpportunityStage;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Quote;
+using EBOS.CRM.Contracts.Requests.CRM.Lead;
+using EBOS.CRM.Contracts.Requests.CRM.Opportunity;
+using EBOS.CRM.Contracts.Requests.CRM.OpportunityStage;
+using EBOS.CRM.Contracts.Requests.CRM.Quote;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.AddLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 using EBOS.CRM.Application.Features.CRM.Lead.Commands.DisqualifyLead;

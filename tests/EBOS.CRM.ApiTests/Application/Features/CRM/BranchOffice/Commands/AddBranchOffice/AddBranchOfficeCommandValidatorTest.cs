@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
 using FluentValidation.TestHelper;
 

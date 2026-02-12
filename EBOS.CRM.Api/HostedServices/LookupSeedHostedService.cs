@@ -1,3 +1,5 @@
+using EBOS.CRM.Domain.Interfaces.Services;
+
 namespace EBOS.CRM.Api.HostedServices;
 
 public sealed class LookupSeedHostedService(IServiceScopeFactory scopeFactory, ILogger<LookupSeedHostedService> logger)

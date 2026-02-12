@@ -1,11 +1,11 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Customer;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Customer;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using Moq;
 using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;

@@ -1,7 +1,7 @@
-using EBOS.CRM.Application.Contracts.Requests.Security;
-using EBOS.CRM.Application.Contracts.Responses.Security;
+using EBOS.CRM.Contracts.Requests.Security;
+using EBOS.CRM.Contracts.Responses.Security;
 using EBOS.CRM.Application.Features.Security.Authentication.Commands.AuthenticateUser;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Security.Authentication.Commands.AuthenticateUser;
@@ -27,7 +27,14 @@ public class AuthenticateUserCommandHandlerTest
             DisplayName: "John Doe",
             IsActive: true);
 
-        var response = new AuthenticatedUserResponse(
+        var serviceRequest = new AuthenticateUserRequest(
+            request.ExternalId,
+            request.Username,
+            request.Email,
+            request.DisplayName,
+            request.IsActive);
+
+        var serviceResponse = new AuthenticatedUserResponse(
             UserId: 1,
             ExternalId: request.ExternalId,
             Username: request.Username,
@@ -37,8 +44,8 @@ public class AuthenticateUserCommandHandlerTest
             Roles: Array.Empty<string>(),
             Permissions: Array.Empty<string>());
 
-        _serviceMock.Setup(s => s.AuthenticateAsync(request, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(response);
+        _serviceMock.Setup(s => s.AuthenticateAsync(serviceRequest, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serviceResponse);
 
         var command = new AuthenticateUserCommand(request);
 
@@ -47,7 +54,7 @@ public class AuthenticateUserCommandHandlerTest
         Assert.NotNull(result);
         Assert.Equal(1, result.UserId);
         Assert.Equal("jdoe", result.Username);
-        _serviceMock.Verify(s => s.AuthenticateAsync(request, It.IsAny<CancellationToken>()), Times.Once);
+        _serviceMock.Verify(s => s.AuthenticateAsync(serviceRequest, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -60,7 +67,14 @@ public class AuthenticateUserCommandHandlerTest
             DisplayName: "John Doe",
             IsActive: true);
 
-        _serviceMock.Setup(s => s.AuthenticateAsync(request, It.IsAny<CancellationToken>()))
+        var serviceRequest = new AuthenticateUserRequest(
+            request.ExternalId,
+            request.Username,
+            request.Email,
+            request.DisplayName,
+            request.IsActive);
+
+        _serviceMock.Setup(s => s.AuthenticateAsync(serviceRequest, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("Service error"));
 
         var command = new AuthenticateUserCommand(request);

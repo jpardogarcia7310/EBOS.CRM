@@ -1,9 +1,10 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.Models;
+using AuditServiceUnavailableException = EBOS.CRM.Application.Services.Audit.AuditServiceUnavailableException;
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
@@ -138,4 +139,3 @@ public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServ
                 lastException);
     }
 }
-

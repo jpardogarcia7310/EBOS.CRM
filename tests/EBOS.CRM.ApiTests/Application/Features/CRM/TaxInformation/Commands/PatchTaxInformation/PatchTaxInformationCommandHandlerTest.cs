@@ -1,9 +1,9 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.Services;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInformation;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMTaxInformation = EBOS.CRM.Domain.Entities.CRM.TaxInformation;
 

@@ -1,6 +1,6 @@
 using MediatR;
-using EBOS.CRM.Application.Contracts.Responses.Common;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.EBOS;
 
 namespace EBOS.CRM.Application.Features.EBOS.Countries.Queries.GetAllCountries;
 

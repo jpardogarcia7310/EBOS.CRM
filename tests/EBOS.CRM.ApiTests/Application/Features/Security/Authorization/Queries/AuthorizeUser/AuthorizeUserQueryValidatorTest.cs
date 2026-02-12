@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.Security;
+using EBOS.CRM.Contracts.Requests.Security;
 using EBOS.CRM.Application.Features.Security.Authorization.Queries.AuthorizeUser;
 using FluentValidation.TestHelper;
 

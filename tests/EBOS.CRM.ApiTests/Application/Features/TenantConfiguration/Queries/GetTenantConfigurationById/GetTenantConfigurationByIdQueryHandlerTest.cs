@@ -1,5 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Application.Features.EBOS.TenantConfiguration.Queries.GetTenantConfigurationById;
 using TenantConfigurationEntity = EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;

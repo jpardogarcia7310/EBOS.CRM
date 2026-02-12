@@ -1,5 +1,5 @@
-using EBOS.CRM.Application.Contracts.Responses.Common;
-using EBOS.CRM.Application.Contracts.Responses.EBOS;
+using EBOS.CRM.Contracts.Responses.Common;
+using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using MapsterMapper;
 using MediatR;

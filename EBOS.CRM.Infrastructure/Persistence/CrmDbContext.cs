@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Entities.Identity;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;

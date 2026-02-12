@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.IndividualCustomer;
+using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIndividualCustomer;
 using FluentValidation.TestHelper;
 

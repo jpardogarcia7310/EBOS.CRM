@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Requests.Services;
 
 namespace EBOS.CRM.Application.Services.Commands;
 

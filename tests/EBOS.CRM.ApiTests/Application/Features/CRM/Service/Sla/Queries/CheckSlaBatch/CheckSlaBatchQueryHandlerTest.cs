@@ -1,6 +1,5 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Sla;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Sla;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Queries.CheckSlaBatch;
-using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using Moq;
 using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;
@@ -72,11 +71,11 @@ public class CheckSlaBatchQueryHandlerTest
 
         caseRepositoryMock
             .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IReadOnlyCollection<CaseEntity>)cases);
+            .ReturnsAsync(cases);
 
         slaRepositoryMock
             .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IReadOnlyCollection<SlaEntity>)slas);
+            .ReturnsAsync(slas);
 
         var handler = new CheckSlaBatchQueryHandler(caseRepositoryMock.Object, slaRepositoryMock.Object);
         var request = new CheckSlaBatchRequest(TenantId: 1, Now: now, PageNumber: 1, PageSize: 10);

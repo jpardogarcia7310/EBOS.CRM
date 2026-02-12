@@ -11,6 +11,7 @@ using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Services.Commands;
 using EBOS.CRM.Domain.Identity;
+using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;

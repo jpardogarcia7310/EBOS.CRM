@@ -1,6 +1,6 @@
 using EBOS.CRM.Api.Constants;
-using EBOS.CRM.Application.Contracts.Requests.CRM.Service.Case;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.Service.Case;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Commands.AddCase;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Commands.AssignCaseOwner;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Commands.AssignCaseQueue;
