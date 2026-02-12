@@ -1,6 +1,6 @@
 ﻿# Backlog técnico Service MVP
 
-Trabajo concreto alineado con la estructura local (Clean Architecture, mÃ³dulo Service en `EBOS.CRM.*`).
+Trabajo concreto alineado con la estructura local (Clean Architecture, módulo Service en `EBOS.CRM.*`).
 Derivado de los issues #60, #81, #82, #83, #84.
 
 ## Alcance del MVP
