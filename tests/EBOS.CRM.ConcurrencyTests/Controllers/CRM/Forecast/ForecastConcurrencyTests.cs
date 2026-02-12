@@ -14,7 +14,7 @@ public class ForecastConcurrencyTests(ConcurrencyWebApplicationFactory<Program> 
     [Fact]
     public async Task Forecast_Read_ReturnsSuccess()
     {
-        var response = await _client.GetAsync($"/api/v{_version}/forecast");
+        var response = await _client.GetAsync($"/api/v{_version}/forecast?tenantId=1");
         response.EnsureSuccessStatusCode();
 
         var summary = await response.Content.ReadFromJsonAsync<ForecastSummaryResponse>();
