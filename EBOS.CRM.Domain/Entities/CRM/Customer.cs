@@ -25,5 +25,8 @@ public class Customer : ErasableEntity, ITenantScopedEntity
     // Optional: Only if you want direct navigation
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
     public ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
+    public ICollection<AccountContact> AccountContacts { get; set; } = new List<AccountContact>();
+    public ICollection<CustomerPreference> Preferences { get; set; } = new List<CustomerPreference>();
+    public ICollection<CustomerConsent> Consents { get; set; } = new List<CustomerConsent>();
 }
 
