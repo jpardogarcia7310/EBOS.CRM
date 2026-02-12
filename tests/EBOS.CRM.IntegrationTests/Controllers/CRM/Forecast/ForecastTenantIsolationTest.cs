@@ -19,7 +19,7 @@ public class ForecastTenantIsolationTest(CustomWebApplicationFactory factory) : 
         SeedOpportunities();
 
         var clientTenant1 = HttpClientFactory.CreateClientWithTenant(_factory, 1);
-        var response1 = await clientTenant1.GetAsync($"/api/v{_version}/forecast");
+        var response1 = await clientTenant1.GetAsync($"/api/v{_version}/forecast?tenantId=1");
         response1.EnsureSuccessStatusCode();
         var summary1 = await response1.Content.ReadFromJsonAsync<ForecastSummaryResponse>();
         summary1.Should().NotBeNull();
@@ -27,7 +27,7 @@ public class ForecastTenantIsolationTest(CustomWebApplicationFactory factory) : 
         summary1.WeightedAmount.Should().Be(500m);
 
         var clientTenant2 = HttpClientFactory.CreateClientWithTenant(_factory, 2);
-        var response2 = await clientTenant2.GetAsync($"/api/v{_version}/forecast");
+        var response2 = await clientTenant2.GetAsync($"/api/v{_version}/forecast?tenantId=2");
         response2.EnsureSuccessStatusCode();
         var summary2 = await response2.Content.ReadFromJsonAsync<ForecastSummaryResponse>();
         summary2.Should().NotBeNull();

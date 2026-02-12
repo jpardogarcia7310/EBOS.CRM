@@ -20,4 +20,41 @@ public class CaseActivity : ErasableEntity, ITenantScopedEntity
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
+
+    public void SetStatus(string status)
+    {
+        if (!IsValidStatus(status))
+        {
+            throw new InvalidOperationException("Status value is invalid.");
+        }
+
+        if (!IsValidTransition(Status, status))
+        {
+            throw new InvalidOperationException("Status transition is not allowed.");
+        }
+
+        Status = status;
+    }
+
+    public static bool IsValidStatus(string status)
+    {
+        return status is StatusOpen or StatusInProgress or StatusCompleted or StatusCancelled;
+    }
+
+    public static bool IsValidTransition(string currentStatus, string nextStatus)
+    {
+        if (string.IsNullOrWhiteSpace(currentStatus))
+        {
+            return nextStatus == StatusOpen;
+        }
+
+        return currentStatus switch
+        {
+            StatusOpen => nextStatus is StatusInProgress or StatusCompleted or StatusCancelled,
+            StatusInProgress => nextStatus is StatusCompleted or StatusCancelled,
+            StatusCompleted => false,
+            StatusCancelled => false,
+            _ => false
+        };
+    }
 }

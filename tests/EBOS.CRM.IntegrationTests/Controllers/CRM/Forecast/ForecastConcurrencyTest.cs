@@ -14,7 +14,7 @@ public class ForecastConcurrencyTest(CustomWebApplicationFactory factory) : ICla
     public async Task Stress_GetSummary_ConcurrentRequests_ReturnsConsistentResults()
     {
         var tasks = Enumerable.Range(0, 20)
-            .Select(_ => _client.GetAsync($"/api/v{_version}/forecast"))
+            .Select(_ => _client.GetAsync($"/api/v{_version}/forecast?tenantId=1"))
             .ToList();
 
         var responses = await Task.WhenAll(tasks);
