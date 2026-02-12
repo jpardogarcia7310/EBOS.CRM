@@ -2,7 +2,6 @@ using EBOS.CRM.Application.Services.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Infrastructure.Options;
-using EBOS.CRM.Infrastructure.Repositories.Concrete;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 using EBOS.CRM.Infrastructure.Services.Audit;

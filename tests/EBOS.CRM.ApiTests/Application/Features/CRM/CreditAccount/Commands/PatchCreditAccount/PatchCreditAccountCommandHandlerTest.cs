@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Application.Contracts.Requests.Services;
 using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.PatchCreditAccount;
 using EBOS.CRM.Application.Services.Interfaces;
@@ -24,7 +25,7 @@ public class PatchCreditAccountCommandHandlerTest
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 

@@ -10,8 +10,7 @@ public sealed class AuthenticateUserCommandHandler(IAuthenticationService authen
     private readonly IAuthenticationService _authenticationService = authenticationService
         ?? throw new ArgumentNullException(nameof(authenticationService));
 
-    public Task<AuthenticatedUserResponse> Handle(
-        AuthenticateUserCommand request,
+    public Task<AuthenticatedUserResponse> Handle(AuthenticateUserCommand request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

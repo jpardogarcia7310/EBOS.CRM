@@ -1,6 +1,6 @@
 using EBOS.CRM.Domain.Entities.CRM;
 
-namespace EBOS.CRM.Application.Services.Interfaces;
+namespace EBOS.CRM.Domain.Interfaces.Services;
 
 public interface ICaseRoutingService
 {

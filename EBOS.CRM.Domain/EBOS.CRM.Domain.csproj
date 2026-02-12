@@ -11,12 +11,4 @@
     <PackageReference Include="EBOS.Core" Version="1.6.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="..\..\..\..\..\..\Users\juan.pardogarcia\.nuget\packages\ebos.core\1.6.4\contentFiles\any\net8.0\Logo_EBOS_128.png" />
-  </ItemGroup>
-
 </Project>
