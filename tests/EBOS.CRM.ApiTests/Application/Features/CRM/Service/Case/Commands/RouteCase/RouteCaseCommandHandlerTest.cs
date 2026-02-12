@@ -56,7 +56,7 @@ public class RouteCaseCommandHandlerTest
             QueueId = 1,
             OwnerUserId = 0
         };
-        var request = new RouteCaseRequest(false);
+        var request = new RouteCaseRequest(1, false);
         var response = new CaseResponse(entity.Id, entity.TenantId, entity.Title, entity.Description,
             entity.Status, entity.Priority, 10, 2, entity.SlaId, entity.DueAt, entity.ClosedAt, true);
 
@@ -99,7 +99,7 @@ public class RouteCaseCommandHandlerTest
             .ReturnsAsync(entity);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _handler.Handle(new RouteCaseCommand(entity.Id, new RouteCaseRequest()), CancellationToken.None));
+            _handler.Handle(new RouteCaseCommand(entity.Id, new RouteCaseRequest(1)), CancellationToken.None));
 
         _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CaseEntity>(), It.IsAny<CancellationToken>()), Times.Never);
     }

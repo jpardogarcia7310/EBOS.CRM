@@ -11,7 +11,7 @@ public class RouteCaseCommandValidatorTest
     [Fact]
     public void Validate_WhenRequestIsValid_Succeeds()
     {
-        var command = new RouteCaseCommand(1, new RouteCaseRequest());
+        var command = new RouteCaseCommand(1, new RouteCaseRequest(1));
 
         var result = _validator.TestValidate(command);
 
@@ -21,7 +21,7 @@ public class RouteCaseCommandValidatorTest
     [Fact]
     public void Validate_WhenIdIsInvalid_Fails()
     {
-        var command = new RouteCaseCommand(0, new RouteCaseRequest());
+        var command = new RouteCaseCommand(0, new RouteCaseRequest(1));
 
         var result = _validator.TestValidate(command);
 
