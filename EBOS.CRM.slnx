@@ -13,12 +13,16 @@
   <Folder Name="/documentation/Features/">
     <File Path="documentation/Features/Features.md" />
     <File Path="documentation/Features/Features_ES.md" />
-    <File Path="documentation/Features/Multi-Tenant-Governance.md" />
-    <File Path="documentation/Features/Multi-Tenant-Governance_ES.md" />
-    <File Path="documentation/Features/Sales-MVP-Backlog.md" />
-    <File Path="documentation/Features/Sales-MVP-Backlog_ES.md" />
-    <File Path="documentation/Features/Service-MVP-Backlog.md" />
-    <File Path="documentation/Features/Service-MVP-Backlog_ES.md" />
+  </Folder>
+  <Folder Name="/documentation/Features/Backlogs/">
+    <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance.md" />
+    <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance_ES.md" />
+    <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog_ES.md" />
+    <File Path="documentation/Features/Backlogs/Service-MVP-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Service-MVP-Backlog_ES.md" />
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
   </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
