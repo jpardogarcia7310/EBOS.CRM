@@ -13,15 +13,16 @@ public class GetAccountContactsByAccountQueryHandler(IAccountContactRepository r
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.CorporateCustomerId == request.CorporateCustomerId
-                                           && x.TenantId == request.TenantId)
-            .ToList();
-        var total = filtered.Count;
-        var itemsPage = filtered
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
+        var itemsPage = await repository.GetByCorporateCustomerPagedAsync(
+            request.TenantId,
+            request.CorporateCustomerId,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
+        var total = await repository.CountByCorporateCustomerAsync(
+            request.TenantId,
+            request.CorporateCustomerId,
+            cancellationToken);
 
         var items = mapper.Map<IReadOnlyCollection<AccountContactResponse>>(itemsPage);
         return new PagedResult<AccountContactResponse>(items, total);

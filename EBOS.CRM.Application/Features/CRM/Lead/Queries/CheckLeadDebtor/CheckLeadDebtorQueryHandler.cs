@@ -1,6 +1,7 @@
 using EBOS.CRM.Contracts.Requests.CRM.Lead;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Lead.Queries.CheckLeadDebtor;

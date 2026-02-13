@@ -1,8 +1,7 @@
 using EBOS.CRM.Contracts.Requests.Security;
 using EBOS.CRM.Contracts.Responses.Security;
-using EBOS.CRM.Domain.Interfaces.Services.Models;
 
-namespace EBOS.CRM.Domain.Interfaces.Services;
+namespace EBOS.CRM.Domain.Interfaces.Services.Identity;
 
 public interface IAuthorizationService
 {

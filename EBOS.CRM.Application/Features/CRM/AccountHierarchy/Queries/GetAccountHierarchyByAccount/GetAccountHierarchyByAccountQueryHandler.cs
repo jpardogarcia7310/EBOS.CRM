@@ -13,16 +13,16 @@ public class GetAccountHierarchyByAccountQueryHandler(IAccountHierarchyRepositor
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.TenantId == request.TenantId
-                                           && (x.ParentCorporateCustomerId == request.CorporateCustomerId
-                                               || x.ChildCorporateCustomerId == request.CorporateCustomerId))
-            .ToList();
-        var total = filtered.Count;
-        var itemsPage = filtered
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
+        var itemsPage = await repository.GetByAccountPagedAsync(
+            request.TenantId,
+            request.CorporateCustomerId,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
+        var total = await repository.CountByAccountAsync(
+            request.TenantId,
+            request.CorporateCustomerId,
+            cancellationToken);
 
         var items = mapper.Map<IReadOnlyCollection<AccountHierarchyResponse>>(itemsPage);
         return new PagedResult<AccountHierarchyResponse>(items, total);

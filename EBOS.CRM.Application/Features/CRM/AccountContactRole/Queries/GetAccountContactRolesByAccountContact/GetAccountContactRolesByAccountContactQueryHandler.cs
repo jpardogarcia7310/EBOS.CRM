@@ -13,15 +13,16 @@ public class GetAccountContactRolesByAccountContactQueryHandler(IAccountContactR
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.AccountContactId == request.AccountContactId
-                                           && x.TenantId == request.TenantId)
-            .ToList();
-        var total = filtered.Count;
-        var itemsPage = filtered
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
+        var itemsPage = await repository.GetByAccountContactPagedAsync(
+            request.TenantId,
+            request.AccountContactId,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
+        var total = await repository.CountByAccountContactAsync(
+            request.TenantId,
+            request.AccountContactId,
+            cancellationToken);
 
         var items = mapper.Map<IReadOnlyCollection<AccountContactRoleResponse>>(itemsPage);
         return new PagedResult<AccountContactRoleResponse>(items, total);

@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Domain.Interfaces.Services;
+namespace EBOS.CRM.Domain.Interfaces.Services.EBOS;
 
 public interface ITenantContext
 {

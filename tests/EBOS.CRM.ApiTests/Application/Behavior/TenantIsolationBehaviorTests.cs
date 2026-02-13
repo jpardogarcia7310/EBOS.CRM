@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using FluentValidation;
 using MediatR;
 using OptionsProvider = Microsoft.Extensions.Options.Options;

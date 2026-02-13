@@ -13,15 +13,16 @@ public class GetCustomerPreferencesByCustomerQueryHandler(ICustomerPreferenceRep
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.CustomerId == request.CustomerId
-                                           && x.TenantId == request.TenantId)
-            .ToList();
-        var total = filtered.Count;
-        var itemsPage = filtered
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
+        var itemsPage = await repository.GetByCustomerPagedAsync(
+            request.TenantId,
+            request.CustomerId,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
+        var total = await repository.CountByCustomerAsync(
+            request.TenantId,
+            request.CustomerId,
+            cancellationToken);
 
         var items = mapper.Map<IReadOnlyCollection<CustomerPreferenceResponse>>(itemsPage);
         return new PagedResult<CustomerPreferenceResponse>(items, total);

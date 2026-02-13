@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Entities.Identity;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 

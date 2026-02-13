@@ -15,7 +15,7 @@ public class GetAllTaxInformationsQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllTaxInformationsQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.TaxInformation> { new() };
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.TaxInformation> { new() };
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);

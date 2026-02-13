@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
@@ -11,6 +12,7 @@ namespace EBOS.CRM.Application.Features.CRM.AccountHierarchy.Commands.AddAccount
 public class AddAccountHierarchyCommandHandler(
     IAccountHierarchyRepository repository,
     ICorporateCustomerRepository corporateCustomerRepository,
+    IAccountHierarchyCycleGuard cycleGuard,
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper)
@@ -35,6 +37,13 @@ public class AddAccountHierarchyCommandHandler(
         if (child.TenantId != entityRequest.TenantId)
         {
             throw new InvalidOperationException("Child corporate customer tenant mismatch.");
+        }
+
+        var createsCycle = await cycleGuard.CreatesCycleAsync(entityRequest.TenantId,
+            entityRequest.ParentCorporateCustomerId, entityRequest.ChildCorporateCustomerId, cancellationToken);
+        if (createsCycle)
+        {
+            throw new InvalidOperationException("Account hierarchy cycle detected.");
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy>(entityRequest);

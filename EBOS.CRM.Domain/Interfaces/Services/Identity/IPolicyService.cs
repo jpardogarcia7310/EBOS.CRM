@@ -1,4 +1,4 @@
-namespace EBOS.CRM.Domain.Interfaces.Services;
+namespace EBOS.CRM.Domain.Interfaces.Services.Identity;
 
 public interface IPolicyService
 {

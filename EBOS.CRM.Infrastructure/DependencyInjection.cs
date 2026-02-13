@@ -1,6 +1,9 @@
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.Identity;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
@@ -47,11 +50,9 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IPolicyService, PolicyService>();
-        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
-        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
-        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
 
         // Repositories base (AddScoped for per-request lifetime)
+        services.AddScoped<IAccountHierarchyCycleGuard, AccountHierarchyCycleGuard>();
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
         services.AddScoped<IBankInformationRepository, BankInformationRepository>();
@@ -59,12 +60,20 @@ public static class DependencyInjection
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
         services.AddScoped<ICaseActivityRepository, CaseActivityRepository>();
         services.AddScoped<ICaseRepository, CaseRepository>();
+        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
+        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
+        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
         services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
         services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IAccountContactRepository, AccountContactRepository>();
+        services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
+        services.AddScoped<IAccountHierarchyRepository, AccountHierarchyRepository>();
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
         services.AddScoped<ICustomerDedupeRepository, CustomerDedupeRepository>();
+        services.AddScoped<ICustomerPreferenceRepository, CustomerPreferenceRepository>();
+        services.AddScoped<ICustomerConsentRepository, CustomerConsentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
