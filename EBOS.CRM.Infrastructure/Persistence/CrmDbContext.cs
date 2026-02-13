@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Entities.Identity;
@@ -37,7 +36,13 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<CustomerPreferences> CustomerPreferences => Set<CustomerPreferences>();
     public DbSet<CustomerConsents> CustomerConsents => Set<CustomerConsents>();
     public DbSet<Customer> Customers => Set<Customer>();
-    public DbSet<CustomerAddresses> CustomerAddresses => Set<CustomerAddresses>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
+    public DbSet<AccountContact> AccountContacts => Set<AccountContact>();
+    public DbSet<AccountContactRole> AccountContactRoles => Set<AccountContactRole>();
+    public DbSet<AccountHierarchy> AccountHierarchies => Set<AccountHierarchy>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
+    public DbSet<CustomerConsent> CustomerConsents => Set<CustomerConsent>();
+    public DbSet<ChannelType> ChannelTypes => Set<ChannelType>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
     public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
     public DbSet<Lead> Leads => Set<Lead>();
