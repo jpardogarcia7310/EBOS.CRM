@@ -1,13 +1,12 @@
 using EBOS.CRM.Contracts.Responses.Common;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Repositories.CRM.Models;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerMerge.Queries.FindCustomerDuplicates;
 
-public class FindCustomerDuplicatesQueryHandler(ICustomerRepository customerRepository,
-    ICorporateCustomerRepository corporateCustomerRepository,
-    IIndividualCustomerRepository individualCustomerRepository)
+public class FindCustomerDuplicatesQueryHandler(ICustomerDedupeRepository dedupeRepository)
     : IRequestHandler<FindCustomerDuplicatesQuery, PagedResult<CustomerDuplicateCandidateResponse>>
 {
     public async Task<PagedResult<CustomerDuplicateCandidateResponse>> Handle(FindCustomerDuplicatesQuery request,
@@ -17,60 +16,45 @@ public class FindCustomerDuplicatesQueryHandler(ICustomerRepository customerRepo
 
         var criteria = request.Request ?? throw new ArgumentNullException(nameof(request.Request));
 
-        var customers = await customerRepository.GetAllAsync(cancellationToken);
-        var corporateCustomers = await corporateCustomerRepository.GetAllAsync(cancellationToken);
-        var individualCustomers = await individualCustomerRepository.GetAllAsync(cancellationToken);
+        var dedupeCriteria = new CustomerDedupeCriteria(
+            criteria.TenantId,
+            NormalizeEmail(criteria.Email),
+            NormalizePhone(criteria.Phone),
+            NormalizeAlphanumericUpper(criteria.TaxId),
+            NormalizeAlphanumericUpper(criteria.IdentificationNumber));
 
-        var candidates = new List<CustomerDuplicateCandidateResponse>();
+        var total = await dedupeRepository.CountDuplicatesAsync(dedupeCriteria, cancellationToken);
+        var candidates = await dedupeRepository.FindDuplicatesAsync(dedupeCriteria, request.PageNumber, request.PageSize,
+            cancellationToken);
 
-        foreach (var customer in customers.Where(x => x.TenantId == criteria.TenantId))
-        {
-            var score = 0;
-            var reasons = new List<string>();
-
-            if (!string.IsNullOrWhiteSpace(criteria.Email) &&
-                string.Equals(customer.Email, criteria.Email, StringComparison.OrdinalIgnoreCase))
-            {
-                score += 50;
-                reasons.Add("Email");
-            }
-
-            if (!string.IsNullOrWhiteSpace(criteria.Phone) &&
-                string.Equals(customer.Phone, criteria.Phone, StringComparison.OrdinalIgnoreCase))
-            {
-                score += 30;
-                reasons.Add("Phone");
-            }
-
-            var corporate = corporateCustomers.FirstOrDefault(x => x.Id == customer.Id);
-            if (corporate is not null && !string.IsNullOrWhiteSpace(criteria.TaxId) &&
-                string.Equals(corporate.TaxIdentification, criteria.TaxId, StringComparison.OrdinalIgnoreCase))
-            {
-                score += 40;
-                reasons.Add("TaxId");
-            }
-
-            var individual = individualCustomers.FirstOrDefault(x => x.Id == customer.Id);
-            if (individual is not null && !string.IsNullOrWhiteSpace(criteria.IdentificationNumber) &&
-                string.Equals(individual.IdentificationNumber, criteria.IdentificationNumber, StringComparison.OrdinalIgnoreCase))
-            {
-                score += 40;
-                reasons.Add("IdentificationNumber");
-            }
-
-            if (score > 0)
-            {
-                candidates.Add(new CustomerDuplicateCandidateResponse(customer.Id, string.Join(",", reasons), score));
-            }
-        }
-
-        var total = candidates.Count;
-        var itemsPage = candidates
-            .OrderByDescending(x => x.Score)
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
+        var items = candidates.Select(x => new CustomerDuplicateCandidateResponse(x.CustomerId, x.MatchReason, x.Score))
             .ToList();
 
-        return new PagedResult<CustomerDuplicateCandidateResponse>(itemsPage, total);
+        return new PagedResult<CustomerDuplicateCandidateResponse>(items, total);
+    }
+
+    private static string? NormalizeEmail(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim().ToLowerInvariant();
+
+    private static string? NormalizePhone(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var digits = new string(value.Where(char.IsDigit).ToArray());
+        return string.IsNullOrWhiteSpace(digits) ? null : digits;
+    }
+
+    private static string? NormalizeAlphanumericUpper(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var filtered = new string(value.Where(char.IsLetterOrDigit).ToArray());
+        return string.IsNullOrWhiteSpace(filtered) ? null : filtered.ToUpperInvariant();
     }
 }
