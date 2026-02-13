@@ -19,16 +19,22 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     // DbSets
     public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
+    public DbSet<AccountContacts> AccountContacts => Set<AccountContacts>();
+    public DbSet<AccountContactRoles> AccountContactRoles => Set<AccountContactRoles>();
+    public DbSet<AccountHierarchies> AccountHierarchies => Set<AccountHierarchies>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
     public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
     public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
     public DbSet<Case> Cases => Set<Case>();
+    public DbSet<ChannelTypes> ChannelTypes => Set<ChannelTypes>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
+    public DbSet<CustomerPreferences> CustomerPreferences => Set<CustomerPreferences>();
+    public DbSet<CustomerConsents> CustomerConsents => Set<CustomerConsents>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<AccountContact> AccountContacts => Set<AccountContact>();

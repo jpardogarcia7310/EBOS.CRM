@@ -1,0 +1,87 @@
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
+using MapsterMapper;
+using MediatR;
+
+namespace EBOS.CRM.Application.Features.CRM.AccountContact.Commands.AddAccountContact;
+
+public class AddAccountContactCommandHandler(
+    IAccountContactRepository repository,
+    ICorporateCustomerRepository corporateCustomerRepository,
+    IIndividualCustomerRepository individualCustomerRepository,
+    IAuditService auditService,
+    ICurrentUserContext currentUser,
+    IMapper mapper)
+    : IRequestHandler<AddAccountContactCommand, AccountContactResponse>
+{
+    public async Task<AccountContactResponse> Handle(AddAccountContactCommand request, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var entityRequest = request.AccountContactRequest ??
+                            throw new ArgumentNullException(nameof(request.AccountContactRequest));
+
+        var corporateCustomer = await corporateCustomerRepository.GetByIdAsync(entityRequest.CorporateCustomerId, cancellationToken)
+            ?? throw new InvalidOperationException("Corporate customer not found.");
+        if (corporateCustomer.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("Corporate customer tenant mismatch.");
+        }
+
+        var individualCustomer = await individualCustomerRepository.GetByIdAsync(entityRequest.IndividualCustomerId, cancellationToken)
+            ?? throw new InvalidOperationException("Individual customer not found.");
+        if (individualCustomer.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("Individual customer tenant mismatch.");
+        }
+
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountContact>(entityRequest);
+        entity.Assign(entityRequest.CorporateCustomerId, entityRequest.IndividualCustomerId, entityRequest.StartAt);
+        if (entityRequest.EndAt.HasValue)
+        {
+            entity.Unassign(entityRequest.EndAt.Value);
+        }
+        entity.SetPrimary(entityRequest.IsPrimary);
+
+        await repository.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            if (entity.IsPrimary)
+            {
+                var existing = await repository.GetAllAsync(cancellationToken);
+                foreach (var contact in existing.Where(x => x.CorporateCustomerId == entity.CorporateCustomerId && x.IsPrimary))
+                {
+                    contact.SetPrimary(false);
+                    await repository.UpdateAsync(contact, cancellationToken);
+                }
+            }
+
+            await repository.AddAsync(entity, cancellationToken);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            var auditRequest = new AuditInsertRequest(
+                UserId: currentUser.UserId,
+                TimeStamp: DateTimeOffset.UtcNow,
+                Action: AuditActions.Add,
+                Entity: nameof(Domain.Entities.CRM.AccountContact),
+                RegisterId: entity.Id,
+                OldValues: null,
+                NewValues: AuditSerialization.Serialize(entity),
+                CorrelationId: currentUser.CorrelationId);
+
+            await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            await repository.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await repository.RollbackAsync(cancellationToken);
+            throw;
+        }
+
+        return mapper.Map<AccountContactResponse>(entity);
+    }
+}
