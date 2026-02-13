@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IPolicyService, PolicyService>();
         services.AddScoped<ICaseRoutingService, CaseRoutingService>();
         services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
+        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAddressRepository, AddressRepository>();

@@ -35,5 +35,8 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .WithOne(bo => bo.CorporateCustomer)
             .HasForeignKey(bo => bo.CorporateCustomerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(c => new { c.TenantId, c.TaxIdentification })
+            .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification");
     }
 }
