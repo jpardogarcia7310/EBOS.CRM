@@ -33,6 +33,8 @@ public static class DependencyInjection
 
         services.AddOptions<AuditServiceOptions>()
             .Bind(configuration.GetSection(AuditServiceOptions.SectionName));
+        services.AddOptions<CustomerDedupeOptions>()
+            .Bind(configuration.GetSection(CustomerDedupeOptions.SectionName));
         services.AddHttpClient<IAuditService, AuditServiceClient>(client =>
         {
             var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
@@ -61,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+        services.AddScoped<ICustomerDedupeRepository, CustomerDedupeRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
