@@ -14,7 +14,9 @@ public class GetCustomerPreferencesByCustomerQueryHandler(ICustomerPreferenceRep
         cancellationToken.ThrowIfCancellationRequested();
 
         var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.CustomerId == request.CustomerId).ToList();
+        var filtered = entities.Where(x => x.CustomerId == request.CustomerId
+                                           && x.TenantId == request.TenantId)
+            .ToList();
         var total = filtered.Count;
         var itemsPage = filtered
             .Skip((request.PageNumber - 1) * request.PageSize)

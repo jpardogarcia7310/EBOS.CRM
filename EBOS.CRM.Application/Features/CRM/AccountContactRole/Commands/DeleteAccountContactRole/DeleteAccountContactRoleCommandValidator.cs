@@ -7,5 +7,7 @@ public class DeleteAccountContactRoleCommandValidator : AbstractValidator<Delete
     public DeleteAccountContactRoleCommandValidator()
     {
         RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.AccountContactRoleRequest).NotNull();
+        RuleFor(x => x.AccountContactRoleRequest.TenantId).GreaterThan(0);
     }
 }

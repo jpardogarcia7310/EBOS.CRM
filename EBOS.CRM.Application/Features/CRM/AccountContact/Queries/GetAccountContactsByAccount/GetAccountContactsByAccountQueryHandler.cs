@@ -14,7 +14,9 @@ public class GetAccountContactsByAccountQueryHandler(IAccountContactRepository r
         cancellationToken.ThrowIfCancellationRequested();
 
         var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.CorporateCustomerId == request.CorporateCustomerId).ToList();
+        var filtered = entities.Where(x => x.CorporateCustomerId == request.CorporateCustomerId
+                                           && x.TenantId == request.TenantId)
+            .ToList();
         var total = filtered.Count;
         var itemsPage = filtered
             .Skip((request.PageNumber - 1) * request.PageSize)

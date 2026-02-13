@@ -6,6 +6,9 @@ public class GetAccountContactRolesByAccountContactQueryValidator : AbstractVali
 {
     public GetAccountContactRolesByAccountContactQueryValidator()
     {
+        RuleFor(x => x.TenantId).GreaterThan(0);
         RuleFor(x => x.AccountContactId).GreaterThan(0);
+        RuleFor(x => x.PageNumber).GreaterThan(0);
+        RuleFor(x => x.PageSize).GreaterThan(0);
     }
 }

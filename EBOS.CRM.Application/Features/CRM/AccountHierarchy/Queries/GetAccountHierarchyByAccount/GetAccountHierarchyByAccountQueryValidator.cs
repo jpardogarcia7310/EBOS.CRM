@@ -6,6 +6,9 @@ public class GetAccountHierarchyByAccountQueryValidator : AbstractValidator<GetA
 {
     public GetAccountHierarchyByAccountQueryValidator()
     {
+        RuleFor(x => x.TenantId).GreaterThan(0);
         RuleFor(x => x.CorporateCustomerId).GreaterThan(0);
+        RuleFor(x => x.PageNumber).GreaterThan(0);
+        RuleFor(x => x.PageSize).GreaterThan(0);
     }
 }

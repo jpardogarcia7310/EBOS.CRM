@@ -16,9 +16,17 @@ public class DeleteAccountContactCommandHandler(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        var entityRequest = request.AccountContactRequest ??
+                            throw new ArgumentNullException(nameof(request.AccountContactRequest));
+
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return false;
+
+        if (entity.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("Account contact tenant mismatch.");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
         await repository.BeginTransactionAsync(cancellationToken);

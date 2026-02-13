@@ -16,9 +16,17 @@ public class DeleteAccountContactRoleCommandHandler(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        var entityRequest = request.AccountContactRoleRequest ??
+                            throw new ArgumentNullException(nameof(request.AccountContactRoleRequest));
+
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return false;
+
+        if (entity.TenantId != entityRequest.TenantId)
+        {
+            throw new InvalidOperationException("Account contact role tenant mismatch.");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
         await repository.BeginTransactionAsync(cancellationToken);

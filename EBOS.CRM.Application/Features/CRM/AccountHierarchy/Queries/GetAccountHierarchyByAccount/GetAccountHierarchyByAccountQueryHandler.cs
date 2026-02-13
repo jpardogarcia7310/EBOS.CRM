@@ -14,8 +14,9 @@ public class GetAccountHierarchyByAccountQueryHandler(IAccountHierarchyRepositor
         cancellationToken.ThrowIfCancellationRequested();
 
         var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.ParentCorporateCustomerId == request.CorporateCustomerId
-                                           || x.ChildCorporateCustomerId == request.CorporateCustomerId)
+        var filtered = entities.Where(x => x.TenantId == request.TenantId
+                                           && (x.ParentCorporateCustomerId == request.CorporateCustomerId
+                                               || x.ChildCorporateCustomerId == request.CorporateCustomerId))
             .ToList();
         var total = filtered.Count;
         var itemsPage = filtered

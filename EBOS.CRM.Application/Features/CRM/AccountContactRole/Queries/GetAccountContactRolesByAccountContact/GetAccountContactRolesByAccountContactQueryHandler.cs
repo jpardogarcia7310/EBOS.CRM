@@ -14,7 +14,9 @@ public class GetAccountContactRolesByAccountContactQueryHandler(IAccountContactR
         cancellationToken.ThrowIfCancellationRequested();
 
         var entities = await repository.GetAllAsync(cancellationToken);
-        var filtered = entities.Where(x => x.AccountContactId == request.AccountContactId).ToList();
+        var filtered = entities.Where(x => x.AccountContactId == request.AccountContactId
+                                           && x.TenantId == request.TenantId)
+            .ToList();
         var total = filtered.Count;
         var itemsPage = filtered
             .Skip((request.PageNumber - 1) * request.PageSize)
