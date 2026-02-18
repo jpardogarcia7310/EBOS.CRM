@@ -60,4 +60,14 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
         RevokedAt = revokedAt;
         Granted = false;
     }
+
+    public void AssignCustomer(long customerId)
+    {
+        if (customerId <= 0)
+        {
+            throw new InvalidOperationException("CustomerId must be a positive value.");
+        }
+
+        CustomerId = customerId;
+    }
 }
