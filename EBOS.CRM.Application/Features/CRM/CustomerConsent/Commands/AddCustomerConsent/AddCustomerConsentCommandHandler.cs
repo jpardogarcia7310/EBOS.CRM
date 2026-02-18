@@ -30,18 +30,14 @@ public class AddCustomerConsentCommandHandler(
             throw new InvalidOperationException("Customer tenant mismatch.");
         }
 
-        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent>(entityRequest);
-        if (entityRequest.Granted)
-        {
-            entity.Grant(entityRequest.GrantedAt, entityRequest.Source, entityRequest.ExpiresAt);
-        }
-        else
-        {
-            entity.Granted = false;
-            entity.GrantedAt = entityRequest.GrantedAt;
-            entity.Source = entityRequest.Source;
-            entity.ExpiresAt = entityRequest.ExpiresAt;
-        }
+        var entity = global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.Create(
+            entityRequest.TenantId,
+            entityRequest.CustomerId,
+            entityRequest.ConsentType,
+            entityRequest.Granted,
+            entityRequest.GrantedAt,
+            entityRequest.Source,
+            entityRequest.ExpiresAt);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
