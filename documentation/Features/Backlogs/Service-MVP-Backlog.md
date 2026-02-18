@@ -1,4 +1,4 @@
-﻿# Service MVP Technical Backlog
+# Service MVP Technical Backlog
 
 Concrete work items aligned with the current local structure (Clean Architecture, Service module under `EBOS.CRM.*`).
 Derived from issues #60, #81, #82, #83, #84 scopes.

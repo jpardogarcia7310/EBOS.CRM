@@ -9,14 +9,10 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.AccountHierarchy.Commands.AddAccountHierarchy;
 
-public class AddAccountHierarchyCommandHandler(
-    IAccountHierarchyRepository repository,
-    ICorporateCustomerRepository corporateCustomerRepository,
-    IAccountHierarchyCycleGuard cycleGuard,
-    IAuditService auditService,
-    ICurrentUserContext currentUser,
-    IMapper mapper)
-    : IRequestHandler<AddAccountHierarchyCommand, AccountHierarchyResponse>
+public class AddAccountHierarchyCommandHandler(IAccountHierarchyRepository repository,
+    ICorporateCustomerRepository corporateCustomerRepository, IAccountHierarchyAcyclicInvariant hierarchyInvariant,
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) : 
+    IRequestHandler<AddAccountHierarchyCommand, AccountHierarchyResponse>
 {
     public async Task<AccountHierarchyResponse> Handle(AddAccountHierarchyCommand request, CancellationToken cancellationToken)
     {
@@ -39,16 +35,10 @@ public class AddAccountHierarchyCommandHandler(
             throw new InvalidOperationException("Child corporate customer tenant mismatch.");
         }
 
-        var createsCycle = await cycleGuard.CreatesCycleAsync(entityRequest.TenantId,
-            entityRequest.ParentCorporateCustomerId, entityRequest.ChildCorporateCustomerId, cancellationToken);
-        if (createsCycle)
-        {
-            throw new InvalidOperationException("Account hierarchy cycle detected.");
-        }
-
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy>(entityRequest);
-        entity.AssignParent(entityRequest.ParentCorporateCustomerId, entityRequest.ChildCorporateCustomerId,
-            entityRequest.RelationType, entityRequest.ValidFrom);
+        await entity.AssignParentAsync(entityRequest.TenantId, entityRequest.ParentCorporateCustomerId,
+            entityRequest.ChildCorporateCustomerId, entityRequest.RelationType, entityRequest.ValidFrom,
+            hierarchyInvariant, cancellationToken);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

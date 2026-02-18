@@ -55,6 +55,7 @@ public static class DependencyInjection
         services.AddScoped<IAccountContactPrimaryGuard, AccountContactPrimaryGuard>();
         services.AddScoped<IAccountContactRepository, AccountContactRepository>();
         services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
+        services.AddScoped<IAccountHierarchyAcyclicInvariant, AccountHierarchyCycleGuard>();
         services.AddScoped<IAccountHierarchyCycleGuard, AccountHierarchyCycleGuard>();
         services.AddScoped<IAccountHierarchyRepository, AccountHierarchyRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();

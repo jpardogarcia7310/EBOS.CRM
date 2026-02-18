@@ -1,5 +1,6 @@
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
@@ -15,7 +16,21 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
     public DateTime? ValidTo { get; set; }
     public bool IsCurrent { get; set; }
 
-    public void AssignParent(long parentCorporateCustomerId, long childCorporateCustomerId, string relationType, DateTime validFrom)
+    public async Task AssignParentAsync(long tenantId, long parentCorporateCustomerId, long childCorporateCustomerId,
+        string relationType, DateTime validFrom, IAccountHierarchyAcyclicInvariant hierarchyInvariant,
+        CancellationToken cancellationToken = default)
+    {
+        if (hierarchyInvariant is null)
+        {
+            throw new ArgumentNullException(nameof(hierarchyInvariant));
+        }
+
+        await hierarchyInvariant.EnsureNoCycleAsync(tenantId, parentCorporateCustomerId, childCorporateCustomerId,
+            cancellationToken);
+        AssignParent(parentCorporateCustomerId, childCorporateCustomerId, relationType, validFrom);
+    }
+
+    internal void AssignParent(long parentCorporateCustomerId, long childCorporateCustomerId, string relationType, DateTime validFrom)
     {
         if (parentCorporateCustomerId <= 0)
         {
