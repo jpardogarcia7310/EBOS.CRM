@@ -21,6 +21,7 @@ public class MappingAccountHierarchy : IRegister
             .Map(dest => dest.IsCurrent, _ => true)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.ValidTo!)
             .Ignore(dest => dest.ParentCorporateCustomer)
             .Ignore(dest => dest.ChildCorporateCustomer);
     }

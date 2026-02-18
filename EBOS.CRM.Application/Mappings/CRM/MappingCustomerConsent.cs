@@ -22,6 +22,7 @@ public class MappingCustomerConsent : IRegister
             .Map(dest => dest.ExpiresAt, src => src.ExpiresAt)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.RevokedAt!)
             .Ignore(dest => dest.Customer);
     }
 }

@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
@@ -12,6 +13,7 @@ public class AddAccountContactCommandHandler(
     IAccountContactRepository repository,
     ICorporateCustomerRepository corporateCustomerRepository,
     IIndividualCustomerRepository individualCustomerRepository,
+    IAccountContactPrimaryGuard primaryGuard,
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper)
@@ -52,8 +54,9 @@ public class AddAccountContactCommandHandler(
         {
             if (entity.IsPrimary)
             {
-                var existing = await repository.GetAllAsync(cancellationToken);
-                foreach (var contact in existing.Where(x => x.CorporateCustomerId == entity.CorporateCustomerId && x.IsPrimary))
+                var existing = await primaryGuard.GetOtherPrimariesAsync(entityRequest.TenantId,
+                    entity.CorporateCustomerId, null, cancellationToken);
+                foreach (var contact in existing)
                 {
                     contact.SetPrimary(false);
                     await repository.UpdateAsync(contact, cancellationToken);

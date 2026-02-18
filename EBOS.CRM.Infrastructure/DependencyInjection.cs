@@ -52,32 +52,37 @@ public static class DependencyInjection
         services.AddScoped<IPolicyService, PolicyService>();
 
         // Repositories base (AddScoped for per-request lifetime)
+        services.AddScoped<IAccountContactPrimaryGuard, AccountContactPrimaryGuard>();
+        services.AddScoped<IAccountContactRepository, AccountContactRepository>();
+        services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
         services.AddScoped<IAccountHierarchyCycleGuard, AccountHierarchyCycleGuard>();
+        services.AddScoped<IAccountHierarchyRepository, AccountHierarchyRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
         services.AddScoped<IBankInformationRepository, BankInformationRepository>();
-        services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
+        services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<ICaseActivityRepository, CaseActivityRepository>();
         services.AddScoped<ICaseRepository, CaseRepository>();
         services.AddScoped<ICaseRoutingService, CaseRoutingService>();
         services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
-        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
-        services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
-        services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
+        services.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<IAccountContactRepository, AccountContactRepository>();
-        services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
-        services.AddScoped<IAccountHierarchyRepository, AccountHierarchyRepository>();
+        services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
+        services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
+        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+        services.AddScoped<ICustomerConsentRepository, CustomerConsentRepository>();
         services.AddScoped<ICustomerDedupeRepository, CustomerDedupeRepository>();
         services.AddScoped<ICustomerPreferenceRepository, CustomerPreferenceRepository>();
-        services.AddScoped<ICustomerConsentRepository, CustomerConsentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
+        services.AddScoped<ILeadDebtorCheckService, LeadDebtorCheckService>();
         services.AddScoped<ILeadRepository, LeadRepository>();
+        services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
+        services.AddScoped<ILookupSeedService, LookupSeedService>();
         services.AddScoped<IOpportunityRepository, OpportunityRepository>();
         services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
         services.AddScoped<IQueueRepository, QueueRepository>();
@@ -89,17 +94,6 @@ public static class DependencyInjection
         services.AddScoped<ITenantConfigurationRepository, TenantConfigurationRepository>();
         services.AddScoped<ITenantQuotaRepository, TenantQuotaRepository>();
         services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
-        services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
-        services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
-        services.AddScoped<IStatusRepository, StatusRepository>();
-        services.AddScoped<ILeadRepository, LeadRepository>();
-        services.AddScoped<IOpportunityRepository, OpportunityRepository>();
-        services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
-        services.AddScoped<IQuoteRepository, QuoteRepository>();
-        services.AddScoped<ILeadDebtorCheckService, LeadDebtorCheckService>();
-        services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
-        services.AddScoped<ILookupSeedService, LookupSeedService>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>

@@ -6,7 +6,5 @@ public record CustomerPreferenceResponse(
     long CustomerId,
     long ChannelId,
     bool Preferred,
-    DateTime UpdatedAt,
-    long UpdatedBy,
     bool Active
 );
