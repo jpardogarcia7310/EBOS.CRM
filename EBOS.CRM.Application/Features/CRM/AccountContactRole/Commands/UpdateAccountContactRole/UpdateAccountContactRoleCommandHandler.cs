@@ -43,6 +43,7 @@ public class UpdateAccountContactRoleCommandHandler(
         {
             entity.Deactivate(entityRequest.ValidTo.Value);
         }
+        entity.SetPrimary(entityRequest.IsPrimary);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -54,7 +55,7 @@ public class UpdateAccountContactRoleCommandHandler(
                     entity.AccountContactId, entity.Id, cancellationToken);
                 foreach (var role in existing)
                 {
-                    role.IsPrimary = false;
+                    role.SetPrimary(false);
                     await repository.UpdateAsync(role, cancellationToken);
                 }
             }

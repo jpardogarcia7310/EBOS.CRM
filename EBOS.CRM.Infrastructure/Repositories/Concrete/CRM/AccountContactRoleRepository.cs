@@ -6,6 +6,15 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 public class AccountContactRoleRepository(CrmDbContext context)
     : BaseRepository<AccountContactRole>(context), IAccountContactRoleRepository
 {
+    public async Task<IReadOnlyCollection<AccountContactRole>> GetByAccountContactIdsAsync(long tenantId,
+        IReadOnlyCollection<long> accountContactIds, CancellationToken cancellationToken = default)
+    {
+        return await AsQueryable()
+            .Where(x => x.TenantId == tenantId && accountContactIds.Contains(x.AccountContactId))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<AccountContactRole>> GetByAccountContactPagedAsync(long tenantId,
         long accountContactId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {

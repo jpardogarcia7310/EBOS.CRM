@@ -3,4 +3,6 @@ using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
 namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 
-public class SlaRepository(CrmDbContext context) : BaseRepository<Sla>(context), ISlaRepository;
+public class SlaRepository(CrmDbContext context) : BaseRepository<Sla>(context), ISlaRepository
+{
+}

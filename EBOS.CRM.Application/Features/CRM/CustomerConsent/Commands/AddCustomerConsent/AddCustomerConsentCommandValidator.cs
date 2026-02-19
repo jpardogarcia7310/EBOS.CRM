@@ -9,8 +9,15 @@ public class AddCustomerConsentCommandValidator : AbstractValidator<AddCustomerC
         RuleFor(x => x.ConsentRequest).NotNull();
         RuleFor(x => x.ConsentRequest.TenantId).GreaterThan(0);
         RuleFor(x => x.ConsentRequest.CustomerId).GreaterThan(0);
-        RuleFor(x => x.ConsentRequest.ConsentType).NotEmpty();
-        RuleFor(x => x.ConsentRequest.Source).NotEmpty();
+        RuleFor(x => x.ConsentRequest.ConsentType)
+            .NotEmpty()
+            .MaximumLength(100);
+        RuleFor(x => x.ConsentRequest.Source)
+            .NotEmpty()
+            .MaximumLength(100);
         RuleFor(x => x.ConsentRequest.GrantedAt).NotEmpty();
+        RuleFor(x => x.ConsentRequest.ExpiresAt)
+            .Must((request, expiresAt) => !expiresAt.HasValue || expiresAt.Value >= request.ConsentRequest.GrantedAt)
+            .WithMessage("ExpiresAt cannot be earlier than GrantedAt.");
     }
 }

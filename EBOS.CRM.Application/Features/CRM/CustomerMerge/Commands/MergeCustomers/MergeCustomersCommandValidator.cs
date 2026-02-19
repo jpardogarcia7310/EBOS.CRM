@@ -13,5 +13,11 @@ public class MergeCustomersCommandValidator : AbstractValidator<MergeCustomersCo
             .NotNull()
             .Must(ids => ids.Count > 0)
             .WithMessage("MergeCustomerIds must not be empty.");
+        RuleFor(x => x.Request)
+            .Must(r => r.MergeCustomerIds.All(id => id > 0))
+            .WithMessage("MergeCustomerIds must contain only positive values.");
+        RuleFor(x => x.Request)
+            .Must(r => !r.MergeCustomerIds.Contains(r.WinnerCustomerId))
+            .WithMessage("MergeCustomerIds must not include WinnerCustomerId.");
     }
 }

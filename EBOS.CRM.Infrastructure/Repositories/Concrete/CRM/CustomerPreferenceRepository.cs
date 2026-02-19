@@ -6,6 +6,21 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 public class CustomerPreferenceRepository(CrmDbContext context)
     : BaseRepository<CustomerPreference>(context), ICustomerPreferenceRepository
 {
+    public async Task<IReadOnlyCollection<CustomerPreference>> GetByCustomerIdsAsync(long tenantId,
+        IReadOnlyCollection<long> customerIds, CancellationToken cancellationToken = default)
+    {
+        return await AsQueryable()
+            .Where(x => x.TenantId == tenantId && customerIds.Contains(x.CustomerId))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<CustomerPreference?> GetByCustomerAndChannelAsync(long tenantId, long customerId, long channelId,
+        CancellationToken cancellationToken = default)
+        => AsQueryable()
+            .FirstOrDefaultAsync(x => x.TenantId == tenantId && x.CustomerId == customerId && x.ChannelId == channelId,
+                cancellationToken);
+
     public async Task<IReadOnlyCollection<CustomerPreference>> GetByCustomerPagedAsync(long tenantId, long customerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -21,8 +36,7 @@ public class CustomerPreferenceRepository(CrmDbContext context)
             .ToListAsync(cancellationToken);
     }
 
-    public Task<int> CountByCustomerAsync(long tenantId, long customerId,
-        CancellationToken cancellationToken = default)
+    public Task<int> CountByCustomerAsync(long tenantId, long customerId, CancellationToken cancellationToken = default)
         => AsQueryable()
             .Where(x => x.TenantId == tenantId && x.CustomerId == customerId)
             .CountAsync(cancellationToken);

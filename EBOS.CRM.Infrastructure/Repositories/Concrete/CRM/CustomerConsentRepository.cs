@@ -6,6 +6,15 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 public class CustomerConsentRepository(CrmDbContext context)
     : BaseRepository<CustomerConsent>(context), ICustomerConsentRepository
 {
+    public async Task<IReadOnlyCollection<CustomerConsent>> GetByCustomerIdsAsync(long tenantId,
+        IReadOnlyCollection<long> customerIds, CancellationToken cancellationToken = default)
+    {
+        return await AsQueryable()
+            .Where(x => x.TenantId == tenantId && customerIds.Contains(x.CustomerId))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<CustomerConsent>> GetByCustomerPagedAsync(long tenantId, long customerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -21,8 +30,7 @@ public class CustomerConsentRepository(CrmDbContext context)
             .ToListAsync(cancellationToken);
     }
 
-    public Task<int> CountByCustomerAsync(long tenantId, long customerId,
-        CancellationToken cancellationToken = default)
+    public Task<int> CountByCustomerAsync(long tenantId, long customerId, CancellationToken cancellationToken = default)
         => AsQueryable()
             .Where(x => x.TenantId == tenantId && x.CustomerId == customerId)
             .CountAsync(cancellationToken);
