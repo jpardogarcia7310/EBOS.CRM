@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
@@ -11,6 +12,7 @@ namespace EBOS.CRM.Application.Features.CRM.AccountContactRole.Commands.UpdateAc
 public class UpdateAccountContactRoleCommandHandler(
     IAccountContactRoleRepository repository,
     IAccountContactRepository accountContactRepository,
+    IAccountContactRolePrimaryGuard primaryGuard,
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper)
@@ -46,6 +48,17 @@ public class UpdateAccountContactRoleCommandHandler(
 
         try
         {
+            if (entity.IsPrimary)
+            {
+                var existing = await primaryGuard.GetOtherPrimariesAsync(entityRequest.TenantId,
+                    entity.AccountContactId, entity.Id, cancellationToken);
+                foreach (var role in existing)
+                {
+                    role.IsPrimary = false;
+                    await repository.UpdateAsync(role, cancellationToken);
+                }
+            }
+
             await repository.UpdateAsync(entity, cancellationToken);
             await repository.SaveChangesAsync(cancellationToken);
 

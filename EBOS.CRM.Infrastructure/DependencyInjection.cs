@@ -53,6 +53,7 @@ public static class DependencyInjection
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAccountContactPrimaryGuard, AccountContactPrimaryGuard>();
+        services.AddScoped<IAccountContactRolePrimaryGuard, AccountContactRolePrimaryGuard>();
         services.AddScoped<IAccountContactRepository, AccountContactRepository>();
         services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
         services.AddScoped<IAccountHierarchyAcyclicInvariant, AccountHierarchyCycleGuard>();

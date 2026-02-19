@@ -610,6 +610,7 @@ public class MergeCustomersCommandHandler(
         var existingCodes = new HashSet<string>(targetRoles
             .Where(r => !r.Erased)
             .Select(r => r.RoleCode), StringComparer.OrdinalIgnoreCase);
+        var targetHasPrimary = targetRoles.Any(r => r.IsPrimary && !r.Erased);
 
         if (!rolesByContactId.TryGetValue(source.Id, out var sourceRoles))
         {
@@ -623,6 +624,15 @@ public class MergeCustomersCommandHandler(
                 role.Erased = true;
                 await accountContactRoleRepository.UpdateAsync(role, cancellationToken);
                 continue;
+            }
+
+            if (role.IsPrimary && targetHasPrimary)
+            {
+                role.IsPrimary = false;
+            }
+            else if (role.IsPrimary)
+            {
+                targetHasPrimary = true;
             }
 
             role.AccountContactId = target.Id;
