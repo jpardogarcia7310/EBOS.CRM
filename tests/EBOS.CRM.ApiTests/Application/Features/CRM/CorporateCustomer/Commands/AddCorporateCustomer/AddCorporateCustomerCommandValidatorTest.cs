@@ -1,10 +1,9 @@
 using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
-using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
@@ -124,8 +123,11 @@ public class AddCorporateCustomerCommandValidatorTest
                 new() { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" }
             });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new AddCorporateCustomerCommandValidator(countryRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
     }
 }
 

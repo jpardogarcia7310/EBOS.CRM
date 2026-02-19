@@ -1,10 +1,9 @@
 using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
-using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Address.Commands.AddAddress;
@@ -293,8 +292,11 @@ public class AddAddressCommandValidatorTest
         addressTypeRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AddressType { Id = 1, Code = "HOME", Description = "Home", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, validationCatalog.Object);
     }
 }
 

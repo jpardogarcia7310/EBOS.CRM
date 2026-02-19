@@ -1,8 +1,8 @@
 using EBOS.CRM.Application.Features.CRM.CustomerMerge;
-using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Validation;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
@@ -10,13 +10,13 @@ namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCor
 public class UpdateCorporateCustomerCommandValidator : AbstractValidator<UpdateCorporateCustomerCommand>
 {
     private readonly ICountryRepository _countryRepository;
-    private readonly ValidationCatalogOptions _options;
+    private readonly IValidationCatalogService _validationCatalog;
 
     public UpdateCorporateCustomerCommandValidator(ICountryRepository countryRepository,
-        IOptions<ValidationCatalogOptions> options)
+        IValidationCatalogService validationCatalog)
     {
         _countryRepository = countryRepository;
-        _options = options.Value ?? new ValidationCatalogOptions();
+        _validationCatalog = validationCatalog;
 
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.CorporateCustomerRequest).NotNull();
@@ -55,25 +55,14 @@ public class UpdateCorporateCustomerCommandValidator : AbstractValidator<UpdateC
             return true;
         }
 
-        if (string.IsNullOrWhiteSpace(_options.DefaultCountryIso2))
+        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.TaxId(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
-        var country = await _countryRepository.GetAllAsync(cancellationToken);
-        var match = country.FirstOrDefault(c =>
-            string.Equals(c.Iso31661A2Code, _options.DefaultCountryIso2, StringComparison.OrdinalIgnoreCase));
-        if (match is null)
-        {
-            return true;
-        }
-
-        if (!_options.TaxIdPatternsByCountry.TryGetValue(match.Iso31661A2Code, out var pattern) || string.IsNullOrWhiteSpace(pattern))
-        {
-            return true;
-        }
-
-        return Regex.IsMatch(request.TaxIdentification, pattern, RegexOptions.CultureInvariant);
+        return Regex.IsMatch(request.TaxIdentification, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

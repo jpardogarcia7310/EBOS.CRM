@@ -62,6 +62,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<ValidationRule> ValidationRules => Set<ValidationRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

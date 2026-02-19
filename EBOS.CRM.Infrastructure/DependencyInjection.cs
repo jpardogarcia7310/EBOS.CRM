@@ -12,6 +12,7 @@ using EBOS.CRM.Infrastructure.Services.Audit;
 using EBOS.CRM.Infrastructure.Services.Security;
 using EBOS.CRM.Infrastructure.Services.CRM;
 using EBOS.CRM.Infrastructure.Services.Lookup;
+using EBOS.CRM.Infrastructure.Services.Validation;
 using Microsoft.Extensions.Configuration;
 
 namespace EBOS.CRM.Infrastructure;
@@ -101,6 +102,8 @@ public static class DependencyInjection
         services.AddScoped<ITenantConfigurationRepository, TenantConfigurationRepository>();
         services.AddScoped<ITenantQuotaRepository, TenantQuotaRepository>();
         services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
+        services.AddScoped<IValidationCatalogService, ValidationCatalogService>();
+        services.AddScoped<IValidationRuleRepository, ValidationRuleRepository>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>

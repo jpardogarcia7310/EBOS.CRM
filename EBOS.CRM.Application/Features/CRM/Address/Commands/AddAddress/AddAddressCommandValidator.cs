@@ -1,7 +1,7 @@
-using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Validation;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -11,15 +11,15 @@ public class AddAddressCommandValidator : AbstractValidator<AddAddressCommand>
 {
     private readonly ICountryRepository _countryRepository;
     private readonly IAddressTypeRepository _addressTypeRepository;
-    private readonly ValidationCatalogOptions _options;
+    private readonly IValidationCatalogService _validationCatalog;
 
     public AddAddressCommandValidator(ICountryRepository countryRepository,
         IAddressTypeRepository addressTypeRepository,
-        IOptions<ValidationCatalogOptions> options)
+        IValidationCatalogService validationCatalog)
     {
         _countryRepository = countryRepository;
         _addressTypeRepository = addressTypeRepository;
-        _options = options.Value ?? new ValidationCatalogOptions();
+        _validationCatalog = validationCatalog;
 
         RuleFor(x => x.AddressRequest).NotNull();
 
@@ -117,12 +117,14 @@ public class AddAddressCommandValidator : AbstractValidator<AddAddressCommand>
             return true;
         }
 
-        if (!_options.PostalCodePatternsByCountry.TryGetValue(iso2, out var pattern) || string.IsNullOrWhiteSpace(pattern))
+        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.PostalCode(iso2),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
-        return Regex.IsMatch(request.PostalCode, pattern, RegexOptions.CultureInvariant);
+        return Regex.IsMatch(request.PostalCode, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

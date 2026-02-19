@@ -22,11 +22,10 @@ using EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddr
 using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.AddTaxInformationAddress;
-using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Validators;
@@ -206,8 +205,11 @@ public class CrmCoreValidatorTests
         addressTypeRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AddressType { Id = 1, Code = "HOME", Description = "Home", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, validationCatalog.Object);
     }
 
     private static AddCorporateCustomerCommandValidator CreateCorporateValidator()
@@ -219,8 +221,11 @@ public class CrmCoreValidatorTests
                 new() { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" }
             });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new AddCorporateCustomerCommandValidator(countryRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
     }
 
     private static AddIndividualCustomerCommandValidator CreateIndividualValidator()
@@ -229,7 +234,10 @@ public class CrmCoreValidatorTests
         identificationRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new IdentificationType { Id = 1, Code = "DNI", Description = "DNI", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null, Erased = false });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new AddIndividualCustomerCommandValidator(identificationRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddIndividualCustomerCommandValidator(identificationRepo.Object, validationCatalog.Object);
     }
 }

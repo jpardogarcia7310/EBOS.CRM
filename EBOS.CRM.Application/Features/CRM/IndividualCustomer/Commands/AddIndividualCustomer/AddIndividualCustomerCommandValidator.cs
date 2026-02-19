@@ -1,7 +1,7 @@
-using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Validation;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndividualCustomer;
@@ -9,13 +9,13 @@ namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.AddIndiv
 public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndividualCustomerCommand>
 {
     private readonly IIdentificationTypeRepository _identificationTypeRepository;
-    private readonly ValidationCatalogOptions _options;
+    private readonly IValidationCatalogService _validationCatalog;
 
     public AddIndividualCustomerCommandValidator(IIdentificationTypeRepository identificationTypeRepository,
-        IOptions<ValidationCatalogOptions> options)
+        IValidationCatalogService validationCatalog)
     {
         _identificationTypeRepository = identificationTypeRepository;
-        _options = options.Value ?? new ValidationCatalogOptions();
+        _validationCatalog = validationCatalog;
 
         RuleFor(x => x.IndividualCustomerRequest).NotNull();
         RuleFor(x => x.IndividualCustomerRequest.Code).NotEmpty();
@@ -56,12 +56,14 @@ public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndivi
             return true;
         }
 
-        if (!_options.IdentificationPatternsByTypeCode.TryGetValue(type.Code, out var pattern) || string.IsNullOrWhiteSpace(pattern))
+        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.Identification(type.Code),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
-        return Regex.IsMatch(request.IdentificationNumber, pattern, RegexOptions.CultureInvariant);
+        return Regex.IsMatch(request.IdentificationNumber, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

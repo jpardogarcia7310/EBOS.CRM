@@ -1,10 +1,9 @@
 using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIndividualCustomer;
-using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.IndividualCustomer.Commands.UpdateIndividualCustomer;
@@ -42,8 +41,11 @@ public class UpdateIndividualCustomerCommandValidatorTest
         identificationRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new IdentificationType { Id = 1, Code = "DNI", Description = "DNI", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null, Erased = false });
 
-        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
-        return new UpdateIndividualCustomerCommandValidator(identificationRepo.Object, options);
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new UpdateIndividualCustomerCommandValidator(identificationRepo.Object, validationCatalog.Object);
     }
 }
 

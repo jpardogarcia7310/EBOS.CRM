@@ -1,7 +1,7 @@
-using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Validation;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIndividualCustomer;
@@ -9,13 +9,13 @@ namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIn
 public class UpdateIndividualCustomerCommandValidator : AbstractValidator<UpdateIndividualCustomerCommand>
 {
     private readonly IIdentificationTypeRepository _identificationTypeRepository;
-    private readonly ValidationCatalogOptions _options;
+    private readonly IValidationCatalogService _validationCatalog;
 
     public UpdateIndividualCustomerCommandValidator(IIdentificationTypeRepository identificationTypeRepository,
-        IOptions<ValidationCatalogOptions> options)
+        IValidationCatalogService validationCatalog)
     {
         _identificationTypeRepository = identificationTypeRepository;
-        _options = options.Value ?? new ValidationCatalogOptions();
+        _validationCatalog = validationCatalog;
 
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.IndividualCustomerRequest).NotNull();
@@ -57,12 +57,14 @@ public class UpdateIndividualCustomerCommandValidator : AbstractValidator<Update
             return true;
         }
 
-        if (!_options.IdentificationPatternsByTypeCode.TryGetValue(type.Code, out var pattern) || string.IsNullOrWhiteSpace(pattern))
+        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.Identification(type.Code),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
-        return Regex.IsMatch(request.IdentificationNumber, pattern, RegexOptions.CultureInvariant);
+        return Regex.IsMatch(request.IdentificationNumber, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 
