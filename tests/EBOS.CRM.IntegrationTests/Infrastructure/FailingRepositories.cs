@@ -772,6 +772,12 @@ public sealed class FailingCustomerAddressRepository : ICustomerAddressRepositor
         throw new InvalidOperationException("Simulated repository failure.");
     }
 
+    public Task<IReadOnlyCollection<CustomerAddress>> GetByCustomerIdsAsync(long tenantId, IReadOnlyCollection<long> customerIds,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
@@ -1248,6 +1254,12 @@ public sealed class FailingOpportunityRepository : IOpportunityRepository
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }
+
+    public Task<IReadOnlyCollection<Opportunity>> GetByForecastCriteriaAsync(long tenantId, long? ownerUserId, long? stageId,
+        DateTime? from, DateTime? to, CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
 }
 
 public sealed class FailingOpportunityStageRepository : IOpportunityStageRepository
@@ -1324,6 +1336,11 @@ public sealed class FailingOpportunityStageRepository : IOpportunityStageReposit
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("Simulated repository failure.");
+    }
+
+    public Task<IReadOnlyCollection<OpportunityStage>> GetActiveAsync(CancellationToken cancellationToken = default)
     {
         throw new InvalidOperationException("Simulated repository failure.");
     }

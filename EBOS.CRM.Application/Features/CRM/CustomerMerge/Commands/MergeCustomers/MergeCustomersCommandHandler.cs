@@ -4,7 +4,9 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Application.Options;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerMerge.Commands.MergeCustomers;
 
@@ -18,7 +20,8 @@ public class MergeCustomersCommandHandler(
     IAccountContactRepository accountContactRepository,
     IAccountContactRoleRepository accountContactRoleRepository,
     IAuditService auditService,
-    ICurrentUserContext currentUser)
+    ICurrentUserContext currentUser,
+    IOptions<CustomerMergeOptions> mergeOptions)
     : IRequestHandler<MergeCustomersCommand, CustomerMergeResultResponse>
 {
     private enum CustomerType
@@ -53,6 +56,9 @@ public class MergeCustomersCommandHandler(
 
         var winnerOldValues = AuditSerialization.Serialize(winner);
         var winnerUpdated = false;
+        var options = mergeOptions.Value ?? new CustomerMergeOptions();
+        var mergeResolver = new CustomerMergeFieldResolver(currentUser, options);
+        var preferWinnerOnTie = options.PreferWinnerOnTie;
 
         await customerRepository.BeginTransactionAsync(cancellationToken);
 
@@ -69,7 +75,7 @@ public class MergeCustomersCommandHandler(
                 mergeTypeById[mergeId] = type;
             }
 
-            winnerUpdated = await MergeGoldenRecordAsync(winner, winnerType, mergeIds, cancellationToken);
+            winnerUpdated = await MergeGoldenRecordAsync(winner, winnerType, mergeIds, mergeResolver, options, preferWinnerOnTie, cancellationToken);
 
             var addresses = (await customerAddressRepository.GetByCustomerIdsAsync(mergeRequest.TenantId, customerIds.ToList(), cancellationToken))
                 .ToList();
@@ -214,7 +220,8 @@ public class MergeCustomersCommandHandler(
     }
 
     private async Task<bool> MergeGoldenRecordAsync(Domain.Entities.CRM.Customer winner, CustomerType winnerType,
-        IReadOnlyCollection<long> mergeIds, CancellationToken cancellationToken)
+        IReadOnlyCollection<long> mergeIds, CustomerMergeFieldResolver mergeResolver, CustomerMergeOptions options,
+        bool preferWinnerOnTie, CancellationToken cancellationToken)
     {
         var updated = false;
 
@@ -232,37 +239,43 @@ public class MergeCustomersCommandHandler(
 
             var candidateUpdatedAt = GetEffectiveUpdatedAt(candidate);
 
-            if (TryPromoteString(winner.Email, winnerEmailUpdatedAt, candidate.Email, candidateUpdatedAt,
-                    out var mergedEmail, out var mergedEmailUpdatedAt))
+            var winnerEmailContext = CreateFieldContext(winner, "Email", options);
+            var candidateEmailContext = CreateFieldContext(candidate, "Email", options);
+            var resolvedEmail = mergeResolver.ResolveString(winner.Email, winnerEmailUpdatedAt,
+                candidate.Email, candidateUpdatedAt, preferWinnerOnTie, winnerEmailContext, candidateEmailContext);
+            if (!string.Equals(resolvedEmail, winner.Email, StringComparison.Ordinal))
             {
-                winner.Email = mergedEmail;
-                winnerEmailUpdatedAt = mergedEmailUpdatedAt;
+                winner.Email = resolvedEmail!;
+                winnerEmailUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteString(winner.Phone, winnerPhoneUpdatedAt, candidate.Phone, candidateUpdatedAt,
-                    out var mergedPhone, out var mergedPhoneUpdatedAt))
+            var winnerPhoneContext = CreateFieldContext(winner, "Phone", options);
+            var candidatePhoneContext = CreateFieldContext(candidate, "Phone", options);
+            var resolvedPhone = mergeResolver.ResolveString(winner.Phone, winnerPhoneUpdatedAt,
+                candidate.Phone, candidateUpdatedAt, preferWinnerOnTie, winnerPhoneContext, candidatePhoneContext);
+            if (!string.Equals(resolvedPhone, winner.Phone, StringComparison.Ordinal))
             {
-                winner.Phone = mergedPhone;
-                winnerPhoneUpdatedAt = mergedPhoneUpdatedAt;
+                winner.Phone = resolvedPhone!;
+                winnerPhoneUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
         }
 
         if (winnerType == CustomerType.Corporate)
         {
-            updated |= await MergeCorporateGoldenRecordAsync(winner.Id, mergeIds, cancellationToken);
+            updated |= await MergeCorporateGoldenRecordAsync(winner.Id, mergeIds, mergeResolver, options, preferWinnerOnTie, cancellationToken);
         }
         else
         {
-            updated |= await MergeIndividualGoldenRecordAsync(winner.Id, mergeIds, cancellationToken);
+            updated |= await MergeIndividualGoldenRecordAsync(winner.Id, mergeIds, mergeResolver, options, preferWinnerOnTie, cancellationToken);
         }
 
         return updated;
     }
 
     private async Task<bool> MergeCorporateGoldenRecordAsync(long winnerId, IReadOnlyCollection<long> mergeIds,
-        CancellationToken cancellationToken)
+        CustomerMergeFieldResolver mergeResolver, CustomerMergeOptions options, bool preferWinnerOnTie, CancellationToken cancellationToken)
     {
         var updated = false;
         var winnerCorporate = await corporateCustomerRepository.GetByIdAsync(winnerId, cancellationToken);
@@ -285,19 +298,25 @@ public class MergeCustomersCommandHandler(
 
             var candidateUpdatedAt = GetEffectiveUpdatedAt(candidate);
 
-            if (TryPromoteString(winnerCorporate.LegalName, legalNameUpdatedAt, candidate.LegalName,
-                    candidateUpdatedAt, out var mergedLegalName, out var mergedLegalNameUpdatedAt))
+            var winnerLegalContext = CreateFieldContext(winnerCorporate, "LegalName", options);
+            var candidateLegalContext = CreateFieldContext(candidate, "LegalName", options);
+            var resolvedLegalName = mergeResolver.ResolveString(winnerCorporate.LegalName, legalNameUpdatedAt,
+                candidate.LegalName, candidateUpdatedAt, preferWinnerOnTie, winnerLegalContext, candidateLegalContext);
+            if (!string.Equals(resolvedLegalName, winnerCorporate.LegalName, StringComparison.Ordinal))
             {
-                winnerCorporate.LegalName = mergedLegalName;
-                legalNameUpdatedAt = mergedLegalNameUpdatedAt;
+                winnerCorporate.LegalName = resolvedLegalName!;
+                legalNameUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteString(winnerCorporate.TaxIdentification, taxIdUpdatedAt, candidate.TaxIdentification,
-                    candidateUpdatedAt, out var mergedTaxId, out var mergedTaxIdUpdatedAt))
+            var winnerTaxContext = CreateFieldContext(winnerCorporate, "TaxIdentification", options);
+            var candidateTaxContext = CreateFieldContext(candidate, "TaxIdentification", options);
+            var resolvedTaxId = mergeResolver.ResolveString(winnerCorporate.TaxIdentification, taxIdUpdatedAt,
+                candidate.TaxIdentification, candidateUpdatedAt, preferWinnerOnTie, winnerTaxContext, candidateTaxContext);
+            if (!string.Equals(resolvedTaxId, winnerCorporate.TaxIdentification, StringComparison.Ordinal))
             {
-                winnerCorporate.TaxIdentification = mergedTaxId;
-                taxIdUpdatedAt = mergedTaxIdUpdatedAt;
+                winnerCorporate.TaxIdentification = resolvedTaxId!;
+                taxIdUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
         }
@@ -311,7 +330,7 @@ public class MergeCustomersCommandHandler(
     }
 
     private async Task<bool> MergeIndividualGoldenRecordAsync(long winnerId, IReadOnlyCollection<long> mergeIds,
-        CancellationToken cancellationToken)
+        CustomerMergeFieldResolver mergeResolver, CustomerMergeOptions options, bool preferWinnerOnTie, CancellationToken cancellationToken)
     {
         var updated = false;
         var winnerIndividual = await individualCustomerRepository.GetByIdAsync(winnerId, cancellationToken);
@@ -337,45 +356,58 @@ public class MergeCustomersCommandHandler(
 
             var candidateUpdatedAt = GetEffectiveUpdatedAt(candidate);
 
-            if (TryPromoteString(winnerIndividual.FirstName, firstNameUpdatedAt, candidate.FirstName,
-                    candidateUpdatedAt, out var mergedFirstName, out var mergedFirstNameUpdatedAt))
+            var winnerFirstContext = CreateFieldContext(winnerIndividual, "FirstName", options);
+            var candidateFirstContext = CreateFieldContext(candidate, "FirstName", options);
+            var resolvedFirstName = mergeResolver.ResolveString(winnerIndividual.FirstName, firstNameUpdatedAt,
+                candidate.FirstName, candidateUpdatedAt, preferWinnerOnTie, winnerFirstContext, candidateFirstContext);
+            if (!string.Equals(resolvedFirstName, winnerIndividual.FirstName, StringComparison.Ordinal))
             {
-                winnerIndividual.FirstName = mergedFirstName;
-                firstNameUpdatedAt = mergedFirstNameUpdatedAt;
+                winnerIndividual.FirstName = resolvedFirstName!;
+                firstNameUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteString(winnerIndividual.LastName, lastNameUpdatedAt, candidate.LastName,
-                    candidateUpdatedAt, out var mergedLastName, out var mergedLastNameUpdatedAt))
+            var winnerLastContext = CreateFieldContext(winnerIndividual, "LastName", options);
+            var candidateLastContext = CreateFieldContext(candidate, "LastName", options);
+            var resolvedLastName = mergeResolver.ResolveString(winnerIndividual.LastName, lastNameUpdatedAt,
+                candidate.LastName, candidateUpdatedAt, preferWinnerOnTie, winnerLastContext, candidateLastContext);
+            if (!string.Equals(resolvedLastName, winnerIndividual.LastName, StringComparison.Ordinal))
             {
-                winnerIndividual.LastName = mergedLastName;
-                lastNameUpdatedAt = mergedLastNameUpdatedAt;
+                winnerIndividual.LastName = resolvedLastName!;
+                lastNameUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteString(winnerIndividual.IdentificationNumber, idNumberUpdatedAt,
-                    candidate.IdentificationNumber, candidateUpdatedAt,
-                    out var mergedIdNumber, out var mergedIdNumberUpdatedAt))
+            var winnerIdNumberContext = CreateFieldContext(winnerIndividual, "IdentificationNumber", options);
+            var candidateIdNumberContext = CreateFieldContext(candidate, "IdentificationNumber", options);
+            var resolvedIdNumber = mergeResolver.ResolveString(winnerIndividual.IdentificationNumber, idNumberUpdatedAt,
+                candidate.IdentificationNumber, candidateUpdatedAt, preferWinnerOnTie, winnerIdNumberContext, candidateIdNumberContext);
+            if (!string.Equals(resolvedIdNumber, winnerIndividual.IdentificationNumber, StringComparison.Ordinal))
             {
-                winnerIndividual.IdentificationNumber = mergedIdNumber;
-                idNumberUpdatedAt = mergedIdNumberUpdatedAt;
+                winnerIndividual.IdentificationNumber = resolvedIdNumber!;
+                idNumberUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteId(winnerIndividual.IdentificationTypeId, idTypeUpdatedAt,
-                    candidate.IdentificationTypeId, candidateUpdatedAt,
-                    out var mergedIdType, out var mergedIdTypeUpdatedAt))
+            var winnerIdTypeContext = CreateFieldContext(winnerIndividual, "IdentificationTypeId", options);
+            var candidateIdTypeContext = CreateFieldContext(candidate, "IdentificationTypeId", options);
+            var resolvedIdType = mergeResolver.ResolveLong(winnerIndividual.IdentificationTypeId, idTypeUpdatedAt,
+                candidate.IdentificationTypeId, candidateUpdatedAt, preferWinnerOnTie, winnerIdTypeContext, candidateIdTypeContext);
+            if (resolvedIdType != winnerIndividual.IdentificationTypeId)
             {
-                winnerIndividual.IdentificationTypeId = mergedIdType;
-                idTypeUpdatedAt = mergedIdTypeUpdatedAt;
+                winnerIndividual.IdentificationTypeId = resolvedIdType;
+                idTypeUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
 
-            if (TryPromoteDate(winnerIndividual.BirthDate, birthDateUpdatedAt, candidate.BirthDate,
-                    candidateUpdatedAt, out var mergedBirthDate, out var mergedBirthDateUpdatedAt))
+            var winnerBirthContext = CreateFieldContext(winnerIndividual, "BirthDate", options);
+            var candidateBirthContext = CreateFieldContext(candidate, "BirthDate", options);
+            var resolvedBirthDate = mergeResolver.ResolveDate(winnerIndividual.BirthDate, birthDateUpdatedAt,
+                candidate.BirthDate, candidateUpdatedAt, preferWinnerOnTie, winnerBirthContext, candidateBirthContext);
+            if (resolvedBirthDate != winnerIndividual.BirthDate)
             {
-                winnerIndividual.BirthDate = mergedBirthDate;
-                birthDateUpdatedAt = mergedBirthDateUpdatedAt;
+                winnerIndividual.BirthDate = resolvedBirthDate;
+                birthDateUpdatedAt = candidateUpdatedAt;
                 updated = true;
             }
         }
@@ -391,77 +423,11 @@ public class MergeCustomersCommandHandler(
     private static DateTime GetEffectiveUpdatedAt(Domain.Entities.CRM.Customer customer)
         => customer.UpdatedAt ?? customer.CreatedAt;
 
-    private static bool TryPromoteString(string? current, DateTime currentUpdatedAt,
-        string? candidate, DateTime candidateUpdatedAt, out string merged, out DateTime mergedUpdatedAt)
+    private static CustomerMergeFieldContext CreateFieldContext(Domain.Entities.CRM.Customer customer, string fieldKey,
+        CustomerMergeOptions options)
     {
-        if (string.IsNullOrWhiteSpace(candidate))
-        {
-            merged = current ?? string.Empty;
-            mergedUpdatedAt = currentUpdatedAt;
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(current))
-        {
-            merged = candidate!;
-            mergedUpdatedAt = candidateUpdatedAt;
-            return true;
-        }
-
-        if (candidateUpdatedAt > currentUpdatedAt)
-        {
-            merged = candidate!;
-            mergedUpdatedAt = candidateUpdatedAt;
-            return true;
-        }
-
-        merged = current;
-        mergedUpdatedAt = currentUpdatedAt;
-        return false;
-    }
-
-    private static bool TryPromoteId(long current, DateTime currentUpdatedAt,
-        long candidate, DateTime candidateUpdatedAt, out long merged, out DateTime mergedUpdatedAt)
-    {
-        if (candidate <= 0)
-        {
-            merged = current;
-            mergedUpdatedAt = currentUpdatedAt;
-            return false;
-        }
-
-        if (current <= 0 || candidateUpdatedAt > currentUpdatedAt)
-        {
-            merged = candidate;
-            mergedUpdatedAt = candidateUpdatedAt;
-            return true;
-        }
-
-        merged = current;
-        mergedUpdatedAt = currentUpdatedAt;
-        return false;
-    }
-
-    private static bool TryPromoteDate(DateTime current, DateTime currentUpdatedAt,
-        DateTime candidate, DateTime candidateUpdatedAt, out DateTime merged, out DateTime mergedUpdatedAt)
-    {
-        if (candidate == default)
-        {
-            merged = current;
-            mergedUpdatedAt = currentUpdatedAt;
-            return false;
-        }
-
-        if (current == default || candidateUpdatedAt > currentUpdatedAt)
-        {
-            merged = candidate;
-            mergedUpdatedAt = candidateUpdatedAt;
-            return true;
-        }
-
-        merged = current;
-        mergedUpdatedAt = currentUpdatedAt;
-        return false;
+        var channelKey = options.FieldChannelMap.TryGetValue(fieldKey, out var mapped) ? mapped : fieldKey;
+        return new CustomerMergeFieldContext(customer.Source, channelKey, customer.Confidentiality);
     }
 
     private async Task MergeCustomerPreferencesAsync(long winnerId, IReadOnlyCollection<long> mergeIds,

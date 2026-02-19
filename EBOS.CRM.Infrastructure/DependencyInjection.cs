@@ -4,6 +4,7 @@ using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services.Identity;
+using EBOS.CRM.Application.Options;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
@@ -38,6 +39,8 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(AuditServiceOptions.SectionName));
         services.AddOptions<CustomerDedupeOptions>()
             .Bind(configuration.GetSection(CustomerDedupeOptions.SectionName));
+        services.AddOptions<CustomerMergeOptions>()
+            .Bind(configuration.GetSection(CustomerMergeOptions.SectionName));
         services.AddHttpClient<IAuditService, AuditServiceClient>(client =>
         {
             var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
