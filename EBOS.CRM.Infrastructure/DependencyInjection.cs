@@ -41,6 +41,8 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(CustomerDedupeOptions.SectionName));
         services.AddOptions<CustomerMergeOptions>()
             .Bind(configuration.GetSection(CustomerMergeOptions.SectionName));
+        services.AddOptions<ValidationCatalogOptions>()
+            .Bind(configuration.GetSection(ValidationCatalogOptions.SectionName));
         services.AddHttpClient<IAuditService, AuditServiceClient>(client =>
         {
             var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()

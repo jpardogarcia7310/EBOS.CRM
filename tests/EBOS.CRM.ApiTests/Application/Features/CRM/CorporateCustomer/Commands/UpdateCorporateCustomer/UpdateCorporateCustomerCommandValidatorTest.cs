@@ -1,12 +1,17 @@
 using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
+using EBOS.CRM.Application.Options;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using FluentValidation.TestHelper;
+using Microsoft.Extensions.Options;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
 
 public class UpdateCorporateCustomerCommandValidatorTest
 {
-    private readonly UpdateCorporateCustomerCommandValidator _validator = new();
+    private readonly UpdateCorporateCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_InvalidId_Fails()
@@ -109,6 +114,19 @@ public class UpdateCorporateCustomerCommandValidatorTest
             LegalName: "Corp",
             TaxIdentification: "TAX999"
         );
+
+    private static UpdateCorporateCustomerCommandValidator CreateValidator()
+    {
+        var countryRepo = new Mock<ICountryRepository>();
+        countryRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Country>
+            {
+                new() { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" }
+            });
+
+        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
+        return new UpdateCorporateCustomerCommandValidator(countryRepo.Object, options);
+    }
 }
 
 

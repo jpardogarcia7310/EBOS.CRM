@@ -1,12 +1,17 @@
 using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
+using EBOS.CRM.Application.Options;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using FluentValidation.TestHelper;
+using Microsoft.Extensions.Options;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Address.Commands.AddAddress;
 
 public class AddAddressCommandValidatorTest
 {
-    private readonly AddAddressCommandValidator _validator = new();
+    private readonly AddAddressCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_ValidRequest_Passes()
@@ -277,6 +282,20 @@ public class AddAddressCommandValidatorTest
         CountryId: 1,
         AddressTypeId: 1
     );
+
+    private static AddAddressCommandValidator CreateValidator()
+    {
+        var countryRepo = new Mock<ICountryRepository>();
+        countryRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Country { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" });
+
+        var addressTypeRepo = new Mock<IAddressTypeRepository>();
+        addressTypeRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AddressType { Id = 1, Code = "HOME", Description = "Home", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null });
+
+        var options = global::Microsoft.Extensions.Options.Options.Create(new ValidationCatalogOptions());
+        return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, options);
+    }
 }
 
 
