@@ -39,8 +39,11 @@ public class UpsertCustomerPreferenceCommandHandler(
             throw new InvalidOperationException("Channel type is not active.");
         }
 
-        var existing = (await repository.GetAllAsync(cancellationToken))
-            .FirstOrDefault(x => x.CustomerId == entityRequest.CustomerId && x.ChannelId == entityRequest.ChannelId);
+        var existing = await repository.GetByCustomerAndChannelAsync(
+            entityRequest.TenantId,
+            entityRequest.CustomerId,
+            entityRequest.ChannelId,
+            cancellationToken);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

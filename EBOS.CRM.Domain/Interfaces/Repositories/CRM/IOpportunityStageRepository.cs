@@ -3,4 +3,9 @@ using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
-public interface IOpportunityStageRepository : IPagedRepository<OpportunityStage>, IUnitOfWork;
+public interface IOpportunityStageRepository : IPagedRepository<OpportunityStage>, IUnitOfWork
+{
+    Task<IReadOnlyCollection<OpportunityStage>> GetActiveAsync(CancellationToken cancellationToken = default);
+
+
+}

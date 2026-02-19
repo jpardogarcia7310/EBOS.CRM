@@ -1,7 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MediatR;
-using System.Linq;
 
 namespace EBOS.CRM.Application.Features.CRM.Forecast.Queries.GetForecastSummary;
 
@@ -15,31 +14,17 @@ public class GetForecastSummaryQueryHandler(IOpportunityRepository opportunityRe
 
         var filter = request.ForecastRequest ?? throw new ArgumentNullException(nameof(request.ForecastRequest));
 
-        var opportunities = await opportunityRepository.GetAllAsync(cancellationToken);
-        var stages = await stageRepository.GetAllAsync(cancellationToken);
+        var opportunities = await opportunityRepository.GetByForecastCriteriaAsync(
+            filter.TenantId,
+            filter.OwnerUserId,
+            filter.StageId,
+            filter.From,
+            filter.To,
+            cancellationToken);
+        var stages = await stageRepository.GetActiveAsync(cancellationToken);
         var stageNames = stages.ToDictionary(s => s.Id, s => s.Name);
 
         var filtered = opportunities.AsEnumerable();
-
-        if (filter.OwnerUserId.HasValue)
-        {
-            filtered = filtered.Where(o => o.OwnerUserId == filter.OwnerUserId.Value);
-        }
-
-        if (filter.StageId.HasValue)
-        {
-            filtered = filtered.Where(o => o.StageId == filter.StageId.Value);
-        }
-
-        if (filter.From.HasValue)
-        {
-            filtered = filtered.Where(o => o.ExpectedCloseDate.HasValue && o.ExpectedCloseDate.Value >= filter.From.Value);
-        }
-
-        if (filter.To.HasValue)
-        {
-            filtered = filtered.Where(o => o.ExpectedCloseDate.HasValue && o.ExpectedCloseDate.Value <= filter.To.Value);
-        }
 
         var grouped = filtered
             .GroupBy(o => o.StageId)

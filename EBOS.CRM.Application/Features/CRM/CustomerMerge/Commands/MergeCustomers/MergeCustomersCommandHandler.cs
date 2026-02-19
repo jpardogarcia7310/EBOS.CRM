@@ -71,28 +71,23 @@ public class MergeCustomersCommandHandler(
 
             winnerUpdated = await MergeGoldenRecordAsync(winner, winnerType, mergeIds, cancellationToken);
 
-            var addresses = (await customerAddressRepository.GetAllAsync(cancellationToken))
-                .Where(a => customerIds.Contains(a.CustomerId))
+            var addresses = (await customerAddressRepository.GetByCustomerIdsAsync(mergeRequest.TenantId, customerIds.ToList(), cancellationToken))
                 .ToList();
 
-            var preferences = (await customerPreferenceRepository.GetAllAsync(cancellationToken))
-                .Where(p => customerIds.Contains(p.CustomerId))
+            var preferences = (await customerPreferenceRepository.GetByCustomerIdsAsync(mergeRequest.TenantId, customerIds.ToList(), cancellationToken))
                 .ToList();
 
-            var consents = (await customerConsentRepository.GetAllAsync(cancellationToken))
-                .Where(c => customerIds.Contains(c.CustomerId))
+            var consents = (await customerConsentRepository.GetByCustomerIdsAsync(mergeRequest.TenantId, customerIds.ToList(), cancellationToken))
                 .ToList();
 
-            var accountContacts = (await accountContactRepository.GetAllAsync(cancellationToken))
-                .Where(ac => customerIds.Contains(ac.CorporateCustomerId) || customerIds.Contains(ac.IndividualCustomerId))
+            var accountContacts = (await accountContactRepository.GetByCustomerIdsAsync(mergeRequest.TenantId, customerIds.ToList(), cancellationToken))
                 .ToList();
 
             var accountContactIds = accountContacts
                 .Select(ac => ac.Id)
                 .ToHashSet();
 
-            var contactRoles = (await accountContactRoleRepository.GetAllAsync(cancellationToken))
-                .Where(role => accountContactIds.Contains(role.AccountContactId))
+            var contactRoles = (await accountContactRoleRepository.GetByAccountContactIdsAsync(mergeRequest.TenantId, accountContactIds.ToList(), cancellationToken))
                 .ToList();
 
             await MergeCustomerAddressesAsync(winner.Id, mergeIds, addresses, cancellationToken);
