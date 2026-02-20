@@ -1,5 +1,7 @@
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
 using Moq;
@@ -93,7 +95,11 @@ public class UpdateCustomerCommandValidatorTest
         validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
-        return new UpdateCustomerCommandValidator(validationCatalog.Object);
+        var countryRepository = new Mock<ICountryRepository>();
+        countryRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country)null!);
+
+        return new UpdateCustomerCommandValidator(validationCatalog.Object, countryRepository.Object);
     }
 }
 

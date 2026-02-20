@@ -117,10 +117,20 @@ public class UpdateCorporateCustomerCommandValidatorTest
     private static UpdateCorporateCustomerCommandValidator CreateValidator()
     {
         var countryRepo = new Mock<ICountryRepository>();
-        countryRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Country>
+        countryRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Country
             {
-                new() { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" }
+                Id = 1,
+                Iso31661A2Code = "EC",
+                Name = "Ecuador",
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1,
+                Currency = "USD",
+                CurrencyCode = "USD",
+                Domain = ".ec",
+                InternationalPhoneCode = "593",
+                Iso31661A3Code = "ECU",
+                Iso31661NumCode = "218"
             });
 
         var validationCatalog = new Mock<IValidationCatalogService>();

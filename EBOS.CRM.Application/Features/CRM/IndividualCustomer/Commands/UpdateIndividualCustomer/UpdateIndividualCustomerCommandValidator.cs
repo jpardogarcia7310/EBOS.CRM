@@ -8,12 +8,15 @@ namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIn
 
 public class UpdateIndividualCustomerCommandValidator : AbstractValidator<UpdateIndividualCustomerCommand>
 {
+    private readonly ICountryRepository _countryRepository;
     private readonly IIdentificationTypeRepository _identificationTypeRepository;
     private readonly IValidationCatalogService _validationCatalog;
 
-    public UpdateIndividualCustomerCommandValidator(IIdentificationTypeRepository identificationTypeRepository,
+    public UpdateIndividualCustomerCommandValidator(ICountryRepository countryRepository,
+        IIdentificationTypeRepository identificationTypeRepository,
         IValidationCatalogService validationCatalog)
     {
+        _countryRepository = countryRepository;
         _identificationTypeRepository = identificationTypeRepository;
         _validationCatalog = validationCatalog;
 
@@ -39,6 +42,14 @@ public class UpdateIndividualCustomerCommandValidator : AbstractValidator<Update
         RuleFor(x => x.IndividualCustomerRequest)
             .MustAsync(PhoneMatchesDefaultAsync)
             .WithMessage("Phone does not match the configured mask.");
+
+        When(x => x.IndividualCustomerRequest.CountryId.HasValue, () =>
+        {
+            RuleFor(x => x.IndividualCustomerRequest.CountryId!.Value).GreaterThan(0);
+            RuleFor(x => x.IndividualCustomerRequest.CountryId!.Value)
+                .MustAsync(CountryExistsAsync)
+                .WithMessage("CountryId does not exist.");
+        });
     }
 
     private async Task<bool> IdentificationTypeExistsAsync(long id, CancellationToken cancellationToken)
@@ -79,14 +90,42 @@ public class UpdateIndividualCustomerCommandValidator : AbstractValidator<Update
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
-            cancellationToken);
+        var pattern = await GetPhonePatternAsync(request.CountryId, cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
         return Regex.IsMatch(request.Phone, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+    }
+
+    private async Task<string?> GetPhonePatternAsync(long? countryId, CancellationToken cancellationToken)
+    {
+        if (countryId.HasValue && countryId.Value > 0)
+        {
+            var country = await _countryRepository.GetByIdAsync(countryId.Value, cancellationToken);
+            var iso2 = country?.Iso31661A2Code;
+            if (!string.IsNullOrWhiteSpace(iso2))
+            {
+                var countryPattern = await _validationCatalog.GetPatternAsync(
+                    ValidationRuleKeys.Phone(iso2.ToUpperInvariant()),
+                    cancellationToken);
+                if (!string.IsNullOrWhiteSpace(countryPattern))
+                {
+                    return countryPattern;
+                }
+            }
+        }
+
+        return await _validationCatalog.GetPatternAsync(
+            ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+    }
+
+    private async Task<bool> CountryExistsAsync(long countryId, CancellationToken cancellationToken)
+    {
+        var entity = await _countryRepository.GetByIdAsync(countryId, cancellationToken);
+        return entity != null;
     }
 }
 

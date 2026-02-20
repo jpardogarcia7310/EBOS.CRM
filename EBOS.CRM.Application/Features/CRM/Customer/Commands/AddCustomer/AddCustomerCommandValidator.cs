@@ -1,5 +1,6 @@
 using EBOS.CRM.Application.Features.CRM.CustomerMerge;
 using EBOS.CRM.Application.Validation;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
 using System.Text.RegularExpressions;
@@ -9,10 +10,12 @@ namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
 public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
 {
     private readonly IValidationCatalogService _validationCatalog;
+    private readonly ICountryRepository _countryRepository;
 
-    public AddCustomerCommandValidator(IValidationCatalogService validationCatalog)
+    public AddCustomerCommandValidator(IValidationCatalogService validationCatalog, ICountryRepository countryRepository)
     {
         _validationCatalog = validationCatalog;
+        _countryRepository = countryRepository;
 
         RuleFor(x => x.CustomerRequest).NotNull();
         When(x => x.CustomerRequest != null, () =>
@@ -31,12 +34,20 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
                 .Matches(CustomerDedupeValidationRules.DigitsPattern);
 
             RuleFor(x => x.CustomerRequest)
-                .MustAsync(PhoneMatchesDefaultAsync)
+                .MustAsync(PhoneMatchesAsync)
                 .WithMessage("Phone does not match the configured mask.");
+
+            When(x => x.CustomerRequest.CountryId.HasValue, () =>
+            {
+                RuleFor(x => x.CustomerRequest.CountryId!.Value).GreaterThan(0);
+                RuleFor(x => x.CustomerRequest.CountryId!.Value)
+                    .MustAsync(CountryExistsAsync)
+                    .WithMessage("CountryId does not exist.");
+            });
         });
     }
 
-    private async Task<bool> PhoneMatchesDefaultAsync(global::EBOS.CRM.Contracts.Requests.CRM.Customer.AddCustomerRequest request,
+    private async Task<bool> PhoneMatchesAsync(global::EBOS.CRM.Contracts.Requests.CRM.Customer.AddCustomerRequest request,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Phone))
@@ -44,14 +55,42 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
-            cancellationToken);
+        var pattern = await GetPhonePatternAsync(request.CountryId, cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
         return Regex.IsMatch(request.Phone, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+    }
+
+    private async Task<string?> GetPhonePatternAsync(long? countryId, CancellationToken cancellationToken)
+    {
+        if (countryId.HasValue && countryId.Value > 0)
+        {
+            var country = await _countryRepository.GetByIdAsync(countryId.Value, cancellationToken);
+            var iso2 = country?.Iso31661A2Code;
+            if (!string.IsNullOrWhiteSpace(iso2))
+            {
+                var countryPattern = await _validationCatalog.GetPatternAsync(
+                    ValidationRuleKeys.Phone(iso2.ToUpperInvariant()),
+                    cancellationToken);
+                if (!string.IsNullOrWhiteSpace(countryPattern))
+                {
+                    return countryPattern;
+                }
+            }
+        }
+
+        return await _validationCatalog.GetPatternAsync(
+            ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+    }
+
+    private async Task<bool> CountryExistsAsync(long countryId, CancellationToken cancellationToken)
+    {
+        var entity = await _countryRepository.GetByIdAsync(countryId, cancellationToken);
+        return entity != null;
     }
 }
 

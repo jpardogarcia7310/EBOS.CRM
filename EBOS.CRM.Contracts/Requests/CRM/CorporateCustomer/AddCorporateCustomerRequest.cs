@@ -7,5 +7,6 @@ public record AddCorporateCustomerRequest(
     string Phone,
     long StatusId,
     string LegalName,
-    string TaxIdentification
+    string TaxIdentification,
+    long? CountryId = null
 );

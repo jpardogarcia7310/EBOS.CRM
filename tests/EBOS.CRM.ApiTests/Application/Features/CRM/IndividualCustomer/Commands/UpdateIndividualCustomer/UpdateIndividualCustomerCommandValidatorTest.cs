@@ -37,6 +37,23 @@ public class UpdateIndividualCustomerCommandValidatorTest
 
     private static UpdateIndividualCustomerCommandValidator CreateValidator()
     {
+        var countryRepo = new Mock<ICountryRepository>();
+        countryRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Country
+            {
+                Id = 1,
+                Iso31661A2Code = "EC",
+                Name = "Ecuador",
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1,
+                Currency = "USD",
+                CurrencyCode = "USD",
+                Domain = ".ec",
+                InternationalPhoneCode = "593",
+                Iso31661A3Code = "ECU",
+                Iso31661NumCode = "218"
+            });
+
         var identificationRepo = new Mock<IIdentificationTypeRepository>();
         identificationRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new IdentificationType { Id = 1, Code = "DNI", Description = "DNI", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null, Erased = false });
@@ -45,7 +62,7 @@ public class UpdateIndividualCustomerCommandValidatorTest
         validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
-        return new UpdateIndividualCustomerCommandValidator(identificationRepo.Object, validationCatalog.Object);
+        return new UpdateIndividualCustomerCommandValidator(countryRepo.Object, identificationRepo.Object, validationCatalog.Object);
     }
 }
 

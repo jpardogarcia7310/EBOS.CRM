@@ -45,8 +45,16 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
                 .WithMessage("TaxIdentification does not match the configured country mask.");
 
             RuleFor(x => x.CorporateCustomerRequest)
-                .MustAsync(PhoneMatchesDefaultAsync)
+                .MustAsync(PhoneMatchesAsync)
                 .WithMessage("Phone does not match the configured mask.");
+
+            When(x => x.CorporateCustomerRequest.CountryId.HasValue, () =>
+            {
+                RuleFor(x => x.CorporateCustomerRequest.CountryId!.Value).GreaterThan(0);
+                RuleFor(x => x.CorporateCustomerRequest.CountryId!.Value)
+                    .MustAsync(CountryExistsAsync)
+                    .WithMessage("CountryId does not exist.");
+            });
         });
     }
 
@@ -58,8 +66,7 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.TaxId(ValidationRuleKeys.DefaultCountryKey),
-            cancellationToken);
+        var pattern = await GetTaxIdPatternAsync(request.CountryId, cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
@@ -68,7 +75,7 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
         return Regex.IsMatch(request.TaxIdentification, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 
-    private async Task<bool> PhoneMatchesDefaultAsync(global::EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer.AddCorporateCustomerRequest request,
+    private async Task<bool> PhoneMatchesAsync(global::EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer.AddCorporateCustomerRequest request,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Phone))
@@ -76,14 +83,65 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
-            cancellationToken);
+        var pattern = await GetPhonePatternAsync(request.CountryId, cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
             return true;
         }
 
         return Regex.IsMatch(request.Phone, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+    }
+
+    private async Task<string?> GetTaxIdPatternAsync(long? countryId, CancellationToken cancellationToken)
+    {
+        if (countryId.HasValue && countryId.Value > 0)
+        {
+            var country = await _countryRepository.GetByIdAsync(countryId.Value, cancellationToken);
+            var iso2 = country?.Iso31661A2Code;
+            if (!string.IsNullOrWhiteSpace(iso2))
+            {
+                var countryPattern = await _validationCatalog.GetPatternAsync(
+                    ValidationRuleKeys.TaxId(iso2.ToUpperInvariant()),
+                    cancellationToken);
+                if (!string.IsNullOrWhiteSpace(countryPattern))
+                {
+                    return countryPattern;
+                }
+            }
+        }
+
+        return await _validationCatalog.GetPatternAsync(
+            ValidationRuleKeys.TaxId(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+    }
+
+    private async Task<string?> GetPhonePatternAsync(long? countryId, CancellationToken cancellationToken)
+    {
+        if (countryId.HasValue && countryId.Value > 0)
+        {
+            var country = await _countryRepository.GetByIdAsync(countryId.Value, cancellationToken);
+            var iso2 = country?.Iso31661A2Code;
+            if (!string.IsNullOrWhiteSpace(iso2))
+            {
+                var countryPattern = await _validationCatalog.GetPatternAsync(
+                    ValidationRuleKeys.Phone(iso2.ToUpperInvariant()),
+                    cancellationToken);
+                if (!string.IsNullOrWhiteSpace(countryPattern))
+                {
+                    return countryPattern;
+                }
+            }
+        }
+
+        return await _validationCatalog.GetPatternAsync(
+            ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+    }
+
+    private async Task<bool> CountryExistsAsync(long countryId, CancellationToken cancellationToken)
+    {
+        var entity = await _countryRepository.GetByIdAsync(countryId, cancellationToken);
+        return entity != null;
     }
 }
 
