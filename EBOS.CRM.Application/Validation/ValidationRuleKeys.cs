@@ -8,4 +8,5 @@ public static class ValidationRuleKeys
     public static string Phone(string iso2) => $"phone:{iso2}";
     public static string TaxId(string iso2) => $"tax_id:{iso2}";
     public static string Identification(string typeCode) => $"id:{typeCode}";
+    public static string Channel(string iso2) => $"channel:{iso2}";
 }

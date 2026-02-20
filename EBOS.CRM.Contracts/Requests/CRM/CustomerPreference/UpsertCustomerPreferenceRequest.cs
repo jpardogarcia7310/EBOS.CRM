@@ -4,5 +4,6 @@ public record UpsertCustomerPreferenceRequest(
     long TenantId,
     long CustomerId,
     long ChannelId,
-    bool Preferred
+    bool Preferred,
+    long? CountryId = null
 );
