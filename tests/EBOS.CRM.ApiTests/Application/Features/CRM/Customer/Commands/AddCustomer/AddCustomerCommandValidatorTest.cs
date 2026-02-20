@@ -1,12 +1,14 @@
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Customer.Commands.AddCustomer;
 
 public class AddCustomerCommandValidatorTest
 {
-    private readonly AddCustomerCommandValidator _validator = new();
+    private readonly AddCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_ValidRequest_Passes()
@@ -83,6 +85,15 @@ public class AddCustomerCommandValidatorTest
             Phone: "123",
             StatusId: 1
         );
+
+    private static AddCustomerCommandValidator CreateValidator()
+    {
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddCustomerCommandValidator(validationCatalog.Object);
+    }
 }
 
 

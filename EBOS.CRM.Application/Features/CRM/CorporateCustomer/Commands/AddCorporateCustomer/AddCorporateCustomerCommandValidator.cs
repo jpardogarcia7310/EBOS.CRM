@@ -43,6 +43,10 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
             RuleFor(x => x.CorporateCustomerRequest)
                 .MustAsync(TaxIdentificationMatchesCountryAsync)
                 .WithMessage("TaxIdentification does not match the configured country mask.");
+
+            RuleFor(x => x.CorporateCustomerRequest)
+                .MustAsync(PhoneMatchesDefaultAsync)
+                .WithMessage("Phone does not match the configured mask.");
         });
     }
 
@@ -54,7 +58,7 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.TaxId(ValidationRuleKeys.DefaultCountryKey),
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.TaxId(ValidationRuleKeys.DefaultCountryKey),
             cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
@@ -62,6 +66,24 @@ public class AddCorporateCustomerCommandValidator : AbstractValidator<AddCorpora
         }
 
         return Regex.IsMatch(request.TaxIdentification, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+    }
+
+    private async Task<bool> PhoneMatchesDefaultAsync(global::EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer.AddCorporateCustomerRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Phone))
+        {
+            return true;
+        }
+
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            return true;
+        }
+
+        return Regex.IsMatch(request.Phone, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

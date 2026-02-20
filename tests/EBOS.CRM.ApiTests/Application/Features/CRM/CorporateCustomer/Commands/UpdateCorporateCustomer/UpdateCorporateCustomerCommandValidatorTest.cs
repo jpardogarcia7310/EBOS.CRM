@@ -124,11 +124,12 @@ public class UpdateCorporateCustomerCommandValidatorTest
             });
 
         var validationCatalog = new Mock<IValidationCatalogService>();
-        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         return new UpdateCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
     }
 }
+
 
 

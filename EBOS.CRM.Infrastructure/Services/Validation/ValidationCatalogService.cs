@@ -15,22 +15,22 @@ public class ValidationCatalogService : IValidationCatalogService
         _cache = cache;
     }
 
-    public async Task<string?> GetPatternAsync(long tenantId, string key, CancellationToken cancellationToken = default)
+    public async Task<string?> GetPatternAsync(string key, CancellationToken cancellationToken = default)
     {
-        if (tenantId <= 0 || string.IsNullOrWhiteSpace(key))
+        if (string.IsNullOrWhiteSpace(key))
         {
             return null;
         }
 
         var normalizedKey = key.Trim();
-        var cacheKey = $"validation_rule:{tenantId}:{normalizedKey}";
+        var cacheKey = $"validation_rule:{normalizedKey}";
 
         if (_cache.TryGetValue(cacheKey, out string? cached))
         {
             return cached;
         }
 
-        var rules = await _repository.GetByKeysAsync(tenantId, new[] { normalizedKey }, cancellationToken);
+        var rules = await _repository.GetByKeysAsync(new[] { normalizedKey }, cancellationToken);
         var pattern = rules.FirstOrDefault()?.Pattern;
 
         _cache.Set(cacheKey, pattern, TimeSpan.FromMinutes(10));

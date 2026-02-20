@@ -34,6 +34,10 @@ public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndivi
         RuleFor(x => x.IndividualCustomerRequest)
             .MustAsync(IdentificationNumberMatchesTypeAsync)
             .WithMessage("IdentificationNumber does not match the configured mask.");
+
+        RuleFor(x => x.IndividualCustomerRequest)
+            .MustAsync(PhoneMatchesDefaultAsync)
+            .WithMessage("Phone does not match the configured mask.");
     }
 
     private async Task<bool> IdentificationTypeExistsAsync(long id, CancellationToken cancellationToken)
@@ -56,7 +60,7 @@ public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndivi
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.Identification(type.Code),
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Identification(type.Code),
             cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {
@@ -64,6 +68,24 @@ public class AddIndividualCustomerCommandValidator : AbstractValidator<AddIndivi
         }
 
         return Regex.IsMatch(request.IdentificationNumber, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+    }
+
+    private async Task<bool> PhoneMatchesDefaultAsync(global::EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer.AddIndividualCustomerRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Phone))
+        {
+            return true;
+        }
+
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Phone(ValidationRuleKeys.DefaultCountryKey),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            return true;
+        }
+
+        return Regex.IsMatch(request.Phone, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

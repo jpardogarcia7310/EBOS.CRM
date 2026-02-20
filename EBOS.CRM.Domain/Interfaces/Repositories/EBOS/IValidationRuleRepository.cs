@@ -5,6 +5,6 @@ namespace EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 public interface IValidationRuleRepository : IReadOnlyPagedRepository<ValidationRule>
 {
-    Task<IReadOnlyCollection<ValidationRule>> GetByKeysAsync(long tenantId, IReadOnlyCollection<string> keys,
+    Task<IReadOnlyCollection<ValidationRule>> GetByKeysAsync(IReadOnlyCollection<string> keys,
         CancellationToken cancellationToken = default);
 }

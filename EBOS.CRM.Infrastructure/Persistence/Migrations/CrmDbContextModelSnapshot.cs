@@ -1564,9 +1564,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1604,9 +1601,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "Key")
+                    b.HasIndex("Key")
                         .IsUnique()
-                        .HasDatabaseName("UX_ValidationRule_TenantId_Key");
+                        .HasDatabaseName("UX_ValidationRule_Key");
 
                     b.ToTable("ValidationRules", "EBOS");
                 });

@@ -1,11 +1,9 @@
 using EBOS.Core.Primitives;
-using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.EBOS;
 
-public class ValidationRule : ErasableEntity, ITenantScopedEntity
+public class ValidationRule : ErasableEntity
 {
-    public long TenantId { get; set; }
     public string Key { get; set; } = null!; // e.g. "postal_code:EC", "tax_id:DEFAULT", "id:DNI"
     public string Pattern { get; set; } = null!;
     public string? Description { get; set; }

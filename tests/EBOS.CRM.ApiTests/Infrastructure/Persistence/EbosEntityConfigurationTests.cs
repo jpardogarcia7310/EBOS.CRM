@@ -138,6 +138,24 @@ public class EbosEntityConfigurationTests
         AssertIndexes(entity, "IX_TenantUsageMetric_TenantId", "IX_TenantUsageMetric_TenantId_Metric_PeriodStart");
     }
 
+    [Fact]
+    public void ValidationRule_Config_Is_Correct()
+    {
+        using var context = CreateContext();
+        var entity = GetEntityType<ValidationRule>(context);
+
+        AssertTable(entity, "ValidationRules", "EBOS");
+        AssertProperty(entity, "Key", required: true, maxLength: 100);
+        AssertProperty(entity, "Pattern", required: true, maxLength: 400);
+        AssertProperty(entity, "Description", required: false, maxLength: 200);
+        AssertProperty(entity, "IsActive", required: true);
+        AssertProperty(entity, "CreatedAt", required: true);
+        AssertProperty(entity, "CreatedBy", required: true);
+        AssertProperty(entity, "Erased", required: true);
+
+        AssertIndexes(entity, "UX_ValidationRule_Key");
+    }
+
     private static IEntityType GetEntityType<T>(DbContext context)
     {
         var model = context.GetService<IDesignTimeModel>().Model;

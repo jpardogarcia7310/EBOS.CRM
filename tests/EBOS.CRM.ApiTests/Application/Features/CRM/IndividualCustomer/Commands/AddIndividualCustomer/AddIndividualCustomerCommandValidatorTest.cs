@@ -42,11 +42,12 @@ public class AddIndividualCustomerCommandValidatorTest
             .ReturnsAsync(new IdentificationType { Id = 1, Code = "DNI", Description = "DNI", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null, Erased = false });
 
         var validationCatalog = new Mock<IValidationCatalogService>();
-        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         return new AddIndividualCustomerCommandValidator(identificationRepo.Object, validationCatalog.Object);
     }
 }
+
 
 

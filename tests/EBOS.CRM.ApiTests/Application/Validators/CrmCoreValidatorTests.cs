@@ -65,7 +65,7 @@ public class CrmCoreValidatorTests
     [Fact]
     public void AddCustomer_Validates_All_Fields()
     {
-        var validator = new AddCustomerCommandValidator();
+        var validator = CreateCustomerValidator();
         var request = new AddCustomerRequest(1, "CUST", "a@b.com", "123456", 1);
         validator.Validate(new AddCustomerCommand(request)).IsValid.Should().BeTrue();
 
@@ -206,7 +206,7 @@ public class CrmCoreValidatorTests
             .ReturnsAsync(new AddressType { Id = 1, Code = "HOME", Description = "Home", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null });
 
         var validationCatalog = new Mock<IValidationCatalogService>();
-        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, validationCatalog.Object);
@@ -222,7 +222,7 @@ public class CrmCoreValidatorTests
             });
 
         var validationCatalog = new Mock<IValidationCatalogService>();
-        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         return new AddCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
@@ -235,9 +235,19 @@ public class CrmCoreValidatorTests
             .ReturnsAsync(new IdentificationType { Id = 1, Code = "DNI", Description = "DNI", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null, Erased = false });
 
         var validationCatalog = new Mock<IValidationCatalogService>();
-        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string?)null);
 
         return new AddIndividualCustomerCommandValidator(identificationRepo.Object, validationCatalog.Object);
     }
+
+    private static AddCustomerCommandValidator CreateCustomerValidator()
+    {
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddCustomerCommandValidator(validationCatalog.Object);
+    }
 }
+

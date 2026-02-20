@@ -117,7 +117,7 @@ public class AddAddressCommandValidator : AbstractValidator<AddAddressCommand>
             return true;
         }
 
-        var pattern = await _validationCatalog.GetPatternAsync(request.TenantId, ValidationRuleKeys.PostalCode(iso2),
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.PostalCode(iso2),
             cancellationToken);
         if (string.IsNullOrWhiteSpace(pattern))
         {

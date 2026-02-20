@@ -35,7 +35,7 @@ public class ValidationRuleRepository(CrmDbContext context) : IValidationRuleRep
     public IQueryable<ValidationRule> AsQueryable(bool includeErased = false)
         => includeErased ? _dbSet.AsQueryable() : _dbSet.AsQueryable().Where(r => !r.Erased);
 
-    public async Task<IReadOnlyCollection<ValidationRule>> GetByKeysAsync(long tenantId, IReadOnlyCollection<string> keys,
+    public async Task<IReadOnlyCollection<ValidationRule>> GetByKeysAsync(IReadOnlyCollection<string> keys,
         CancellationToken cancellationToken = default)
     {
         if (keys.Count == 0)
@@ -44,7 +44,7 @@ public class ValidationRuleRepository(CrmDbContext context) : IValidationRuleRep
         }
 
         return await _dbSet.AsNoTracking()
-            .Where(r => !r.Erased && r.IsActive && r.TenantId == tenantId && keys.Contains(r.Key))
+            .Where(r => !r.Erased && r.IsActive && keys.Contains(r.Key))
             .ToListAsync(cancellationToken);
     }
 }

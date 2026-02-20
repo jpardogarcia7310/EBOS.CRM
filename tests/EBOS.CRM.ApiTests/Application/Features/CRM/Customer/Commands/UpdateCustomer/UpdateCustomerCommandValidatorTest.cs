@@ -1,12 +1,14 @@
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Customer.Commands.UpdateCustomer;
 
 public class UpdateCustomerCommandValidatorTest
 {
-    private readonly UpdateCustomerCommandValidator _validator = new();
+    private readonly UpdateCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_InvalidId_Fails()
@@ -84,6 +86,15 @@ public class UpdateCustomerCommandValidatorTest
             Phone: "123",
             StatusId: 1
         );
+
+    private static UpdateCustomerCommandValidator CreateValidator()
+    {
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new UpdateCustomerCommandValidator(validationCatalog.Object);
+    }
 }
 
 

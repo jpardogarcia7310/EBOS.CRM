@@ -11,7 +11,6 @@ public class ValidationRuleConfiguration : IEntityTypeConfiguration<ValidationRu
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-        builder.Property(x => x.TenantId).IsRequired();
         builder.Property(x => x.Key).IsRequired().HasMaxLength(100);
         builder.Property(x => x.Pattern).IsRequired().HasMaxLength(400);
         builder.Property(x => x.Description).HasMaxLength(200);
@@ -22,8 +21,8 @@ public class ValidationRuleConfiguration : IEntityTypeConfiguration<ValidationRu
         builder.Property(x => x.UpdatedBy);
         builder.Property(x => x.Erased).IsRequired();
 
-        builder.HasIndex(x => new { x.TenantId, x.Key })
+        builder.HasIndex(x => x.Key)
             .IsUnique()
-            .HasDatabaseName("UX_ValidationRule_TenantId_Key");
+            .HasDatabaseName("UX_ValidationRule_Key");
     }
 }
