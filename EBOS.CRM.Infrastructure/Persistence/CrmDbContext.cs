@@ -29,6 +29,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
     public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
     public DbSet<Case> Cases => Set<Case>();
+    public DbSet<ChannelCountry> ChannelCountries => Set<ChannelCountry>();
     public DbSet<ChannelType> ChannelTypes => Set<ChannelType>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
     public DbSet<Country> Countries => Set<Country>();

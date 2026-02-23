@@ -1,24 +1,22 @@
-using EBOS.CRM.Application.Validation;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
-using System.Text.RegularExpressions;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPreference.Commands.UpsertCustomerPreference;
 
 public class UpsertCustomerPreferenceCommandValidator : AbstractValidator<UpsertCustomerPreferenceCommand>
 {
+    private readonly IChannelCountryRepository _channelCountryRepository;
     private readonly IChannelTypeRepository _channelTypeRepository;
     private readonly ICountryRepository _countryRepository;
-    private readonly IValidationCatalogService _validationCatalog;
 
-    public UpsertCustomerPreferenceCommandValidator(IChannelTypeRepository channelTypeRepository,
-        ICountryRepository countryRepository,
-        IValidationCatalogService validationCatalog)
+    public UpsertCustomerPreferenceCommandValidator(IChannelCountryRepository channelCountryRepository,
+        IChannelTypeRepository channelTypeRepository,
+        ICountryRepository countryRepository)
     {
+        _channelCountryRepository = channelCountryRepository;
         _channelTypeRepository = channelTypeRepository;
         _countryRepository = countryRepository;
-        _validationCatalog = validationCatalog;
 
         RuleFor(x => x.PreferenceRequest).NotNull();
         When(x => x.PreferenceRequest != null, () =>
@@ -65,19 +63,6 @@ public class UpsertCustomerPreferenceCommandValidator : AbstractValidator<Upsert
             return true;
         }
 
-        var country = await _countryRepository.GetByIdAsync(request.CountryId.Value, cancellationToken);
-        var iso2 = country?.Iso31661A2Code;
-        if (string.IsNullOrWhiteSpace(iso2))
-        {
-            return true;
-        }
-
-        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.Channel(iso2.ToUpperInvariant()), cancellationToken);
-        if (string.IsNullOrWhiteSpace(pattern))
-        {
-            return true;
-        }
-
-        return Regex.IsMatch(request.ChannelId.ToString(), pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
+        return await _channelCountryRepository.IsAllowedAsync(request.ChannelId, request.CountryId.Value, cancellationToken);
     }
 }

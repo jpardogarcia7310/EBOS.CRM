@@ -74,6 +74,7 @@ public static class DependencyInjection
         services.AddScoped<ICaseRepository, CaseRepository>();
         services.AddScoped<ICaseRoutingService, CaseRoutingService>();
         services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
+        services.AddScoped<IChannelCountryRepository, ChannelCountryRepository>();
         services.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
         services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();

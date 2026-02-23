@@ -12,4 +12,5 @@ public class ChannelType : BaseEntity
     public long UpdatedBy { get; set; }
 
     public ICollection<CRM.CustomerPreference> CustomerPreferences { get; set; } = new List<CRM.CustomerPreference>();
+    public ICollection<ChannelCountry> ChannelCountries { get; set; } = new List<ChannelCountry>();
 }
