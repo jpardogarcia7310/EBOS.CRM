@@ -1,11 +1,12 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.AccountHierarchy.Queries.GetAccountHierarchyById;
 
-public class GetAccountHierarchyByIdQueryHandler(IAccountHierarchyRepository repository, IMapper mapper)
+public class GetAccountHierarchyByIdQueryHandler(IAccountHierarchyRepository repository, ITenantContext tenantContext, IMapper mapper)
     : IRequestHandler<GetAccountHierarchyByIdQuery, AccountHierarchyResponse?>
 {
     public async Task<AccountHierarchyResponse?> Handle(GetAccountHierarchyByIdQuery request, CancellationToken cancellationToken)
@@ -13,6 +14,11 @@ public class GetAccountHierarchyByIdQueryHandler(IAccountHierarchyRepository rep
         cancellationToken.ThrowIfCancellationRequested();
 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
+        if (entity is not null && tenantContext.TenantId > 0 && entity.TenantId != tenantContext.TenantId)
+        {
+            throw new InvalidOperationException("Account hierarchy tenant mismatch.");
+        }
+
         return entity is null ? null : mapper.Map<AccountHierarchyResponse>(entity);
     }
 }

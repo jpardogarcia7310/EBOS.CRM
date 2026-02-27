@@ -37,7 +37,7 @@ public class RevokeCustomerConsentCommandHandler(
             existing.ConsentType,
             entityRequest.RevokedAt,
             existing.Source,
-            existing.ExpiresAt);
+            entityRequest.RevokedAt);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
