@@ -3,6 +3,30 @@
 Concrete work items aligned with the current local structure (Clean Architecture, CRM module under `EBOS.CRM.*`).
 Focus: Customer 360 aggregates, commands/queries, endpoints, and tests.
 
+Mini TOC:
+1. [Scope](#scope-customer-360)
+2. [Domain](#domain-eboscrmdomain)
+3. [Aggregates and entities](#aggregates-and-entities)
+4. [Interfaces](#interfaces-repositories)
+5. [Invariants](#invariants)
+6. [Application](#application-eboscrmapplication)
+7. [Contracts](#contracts-requestsresponses)
+8. [Features](#features-commandsqueries)
+9. [Mapping](#mapping)
+10. [Validation](#validation)
+11. [ConsentType Catalog](#consenttype-catalog-reference)
+12. [API](#api-eboscrmapi)
+13. [Controllers](#controllers)
+14. [Endpoints](#endpoints-v2)
+15. [Infrastructure](#infrastructure-eboscrminfrastructure)
+16. [Tests](#tests)
+17. [Domain tests](#domain-tests)
+18. [Application tests](#application-tests)
+19. [Controller tests](#controller-tests)
+20. [Integration tests](#integration-tests)
+21. [Mapping tests](#mapping-tests)
+22. [Existing test suites reference](#existing-test-suites-reference)
+
 ## Scope (Customer 360)
 
 - Accounts (corporate customers) and individuals.
@@ -62,6 +86,81 @@ Focus: Customer 360 aggregates, commands/queries, endpoints, and tests.
 - Only one primary address per customer (CustomerAddress.IsPrimary).
 - Account hierarchy cannot create cycles (Parent != Child, no loops).
 - Consent history is append-only (do not overwrite; add new record).
+  - Expire convention (explicit via AddCustomerConsent):
+    - Use `Granted = false` with `ExpiresAt == GrantedAt` to record an expiration event.
+    - This creates a new consent event (append-only) and marks the consent as not granted.
+    - Re-grant is a separate event with `Granted = true` (also append-only).
+    - Example payloads:
+      - Grant:
+        ```
+        {
+          "tenantId": 1,
+          "customerId": 1001,
+          "consentType": "MARKETING_EMAIL",
+          "granted": true,
+          "grantedAt": "2026-02-27T10:15:00Z",
+          "source": "web-form",
+          "expiresAt": null
+        }
+        ```
+      - Expire:
+        ```
+        {
+          "tenantId": 1,
+          "customerId": 1001,
+          "consentType": "MARKETING_EMAIL",
+          "granted": false,
+          "grantedAt": "2026-03-01T00:00:00Z",
+          "source": "policy-expiration",
+          "expiresAt": "2026-03-01T00:00:00Z"
+        }
+        ```
+      - Re-grant:
+        ```
+        {
+          "tenantId": 1,
+          "customerId": 1001,
+          "consentType": "MARKETING_EMAIL",
+          "granted": true,
+          "grantedAt": "2026-03-10T09:30:00Z",
+          "source": "call-center",
+          "expiresAt": null
+        }
+        ```
+      - Revoke:
+        ```
+        {
+          "tenantId": 1,
+          "customerId": 1001,
+          "consentType": "MARKETING_EMAIL",
+          "granted": false,
+          "grantedAt": "2026-03-15T14:05:00Z",
+          "source": "customer-request",
+          "expiresAt": "2026-03-15T14:05:00Z"
+        }
+        ```
+    - Revoke endpoint note:
+      - `PATCH /api/v2/CustomerConsent/{id}/revoke` is an explicit revoke of an existing consent record.
+      - For a revoke event, use the revoke endpoint. For an expiration event, use `AddCustomerConsent` with
+        `Granted = false` and `ExpiresAt == GrantedAt`.
+    - Summary table:
+      | Action | Granted | ExpiresAt vs GrantedAt | Endpoint | Notes |
+      | --- | --- | --- | --- | --- |
+      | Grant | true | `ExpiresAt` optional (>= GrantedAt) | `POST /api/v2/CustomerConsent` | New consent event |
+      | Re-grant | true | `ExpiresAt` optional (>= GrantedAt) | `POST /api/v2/CustomerConsent` | New consent event after prior revoke/expire |
+      | Expire | false | `ExpiresAt == GrantedAt` (required) | `POST /api/v2/CustomerConsent` | Explicit expiration event |
+      | Revoke | false | `ExpiresAt == GrantedAt` (required) | `PATCH /api/v2/CustomerConsent/{id}/revoke` | Explicit revoke of existing record |
+    - ConsentType naming:
+      - Use stable, uppercase codes with underscores (e.g., `MARKETING_EMAIL`, `PRODUCT_UPDATES_SMS`).
+      - Treat `ConsentType` as a functional key for "latest state" grouping.
+    - Validation rules:
+      - `TenantId > 0`, `CustomerId > 0`.
+      - `ConsentType` required, max length 100.
+      - `Source` required, max length 100.
+      - `GrantedAt` required.
+      - `ExpiresAt` must be null or >= `GrantedAt`.
+      - If `Granted = false`, `ExpiresAt` is required and must equal `GrantedAt`.
+
 
 ## Application (EBOS.CRM.Application)
 
@@ -125,6 +224,20 @@ Structure mirrors current CRM features (e.g. `Features/CRM/Customer/...`), and u
 - Enforce tenant isolation and reference existence (account/customer/contact).
 - Dedupe query should require minimal matching fields (email, phone, tax id, identification number).
 
+### ConsentType Catalog (Reference)
+
+Suggested catalog (by channel):
+- Email: `MARKETING_EMAIL`, `NEWSLETTER_EMAIL`, `PRODUCT_UPDATES_EMAIL`, `SECURITY_ALERTS_EMAIL`.
+- SMS: `MARKETING_SMS`, `PRODUCT_UPDATES_SMS`, `SECURITY_ALERTS_SMS`.
+- Phone: `MARKETING_CALL`, `SERVICE_CALL`, `SURVEYS_CALL`.
+- Push: `PRODUCT_UPDATES_PUSH`, `SECURITY_ALERTS_PUSH`.
+
+Examples by channel:
+- Email: `MARKETING_EMAIL`, `NEWSLETTER_EMAIL`.
+- SMS: `MARKETING_SMS`, `PRODUCT_UPDATES_SMS`.
+- Phone: `SERVICE_CALL`, `SURVEYS_CALL`.
+- Push: `SECURITY_ALERTS_PUSH`.
+
 ## API (EBOS.CRM.Api)
 
 ### Controllers
@@ -181,27 +294,40 @@ Follow existing CRM controllers layout:
 
 ## Tests
 
-### Unit tests (tests/EBOS.CRM.ApiTests)
+### Domain tests
 
-- Command handler tests for new commands (happy path + not found).
-- Validator tests for required fields and tenant scope.
-- Query handler tests for list responses using `IReadOnlyCollection<T>`.
+- AccountContact and AccountContactRole invariants (primary assignment, role lifecycle, valid date windows).
+- AccountHierarchy acyclic and parent-child constraints.
+- CustomerConsent append-only behavior and consent state transitions (grant, revoke, expire, re-grant).
+
+### Application tests
+
+- Command/query handlers for AccountContact, AccountContactRole, AccountHierarchy, CustomerPreference, CustomerConsent, and CustomerMerge.
+- Validation coverage for tenant scope, required references, and dedupe/merge preconditions.
+- Mapping and response-shape behavior for list and detail flows.
 
 ### Controller tests
 
 - CRUD-style endpoints for AccountContact and AccountContactRole.
 - Primary contact enforcement behavior.
 - Account hierarchy end relation behavior.
-- Preference upsert and consent revoke endpoints.
+- Preference upsert and consent revoke/expire conventions.
 
-### Integration tests (tests/EBOS.CRM.IntegrationTests)
+### Integration tests
 
 - End-to-end account contact flow (create account, create individual, link, set primary).
 - Account hierarchy parent/child assignment and tenant isolation.
 - Preferences and consent history across updates.
 - Dedupe and merge scenarios with golden record rules.
 
-### Concurrency/Stress tests
+### Mapping tests
 
-- Add controller-level tests similar to existing CRM entities for AccountContact and AccountHierarchy.
+- Mapping profiles for AccountContact, AccountContactRole, AccountHierarchy, CustomerPreference, CustomerConsent, and CustomerMerge response contracts.
+
+### Existing test suites reference
+
+- `tests/EBOS.CRM.ApiTests`: unit-level and component-level coverage for handlers, validators, mappings, policies, and CRM controllers involved in Customer 360 flows.
+- `tests/EBOS.CRM.ConcurrencyTests`: concurrent access scenarios on CRM endpoints to validate conflict handling, tenant isolation under load, and consistency of state transitions.
+- `tests/EBOS.CRM.IntegrationTests`: end-to-end API + persistence validation for Customer 360 paths (contacts, hierarchies, preferences, consent, merge) with real infrastructure wiring.
+- `tests/EBOS.CRM.StressTests`: high-volume controller stress coverage to validate throughput, response stability, and behavior under sustained pressure.
 

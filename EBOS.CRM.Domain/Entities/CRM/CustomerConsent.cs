@@ -45,6 +45,32 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
         };
     }
 
+    public static CustomerConsent CreateRevoked(long tenantId, long customerId, string consentType, DateTime revokedAt,
+        string source, DateTime? expiresAt)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            throw new InvalidOperationException("Source is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(consentType))
+        {
+            throw new InvalidOperationException("ConsentType is required.");
+        }
+
+        return new CustomerConsent
+        {
+            TenantId = tenantId,
+            CustomerId = customerId,
+            ConsentType = consentType,
+            Granted = false,
+            GrantedAt = revokedAt,
+            Source = source,
+            ExpiresAt = expiresAt,
+            RevokedAt = revokedAt
+        };
+    }
+
     public void Revoke(DateTime revokedAt)
     {
         if (!Granted)

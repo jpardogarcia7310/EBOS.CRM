@@ -22,33 +22,38 @@ public class RevokeCustomerConsentCommandHandler(
         var entityRequest = request.ConsentRequest ??
                             throw new ArgumentNullException(nameof(request.ConsentRequest));
 
-        var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
-        if (entity is null)
+        var existing = await repository.GetByIdAsync(request.Id, cancellationToken);
+        if (existing is null)
             return null;
 
-        if (entity.TenantId != entityRequest.TenantId)
+        if (existing.TenantId != entityRequest.TenantId)
         {
             throw new InvalidOperationException("Customer consent tenant mismatch.");
         }
 
-        var oldValues = AuditSerialization.Serialize(entity);
-        entity.Revoke(entityRequest.RevokedAt);
+        var newEvent = global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.CreateRevoked(
+            existing.TenantId,
+            existing.CustomerId,
+            existing.ConsentType,
+            entityRequest.RevokedAt,
+            existing.Source,
+            existing.ExpiresAt);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            await repository.UpdateAsync(entity, cancellationToken);
+            await repository.AddAsync(newEvent, cancellationToken);
             await repository.SaveChangesAsync(cancellationToken);
 
             var auditRequest = new AuditInsertRequest(
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
-                Action: AuditActions.Update,
+                Action: AuditActions.Add,
                 Entity: nameof(Domain.Entities.CRM.CustomerConsent),
-                RegisterId: entity.Id,
-                OldValues: oldValues,
-                NewValues: AuditSerialization.Serialize(entity),
+                RegisterId: newEvent.Id,
+                OldValues: null,
+                NewValues: AuditSerialization.Serialize(newEvent),
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
@@ -60,6 +65,6 @@ public class RevokeCustomerConsentCommandHandler(
             throw;
         }
 
-        return mapper.Map<CustomerConsentResponse>(entity);
+        return mapper.Map<CustomerConsentResponse>(newEvent);
     }
 }

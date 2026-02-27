@@ -19,5 +19,14 @@ public class AddCustomerConsentCommandValidator : AbstractValidator<AddCustomerC
         RuleFor(x => x.ConsentRequest.ExpiresAt)
             .Must((request, expiresAt) => !expiresAt.HasValue || expiresAt.Value >= request.ConsentRequest.GrantedAt)
             .WithMessage("ExpiresAt cannot be earlier than GrantedAt.");
+
+        When(x => !x.ConsentRequest.Granted, () =>
+        {
+            RuleFor(x => x.ConsentRequest.ExpiresAt)
+                .NotNull()
+                .WithMessage("ExpiresAt is required for expire events.")
+                .Must((request, expiresAt) => expiresAt.HasValue && expiresAt.Value == request.ConsentRequest.GrantedAt)
+                .WithMessage("ExpiresAt must match GrantedAt for expire events.");
+        });
     }
 }

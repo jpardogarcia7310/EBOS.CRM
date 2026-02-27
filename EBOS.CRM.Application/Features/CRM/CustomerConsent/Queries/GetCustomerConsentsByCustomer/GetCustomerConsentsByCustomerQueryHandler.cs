@@ -13,13 +13,13 @@ public class GetCustomerConsentsByCustomerQueryHandler(ICustomerConsentRepositor
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var itemsPage = await repository.GetByCustomerPagedAsync(
+        var itemsPage = await repository.GetLatestByCustomerPagedAsync(
             request.TenantId,
             request.CustomerId,
             request.PageNumber,
             request.PageSize,
             cancellationToken);
-        var total = await repository.CountByCustomerAsync(
+        var total = await repository.CountLatestByCustomerAsync(
             request.TenantId,
             request.CustomerId,
             cancellationToken);
