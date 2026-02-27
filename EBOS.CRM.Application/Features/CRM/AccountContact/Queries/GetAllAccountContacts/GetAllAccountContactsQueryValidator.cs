@@ -6,6 +6,7 @@ public class GetAllAccountContactsQueryValidator : AbstractValidator<GetAllAccou
 {
     public GetAllAccountContactsQueryValidator()
     {
+        RuleFor(x => x.TenantId).GreaterThan(0);
         RuleFor(x => x.PageNumber).GreaterThan(0);
         RuleFor(x => x.PageSize).GreaterThan(0);
     }

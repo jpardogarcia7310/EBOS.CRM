@@ -4,5 +4,5 @@ using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.AccountContact.Queries.GetAllAccountContacts;
 
-public record GetAllAccountContactsQuery(int PageNumber = 1, int PageSize = 50)
+public record GetAllAccountContactsQuery(long TenantId, int PageNumber = 1, int PageSize = 50)
     : IRequest<PagedResult<AccountContactResponse>>;
