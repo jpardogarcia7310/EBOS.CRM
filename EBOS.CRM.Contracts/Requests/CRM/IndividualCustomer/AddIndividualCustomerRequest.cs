@@ -10,5 +10,6 @@ public record AddIndividualCustomerRequest(
     string LastName,
     DateTime BirthDate,
     string? IdentificationNumber,
-    long IdentificationTypeId
+    long IdentificationTypeId,
+    long? CountryId = null
 );

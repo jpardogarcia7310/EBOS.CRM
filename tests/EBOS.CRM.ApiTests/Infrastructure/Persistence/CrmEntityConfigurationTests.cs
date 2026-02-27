@@ -55,6 +55,8 @@ public class CrmEntityConfigurationTests
         AssertProperty(entity, "Code", required: true, maxLength: 50);
         AssertProperty(entity, "Email", required: true, maxLength: 100);
         AssertProperty(entity, "Phone", required: true, maxLength: 12);
+        AssertProperty(entity, "Source", required: false, maxLength: 100);
+        AssertProperty(entity, "Confidentiality", required: false, maxLength: 50);
         AssertProperty(entity, "CreatedAt", required: true);
         AssertProperty(entity, "CreatedBy", required: true);
         AssertProperty(entity, "Erased", required: true);

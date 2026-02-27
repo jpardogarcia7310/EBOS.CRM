@@ -15,7 +15,7 @@ public class GetCustomerByIdQueryHandlerTest
     public async Task Handle_WhenFound_Maps()
     {
         var handler = new GetCustomerByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entity = new EBOS.CRM.Domain.Entities.CRM.Customer();
+        var entity = new global::EBOS.CRM.Domain.Entities.CRM.Customer();
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

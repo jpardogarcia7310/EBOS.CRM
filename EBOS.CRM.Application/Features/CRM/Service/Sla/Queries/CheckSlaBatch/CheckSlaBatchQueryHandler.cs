@@ -18,26 +18,16 @@ public sealed class CheckSlaBatchQueryHandler(
         var safePageNumber = Math.Max(1, payload.PageNumber);
         var safePageSize = Math.Max(1, payload.PageSize);
 
-        var casesAll = await caseRepository.GetAllAsync(cancellationToken);
-        var filteredCases = casesAll
-            .Where(c => c.TenantId == payload.TenantId && c.DueAt != null && c.Status != CaseEntity.StatusClosed)
-            .OrderBy(c => c.Id)
+        var cases = (await caseRepository.GetOpenSlaBatchAsync(payload.TenantId, safePageNumber, safePageSize, cancellationToken))
             .ToList();
-
-        var total = filteredCases.Count;
-        var cases = filteredCases
-            .Skip((safePageNumber - 1) * safePageSize)
-            .Take(safePageSize)
-            .ToList();
+        var total = await caseRepository.CountOpenSlaBatchAsync(payload.TenantId, cancellationToken);
 
         var slaIds = cases
             .Select(c => c.SlaId)
             .Distinct()
             .ToList();
 
-        var slasAll = await slaRepository.GetAllAsync(cancellationToken);
-        var slas = slasAll
-            .Where(s => slaIds.Contains(s.Id))
+        var slas = (await slaRepository.GetByIdsAsync(slaIds, cancellationToken))
             .ToList();
 
         var slaMap = slas.ToDictionary(s => s.Id);

@@ -1,16 +1,39 @@
-# Backlog tecnico Sales MVP
+# Backlog técnico Ventas MVP
 
-Items concretos alineados con la estructura local (Clean Architecture, modulo CRM bajo `EBOS.CRM.*`).
+Items concretos alineados con la estructura local (Clean Architecture, módulo CRM bajo `EBOS.CRM.*`).
+
+Mini TOC:
+1. [Alcance MVP](#alcance-mvp)
+2. [Dominio](#dominio-eboscrmdomain)
+3. [Agregados y entidades](#agregados-y-entidades)
+4. [Interfaces](#interfaces-repositorios)
+5. [Invariantes](#invariantes)
+6. [Aplicación](#aplicacion-eboscrmapplication)
+7. [Contratos](#contratos-solicitudesrespuestas)
+8. [Funcionalidades](#funcionalidades-comandosconsultas)
+9. [Mapeo](#mapeo)
+10. [Validación](#validacion)
+11. [API](#api-eboscrmapi)
+12. [Controladores](#controladores)
+13. [Puntos finales](#puntos-finales-v1)
+14. [Infraestructura](#infraestructura-eboscrminfrastructure)
+15. [Pruebas](#pruebas-testseboscrmapitests)
+16. [Pruebas de dominio](#pruebas-de-dominio)
+17. [Pruebas de aplicación](#pruebas-de-aplicacion)
+18. [Pruebas de controladores](#pruebas-de-controladores)
+19. [Pruebas de integración](#pruebas-de-integracion)
+20. [Pruebas de mapeo](#pruebas-de-mapeo)
+21. [Referencia de suites de pruebas existentes](#referencia-de-suites-de-pruebas-existentes)
 
 ## Alcance MVP
 
-- Leads (captura, calificacion, conversion a Opportunity).
-- Opportunities con etapas y montos.
-- Forecast basico de pipeline (por etapa y owner).
+- Prospectos (captura, calificación, conversión a Opportunity).
+- Oportunidades con etapas y montos.
+- Pronóstico básico de embudo (por etapa y responsable).
 
-## Domain (EBOS.CRM.Domain)
+## Dominio (EBOS.CRM.Domain)
 
-### Aggregates y entidades
+### Agregados y entidades
 
 - Lead
   - Campos: Id, TenantId, Source, Status, OwnerUserId, CompanyName, ContactName, Email, Phone, EstimatedValue, Notes, CreatedAt, UpdatedAt.
@@ -18,39 +41,39 @@ Items concretos alineados con la estructura local (Clean Architecture, modulo CR
 - Opportunity
   - Campos: Id, TenantId, Name, StageId, OwnerUserId, AccountId (Corporate/Individual), ExpectedCloseDate, Amount, Probability, SourceLeadId, CreatedAt, UpdatedAt.
   - Comportamiento: MoveStage, UpdateForecast, CloseWon, CloseLost (con motivo).
-- OpportunityStage (lookup)
+- OpportunityStage (tabla de referencia)
   - Campos: Id, TenantId, Name, Order, DefaultProbability, IsClosed, IsWon.
-- ForecastSnapshot (opcional MVP si no hay background jobs)
+- ForecastSnapshot (opcional MVP si no hay tareas en segundo plano)
   - Campos: Id, TenantId, SnapshotDate, OwnerUserId, StageId, TotalAmount, WeightedAmount.
 
-### Interfaces (Repositories)
+### Interfaces (Repositorios)
 
 - `ILeadRepository`
 - `IOpportunityRepository`
 - `IOpportunityStageRepository`
 - `IForecastSnapshotRepository` (opcional)
 
-### Invariants
+### Invariantes
 
 - TenantId requerido en todos los aggregates.
 - Stage debe existir y ser tenant-scoped.
-- Lead conversion solo una vez y a una unica Opportunity.
-- Opportunity amount >= 0, probability 0..1.
+- Lead conversión solo una vez y a una única Opportunity.
+- Monto de Opportunity >= 0, probabilidad 0..1.
 - CloseWon/CloseLost solo desde etapas no cerradas.
 
-## Application (EBOS.CRM.Application)
+## Aplicación (EBOS.CRM.Application)
 
-### Contracts (Requests/Responses)
+### Contratos (Solicitudes/Respuestas)
 
-- Requests:
+- Solicitudes:
   - Lead: AddLeadRequest, UpdateLeadRequest, QualifyLeadRequest, DisqualifyLeadRequest, ConvertLeadRequest.
   - Opportunity: AddOpportunityRequest, UpdateOpportunityRequest, PatchOpportunityStageRequest, CloseOpportunityRequest.
   - Stage: AddOpportunityStageRequest, UpdateOpportunityStageRequest.
-  - Forecast: GetForecastRequest (rango de fechas, owner, stage).
-- Responses:
+- Pronóstico: GetForecastRequest (rango de fechas, responsable, etapa).
+- Respuestas:
   - LeadResponse, OpportunityResponse, OpportunityStageResponse, ForecastSummaryResponse.
 
-### Features (Commands/Queries)
+### Funcionalidades (Comandos/Consultas)
 
 Estructura igual a los features CRM actuales:
 
@@ -75,21 +98,21 @@ Estructura igual a los features CRM actuales:
 
 - `Features/CRM/Forecast/Queries/GetForecastSummary`
 
-### Mapping
+### Mapeo
 
 - `Mappings/CRM/MappingLead`
 - `Mappings/CRM/MappingOpportunity`
 - `Mappings/CRM/MappingOpportunityStage`
 - `Mappings/CRM/MappingForecast`
 
-### Validation
+### Validación
 
-- Validators de FluentValidation por request.
-- Reusar tenant isolation behavior (ya existe).
+- Validadores de FluentValidation por solicitud.
+- Reusar el comportamiento de aislamiento de tenant (ya existe).
 
 ## API (EBOS.CRM.Api)
 
-### Controllers
+### Controladores
 
 Seguir el layout actual de controllers CRM:
 
@@ -98,9 +121,9 @@ Seguir el layout actual de controllers CRM:
 - `Controllers/CRM/OpportunityStage/OpportunityStageController`
 - `Controllers/CRM/Forecast/ForecastController`
 
-### Endpoints (v1)
+### Puntos finales (v1)
 
-- Leads
+- Prospectos
   - `GET /api/v1/Lead`
   - `GET /api/v1/Lead/{id}`
   - `POST /api/v1/Lead`
@@ -108,51 +131,58 @@ Seguir el layout actual de controllers CRM:
   - `PATCH /api/v1/Lead/{id}/qualify`
   - `PATCH /api/v1/Lead/{id}/disqualify`
   - `POST /api/v1/Lead/{id}/convert`
-- Opportunities
+- Oportunidades
   - `GET /api/v1/Opportunity`
   - `GET /api/v1/Opportunity/{id}`
   - `POST /api/v1/Opportunity`
   - `PUT /api/v1/Opportunity/{id}`
   - `PATCH /api/v1/Opportunity/{id}/stage`
   - `PATCH /api/v1/Opportunity/{id}/close`
-- Opportunity Stages
+- Etapas de oportunidad
   - `GET /api/v1/OpportunityStage`
   - `POST /api/v1/OpportunityStage`
   - `PUT /api/v1/OpportunityStage/{id}`
-- Forecast
+- Pronóstico
   - `GET /api/v1/Forecast?from=...&to=...&ownerUserId=...&stageId=...`
 
-## Infrastructure (EBOS.CRM.Infrastructure)
+## Infraestructura (EBOS.CRM.Infrastructure)
 
-- EF Core entity configurations para Lead, Opportunity, OpportunityStage.
-- Seed de OpportunityStage por defecto (Prospecting, Qualified, Proposal, Negotiation, Closed Won, Closed Lost).
+- Configuraciones de entidades EF Core para Lead, Opportunity, OpportunityStage.
+- Carga inicial de OpportunityStage por defecto (Prospecting, Qualified, Proposal, Negotiation, Closed Won, Closed Lost).
 - Implementaciones de repositorios y registro en DI.
-- Actualizar `CrmDbContext` y migrations.
+- Actualizar `CrmDbContext` y migraciones.
 
-## Tests (tests/EBOS.CRM.ApiTests)
+## Pruebas (tests/EBOS.CRM.ApiTests)
 
-### Domain tests
+### Pruebas de dominio
 
-- Reglas de conversion de Lead e idempotencia.
+- Reglas de conversión de Lead e idempotencia.
 - Transiciones de etapa y reglas de cierre de Opportunity.
 - Invariants de TenantId.
 
-### Application tests
+### Pruebas de aplicación
 
-- Command handlers para success y error paths.
-- Validaciones por request.
-- Forecast query devuelve agregados esperados.
+- Manejadores de comandos para rutas exitosas y de error.
+- Validaciones por solicitud.
+- La consulta de pronóstico devuelve agregados esperados.
 
-### Controller tests
+### Pruebas de controladores
 
-- CRUD happy paths y payloads invalidos.
+- CRUD con rutas exitosas y cargas útiles inválidas.
 - Endpoints de stage/close.
 
-### Integration tests
+### Pruebas de integración
 
-- Conversion end-to-end de Lead crea Opportunity.
-- Tenant isolation con multiples tenants.
+- Conversión extremo a extremo de Lead crea Opportunity.
+- Tenant isolation con múltiples tenants.
 
-### Mapping tests
+### Pruebas de mapeo
 
-- AutoMapper profiles para lead/opportunity/stage/forecast.
+- Perfiles de AutoMapper para lead/opportunity/stage/forecast.
+
+### Referencia de suites de pruebas existentes
+
+- `tests/EBOS.CRM.ApiTests`: cobertura unitaria y de componentes para comandos/consultas de ventas, validadores, mapeos y controladores (Lead, Opportunity, OpportunityStage, Forecast).
+- `tests/EBOS.CRM.ConcurrencyTests`: escenarios concurrentes sobre endpoints de ventas para validar transiciones de etapa, cierres y consistencia ante actualizaciones simultáneas.
+- `tests/EBOS.CRM.IntegrationTests`: flujos extremo a extremo de conversión de lead, ciclo de vida de opportunity y consulta de forecast con persistencia real.
+- `tests/EBOS.CRM.StressTests`: ejecución de alto volumen sobre controladores de ventas para validar rendimiento sostenido, estabilidad de latencia y tasa de errores bajo carga.

@@ -9,8 +9,7 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDedupeOptions> options)
     : ICustomerDedupeRepository
 {
-    private readonly CrmDbContext _context = context;
-    private readonly CustomerDedupeOptions _options = options.Value ?? new CustomerDedupeOptions();
+    private readonly CustomerDedupeOptions _options = options.Value;
 
     public async Task<IReadOnlyCollection<CustomerDuplicateCandidate>> FindDuplicatesAsync(CustomerDedupeCriteria criteria,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -43,9 +42,9 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
 
     private IQueryable<DedupeProjection> BuildQuery(CustomerDedupeCriteria criteria)
     {
-        var customers = _context.Customers.AsNoTracking();
-        var corporateCustomers = _context.Customers.OfType<CorporateCustomer>().AsNoTracking();
-        var individualCustomers = _context.Customers.OfType<IndividualCustomer>().AsNoTracking();
+        var customers = context.Customers.AsNoTracking();
+        var corporateCustomers = context.Customers.OfType<CorporateCustomer>().AsNoTracking();
+        var individualCustomers = context.Customers.OfType<IndividualCustomer>().AsNoTracking();
 
         var email = criteria.Email;
         var phone = criteria.Phone;
@@ -60,9 +59,14 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
             from ind in indJoin.DefaultIfEmpty()
             let emailMatch = !string.IsNullOrWhiteSpace(email) && customer.Email.ToLower() == email
             let phoneMatch = !string.IsNullOrWhiteSpace(phone) && customer.Phone == phone
-            let taxIdMatch = corp != null && !string.IsNullOrWhiteSpace(taxId) && corp.TaxIdentification.ToUpper() == taxId
-            let identificationMatch = ind != null && !string.IsNullOrWhiteSpace(idNumber) && ind.IdentificationNumber != null &&
-                                      ind.IdentificationNumber.ToUpper() == idNumber
+            let taxIdMatch = corp != null
+                             && !string.IsNullOrWhiteSpace(taxId)
+                             && corp.TaxIdentification != null
+                             && (corp.TaxIdentification ?? string.Empty).ToUpper() == taxId
+            let identificationMatch = ind != null
+                                      && !string.IsNullOrWhiteSpace(idNumber)
+                                      && ind.IdentificationNumber != null
+                                      && (ind.IdentificationNumber ?? string.Empty).ToUpper() == idNumber
             let score = (emailMatch ? _options.EmailWeight : 0)
                         + (phoneMatch ? _options.PhoneWeight : 0)
                         + (taxIdMatch ? _options.TaxIdWeight : 0)

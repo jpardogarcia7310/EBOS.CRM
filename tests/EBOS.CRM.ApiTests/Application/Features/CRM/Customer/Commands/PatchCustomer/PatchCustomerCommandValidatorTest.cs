@@ -1,12 +1,16 @@
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Customer.Commands.PatchCustomer;
 
 public class PatchCustomerCommandValidatorTest
 {
-    private readonly PatchCustomerCommandValidator _validator = new();
+    private readonly PatchCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_InvalidId_Fails()
@@ -144,4 +148,17 @@ public class PatchCustomerCommandValidatorTest
         Email: "a@b.com",
         Phone: "123",
         StatusId: 1);
+
+    private static PatchCustomerCommandValidator CreateValidator()
+    {
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var countryRepository = new Mock<ICountryRepository>();
+        countryRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country)null!);
+
+        return new PatchCustomerCommandValidator(validationCatalog.Object, countryRepository.Object);
+    }
 }

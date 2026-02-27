@@ -46,6 +46,9 @@ public class MappingIndividualCustomer : IRegister
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
             .Ignore(dest => dest.CustomerAddresses)
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
             .Ignore(dest => dest.IdentificationType);
 
         config.NewConfig<UpdateIndividualCustomerRequest, IndividualCustomer>()
@@ -71,6 +74,9 @@ public class MappingIndividualCustomer : IRegister
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
             .Ignore(dest => dest.CustomerAddresses)
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
             .Ignore(dest => dest.IdentificationType);
     }
 }

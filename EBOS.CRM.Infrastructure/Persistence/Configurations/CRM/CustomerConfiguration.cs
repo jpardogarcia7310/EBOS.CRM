@@ -20,6 +20,10 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.Phone)
             .IsRequired()
             .HasMaxLength(12);
+        builder.Property(c => c.Source)
+            .HasMaxLength(100);
+        builder.Property(c => c.Confidentiality)
+            .HasMaxLength(50);
         builder.Property(c => c.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("SYSUTCDATETIME()");

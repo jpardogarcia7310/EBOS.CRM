@@ -1,12 +1,26 @@
+using EBOS.CRM.Application.Validation;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
 
 public class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressCommand>
 {
-    public UpdateAddressCommandValidator()
+    private readonly ICountryRepository _countryRepository;
+    private readonly IAddressTypeRepository _addressTypeRepository;
+    private readonly IValidationCatalogService _validationCatalog;
+
+    public UpdateAddressCommandValidator(ICountryRepository countryRepository,
+        IAddressTypeRepository addressTypeRepository,
+        IValidationCatalogService validationCatalog)
     {
+        _countryRepository = countryRepository;
+        _addressTypeRepository = addressTypeRepository;
+        _validationCatalog = validationCatalog;
+
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.AddressRequest).NotNull();
 
@@ -54,6 +68,18 @@ public class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressComm
 
             RuleFor(x => x.AddressRequest.CountryId).GreaterThan(0);
             RuleFor(x => x.AddressRequest.AddressTypeId).GreaterThan(0);
+
+            RuleFor(x => x.AddressRequest.CountryId)
+                .MustAsync(CountryExistsAsync)
+                .WithMessage("CountryId does not exist.");
+
+            RuleFor(x => x.AddressRequest.AddressTypeId)
+                .MustAsync(AddressTypeExistsAsync)
+                .WithMessage("AddressTypeId does not exist.");
+
+            RuleFor(x => x.AddressRequest)
+                .MustAsync(PostalCodeMatchesCountryAsync)
+                .WithMessage("PostalCode does not match the country format.");
         });
     }
 
@@ -63,6 +89,43 @@ public class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressComm
             return false;
 
         return parsed >= min && parsed <= max;
+    }
+
+    private async Task<bool> CountryExistsAsync(long countryId, CancellationToken cancellationToken)
+    {
+        var entity = await _countryRepository.GetByIdAsync(countryId, cancellationToken);
+        return entity is not null;
+    }
+
+    private async Task<bool> AddressTypeExistsAsync(long addressTypeId, CancellationToken cancellationToken)
+    {
+        var entity = await _addressTypeRepository.GetByIdAsync(addressTypeId, cancellationToken);
+        return entity is not null;
+    }
+
+    private async Task<bool> PostalCodeMatchesCountryAsync(global::EBOS.CRM.Contracts.Requests.CRM.Address.UpdateAddressRequest request,
+        CancellationToken cancellationToken)
+    {
+        var country = await _countryRepository.GetByIdAsync(request.CountryId, cancellationToken);
+        if (country is null)
+        {
+            return true;
+        }
+
+        var iso2 = country.Iso31661A2Code;
+        if (string.IsNullOrWhiteSpace(iso2))
+        {
+            return true;
+        }
+
+        var pattern = await _validationCatalog.GetPatternAsync(ValidationRuleKeys.PostalCode(iso2),
+            cancellationToken);
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            return true;
+        }
+
+        return Regex.IsMatch(request.PostalCode, pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(200));
     }
 }
 

@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 
 namespace EBOS.CRM.Infrastructure.Services.CRM;
 

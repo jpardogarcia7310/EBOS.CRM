@@ -15,7 +15,7 @@ public class GetCreditAccountByIdQueryHandlerTest
     public async Task Handle_WhenFound_Maps()
     {
         var handler = new GetCreditAccountByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entity = new EBOS.CRM.Domain.Entities.CRM.CreditAccount();
+        var entity = new global::EBOS.CRM.Domain.Entities.CRM.CreditAccount();
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);
