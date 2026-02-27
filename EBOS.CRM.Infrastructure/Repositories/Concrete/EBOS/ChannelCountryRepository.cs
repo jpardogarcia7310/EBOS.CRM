@@ -9,11 +9,16 @@ public class ChannelCountryRepository(CrmDbContext context) : IChannelCountryRep
     private readonly DbSet<ChannelCountry> _dbSet = context.Set<ChannelCountry>();
 
     public Task<ChannelCountry?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
-        => _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+        => _dbSet.AsNoTracking()
+            .Include(x => x.ChannelType)
+            .Include(x => x.Country)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
 
     public async Task<IReadOnlyCollection<ChannelCountry>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet.AsNoTracking()
+            .Include(x => x.ChannelType)
+            .Include(x => x.Country)
             .ToListAsync(cancellationToken);
     }
 
@@ -24,6 +29,8 @@ public class ChannelCountryRepository(CrmDbContext context) : IChannelCountryRep
         var safePageSize = Math.Max(1, pageSize);
 
         return await _dbSet.AsNoTracking()
+            .Include(x => x.ChannelType)
+            .Include(x => x.Country)
             .OrderBy(it => it.Id)
             .Skip((safePageNumber - 1) * safePageSize)
             .Take(safePageSize)

@@ -156,6 +156,24 @@ public class EbosEntityConfigurationTests
         AssertIndexes(entity, "UX_ValidationRule_Key");
     }
 
+    [Fact]
+    public void ChannelCountry_Config_Is_Correct()
+    {
+        using var context = CreateContext();
+        var entity = GetEntityType<ChannelCountry>(context);
+
+        AssertTable(entity, "ChannelCountries", "EBOS");
+        AssertProperty(entity, "ChannelTypeId", required: true);
+        AssertProperty(entity, "CountryId", required: true);
+        AssertProperty(entity, "IsActive", required: true);
+        AssertProperty(entity, "CreatedAt", required: true);
+        AssertProperty(entity, "CreatedBy", required: true);
+        AssertProperty(entity, "UpdatedAt", required: true);
+        AssertProperty(entity, "UpdatedBy", required: true);
+
+        AssertIndexes(entity, "UX_ChannelCountries_ChannelTypeId_CountryId", "IX_ChannelCountries_IsActive");
+    }
+
     private static IEntityType GetEntityType<T>(DbContext context)
     {
         var model = context.GetService<IDesignTimeModel>().Model;

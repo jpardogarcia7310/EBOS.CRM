@@ -1,5 +1,4 @@
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
-using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPreference.Commands.UpsertCustomerPreference;
