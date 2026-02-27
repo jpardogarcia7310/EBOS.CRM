@@ -16,4 +16,6 @@ public class Country : BaseEntity
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
+
+    public ICollection<ChannelCountry> ChannelCountries { get; set; } = new List<ChannelCountry>();
 }

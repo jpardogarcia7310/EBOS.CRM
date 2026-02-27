@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EBOS.CRM.IntegrationTests.Infrastructure;

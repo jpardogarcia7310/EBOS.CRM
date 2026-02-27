@@ -2,6 +2,29 @@
 
 Concrete work items aligned with the current local structure (Clean Architecture, CRM module under `EBOS.CRM.*`).
 
+Mini TOC:
+1. [Scope for MVP](#scope-for-mvp)
+2. [Domain](#domain-eboscrmdomain)
+3. [Aggregates and entities](#aggregates-and-entities)
+4. [Interfaces](#interfaces-repositories)
+5. [Invariants](#invariants)
+6. [Application](#application-eboscrmapplication)
+7. [Contracts](#contracts-requestsresponses)
+8. [Features](#features-commandsqueries)
+9. [Mapping](#mapping)
+10. [Validation](#validation)
+11. [API](#api-eboscrmapi)
+12. [Controllers](#controllers)
+13. [Endpoints](#endpoints-v1)
+14. [Infrastructure](#infrastructure-eboscrminfrastructure)
+15. [Tests](#tests-testseboscrmapitests)
+16. [Domain tests](#domain-tests)
+17. [Application tests](#application-tests)
+18. [Controller tests](#controller-tests)
+19. [Integration tests](#integration-tests)
+20. [Mapping tests](#mapping-tests)
+21. [Existing test suites reference](#existing-test-suites-reference)
+
 ## Scope for MVP
 
 - Leads (capture, qualify, convert to Opportunity).
@@ -156,3 +179,10 @@ Follow existing CRM controllers layout:
 ### Mapping tests
 
 - AutoMapper profiles for lead/opportunity/stage/forecast.
+
+### Existing test suites reference
+
+- `tests/EBOS.CRM.ApiTests`: unit and component coverage for sales commands/queries, validators, mappings, and controllers (Lead, Opportunity, OpportunityStage, Forecast).
+- `tests/EBOS.CRM.ConcurrencyTests`: concurrent scenarios over sales endpoints to validate stage transitions, close operations, and consistency under simultaneous updates.
+- `tests/EBOS.CRM.IntegrationTests`: end-to-end flows for lead conversion, opportunity lifecycle, and forecast retrieval with real persistence and API orchestration.
+- `tests/EBOS.CRM.StressTests`: sustained high-volume execution on sales controllers to validate throughput, latency stability, and error-rate behavior under load.

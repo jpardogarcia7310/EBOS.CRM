@@ -15,15 +15,14 @@ public class GetAllCorporateCustomersQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllCorporateCustomersQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.CorporateCustomer> { new() };
-        var dtos = new List<CorporateCustomerResponse>();
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer> { new() };
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<CorporateCustomerResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<CorporateCustomerResponse>());
 
         var result = await handler.Handle(new GetAllCorporateCustomersQuery(), CancellationToken.None);
 

@@ -15,7 +15,7 @@ public class GetAllBankInformationsQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllBankInformationsQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.BankInformation> { new() };
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.BankInformation> { new() };
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);

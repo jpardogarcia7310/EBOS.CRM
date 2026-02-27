@@ -10,6 +10,8 @@ public class Customer : ErasableEntity, ITenantScopedEntity
     public string Code { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;
+    public string? Source { get; set; }
+    public string? Confidentiality { get; set; }
     public DateTime CreatedAt { get; set; }
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }

@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Entities.Identity;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 
@@ -20,17 +20,25 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     // DbSets
     public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
+    public DbSet<AccountContact> AccountContacts => Set<AccountContact>();
+    public DbSet<AccountContactRole> AccountContactRoles => Set<AccountContactRole>();
+    public DbSet<AccountHierarchy> AccountHierarchies => Set<AccountHierarchy>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
     public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
     public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
     public DbSet<Case> Cases => Set<Case>();
+    public DbSet<ChannelCountry> ChannelCountries => Set<ChannelCountry>();
+    public DbSet<ChannelType> ChannelTypes => Set<ChannelType>();
     public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
+    public DbSet<CustomerConsent> CustomerConsents => Set<CustomerConsent>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
     public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
     public DbSet<Lead> Leads => Set<Lead>();
@@ -55,6 +63,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<ValidationRule> ValidationRules => Set<ValidationRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

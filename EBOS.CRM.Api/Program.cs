@@ -12,6 +12,7 @@ using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Domain.Identity;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;

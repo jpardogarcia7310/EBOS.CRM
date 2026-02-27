@@ -15,7 +15,7 @@ public class GetBranchOfficeAddressByIdQueryHandlerTest
     public async Task Handle_WhenFound_Maps()
     {
         var handler = new GetBranchOfficeAddressByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entity = new EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress();
+        var entity = new global::EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress();
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

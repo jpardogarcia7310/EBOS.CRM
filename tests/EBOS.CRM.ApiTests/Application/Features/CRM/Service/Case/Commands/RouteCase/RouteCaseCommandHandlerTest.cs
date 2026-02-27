@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using Moq;
 using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;

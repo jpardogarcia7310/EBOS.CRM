@@ -1,7 +1,36 @@
-﻿# Service MVP Technical Backlog
+# Service MVP Technical Backlog
 
 Concrete work items aligned with the current local structure (Clean Architecture, Service module under `EBOS.CRM.*`).
 Derived from issues #60, #81, #82, #83, #84 scopes.
+
+Mini TOC:
+1. [Scope for MVP](#scope-for-mvp)
+2. [Why this milestone helps the CRM](#why-this-milestone-helps-the-crm-layer-by-layer)
+3. [Domain value](#domain-value)
+4. [Application value](#application-value)
+5. [API value](#api-value)
+6. [Infrastructure value](#infrastructure-value)
+7. [Testing value](#testing-value)
+8. [Domain](#domain-eboscrmdomain)
+9. [Aggregates and entities](#aggregates-and-entities)
+10. [Interfaces](#interfaces-repositories)
+11. [Invariants](#invariants)
+12. [Application](#application-eboscrmapplication)
+13. [Contracts](#contracts-requestsresponses)
+14. [Features](#features-commandsqueries)
+15. [Mapping](#mapping)
+16. [Validation](#validation)
+17. [API](#api-eboscrmapi)
+18. [Controllers](#controllers)
+19. [Endpoints](#endpoints-v2)
+20. [Infrastructure](#infrastructure-eboscrminfrastructure)
+21. [Tests](#tests-testseboscrmapitests)
+22. [Domain tests](#domain-tests)
+23. [Application tests](#application-tests)
+24. [Controller tests](#controller-tests)
+25. [Integration tests](#integration-tests)
+26. [Mapping tests](#mapping-tests)
+27. [Existing test suites reference](#existing-test-suites-reference)
 
 ## Scope for MVP
 
@@ -39,67 +68,6 @@ Derived from issues #60, #81, #82, #83, #84 scopes.
 ### API value
 
 - Exposes endpoints to create/manage cases, SLAs, queues, and case activities.
-- Enables integration with UI or external systems.
-
-**Pros**
-- Fast enablement for support dashboards.
-- Consistent patterns with existing CRM controllers.
-
-**Cons**
-- Additional endpoints to version and document.
-
-### Infrastructure value
-
-- Persists service data with EF mappings + migrations.
-- Provides repositories for Service entities.
-
-**Pros**
-- Reliable storage and query performance.
-- Consistent DI and data access patterns.
-
-**Cons**
-- Migration overhead and schema evolution to manage.
-
-### Testing value
-
-- Verifies lifecycle rules, SLA behavior, and assignment workflows.
-
-**Pros**
-- Reduces regressions when business rules grow.
-- Confidence for future automation and reporting.
-
-**Cons**
-- More test coverage to keep up to date.
-
-## Why this milestone helps the CRM (layer by layer)
-
-### Domain value
-
-- Adds the minimum business vocabulary to deliver support: Case, Sla, Queue.
-- Enables consistent lifecycle rules (open/close/reopen) and SLA due dates.
-
-**Pros**
-- Clear ownership and states for service operations.
-- Reusable invariants for future automation.
-
-**Cons**
-- Requires disciplined data entry to stay reliable.
-
-### Application value
-
-- Encodes workflows (case lifecycle, SLA checks, queue assignment rules).
-- Centralizes validation and tenant isolation.
-
-**Pros**
-- Predictable behavior across API, tests, and UI.
-- Easier to evolve rules without touching controllers.
-
-**Cons**
-- More handler/validator surface to maintain.
-
-### API value
-
-- Exposes endpoints to create/manage cases, SLAs, and queues.
 - Enables integration with UI or external systems.
 
 **Pros**
@@ -294,4 +262,15 @@ Follow existing CRM controllers layout:
 
 - End-to-end case creation with queue + SLA.
 - Tenant isolation across cases, SLAs, queues.
+
+### Mapping tests
+
+- AutoMapper profiles for case/case activity/sla/queue.
+
+### Existing test suites reference
+
+- `tests/EBOS.CRM.ApiTests`: unit and component tests for service handlers, validators, mappings, and controllers (Case, CaseActivity, Sla, Queue), including lifecycle and SLA checks.
+- `tests/EBOS.CRM.ConcurrencyTests`: concurrent request scenarios on service endpoints to validate safe close/reopen/assign behavior and consistency under simultaneous operations.
+- `tests/EBOS.CRM.IntegrationTests`: end-to-end validation of case workflows with queue/SLA assignment and tenant-scoped persistence across layers.
+- `tests/EBOS.CRM.StressTests`: sustained stress coverage on service controllers to verify throughput, response stability, and reliability under heavy load.
 

@@ -15,7 +15,7 @@ public class GetAllAddressesQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllAddressesQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.Address> { new() };
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.Address> { new() };
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);

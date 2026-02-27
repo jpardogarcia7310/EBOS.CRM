@@ -22,7 +22,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.AddressType", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountContact", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,19 +30,8 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("AllowsMultiple")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Category")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<long>("CorporateCustomerId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -52,15 +41,23 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Property<long>("CreatedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<DateTime?>("EndAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("RequiresPrimary")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("IndividualCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -70,7 +67,107 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AddressTypes", "EBOS");
+                    b.HasIndex("CorporateCustomerId");
+
+                    b.HasIndex("IndividualCustomerId");
+
+                    b.HasIndex("TenantId", "CorporateCustomerId")
+                        .HasDatabaseName("IX_AccountContact_TenantId_CorporateCustomerId");
+
+                    b.HasIndex("TenantId", "IndividualCustomerId")
+                        .HasDatabaseName("IX_AccountContact_TenantId_IndividualCustomerId");
+
+                    b.ToTable("AccountContacts", "CRM");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountContactRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AccountContactId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountContactId");
+
+                    b.HasIndex("TenantId", "AccountContactId")
+                        .HasDatabaseName("IX_AccountContactRole_TenantId_AccountContactId");
+
+                    b.ToTable("AccountContactRoles", "CRM");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountHierarchy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ChildCorporateCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("ParentCorporateCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RelationType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildCorporateCustomerId");
+
+                    b.HasIndex("ParentCorporateCustomerId");
+
+                    b.HasIndex("TenantId", "ChildCorporateCustomerId")
+                        .HasDatabaseName("IX_AccountHierarchy_TenantId_ChildCorporateCustomerId");
+
+                    b.HasIndex("TenantId", "ParentCorporateCustomerId")
+                        .HasDatabaseName("IX_AccountHierarchy_TenantId_ParentCorporateCustomerId");
+
+                    b.ToTable("AccountHierarchies", "CRM");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Address", b =>
@@ -435,6 +532,62 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("Cases", "CRM");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CaseActivity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CaseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CaseActivity_TenantId");
+
+                    b.HasIndex("CaseId", "Status")
+                        .HasDatabaseName("IX_CaseActivity_CaseId_Status");
+
+                    b.ToTable("CaseActivities", "CRM");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CreditAccount", b =>
                 {
                     b.Property<long>("Id")
@@ -581,6 +734,10 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Confidentiality")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -607,6 +764,10 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
+                    b.Property<string>("Source")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<long>("StatusId")
                         .HasColumnType("bigint");
 
@@ -630,6 +791,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "Code")
                         .IsUnique()
                         .HasDatabaseName("UX_Customer_TenantId_Code");
+
+                    b.HasIndex("TenantId", "Email")
+                        .HasDatabaseName("IX_Customer_TenantId_Email");
+
+                    b.HasIndex("TenantId", "Phone")
+                        .HasDatabaseName("IX_Customer_TenantId_Phone");
 
                     b.ToTable("Customers", "CRM", t =>
                         {
@@ -703,6 +870,97 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_CustomerAddress_ValidFrom_NotNull", "[ValidFrom] IS NOT NULL");
                         });
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerConsent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ConsentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Granted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("GrantedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId", "CustomerId")
+                        .HasDatabaseName("IX_CustomerConsent_TenantId_CustomerId");
+
+                    b.ToTable("CustomerConsents", "CRM");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPreference", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Preferred")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId", "CustomerId", "ChannelId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CustomerPreference_TenantId_Customer_Channel");
+
+                    b.ToTable("CustomerPreferences", "CRM");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Lead", b =>
@@ -1253,7 +1511,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("TaxInformationAddresses", "CRM");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.TenantConfiguration", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.AddressType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1261,43 +1519,97 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
+                    b.Property<bool>("AllowsMultiple")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
-                    b.Property<string>("Key")
+                    b.Property<string>("Category")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("RequiresPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AddressTypes", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ChannelCountry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ChannelTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CountryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<long>("UpdatedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ValueJson")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_TenantConfiguration_TenantId");
+                    b.HasIndex("CountryId");
 
-                    b.HasIndex("TenantId", "Key")
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_ChannelCountries_IsActive");
+
+                    b.HasIndex("ChannelTypeId", "CountryId")
                         .IsUnique()
-                        .HasDatabaseName("UX_TenantConfiguration_TenantId_Key");
+                        .HasDatabaseName("UX_ChannelCountries_ChannelTypeId_CountryId");
 
-                    b.ToTable("TenantConfigurations", "EBOS");
+                    b.ToTable("ChannelCountries", "EBOS");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.TenantQuota", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ChannelType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1305,92 +1617,42 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("EffectiveFrom")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EffectiveTo")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Limit")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("Metric")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Unit")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_TenantQuota_TenantId");
-
-                    b.HasIndex("TenantId", "Metric", "EffectiveFrom")
-                        .IsUnique()
-                        .HasDatabaseName("UX_TenantQuota_TenantId_Metric_EffectiveFrom");
-
-                    b.ToTable("TenantQuotas", "EBOS");
-                });
-
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.TenantUsageMetric", b =>
-                {
-                    b.Property<long>("Id")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Erased")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Metric")
+                    b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("PeriodEnd")
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PeriodStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long>("TenantId")
+                    b.Property<long>("UpdatedBy")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Unit")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<decimal>("Value")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_TenantUsageMetric_TenantId");
+                    b.HasIndex("Descripcion")
+                        .HasDatabaseName("IX_ChannelTypes_Descripcion");
 
-                    b.HasIndex("TenantId", "Metric", "PeriodStart")
-                        .HasDatabaseName("IX_TenantUsageMetric_TenantId_Metric_PeriodStart");
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_ChannelTypes_IsActive");
 
-                    b.ToTable("TenantUsageMetrics", "EBOS");
+                    b.ToTable("ChannelTypes", "EBOS");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Country", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.Country", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1489,7 +1751,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.IdentificationType", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.IdentificationType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1527,6 +1789,228 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("IdentificationTypes", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.Status", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ValueJson")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TenantConfiguration_TenantId");
+
+                    b.HasIndex("TenantId", "Key")
+                        .IsUnique()
+                        .HasDatabaseName("UX_TenantConfiguration_TenantId_Key");
+
+                    b.ToTable("TenantConfigurations", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.TenantQuota", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Limit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Metric")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TenantQuota_TenantId");
+
+                    b.HasIndex("TenantId", "Metric", "EffectiveFrom")
+                        .IsUnique()
+                        .HasDatabaseName("UX_TenantQuota_TenantId_Metric_EffectiveFrom");
+
+                    b.ToTable("TenantQuotas", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.TenantUsageMetric", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Metric")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TenantUsageMetric_TenantId");
+
+                    b.HasIndex("TenantId", "Metric", "PeriodStart")
+                        .HasDatabaseName("IX_TenantUsageMetric_TenantId_Metric_PeriodStart");
+
+                    b.ToTable("TenantUsageMetrics", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ValidationRule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Pattern")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ValidationRule_Key");
+
+                    b.ToTable("ValidationRules", "EBOS");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.AbacAttribute", b =>
@@ -2153,38 +2637,6 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("UserRoles", "IAM");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Status", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Statuses", "EBOS");
-                });
-
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CorporateCustomer", b =>
                 {
                     b.HasBaseType("EBOS.CRM.Domain.Entities.CRM.Customer");
@@ -2198,6 +2650,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.HasIndex("TenantId", "TaxIdentification")
+                        .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification");
 
                     b.ToTable("Customers", "CRM", t =>
                         {
@@ -2239,6 +2694,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("IdentificationTypeId")
                         .HasDatabaseName("IX_IndividualCustomer_IdentificationTypeId");
 
+                    b.HasIndex("TenantId", "IdentificationNumber")
+                        .HasDatabaseName("IX_IndividualCustomer_TenantId_IdentificationNumber");
+
                     b.ToTable(t =>
                         {
                             t.HasCheckConstraint("CK_Customer_Email_Valid", "[Email] LIKE '%@%.%'");
@@ -2249,15 +2707,64 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator().HasValue("Individual");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountContact", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.CorporateCustomer", "CorporateCustomer")
+                        .WithMany("AccountContacts")
+                        .HasForeignKey("CorporateCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.IndividualCustomer", "IndividualCustomer")
+                        .WithMany("AccountContacts")
+                        .HasForeignKey("IndividualCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CorporateCustomer");
+
+                    b.Navigation("IndividualCustomer");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountContactRole", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.AccountContact", "AccountContact")
+                        .WithMany("Roles")
+                        .HasForeignKey("AccountContactId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AccountContact");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountHierarchy", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.CorporateCustomer", "ChildCorporateCustomer")
+                        .WithMany("ChildRelationships")
+                        .HasForeignKey("ChildCorporateCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.CorporateCustomer", "ParentCorporateCustomer")
+                        .WithMany("ParentRelationships")
+                        .HasForeignKey("ParentCorporateCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChildCorporateCustomer");
+
+                    b.Navigation("ParentCorporateCustomer");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Address", b =>
                 {
-                    b.HasOne("EBOS.CRM.Domain.Entities.AddressType", "AddressType")
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.AddressType", "AddressType")
                         .WithMany("Addresses")
                         .HasForeignKey("AddressTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EBOS.CRM.Domain.Entities.Country", "Country")
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2333,6 +2840,17 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Sla");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CaseActivity", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Case", "Case")
+                        .WithMany("Activities")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CreditAccount", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", "Customer")
@@ -2357,7 +2875,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Customer", b =>
                 {
-                    b.HasOne("EBOS.CRM.Domain.Entities.Status", "Status")
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.Status", "Status")
                         .WithMany("Customers")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2381,6 +2899,36 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Address");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerConsent", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", "Customer")
+                        .WithMany("Consents")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPreference", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.ChannelType", "Channel")
+                        .WithMany("CustomerPreferences")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", "Customer")
+                        .WithMany("Preferences")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
 
                     b.Navigation("Customer");
                 });
@@ -2450,6 +2998,25 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("TaxInformation");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ChannelCountry", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.ChannelType", "ChannelType")
+                        .WithMany("ChannelCountries")
+                        .HasForeignKey("ChannelTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.Country", "Country")
+                        .WithMany("ChannelCountries")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChannelType");
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.PolicyPermission", b =>
@@ -2579,7 +3146,7 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.IndividualCustomer", b =>
                 {
-                    b.HasOne("EBOS.CRM.Domain.Entities.IdentificationType", "IdentificationType")
+                    b.HasOne("EBOS.CRM.Domain.Entities.EBOS.IdentificationType", "IdentificationType")
                         .WithMany()
                         .HasForeignKey("IdentificationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2588,9 +3155,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("IdentificationType");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.AddressType", b =>
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.AccountContact", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Address", b =>
@@ -2607,6 +3174,11 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("BranchOfficeAddresses");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Case", b =>
+                {
+                    b.Navigation("Activities");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CreditAccount", b =>
                 {
                     b.Navigation("CreditTransactions");
@@ -2618,9 +3190,13 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.Navigation("BankInformation");
 
+                    b.Navigation("Consents");
+
                     b.Navigation("CreditAccount");
 
                     b.Navigation("CustomerAddresses");
+
+                    b.Navigation("Preferences");
 
                     b.Navigation("TaxInformation");
                 });
@@ -2653,6 +3229,28 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.TaxInformation", b =>
                 {
                     b.Navigation("TaxInformationAddresses");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.AddressType", b =>
+                {
+                    b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ChannelType", b =>
+                {
+                    b.Navigation("ChannelCountries");
+
+                    b.Navigation("CustomerPreferences");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.Country", b =>
+                {
+                    b.Navigation("ChannelCountries");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.Status", b =>
+                {
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.Identity.AbacAttribute", b =>
@@ -2699,14 +3297,20 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("EBOS.CRM.Domain.Entities.Status", b =>
-                {
-                    b.Navigation("Customers");
-                });
-
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CorporateCustomer", b =>
                 {
+                    b.Navigation("AccountContacts");
+
                     b.Navigation("BranchOffices");
+
+                    b.Navigation("ChildRelationships");
+
+                    b.Navigation("ParentRelationships");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.IndividualCustomer", b =>
+                {
+                    b.Navigation("AccountContacts");
                 });
 #pragma warning restore 612, 618
         }

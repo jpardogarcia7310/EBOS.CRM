@@ -53,4 +53,23 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         IsPrimary = isPrimary;
     }
+
+    public void SetPrimaryRole(long accountContactRoleId)
+    {
+        if (accountContactRoleId <= 0)
+        {
+            throw new InvalidOperationException("AccountContactRoleId must be a positive value.");
+        }
+
+        var target = Roles.FirstOrDefault(r => r.Id == accountContactRoleId);
+        if (target is null)
+        {
+            throw new InvalidOperationException("AccountContactRole not found.");
+        }
+
+        foreach (var role in Roles)
+        {
+            role.SetPrimary(role.Id == accountContactRoleId);
+        }
+    }
 }

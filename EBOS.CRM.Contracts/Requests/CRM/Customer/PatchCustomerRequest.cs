@@ -5,5 +5,6 @@ public sealed record PatchCustomerRequest(
     string? Code,
     string? Email,
     string? Phone,
-    long? StatusId
+    long? StatusId,
+    long? CountryId = null
 );

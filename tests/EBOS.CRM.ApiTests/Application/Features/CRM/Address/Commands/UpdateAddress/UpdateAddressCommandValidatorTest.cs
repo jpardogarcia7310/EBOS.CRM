@@ -1,12 +1,16 @@
 using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Address.Commands.UpdateAddress;
 
 public class UpdateAddressCommandValidatorTest
 {
-    private readonly UpdateAddressCommandValidator _validator = new();
+    private readonly UpdateAddressCommandValidator _validator = CreateValidator();
 
     [Fact]
     public void Validate_ValidRequest_Passes()
@@ -288,6 +292,24 @@ public class UpdateAddressCommandValidatorTest
         CountryId: 1,
         AddressTypeId: 1
     );
+
+    private static UpdateAddressCommandValidator CreateValidator()
+    {
+        var countryRepo = new Mock<ICountryRepository>();
+        countryRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Country { Id = 1, Iso31661A2Code = "EC", Name = "Ecuador", CreatedAt = DateTime.UtcNow, CreatedBy = 1, Currency = "USD", CurrencyCode = "USD", Domain = ".ec", InternationalPhoneCode = "593", Iso31661A3Code = "ECU", Iso31661NumCode = "218" });
+
+        var addressTypeRepo = new Mock<IAddressTypeRepository>();
+        addressTypeRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AddressType { Id = 1, Code = "HOME", Description = "Home", CreatedAt = DateTime.UtcNow, CreatedBy = 1, UpdatedAt = null, UpdatedBy = null });
+
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new UpdateAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, validationCatalog.Object);
+    }
 }
+
 
 

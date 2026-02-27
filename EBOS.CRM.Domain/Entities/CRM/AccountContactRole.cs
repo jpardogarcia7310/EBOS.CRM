@@ -29,4 +29,14 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
         ValidTo = validTo;
         IsPrimary = false;
     }
+
+    public void SetPrimary(bool isPrimary)
+    {
+        if (isPrimary && ValidTo.HasValue)
+        {
+            throw new InvalidOperationException("Cannot set primary role when role is not active.");
+        }
+
+        IsPrimary = isPrimary;
+    }
 }

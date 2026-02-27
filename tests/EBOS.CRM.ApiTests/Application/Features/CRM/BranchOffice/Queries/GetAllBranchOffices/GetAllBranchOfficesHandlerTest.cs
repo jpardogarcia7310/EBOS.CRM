@@ -15,15 +15,14 @@ public class GetAllBranchOfficesQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllBranchOfficesQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.BranchOffice> { new() };
-        var dtos = new List<BranchOfficeResponse>();
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.BranchOffice> { new() };
 
         _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
         _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<BranchOfficeResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<BranchOfficeResponse>());
 
         var result = await handler.Handle(new GetAllBranchOfficesQuery(), CancellationToken.None);
 

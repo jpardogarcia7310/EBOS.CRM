@@ -11,7 +11,5 @@ public sealed class IndividualCustomer : Customer
 
     public long IdentificationTypeId { get; set; }
     public IdentificationType IdentificationType { get; set; } = null!;
-
-    public ICollection<AccountContact> AccountContacts { get; set; } = new List<AccountContact>();
 }
 
