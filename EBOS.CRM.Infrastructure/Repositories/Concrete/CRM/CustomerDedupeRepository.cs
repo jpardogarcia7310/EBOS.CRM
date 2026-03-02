@@ -57,16 +57,16 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
             from corp in corpJoin.DefaultIfEmpty()
             join ind in individualCustomers on customer.Id equals ind.Id into indJoin
             from ind in indJoin.DefaultIfEmpty()
-            let emailMatch = !string.IsNullOrWhiteSpace(email) && customer.Email.ToLower() == email
+            let emailMatch = !string.IsNullOrWhiteSpace(email) && customer.Email == email
             let phoneMatch = !string.IsNullOrWhiteSpace(phone) && customer.Phone == phone
             let taxIdMatch = corp != null
                              && !string.IsNullOrWhiteSpace(taxId)
                              && corp.TaxIdentification != null
-                             && (corp.TaxIdentification ?? string.Empty).ToUpper() == taxId
+                             && corp.TaxIdentification == taxId
             let identificationMatch = ind != null
                                       && !string.IsNullOrWhiteSpace(idNumber)
                                       && ind.IdentificationNumber != null
-                                      && (ind.IdentificationNumber ?? string.Empty).ToUpper() == idNumber
+                                      && ind.IdentificationNumber == idNumber
             let score = (emailMatch ? _options.EmailWeight : 0)
                         + (phoneMatch ? _options.PhoneWeight : 0)
                         + (taxIdMatch ? _options.TaxIdWeight : 0)

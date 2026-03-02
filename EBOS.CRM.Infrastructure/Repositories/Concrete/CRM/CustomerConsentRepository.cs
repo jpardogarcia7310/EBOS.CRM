@@ -21,21 +21,21 @@ public class CustomerConsentRepository(CrmDbContext context)
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);
 
-        var events = await AsQueryable()
+        var latestByTypeQuery = AsQueryable()
             .Where(x => x.TenantId == tenantId && x.CustomerId == customerId)
+            .GroupBy(x => x.ConsentType)
+            .Select(g => g
+                .OrderByDescending(x => x.RevokedAt ?? x.GrantedAt)
+                .ThenByDescending(x => x.Id)
+                .First());
+
+        return await latestByTypeQuery
             .OrderByDescending(x => x.RevokedAt ?? x.GrantedAt)
             .ThenByDescending(x => x.Id)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        var latestByType = events
-            .GroupBy(x => x.ConsentType, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First())
             .Skip((safePageNumber - 1) * safePageSize)
             .Take(safePageSize)
-            .ToList();
-
-        return latestByType;
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyCollection<CustomerConsent>> GetByCustomerPagedAsync(long tenantId, long customerId,
