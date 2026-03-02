@@ -28,6 +28,10 @@
     <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
     <File Path="documentation/RunBooks/Customer360-Operability-RunBook_ES.md" />
   </Folder>
+  <Folder Name="/documentation/Observability/">
+    <File Path="documentation/Observability/README.md" />
+    <File Path="documentation/Observability/README_ES.md" />
+  </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path=".gitignore" />
@@ -37,6 +41,13 @@
   </Folder>
   <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/" />
+  <Folder Name="/Elementos de la solución/Observability/grafana">
+    <File Path="documentation/Observability/grafana/customer360-operability-dashboard.json" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/prometheus/">
+    <File Path="documentation/Observability/prometheus/customer360-alert-rules.yml" />
   </Folder>
   <Folder Name="/source/">
     <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" Id="b94674de-a33b-4841-b1af-7cfbd17e3871" />
