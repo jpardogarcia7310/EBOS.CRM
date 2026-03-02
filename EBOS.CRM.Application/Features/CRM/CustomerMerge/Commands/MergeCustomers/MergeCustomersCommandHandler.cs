@@ -4,6 +4,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Application.Options;
 using MediatR;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ public class MergeCustomersCommandHandler(
     IAccountContactRoleRepository accountContactRoleRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
+    ICustomer360Metrics metrics,
     IOptions<CustomerMergeOptions> mergeOptions)
     : IRequestHandler<MergeCustomersCommand, CustomerMergeResultResponse>
 {
@@ -35,6 +37,10 @@ public class MergeCustomersCommandHandler(
         cancellationToken.ThrowIfCancellationRequested();
 
         var mergeRequest = request.Request ?? throw new ArgumentNullException(nameof(request.Request));
+        if (string.IsNullOrWhiteSpace(mergeRequest.Reason))
+        {
+            throw new InvalidOperationException("Merge reason is required.");
+        }
 
         var winner = await customerRepository.GetByIdAsync(mergeRequest.WinnerCustomerId, cancellationToken)
             ?? throw new InvalidOperationException("Winner customer not found.");
@@ -140,10 +146,12 @@ public class MergeCustomersCommandHandler(
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await customerRepository.CommitAsync(cancellationToken);
+            metrics.RecordMerge(mergeRequest.TenantId, merged.Count, true);
         }
         catch
         {
             await customerRepository.RollbackAsync(cancellationToken);
+            metrics.RecordMerge(mergeRequest.TenantId, 0, false);
             throw;
         }
 

@@ -8,7 +8,10 @@ using AuditServiceUnavailableException = EBOS.CRM.Infrastructure.Services.Audit.
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
-public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServiceOptions> options)
+public sealed class AuditServiceClient(
+    HttpClient httpClient,
+    IOptions<AuditServiceOptions> options,
+    IAuditOutboxService auditOutboxService)
     : IAuditService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -28,16 +31,24 @@ public sealed class AuditServiceClient(HttpClient httpClient, IOptions<AuditServ
         }
 
         var endpoint = "api/audit/InsertAudit";
-        return await ExecuteWithRetryAsync(
-            () => httpClient.PostAsJsonAsync(endpoint, request, JsonOptions, cancellationToken),
-            async response =>
-            {
-                var payload = await response.Content.ReadFromJsonAsync<AuditInsertResponse>(
-                    JsonOptions, cancellationToken);
-                return payload ?? new AuditInsertResponse(true, 0);
-            },
-            "InsertAudit",
-            cancellationToken);
+        try
+        {
+            return await ExecuteWithRetryAsync(
+                () => httpClient.PostAsJsonAsync(endpoint, request, JsonOptions, cancellationToken),
+                async response =>
+                {
+                    var payload = await response.Content.ReadFromJsonAsync<AuditInsertResponse>(
+                        JsonOptions, cancellationToken);
+                    return payload ?? new AuditInsertResponse(true, 0);
+                },
+                "InsertAudit",
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await auditOutboxService.EnqueueAsync("InsertAudit", request, ex.Message, cancellationToken);
+            return new AuditInsertResponse(true, 0);
+        }
     }
 
     public Task<IReadOnlyCollection<AuditRecord>> GetAllByEntityAsync(

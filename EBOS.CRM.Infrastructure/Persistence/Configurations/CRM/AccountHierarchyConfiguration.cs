@@ -25,6 +25,7 @@ public class AccountHierarchyConfiguration : IEntityTypeConfiguration<AccountHie
         builder.Property(x => x.ValidFrom).IsRequired();
         builder.Property(x => x.ValidTo);
         builder.Property(x => x.IsCurrent).IsRequired();
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.ParentCorporateCustomerId })
@@ -48,3 +49,5 @@ public class AccountHierarchyConfiguration : IEntityTypeConfiguration<AccountHie
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+

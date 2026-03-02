@@ -19,6 +19,7 @@ public class AccountContactRoleConfiguration : IEntityTypeConfiguration<AccountC
         builder.Property(x => x.IsPrimary).IsRequired();
         builder.Property(x => x.ValidFrom).IsRequired();
         builder.Property(x => x.ValidTo);
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.AccountContactId })
@@ -38,3 +39,5 @@ public class AccountContactRoleConfiguration : IEntityTypeConfiguration<AccountC
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+

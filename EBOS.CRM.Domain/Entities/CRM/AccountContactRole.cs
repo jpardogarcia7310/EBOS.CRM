@@ -12,6 +12,7 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     public bool IsPrimary { get; set; }
     public DateTime ValidFrom { get; set; }
     public DateTime? ValidTo { get; set; }
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
     public void Activate(DateTime validFrom)
     {
@@ -40,3 +41,4 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
         IsPrimary = isPrimary;
     }
 }
+

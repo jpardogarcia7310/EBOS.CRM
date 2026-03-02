@@ -14,6 +14,7 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
     public string Source { get; private set; } = null!;
     public DateTime? ExpiresAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     private CustomerConsent()
     {
@@ -130,3 +131,4 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
         }
     }
 }
+

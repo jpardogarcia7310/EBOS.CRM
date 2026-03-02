@@ -15,6 +15,7 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
     public DateTime ValidFrom { get; set; }
     public DateTime? ValidTo { get; set; }
     public bool IsCurrent { get; set; }
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
     public async Task AssignParentAsync(long tenantId, long parentCorporateCustomerId, long childCorporateCustomerId,
         string relationType, DateTime validFrom, IAccountHierarchyAcyclicInvariant hierarchyInvariant,
@@ -71,3 +72,4 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
         IsCurrent = false;
     }
 }
+

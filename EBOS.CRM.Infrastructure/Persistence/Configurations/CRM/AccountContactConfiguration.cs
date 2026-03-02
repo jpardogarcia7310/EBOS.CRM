@@ -23,6 +23,7 @@ public class AccountContactConfiguration : IEntityTypeConfiguration<AccountConta
         builder.Property(x => x.CreatedBy).IsRequired();
         builder.Property(x => x.UpdatedAt);
         builder.Property(x => x.UpdatedBy);
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId })

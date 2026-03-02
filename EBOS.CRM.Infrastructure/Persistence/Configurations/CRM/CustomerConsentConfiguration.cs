@@ -23,6 +23,7 @@ public class CustomerConsentConfiguration : IEntityTypeConfiguration<CustomerCon
             .HasMaxLength(100);
         builder.Property(x => x.ExpiresAt);
         builder.Property(x => x.RevokedAt);
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.CustomerId })
@@ -36,3 +37,5 @@ public class CustomerConsentConfiguration : IEntityTypeConfiguration<CustomerCon
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+

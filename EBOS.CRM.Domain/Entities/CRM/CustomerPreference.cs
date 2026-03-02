@@ -14,6 +14,7 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
     public bool Preferred { get; set; }
     public DateTime UpdatedAt { get; set; }
     public long UpdatedBy { get; set; }
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
     public void UpdatePreference(bool preferred, DateTime updatedAt, long updatedBy)
     {
@@ -22,3 +23,4 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
         UpdatedBy = updatedBy;
     }
 }
+

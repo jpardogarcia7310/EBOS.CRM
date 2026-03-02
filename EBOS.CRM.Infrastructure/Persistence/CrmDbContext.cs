@@ -20,6 +20,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
     // DbSets
     public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
+    public DbSet<AuditOutboxMessage> AuditOutboxMessages => Set<AuditOutboxMessage>();
     public DbSet<AccountContact> AccountContacts => Set<AccountContact>();
     public DbSet<AccountContactRole> AccountContactRoles => Set<AccountContactRole>();
     public DbSet<AccountHierarchy> AccountHierarchies => Set<AccountHierarchy>();
@@ -73,6 +74,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
         ApplySoftDeleteQueryFilter(modelBuilder);
         ApplyTenantQueryFilter(modelBuilder);
         ApplyTenantSchema(modelBuilder);
+        ApplySqliteConcurrencyCompatibility(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -125,6 +127,29 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
         }
+    }
+
+    private void ApplySqliteConcurrencyCompatibility(ModelBuilder modelBuilder)
+    {
+        if (!string.Equals(Database.ProviderName, "Microsoft.EntityFrameworkCore.Sqlite", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        ConfigureSqliteRowVersion<AccountContact>(modelBuilder);
+        ConfigureSqliteRowVersion<AccountContactRole>(modelBuilder);
+        ConfigureSqliteRowVersion<AccountHierarchy>(modelBuilder);
+        ConfigureSqliteRowVersion<CustomerConsent>(modelBuilder);
+        ConfigureSqliteRowVersion<CustomerPreference>(modelBuilder);
+    }
+
+    private static void ConfigureSqliteRowVersion<TEntity>(ModelBuilder modelBuilder) where TEntity : class
+    {
+        modelBuilder.Entity<TEntity>()
+            .Property<byte[]>("RowVersion")
+            .IsRequired(false)
+            .ValueGeneratedNever()
+            .IsConcurrencyToken();
     }
 
     private void ApplyTenantSchema(ModelBuilder modelBuilder)

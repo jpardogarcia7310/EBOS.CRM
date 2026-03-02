@@ -17,6 +17,7 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     public long CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
     public ICollection<AccountContactRole> Roles { get; set; } = new List<AccountContactRole>();
 
