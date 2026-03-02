@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EBOS.CRM.Infrastructure.Persistence.Migrations;
 
-[DbContext(typeof(CrmDbContext))]
-[Migration("20260228213000_HardenCustomer360Infrastructure")]
 public partial class HardenCustomer360Infrastructure : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
