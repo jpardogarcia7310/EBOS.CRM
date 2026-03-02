@@ -21,6 +21,7 @@ public sealed class MappingChannelType : IRegister
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt)
             .Ignore(dest => dest.UpdatedBy)
-            .Ignore(dest => dest.CustomerPreferences);
+            .Ignore(dest => dest.CustomerPreferences)
+            .Ignore(dest => dest.ChannelCountries);
     }
 }

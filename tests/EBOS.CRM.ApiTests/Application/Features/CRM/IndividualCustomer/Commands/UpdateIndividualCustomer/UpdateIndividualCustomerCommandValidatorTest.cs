@@ -13,11 +13,11 @@ public class UpdateIndividualCustomerCommandValidatorTest
     private readonly UpdateIndividualCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateIndividualCustomerCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
@@ -65,6 +65,8 @@ public class UpdateIndividualCustomerCommandValidatorTest
         return new UpdateIndividualCustomerCommandValidator(countryRepo.Object, identificationRepo.Object, validationCatalog.Object);
     }
 }
+
+
 
 
 

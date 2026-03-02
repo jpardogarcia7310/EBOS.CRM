@@ -74,7 +74,7 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
             TenantId: 1,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"user{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 123 456",
+            Phone: "34600123456",
             StatusId: statusId);
 
         var response = await _client.PostAsJsonAsync($"/api/v{_customerVersion}/Customer", request);
@@ -85,6 +85,7 @@ public class BankInformationTest(CustomWebApplicationFactory factory) : IClassFi
         return created.Id;
     }
 }
+
 
 
 

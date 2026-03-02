@@ -451,9 +451,7 @@ public class MergeCustomersCommandHandler(
             {
                 if (preference.UpdatedAt > winnerPreference.UpdatedAt)
                 {
-                    winnerPreference.Preferred = preference.Preferred;
-                    winnerPreference.UpdatedAt = preference.UpdatedAt;
-                    winnerPreference.UpdatedBy = preference.UpdatedBy;
+                    winnerPreference.MergeFrom(preference);
                     await customerPreferenceRepository.UpdateAsync(winnerPreference, cancellationToken);
                 }
 
@@ -462,7 +460,7 @@ public class MergeCustomersCommandHandler(
                 continue;
             }
 
-            preference.CustomerId = winnerId;
+            preference.ReassignCustomer(winnerId);
             await customerPreferenceRepository.UpdateAsync(preference, cancellationToken);
             winnerPreferences[preference.ChannelId] = preference;
         }
@@ -532,25 +530,24 @@ public class MergeCustomersCommandHandler(
 
                 if (contact.IsPrimary && !existingContact.IsPrimary)
                 {
-                    existingContact.IsPrimary = true;
+                    existingContact.SetPrimary(true);
                     await accountContactRepository.UpdateAsync(existingContact, cancellationToken);
                 }
 
-                contact.IsPrimary = false;
+                contact.SetPrimary(false);
                 contact.Erased = true;
                 await accountContactRepository.UpdateAsync(contact, cancellationToken);
                 continue;
             }
 
-            contact.CorporateCustomerId = newCorporateId;
-            contact.IndividualCustomerId = newIndividualId;
+            contact.ReassignCustomers(newCorporateId, newIndividualId);
 
             if (contact.IsPrimary)
             {
                 if (primaryByCorporate.TryGetValue(newCorporateId, out var primaryContactId) &&
                     primaryContactId != contact.Id)
                 {
-                    contact.IsPrimary = false;
+                    contact.SetPrimary(false);
                 }
                 else
                 {

@@ -13,35 +13,45 @@ public class MappingAccountContact : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddAccountContactRequest, AccountContact>()
+            .ConstructUsing(src => AccountContact.Create(
+                src.TenantId,
+                src.CorporateCustomerId,
+                src.IndividualCustomerId,
+                src.IsPrimary,
+                src.StartAt,
+                src.EndAt,
+                1,
+                null))
             .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
-            .Map(dest => dest.IndividualCustomerId, src => src.IndividualCustomerId)
-            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
-            .Map(dest => dest.StartAt, src => src.StartAt)
-            .Map(dest => dest.EndAt, src => src.EndAt)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
+            .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.CorporateCustomer)
             .Ignore(dest => dest.IndividualCustomer)
             .Ignore(dest => dest.Roles);
 
         config.NewConfig<UpdateAccountContactRequest, AccountContact>()
+            .ConstructUsing(src => AccountContact.Create(
+                src.TenantId,
+                src.CorporateCustomerId,
+                src.IndividualCustomerId,
+                src.IsPrimary,
+                src.StartAt,
+                src.EndAt,
+                1,
+                null))
             .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.CorporateCustomerId, src => src.CorporateCustomerId)
-            .Map(dest => dest.IndividualCustomerId, src => src.IndividualCustomerId)
-            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
-            .Map(dest => dest.StartAt, src => src.StartAt)
-            .Map(dest => dest.EndAt, src => src.EndAt)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.CorporateCustomer)
             .Ignore(dest => dest.IndividualCustomer)
             .Ignore(dest => dest.Roles);

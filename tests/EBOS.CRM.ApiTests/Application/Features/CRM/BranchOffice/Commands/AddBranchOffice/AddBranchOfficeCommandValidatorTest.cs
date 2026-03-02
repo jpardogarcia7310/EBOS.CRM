@@ -9,21 +9,21 @@ public class AddBranchOfficeCommandValidatorTest
     private readonly AddBranchOfficeCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddBranchOfficeCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new AddBranchOfficeCommand(null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest);
     }
@@ -31,11 +31,11 @@ public class AddBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyName_Fails(string value)
+    public async Task Validate_EmptyName_Fails(string value)
     {
         var command = new AddBranchOfficeCommand(BuildAddRequest() with { Name = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.Name);
     }
@@ -43,11 +43,11 @@ public class AddBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhoneNumber_Fails(string value)
+    public async Task Validate_EmptyPhoneNumber_Fails(string value)
     {
         var command = new AddBranchOfficeCommand(BuildAddRequest() with { PhoneNumber = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.PhoneNumber);
     }
@@ -55,11 +55,11 @@ public class AddBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidCorporateCustomerId_Fails(long value)
+    public async Task Validate_InvalidCorporateCustomerId_Fails(long value)
     {
         var command = new AddBranchOfficeCommand(BuildAddRequest() with { CorporateCustomerId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.CorporateCustomerId);
     }
@@ -71,5 +71,7 @@ public class AddBranchOfficeCommandValidatorTest
             CorporateCustomerId: 1
         );
 }
+
+
 
 

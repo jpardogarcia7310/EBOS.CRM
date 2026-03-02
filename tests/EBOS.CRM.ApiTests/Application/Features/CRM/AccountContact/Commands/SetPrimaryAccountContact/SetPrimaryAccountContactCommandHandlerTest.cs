@@ -49,24 +49,11 @@ public class SetPrimaryAccountContactCommandHandlerTest
     public async Task Handle_WhenPrimaryTrue_DisablesOtherPrimariesAndAudits()
     {
         var request = new SetPrimaryAccountContactRequest(1, true);
-        var entity = new CRMAccountContact
-        {
-            Id = 10,
-            TenantId = 1,
-            CorporateCustomerId = 20,
-            IndividualCustomerId = 30,
-            IsPrimary = false,
-            StartAt = DateTime.UtcNow
-        };
-        var otherPrimary = new CRMAccountContact
-        {
-            Id = 11,
-            TenantId = 1,
-            CorporateCustomerId = 20,
-            IndividualCustomerId = 31,
-            IsPrimary = true,
-            StartAt = DateTime.UtcNow
-        };
+        var now = DateTime.UtcNow;
+        var entity = CRMAccountContact.Create(1, 20, 30, false, now, null, 1);
+        entity.Id = 10;
+        var otherPrimary = CRMAccountContact.Create(1, 20, 31, true, now, null, 1);
+        otherPrimary.Id = 11;
 
         _repositoryMock.Setup(r => r.GetByIdAsync(entity.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

@@ -21,6 +21,7 @@ public class MappingAccountContactRole : IRegister
             .Map(dest => dest.ValidTo, src => src.ValidTo)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.AccountContact);
 
         config.NewConfig<UpdateAccountContactRoleRequest, AccountContactRole>()
@@ -32,6 +33,7 @@ public class MappingAccountContactRole : IRegister
             .Map(dest => dest.ValidTo, src => src.ValidTo)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.AccountContact);
     }
 }

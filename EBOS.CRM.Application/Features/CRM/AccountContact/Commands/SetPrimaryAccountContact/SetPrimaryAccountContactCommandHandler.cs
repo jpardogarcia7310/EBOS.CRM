@@ -35,6 +35,7 @@ public class SetPrimaryAccountContactCommandHandler(
 
         var oldValues = AuditSerialization.Serialize(entity);
         entity.SetPrimary(entityRequest.IsPrimary);
+        entity.Touch(currentUser.UserId);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -47,6 +48,7 @@ public class SetPrimaryAccountContactCommandHandler(
                 foreach (var contact in existing)
                 {
                     contact.SetPrimary(false);
+                    contact.Touch(currentUser.UserId);
                     await repository.UpdateAsync(contact, cancellationToken);
                 }
             }

@@ -37,7 +37,7 @@ public class CorporateCustomerErrorHandlingTest(
             TenantId: 1,
             Code: "CORP-001",
             Email: "corp@example.com",
-            Phone: "+1 555 0000",
+            Phone: "15550000",
             StatusId: 1,
             LegalName: "Contoso S.A.",
             TaxIdentification: "A12345678");
@@ -53,7 +53,7 @@ public class CorporateCustomerErrorHandlingTest(
             TenantId: 1,
             Code: "CORP-001",
             Email: "corp@example.com",
-            Phone: "+1 555 0000",
+            Phone: "15550000",
             StatusId: 1,
             LegalName: "Contoso S.A.",
             TaxIdentification: "A12345678");
@@ -83,6 +83,7 @@ public class CorporateCustomerErrorHandlingTest(
         }
     }
 }
+
 
 
 

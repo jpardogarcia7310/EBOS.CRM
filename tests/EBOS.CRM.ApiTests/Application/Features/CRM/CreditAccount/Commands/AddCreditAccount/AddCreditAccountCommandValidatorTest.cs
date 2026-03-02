@@ -9,11 +9,11 @@ public class AddCreditAccountCommandValidatorTest
     private readonly AddCreditAccountCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddCreditAccountCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -25,5 +25,7 @@ public class AddCreditAccountCommandValidatorTest
             CustomerId: 1
         );
 }
+
+
 
 

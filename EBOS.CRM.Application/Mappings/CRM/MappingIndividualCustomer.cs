@@ -49,7 +49,9 @@ public class MappingIndividualCustomer : IRegister
             .Ignore(dest => dest.AccountContacts)
             .Ignore(dest => dest.Preferences)
             .Ignore(dest => dest.Consents)
-            .Ignore(dest => dest.IdentificationType);
+            .Ignore(dest => dest.IdentificationType)
+            .Ignore(dest => dest.Source)
+            .Ignore(dest => dest.Confidentiality);
 
         config.NewConfig<UpdateIndividualCustomerRequest, IndividualCustomer>()
             .Map(dest => dest.TenantId, src => src.TenantId)
@@ -77,7 +79,9 @@ public class MappingIndividualCustomer : IRegister
             .Ignore(dest => dest.AccountContacts)
             .Ignore(dest => dest.Preferences)
             .Ignore(dest => dest.Consents)
-            .Ignore(dest => dest.IdentificationType);
+            .Ignore(dest => dest.IdentificationType)
+            .Ignore(dest => dest.Source)
+            .Ignore(dest => dest.Confidentiality);
     }
 }
 

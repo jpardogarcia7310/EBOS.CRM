@@ -10,108 +10,108 @@ public class UpdateCaseCommandValidatorTest
     private readonly UpdateCaseCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_WhenRequestIsValid_Succeeds()
+    public async Task Validate_WhenRequestIsValid_Succeeds()
     {
         var command = new UpdateCaseCommand(1, BuildValidRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_WhenStatusIsInvalid_Fails()
+    public async Task Validate_WhenStatusIsInvalid_Fails()
     {
         var request = BuildValidRequest() with { Status = "BadStatus" };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Status);
     }
 
     [Fact]
-    public void Validate_WhenPriorityIsInvalid_Fails()
+    public async Task Validate_WhenPriorityIsInvalid_Fails()
     {
         var request = BuildValidRequest() with { Priority = "BadPriority" };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Priority);
     }
 
     [Fact]
-    public void Validate_WhenTitleIsEmpty_Fails()
+    public async Task Validate_WhenTitleIsEmpty_Fails()
     {
         var request = BuildValidRequest() with { Title = "" };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Title);
     }
 
     [Fact]
-    public void Validate_WhenQueueIdIsInvalid_Fails()
+    public async Task Validate_WhenQueueIdIsInvalid_Fails()
     {
         var request = BuildValidRequest() with { QueueId = 0 };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.QueueId);
     }
 
     [Fact]
-    public void Validate_WhenSlaIdIsInvalid_Fails()
+    public async Task Validate_WhenSlaIdIsInvalid_Fails()
     {
         var request = BuildValidRequest() with { SlaId = 0 };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.SlaId);
     }
 
     [Fact]
-    public void Validate_WhenOwnerUserIdIsInvalid_Fails()
+    public async Task Validate_WhenOwnerUserIdIsInvalid_Fails()
     {
         var request = BuildValidRequest() with { OwnerUserId = 0 };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.OwnerUserId);
     }
 
     [Fact]
-    public void Validate_WhenDescriptionIsTooLong_Fails()
+    public async Task Validate_WhenDescriptionIsTooLong_Fails()
     {
         var request = BuildValidRequest() with { Description = new string('a', 2001) };
         var command = new UpdateCaseCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest.Description);
     }
 
     [Fact]
-    public void Validate_WhenRequestIsNull_Fails()
+    public async Task Validate_WhenRequestIsNull_Fails()
     {
         var command = new UpdateCaseCommand(1, null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CaseRequest);
     }
 
     [Fact]
-    public void Validate_WhenIdIsInvalid_Fails()
+    public async Task Validate_WhenIdIsInvalid_Fails()
     {
         var command = new UpdateCaseCommand(0, BuildValidRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
@@ -129,3 +129,5 @@ public class UpdateCaseCommandValidatorTest
         DueAt: DateTime.UtcNow.AddDays(1)
     );
 }
+
+

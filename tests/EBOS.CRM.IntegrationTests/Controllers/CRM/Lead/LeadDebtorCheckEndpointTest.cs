@@ -17,7 +17,7 @@ public class LeadDebtorCheckEndpointTest(CustomWebApplicationFactory factory)
     {
         SeedDebtor(factory);
 
-        var request = new LeadDebtorCheckRequest(1, "moroso@example.com", "+34 600 999 888", null, "Jane Doe");
+        var request = new LeadDebtorCheckRequest(1, "moroso@example.com", "34600999888", null, "Jane Doe");
         var response = await _client.PostAsJsonAsync("/api/v2/Lead/debtor-check", request);
         response.EnsureSuccessStatusCode();
 
@@ -47,7 +47,7 @@ public class LeadDebtorCheckEndpointTest(CustomWebApplicationFactory factory)
             TenantId = 1,
             Code = "IND-MOR",
             Email = "moroso@example.com",
-            Phone = "+34 600 999 888",
+            Phone = "34600999888",
             StatusId = moroso.Id,
             FirstName = "Jane",
             LastName = "Doe",
@@ -71,3 +71,4 @@ public class LeadDebtorCheckEndpointTest(CustomWebApplicationFactory factory)
         db.SaveChanges();
     }
 }
+

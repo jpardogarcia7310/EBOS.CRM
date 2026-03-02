@@ -9,23 +9,23 @@ public class AddAccountHierarchyCommandValidatorTest
     private readonly AddAccountHierarchyCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddAccountHierarchyCommand(new AddAccountHierarchyRequest(
             1, 10, 20, "HOLDING", DateTime.UtcNow));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_SameParentAndChild_Fails()
+    public async Task Validate_SameParentAndChild_Fails()
     {
         var command = new AddAccountHierarchyCommand(new AddAccountHierarchyRequest(
             1, 10, 10, "HOLDING", DateTime.UtcNow));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AccountHierarchyRequest);
     }
@@ -33,13 +33,15 @@ public class AddAccountHierarchyCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidTenantId_Fails(long tenantId)
+    public async Task Validate_InvalidTenantId_Fails(long tenantId)
     {
         var command = new AddAccountHierarchyCommand(new AddAccountHierarchyRequest(
             tenantId, 10, 20, "HOLDING", DateTime.UtcNow));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AccountHierarchyRequest.TenantId);
     }
 }
+
+

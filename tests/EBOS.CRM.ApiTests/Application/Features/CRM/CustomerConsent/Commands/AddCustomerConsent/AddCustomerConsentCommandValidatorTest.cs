@@ -9,37 +9,39 @@ public class AddCustomerConsentCommandValidatorTest
     private readonly AddCustomerConsentCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidGrantEvent_Passes()
+    public async Task Validate_ValidGrantEvent_Passes()
     {
         var command = new AddCustomerConsentCommand(new AddCustomerConsentRequest(
             1, 100, "MARKETING_EMAIL", true, DateTime.UtcNow, "web", null));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_ExpireEventWithoutExpiresAt_Fails()
+    public async Task Validate_ExpireEventWithoutExpiresAt_Fails()
     {
         var now = DateTime.UtcNow;
         var command = new AddCustomerConsentCommand(new AddCustomerConsentRequest(
             1, 100, "MARKETING_EMAIL", false, now, "policy", null));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.ConsentRequest.ExpiresAt);
     }
 
     [Fact]
-    public void Validate_ExpireEventWithDifferentTimestamp_Fails()
+    public async Task Validate_ExpireEventWithDifferentTimestamp_Fails()
     {
         var now = DateTime.UtcNow;
         var command = new AddCustomerConsentCommand(new AddCustomerConsentRequest(
             1, 100, "MARKETING_EMAIL", false, now, "policy", now.AddMinutes(1)));
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.ConsentRequest.ExpiresAt);
     }
 }
+
+

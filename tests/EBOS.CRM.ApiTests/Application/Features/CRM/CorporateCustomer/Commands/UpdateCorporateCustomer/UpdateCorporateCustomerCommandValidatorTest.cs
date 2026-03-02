@@ -13,21 +13,21 @@ public class UpdateCorporateCustomerCommandValidatorTest
     private readonly UpdateCorporateCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateCorporateCustomerCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new UpdateCorporateCustomerCommand(1, null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest);
     }
@@ -35,11 +35,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyCode_Fails(string value)
+    public async Task Validate_EmptyCode_Fails(string value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { Code = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Code);
     }
@@ -47,11 +47,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyEmail_Fails(string value)
+    public async Task Validate_EmptyEmail_Fails(string value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { Email = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Email);
     }
@@ -59,11 +59,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhone_Fails(string value)
+    public async Task Validate_EmptyPhone_Fails(string value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { Phone = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Phone);
     }
@@ -71,11 +71,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyLegalName_Fails(string value)
+    public async Task Validate_EmptyLegalName_Fails(string value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { LegalName = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.LegalName);
     }
@@ -83,11 +83,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyTaxIdentification_Fails(string value)
+    public async Task Validate_EmptyTaxIdentification_Fails(string value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { TaxIdentification = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.TaxIdentification);
     }
@@ -95,11 +95,11 @@ public class UpdateCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidStatus_Fails(long value)
+    public async Task Validate_InvalidStatus_Fails(long value)
     {
         var command = new UpdateCorporateCustomerCommand(1, BuildUpdateRequest() with { StatusId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.StatusId);
     }
@@ -140,6 +140,8 @@ public class UpdateCorporateCustomerCommandValidatorTest
         return new UpdateCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
     }
 }
+
+
 
 
 
