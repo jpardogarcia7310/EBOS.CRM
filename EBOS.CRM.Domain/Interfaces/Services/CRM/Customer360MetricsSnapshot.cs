@@ -5,6 +5,8 @@ public sealed record Customer360MetricsSnapshot(
     long MergeFailures,
     long DedupeQueryTotal,
     long ConsentEventTotal,
+    long ConsentGrantedTotal,
+    long ConsentRevokedTotal,
     long AuditOutboxEnqueueTotal,
     long AuditOutboxDispatchSuccessTotal,
     long AuditOutboxDispatchFailureTotal,

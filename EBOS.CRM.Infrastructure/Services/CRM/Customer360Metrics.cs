@@ -16,6 +16,8 @@ public sealed class Customer360Metrics : ICustomer360Metrics
     private long _mergeFailures;
     private long _dedupeQueryTotal;
     private long _consentEventTotal;
+    private long _consentGrantedTotal;
+    private long _consentRevokedTotal;
     private long _auditOutboxEnqueueTotal;
     private long _auditOutboxDispatchSuccessTotal;
     private long _auditOutboxDispatchFailureTotal;
@@ -53,6 +55,14 @@ public sealed class Customer360Metrics : ICustomer360Metrics
             new("consent_type", consentType),
             new("granted", granted));
         Interlocked.Increment(ref _consentEventTotal);
+        if (granted)
+        {
+            Interlocked.Increment(ref _consentGrantedTotal);
+        }
+        else
+        {
+            Interlocked.Increment(ref _consentRevokedTotal);
+        }
     }
 
     public void RecordAuditOutboxEnqueue(string operation)
@@ -103,6 +113,8 @@ public sealed class Customer360Metrics : ICustomer360Metrics
             MergeFailures: Interlocked.Read(ref _mergeFailures),
             DedupeQueryTotal: Interlocked.Read(ref _dedupeQueryTotal),
             ConsentEventTotal: Interlocked.Read(ref _consentEventTotal),
+            ConsentGrantedTotal: Interlocked.Read(ref _consentGrantedTotal),
+            ConsentRevokedTotal: Interlocked.Read(ref _consentRevokedTotal),
             AuditOutboxEnqueueTotal: Interlocked.Read(ref _auditOutboxEnqueueTotal),
             AuditOutboxDispatchSuccessTotal: Interlocked.Read(ref _auditOutboxDispatchSuccessTotal),
             AuditOutboxDispatchFailureTotal: Interlocked.Read(ref _auditOutboxDispatchFailureTotal),

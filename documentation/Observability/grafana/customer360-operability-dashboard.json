@@ -141,7 +141,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(customer360_dedupe_query_total{job=~\"$job\"}[5m])) by (job)",
+          "expr": "sum(rate(customer360_dedupe_query_total{job=\"ebos-crm-api\"}[5m])) by (job)",
           "legendFormat": "dedupe {{job}}",
           "range": true,
           "refId": "A"
@@ -569,37 +569,7 @@
     "operability",
     "enterprise"
   ],
-  "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "definition": "label_values(customer360_merge_total, job)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "job",
-        "multi": true,
-        "name": "job",
-        "options": [],
-        "query": {
-          "query": "label_values(customer360_merge_total, job)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      }
-    ]
-  },
+  "templating": {"list": []},
   "time": {
     "from": "now-6h",
     "to": "now"

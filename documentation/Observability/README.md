@@ -6,10 +6,23 @@ This folder contains baseline observability assets for PR-6:
   - `grafana/customer360-operability-dashboard.json`
 - Prometheus alert rules:
   - `prometheus/customer360-alert-rules.yml`
+- Ready-to-use baseline config:
+  - `prometheus/prometheus.yml`
+  - `prometheus/alertmanager.yml`
+  - `.env.alerting`
+  - `docker-compose.observability.yml`
+  - `grafana/provisioning/datasources/datasource.yml`
+  - `grafana/provisioning/dashboards/dashboards.yml`
 
-## Metric Names
+## 100% closed state (exact matcher)
 
-The dashboard and alert rules assume OpenTelemetry-to-Prometheus naming using underscores:
+Everything is pinned to the exact matcher:
+
+- `job="ebos-crm-api"`
+
+No regex and no job variable are used in dashboard or alerts.
+
+## Expected metrics
 
 - `customer360_merge_total`
 - `customer360_dedupe_query_total`
@@ -17,33 +30,89 @@ The dashboard and alert rules assume OpenTelemetry-to-Prometheus naming using un
 - `customer360_audit_outbox_total`
 - `customer360_concurrency_total`
 
-If your Prometheus pipeline exposes different names, adjust the `expr` in the rules and panel queries.
+## Is Prometheus embedded in the API?
 
-## Labels used in queries
+No. Prometheus runs as an independent service and scrapes the API endpoint:
 
-- `job` (Prometheus scrape job for this API)
-- `instance`
-- Optional attributes emitted by the app:
-  - `tenant_id`
-  - `operation`
-  - `event`
-  - `success`
-  - `exhausted_retries`
+- `http://<api-host>:<port>/metrics`
 
-## Production adaptation applied
+The API in this repo already exposes `/metrics`.
 
-- Dashboard queries are filtered by Grafana variable `job` (`job=~"$job"`).
-- Alert rules include a production-oriented matcher:
-  - `job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"`
+## Quick local startup (Docker)
 
-If your scrape `job_name` differs, adjust this matcher in:
-- `prometheus/customer360-alert-rules.yml`
+1. Start the API locally with `http` profile (`http://localhost:5013`).
+2. `prometheus/prometheus.yml` is already preconfigured with `host.docker.internal:5013`.
+3. From `documentation/Observability`, run:
 
-## Import/Apply
+```bash
+docker compose -f docker-compose.observability.yml up -d
+```
 
-1. Import dashboard JSON into Grafana.
-2. Create/update a Prometheus rule file with `prometheus/customer360-alert-rules.yml`.
-3. Reload Prometheus rule config.
-4. Verify in Grafana:
-   - dashboard panels show data
-   - alert states are visible in Alertmanager/Grafana Alerting.
+Before first startup, update `.env.alerting` with real credentials
+(SMTP/Slack/Teams/PagerDuty) to enable real alert routing.
+
+4. Open:
+- Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
+- Grafana: `http://localhost:3000` (admin/admin)
+
+5. Import dashboard:
+- Manual import is not needed anymore. Grafana provisions it automatically on startup.
+
+## Minimal verification
+
+1. In Prometheus, query:
+
+```promql
+up{job="ebos-crm-api"}
+```
+
+This should return `1`.
+
+2. Check one Customer 360 metric:
+
+```promql
+sum(rate(customer360_merge_total{job="ebos-crm-api"}[5m]))
+```
+
+3. Check rules loaded:
+- Prometheus > `Status` > `Rules`, group `customer360-operability`.
+
+## Production
+
+- Keep exactly `job_name: ebos-crm-api` in `scrape_config`.
+- If you use Kubernetes/ServiceMonitor, relabel so final `job` label is `ebos-crm-api`.
+- If you change this job name, you must update dashboard and alert rules.
+- `docker-compose.observability.yml` already includes persistent volumes:
+  - `prometheus_data`
+  - `alertmanager_data`
+  - `grafana_data`
+
+## Recommended Next Steps
+
+1. Fill real values in `.env.alerting`.
+2. Start the stack:
+
+```bash
+docker compose -f documentation/Observability/docker-compose.observability.yml up -d
+```
+
+3. Verify in Prometheus:
+
+```promql
+up{job="ebos-crm-api"}
+```
+
+## Alert routing (severity)
+
+`prometheus/alertmanager.yml` routes by `severity`:
+
+- `critical`:
+  - PagerDuty
+  - Slack (critical channel)
+  - Teams (critical webhook)
+  - Critical email
+- `warning`:
+  - Slack (warning channel)
+  - Teams (warning webhook)
+  - Warning email

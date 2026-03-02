@@ -5,7 +5,7 @@ groups:
       - record: customer360:job_selector
         expr: |
           count by (job) (
-            customer360_merge_total{job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"}
+            customer360_merge_total{job="ebos-crm-api"}
           )
 
       - alert: Customer360OutboxDispatchFailuresHigh
@@ -13,7 +13,7 @@ groups:
           sum(rate(customer360_audit_outbox_total{
             event="dispatch",
             success="false",
-            job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+            job="ebos-crm-api"
           }[5m])) by (job)
           > 0.1
         for: 10m
@@ -30,7 +30,7 @@ groups:
           sum(rate(customer360_audit_outbox_total{
             event="dispatch",
             success="false",
-            job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+            job="ebos-crm-api"
           }[5m])) by (job)
           > 0.5
         for: 5m
@@ -47,13 +47,13 @@ groups:
           (
             sum(increase(customer360_audit_outbox_total{
               event="enqueue",
-              job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+              job="ebos-crm-api"
             }[15m])) by (job)
             -
             sum(increase(customer360_audit_outbox_total{
               event="dispatch",
               success="true",
-              job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+              job="ebos-crm-api"
             }[15m])) by (job)
           ) > 50
         for: 15m
@@ -69,7 +69,7 @@ groups:
         expr: |
           sum(rate(customer360_concurrency_total{
             exhausted_retries="true",
-            job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+            job="ebos-crm-api"
           }[5m])) by (job)
           > 0.05
         for: 10m
@@ -85,7 +85,7 @@ groups:
         expr: |
           sum(rate(customer360_merge_total{
             success="false",
-            job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+            job="ebos-crm-api"
           }[5m])) by (job)
           > 0
         for: 10m
@@ -100,7 +100,7 @@ groups:
       - alert: Customer360DedupeTrafficDrop
         expr: |
           sum(rate(customer360_dedupe_query_total{
-            job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"
+            job="ebos-crm-api"
           }[30m])) by (job)
           < 0.001
         for: 60m

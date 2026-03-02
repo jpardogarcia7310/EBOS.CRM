@@ -1,15 +1,28 @@
 # Activos de Observabilidad Customer 360
 
-Esta carpeta contiene activos base de observabilidad para la PR-6:
+Esta carpeta contiene activos base de observabilidad para PR-6:
 
 - Dashboard de Grafana (JSON):
   - `grafana/customer360-operability-dashboard.json`
 - Reglas de alerta de Prometheus:
   - `prometheus/customer360-alert-rules.yml`
+- Configuración base lista para usar:
+  - `prometheus/prometheus.yml`
+  - `prometheus/alertmanager.yml`
+  - `.env.alerting`
+  - `docker-compose.observability.yml`
+  - `grafana/provisioning/datasources/datasource.yml`
+  - `grafana/provisioning/dashboards/dashboards.yml`
 
-## Nombres de métricas
+## Estado cerrado al 100% (matcher exacto)
 
-El dashboard y las reglas de alerta asumen nomenclatura OpenTelemetry hacia Prometheus con guiones bajos:
+Todo está fijado con matcher exacto:
+
+- `job="ebos-crm-api"`
+
+No se usa regex ni variable para el `job` en dashboard ni alertas.
+
+## Métricas esperadas
 
 - `customer360_merge_total`
 - `customer360_dedupe_query_total`
@@ -17,33 +30,89 @@ El dashboard y las reglas de alerta asumen nomenclatura OpenTelemetry hacia Prom
 - `customer360_audit_outbox_total`
 - `customer360_concurrency_total`
 
-Si tu pipeline de Prometheus expone nombres distintos, ajusta los `expr` de las reglas y las consultas de paneles.
+## ¿Prometheus va dentro de la API?
 
-## Labels usadas en consultas
+No. Prometheus se despliega como servicio independiente y hace `scrape` del endpoint de la API:
 
-- `job` (job de scrape de Prometheus para esta API)
-- `instance`
-- Atributos opcionales emitidos por la app:
-  - `tenant_id`
-  - `operation`
-  - `event`
-  - `success`
-  - `exhausted_retries`
+- `http://<host-api>:<puerto>/metrics`
 
-## Adaptación a producción aplicada
+En este repo la API ya expone `/metrics`.
 
-- Las consultas del dashboard están filtradas por variable de Grafana `job` (`job=~"$job"`).
-- Las reglas de alerta incluyen un matcher orientado a producción:
-  - `job=~"(?i).*(ebos.*crm.*api|crm.*api|ebos.*crm).*"`
+## Puesta en marcha rápida local (Docker)
 
-Si tu `job_name` de scrape es diferente, ajusta este matcher en:
-- `prometheus/customer360-alert-rules.yml`
+1. Arranca la API en local en el perfil `http` (`http://localhost:5013`).
+2. `prometheus/prometheus.yml` ya viene preconfigurado con `host.docker.internal:5013`.
+3. Desde `documentation/Observability`, ejecuta:
 
-## Importar/Aplicar
+```bash
+docker compose -f docker-compose.observability.yml up -d
+```
 
-1. Importa el JSON del dashboard en Grafana.
-2. Crea/actualiza un archivo de reglas de Prometheus con `prometheus/customer360-alert-rules.yml`.
-3. Recarga la configuración de reglas en Prometheus.
-4. Verifica en Grafana:
-   - los paneles muestran datos
-   - el estado de alertas aparece en Alertmanager/Grafana Alerting.
+Antes del primer arranque, edita `.env.alerting` con tus credenciales reales
+(SMTP/Slack/Teams/PagerDuty) para habilitar routing real de alertas.
+
+4. Accede a:
+- Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
+- Grafana: `http://localhost:3000` (admin/admin)
+
+5. Importa el dashboard:
+- Ya no hace falta importarlo manualmente. Grafana lo provisiona automáticamente al iniciar.
+
+## Verificación mínima
+
+1. En Prometheus, consulta:
+
+```promql
+up{job="ebos-crm-api"}
+```
+
+Debe devolver `1`.
+
+2. Comprueba una métrica Customer 360:
+
+```promql
+sum(rate(customer360_merge_total{job="ebos-crm-api"}[5m]))
+```
+
+3. Comprueba reglas cargadas:
+- En Prometheus > `Status` > `Rules`, grupo `customer360-operability`.
+
+## Producción
+
+- Mantén exactamente `job_name: ebos-crm-api` en el `scrape_config`.
+- Si usas Kubernetes/ServiceMonitor, aplica relabel para que el label final `job` sea `ebos-crm-api`.
+- Si cambias el job, tendrás que actualizar dashboard y reglas.
+- `docker-compose.observability.yml` ya incluye volúmenes persistentes:
+  - `prometheus_data`
+  - `alertmanager_data`
+  - `grafana_data`
+
+## Siguientes pasos recomendados
+
+1. Rellenar valores reales en `.env.alerting`.
+2. Levantar stack:
+
+```bash
+docker compose -f documentation/Observability/docker-compose.observability.yml up -d
+```
+
+3. Verificar en Prometheus:
+
+```promql
+up{job="ebos-crm-api"}
+```
+
+## Routing de alertas (severidad)
+
+`prometheus/alertmanager.yml` enruta por `severity`:
+
+- `critical`:
+  - PagerDuty
+  - Slack (canal crítico)
+  - Teams (webhook crítico)
+  - Email crítico
+- `warning`:
+  - Slack (canal warning)
+  - Teams (webhook warning)
+  - Email warning
