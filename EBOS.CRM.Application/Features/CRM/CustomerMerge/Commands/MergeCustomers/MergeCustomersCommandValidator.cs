@@ -19,5 +19,8 @@ public class MergeCustomersCommandValidator : AbstractValidator<MergeCustomersCo
         RuleFor(x => x.Request)
             .Must(r => !r.MergeCustomerIds.Contains(r.WinnerCustomerId))
             .WithMessage("MergeCustomerIds must not include WinnerCustomerId.");
+        RuleFor(x => x.Request.Reason)
+            .NotEmpty()
+            .MaximumLength(500);
     }
 }

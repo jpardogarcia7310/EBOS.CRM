@@ -30,4 +30,21 @@ public class AccountHierarchyRepository(CrmDbContext context)
                         (x.ParentCorporateCustomerId == corporateCustomerId
                          || x.ChildCorporateCustomerId == corporateCustomerId))
             .CountAsync(cancellationToken);
+
+    public async Task<IReadOnlyCollection<long>> GetParentIdsByChildIdsAsync(long tenantId,
+        IReadOnlyCollection<long> childCorporateCustomerIds, CancellationToken cancellationToken = default)
+    {
+        if (childCorporateCustomerIds.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        return await AsQueryable()
+            .Where(x => x.TenantId == tenantId
+                        && x.IsCurrent
+                        && childCorporateCustomerIds.Contains(x.ChildCorporateCustomerId))
+            .Select(x => x.ParentCorporateCustomerId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
 }

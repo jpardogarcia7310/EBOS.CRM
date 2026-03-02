@@ -6,15 +6,34 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
 {
-    public long TenantId { get; set; }
-    public long ParentCorporateCustomerId { get; set; }
-    public CorporateCustomer ParentCorporateCustomer { get; set; } = null!;
-    public long ChildCorporateCustomerId { get; set; }
-    public CorporateCustomer ChildCorporateCustomer { get; set; } = null!;
-    public string RelationType { get; set; } = null!;
-    public DateTime ValidFrom { get; set; }
-    public DateTime? ValidTo { get; set; }
-    public bool IsCurrent { get; set; }
+    public long TenantId { get; private set; }
+    public long ParentCorporateCustomerId { get; private set; }
+    public CorporateCustomer ParentCorporateCustomer { get; private set; } = null!;
+    public long ChildCorporateCustomerId { get; private set; }
+    public CorporateCustomer ChildCorporateCustomer { get; private set; } = null!;
+    public string RelationType { get; private set; } = null!;
+    public DateTime ValidFrom { get; private set; }
+    public DateTime? ValidTo { get; private set; }
+    public bool IsCurrent { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
+    long ITenantScopedEntity.TenantId { get => TenantId; set => TenantId = value; }
+
+    private AccountHierarchy()
+    {
+    }
+
+    public static AccountHierarchy Create(long tenantId, long parentCorporateCustomerId, long childCorporateCustomerId,
+        string relationType, DateTime validFrom)
+    {
+        var entity = new AccountHierarchy
+        {
+            TenantId = tenantId,
+            Erased = false
+        };
+
+        entity.AssignParent(parentCorporateCustomerId, childCorporateCustomerId, relationType, validFrom);
+        return entity;
+    }
 
     public async Task AssignParentAsync(long tenantId, long parentCorporateCustomerId, long childCorporateCustomerId,
         string relationType, DateTime validFrom, IAccountHierarchyAcyclicInvariant hierarchyInvariant,
@@ -25,6 +44,12 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
             throw new ArgumentNullException(nameof(hierarchyInvariant));
         }
 
+        if (tenantId <= 0)
+        {
+            throw new InvalidOperationException("TenantId must be a positive value.");
+        }
+
+        TenantId = tenantId;
         await hierarchyInvariant.EnsureNoCycleAsync(tenantId, parentCorporateCustomerId, childCorporateCustomerId,
             cancellationToken);
         AssignParent(parentCorporateCustomerId, childCorporateCustomerId, relationType, validFrom);
@@ -71,3 +96,4 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
         IsCurrent = false;
     }
 }
+

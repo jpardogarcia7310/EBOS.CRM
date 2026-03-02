@@ -8,21 +8,21 @@ public class GetTenantConfigurationByIdQueryValidatorTest
     private readonly GetTenantConfigurationByIdQueryValidator _validator = new();
 
     [Fact]
-    public void Validate_PositiveId_Passes()
+    public async Task Validate_PositiveId_Passes()
     {
         var query = new GetTenantConfigurationByIdQuery(1);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldNotHaveValidationErrorFor(q => q.Id);
     }
 
     [Fact]
-    public void Validate_ZeroId_FailsWithCodeAndMessage()
+    public async Task Validate_ZeroId_FailsWithCodeAndMessage()
     {
         var query = new GetTenantConfigurationByIdQuery(0);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(q => q.Id)
             .WithErrorCode("VAL_ID_POSITIVE")
@@ -30,14 +30,16 @@ public class GetTenantConfigurationByIdQueryValidatorTest
     }
 
     [Fact]
-    public void Validate_NegativeId_FailsWithCodeAndMessage()
+    public async Task Validate_NegativeId_FailsWithCodeAndMessage()
     {
         var query = new GetTenantConfigurationByIdQuery(-5);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(q => q.Id)
             .WithErrorCode("VAL_ID_POSITIVE")
             .WithErrorMessage("The identifier must be a positive integer greater than 0.");
     }
 }
+
+

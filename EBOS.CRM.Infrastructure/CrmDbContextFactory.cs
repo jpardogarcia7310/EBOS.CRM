@@ -1,3 +1,5 @@
+using EBOS.CRM.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.Text.Json;
 

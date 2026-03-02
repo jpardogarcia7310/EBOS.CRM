@@ -30,19 +30,23 @@ public class AccountHierarchyCycleGuard(IAccountHierarchyRepository repository)
 
         while (frontier.Count > 0)
         {
-            var current = frontier.Dequeue();
-            var parents = await repository.GetByAccountPagedAsync(tenantId, current, 1, int.MaxValue, cancellationToken);
-
-            foreach (var relation in parents.Where(r => r.ChildCorporateCustomerId == current))
+            var levelChildren = new List<long>(frontier.Count);
+            while (frontier.Count > 0)
             {
-                if (relation.ParentCorporateCustomerId == childCorporateCustomerId)
+                levelChildren.Add(frontier.Dequeue());
+            }
+
+            var parentIds = await repository.GetParentIdsByChildIdsAsync(tenantId, levelChildren, cancellationToken);
+            foreach (var parentId in parentIds)
+            {
+                if (parentId == childCorporateCustomerId)
                 {
                     return true;
                 }
 
-                if (visited.Add(relation.ParentCorporateCustomerId))
+                if (visited.Add(parentId))
                 {
-                    frontier.Enqueue(relation.ParentCorporateCustomerId);
+                    frontier.Enqueue(parentId);
                 }
             }
         }

@@ -45,13 +45,13 @@ public class UpdateAccountContactCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        mapper.Map(entityRequest, entity);
         entity.Assign(entityRequest.CorporateCustomerId, entityRequest.IndividualCustomerId, entityRequest.StartAt);
         if (entityRequest.EndAt.HasValue)
         {
             entity.Unassign(entityRequest.EndAt.Value);
         }
         entity.SetPrimary(entityRequest.IsPrimary);
+        entity.Touch(currentUser.UserId);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -64,6 +64,7 @@ public class UpdateAccountContactCommandHandler(
                 foreach (var contact in existing)
                 {
                     contact.SetPrimary(false);
+                    contact.Touch(currentUser.UserId);
                     await repository.UpdateAsync(contact, cancellationToken);
                 }
             }

@@ -8,26 +8,26 @@ public class GetCountryByIdValidatorTest
     private readonly GetCountryByIdQueryValidator _validator = new();
 
     [Fact]
-    public void Validate_PositiveId_Passes()
+    public async Task Validate_PositiveId_Passes()
     {
         // Arrange
         var query = new GetCountryByIdQuery(1);
 
         // Act
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         // Assert
         result.ShouldNotHaveValidationErrorFor(q => q.Id);
     }
 
     [Fact]
-    public void Validate_ZeroId_FailsWithCodeAndMessage()
+    public async Task Validate_ZeroId_FailsWithCodeAndMessage()
     {
         // Arrange
         var query = new GetCountryByIdQuery(0);
 
         // Act
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
@@ -36,13 +36,13 @@ public class GetCountryByIdValidatorTest
     }
 
     [Fact]
-    public void Validate_NegativeId_FailsWithCodeAndMessage()
+    public async Task Validate_NegativeId_FailsWithCodeAndMessage()
     {
         // Arrange
         var query = new GetCountryByIdQuery(-5);
 
         // Act
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         // Assert
         result.ShouldHaveValidationErrorFor(q => q.Id)
@@ -51,15 +51,15 @@ public class GetCountryByIdValidatorTest
     }
 
     [Fact]
-    public void Validate_MultipleCalls_AreStateless()
+    public async Task Validate_MultipleCalls_AreStateless()
     {
         // Arrange
         var queryValid = new GetCountryByIdQuery(10);
         var queryInvalid = new GetCountryByIdQuery(0);
 
         // Act
-        var resultValid = _validator.TestValidate(queryValid);
-        var resultInvalid = _validator.TestValidate(queryInvalid);
+        var resultValid = await _validator.TestValidateAsync(queryValid);
+        var resultInvalid = await _validator.TestValidateAsync(queryInvalid);
 
         // Assert
         resultValid.ShouldNotHaveValidationErrorFor(q => q.Id);
@@ -67,7 +67,7 @@ public class GetCountryByIdValidatorTest
     }
 
     [Fact]
-    public void Validate_ThreadSafety_UnderParallelInvocations()
+    public async Task Validate_ThreadSafety_UnderParallelInvocations()
     {
         // Arrange
         var queries = new[]
@@ -79,12 +79,14 @@ public class GetCountryByIdValidatorTest
             };
 
         // Act
-        var results = queries.AsParallel().Select(q => _validator.TestValidate(q)).ToList();
+        var results = await Task.WhenAll(queries.Select(q => _validator.TestValidateAsync(q)));
 
         // Assert
         Assert.Contains(results, r => r.IsValid); // At least one valid
         Assert.Contains(results, r => !r.IsValid); // At least one invalid
     }
 }
+
+
 
 

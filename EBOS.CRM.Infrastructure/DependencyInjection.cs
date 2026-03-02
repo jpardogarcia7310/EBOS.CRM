@@ -38,6 +38,8 @@ public static class DependencyInjection
 
         services.AddOptions<AuditServiceOptions>()
             .Bind(configuration.GetSection(AuditServiceOptions.SectionName));
+        services.AddOptions<AuditOutboxOptions>()
+            .Bind(configuration.GetSection(AuditOutboxOptions.SectionName));
         services.AddOptions<CustomerDedupeOptions>()
             .Bind(configuration.GetSection(CustomerDedupeOptions.SectionName));
         services.AddOptions<CustomerMergeOptions>()
@@ -45,6 +47,13 @@ public static class DependencyInjection
         services.AddOptions<ValidationCatalogOptions>()
             .Bind(configuration.GetSection(ValidationCatalogOptions.SectionName));
         services.AddHttpClient<IAuditService, AuditServiceClient>(client =>
+        {
+            var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
+                          ?? new AuditServiceOptions();
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+        });
+        services.AddHttpClient(nameof(AuditServiceClient), client =>
         {
             var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
                           ?? new AuditServiceOptions();
@@ -59,6 +68,7 @@ public static class DependencyInjection
 
         // Repositories base (AddScoped for per-request lifetime)
         services.AddScoped<IAccountContactPrimaryGuard, AccountContactPrimaryGuard>();
+        services.AddSingleton<ICustomer360Metrics, Customer360Metrics>();
         services.AddScoped<IAccountContactRolePrimaryGuard, AccountContactRolePrimaryGuard>();
         services.AddScoped<IAccountContactRepository, AccountContactRepository>();
         services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
@@ -105,6 +115,8 @@ public static class DependencyInjection
         services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
         services.AddScoped<IValidationCatalogService, ValidationCatalogService>();
         services.AddScoped<IValidationRuleRepository, ValidationRuleRepository>();
+        services.AddScoped<IAuditOutboxService, AuditOutboxService>();
+        services.AddHostedService<AuditOutboxDispatcher>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>

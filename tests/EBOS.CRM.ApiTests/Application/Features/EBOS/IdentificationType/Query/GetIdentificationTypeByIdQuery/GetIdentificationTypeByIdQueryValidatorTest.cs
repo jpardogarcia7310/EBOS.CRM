@@ -8,21 +8,21 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     private readonly GetIdentificationTypeByIdQueryValidator _validator = new();
 
     [Fact]
-    public void Validate_PositiveId_Passes()
+    public async Task Validate_PositiveId_Passes()
     {
         var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(1);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldNotHaveValidationErrorFor(q => q.Id);
     }
 
     [Fact]
-    public void Validate_ZeroId_FailsWithCodeAndMessage()
+    public async Task Validate_ZeroId_FailsWithCodeAndMessage()
     {
         var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(q => q.Id)
             .WithErrorCode("VAL_ID_POSITIVE")
@@ -30,11 +30,11 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     }
 
     [Fact]
-    public void Validate_NegativeId_FailsWithCodeAndMessage()
+    public async Task Validate_NegativeId_FailsWithCodeAndMessage()
     {
         var query = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(-5);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(q => q.Id)
             .WithErrorCode("VAL_ID_POSITIVE")
@@ -42,20 +42,20 @@ public class GetIdentificationTypeByIdQueryValidatorTest
     }
 
     [Fact]
-    public void Validate_MultipleCalls_AreStateless()
+    public async Task Validate_MultipleCalls_AreStateless()
     {
         var queryValid = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(10);
         var queryInvalid = new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(0);
 
-        var resultValid = _validator.TestValidate(queryValid);
-        var resultInvalid = _validator.TestValidate(queryInvalid);
+        var resultValid = await _validator.TestValidateAsync(queryValid);
+        var resultInvalid = await _validator.TestValidateAsync(queryInvalid);
 
         resultValid.ShouldNotHaveValidationErrorFor(q => q.Id);
         resultInvalid.ShouldHaveValidationErrorFor(q => q.Id);
     }
 
     [Fact]
-    public void Validate_ThreadSafety_UnderParallelInvocations()
+    public async Task Validate_ThreadSafety_UnderParallelInvocations()
     {
         var queries = new[]
         {
@@ -65,19 +65,26 @@ public class GetIdentificationTypeByIdQueryValidatorTest
             new global::EBOS.CRM.Application.Features.EBOS.IdentificationType.Query.GetIdentificationTypeByIdQuery.GetIdentificationTypeByIdQuery(5)
         };
 
-        Parallel.ForEach(queries, query =>
+        var results = await Task.WhenAll(queries.Select(async query => new
         {
-            var result = _validator.TestValidate(query);
-            if (query.Id > 0)
+            Query = query,
+            Result = await _validator.TestValidateAsync(query)
+        }));
+
+        foreach (var item in results)
+        {
+            if (item.Query.Id > 0)
             {
-                result.ShouldNotHaveValidationErrorFor(q => q.Id);
+                item.Result.ShouldNotHaveValidationErrorFor(q => q.Id);
             }
             else
             {
-                result.ShouldHaveValidationErrorFor(q => q.Id);
+                item.Result.ShouldHaveValidationErrorFor(q => q.Id);
             }
-        });
+        }
     }
 }
+
+
 
 

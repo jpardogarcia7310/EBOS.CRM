@@ -13,11 +13,11 @@ public class AddIndividualCustomerCommandValidatorTest
     private readonly AddIndividualCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddIndividualCustomerCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -65,6 +65,8 @@ public class AddIndividualCustomerCommandValidatorTest
         return new AddIndividualCustomerCommandValidator(countryRepo.Object, identificationRepo.Object, validationCatalog.Object);
     }
 }
+
+
 
 
 

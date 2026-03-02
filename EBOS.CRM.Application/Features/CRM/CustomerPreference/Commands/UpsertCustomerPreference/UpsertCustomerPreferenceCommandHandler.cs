@@ -51,8 +51,13 @@ public class UpsertCustomerPreferenceCommandHandler(
         {
             if (existing is null)
             {
-                var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerPreference>(entityRequest);
-                entity.UpdatePreference(entityRequest.Preferred, DateTime.UtcNow, currentUser.UserId);
+                var entity = global::EBOS.CRM.Domain.Entities.CRM.CustomerPreference.Create(
+                    entityRequest.TenantId,
+                    entityRequest.CustomerId,
+                    entityRequest.ChannelId,
+                    entityRequest.Preferred,
+                    DateTime.UtcNow,
+                    currentUser.UserId);
 
                 await repository.AddAsync(entity, cancellationToken);
                 await repository.SaveChangesAsync(cancellationToken);

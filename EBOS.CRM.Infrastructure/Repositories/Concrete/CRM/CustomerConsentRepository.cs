@@ -21,21 +21,34 @@ public class CustomerConsentRepository(CrmDbContext context)
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = Math.Max(1, pageSize);
 
-        var events = await AsQueryable()
-            .Where(x => x.TenantId == tenantId && x.CustomerId == customerId)
+        var baseQuery = AsQueryable()
+            .Where(x => x.TenantId == tenantId && x.CustomerId == customerId);
+
+        var latestDatesByType = baseQuery
+            .GroupBy(x => x.ConsentType)
+            .Select(g => new
+            {
+                ConsentType = g.Key,
+                LatestAt = g.Max(x => x.RevokedAt ?? x.GrantedAt)
+            });
+
+        var latestIdsByType = baseQuery
+            .Join(latestDatesByType,
+                consent => new { consent.ConsentType, EventAt = consent.RevokedAt ?? consent.GrantedAt },
+                latest => new { latest.ConsentType, EventAt = latest.LatestAt },
+                (consent, _) => consent)
+            .GroupBy(x => x.ConsentType)
+            .Select(g => g.Max(x => x.Id));
+
+        return await baseQuery
+            .Where(x => latestIdsByType.Contains(x.Id))
             .OrderByDescending(x => x.RevokedAt ?? x.GrantedAt)
             .ThenByDescending(x => x.Id)
+            .Skip((safePageNumber - 1) * safePageSize)
+            .Take(safePageSize)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        var latestByType = events
-            .GroupBy(x => x.ConsentType, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First())
-            .Skip((safePageNumber - 1) * safePageSize)
-            .Take(safePageSize)
-            .ToList();
-
-        return latestByType;
     }
 
     public async Task<IReadOnlyCollection<CustomerConsent>> GetByCustomerPagedAsync(long tenantId, long customerId,

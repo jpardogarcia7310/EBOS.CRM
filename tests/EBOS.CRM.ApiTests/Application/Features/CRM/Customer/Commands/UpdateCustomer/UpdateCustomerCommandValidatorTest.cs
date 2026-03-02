@@ -13,21 +13,21 @@ public class UpdateCustomerCommandValidatorTest
     private readonly UpdateCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateCustomerCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new UpdateCustomerCommand(1, null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest);
     }
@@ -35,11 +35,11 @@ public class UpdateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyCode_Fails(string value)
+    public async Task Validate_EmptyCode_Fails(string value)
     {
         var command = new UpdateCustomerCommand(1, BuildUpdateRequest() with { Code = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Code);
     }
@@ -47,11 +47,11 @@ public class UpdateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyEmail_Fails(string value)
+    public async Task Validate_EmptyEmail_Fails(string value)
     {
         var command = new UpdateCustomerCommand(1, BuildUpdateRequest() with { Email = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Email);
     }
@@ -59,11 +59,11 @@ public class UpdateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhone_Fails(string value)
+    public async Task Validate_EmptyPhone_Fails(string value)
     {
         var command = new UpdateCustomerCommand(1, BuildUpdateRequest() with { Phone = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Phone);
     }
@@ -71,11 +71,11 @@ public class UpdateCustomerCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidStatus_Fails(long value)
+    public async Task Validate_InvalidStatus_Fails(long value)
     {
         var command = new UpdateCustomerCommand(1, BuildUpdateRequest() with { StatusId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.StatusId);
     }
@@ -102,6 +102,8 @@ public class UpdateCustomerCommandValidatorTest
         return new UpdateCustomerCommandValidator(validationCatalog.Object, countryRepository.Object);
     }
 }
+
+
 
 
 

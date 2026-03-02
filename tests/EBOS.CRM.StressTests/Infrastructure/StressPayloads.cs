@@ -121,18 +121,18 @@ public static class StressPayloads
                         Post: () => JsonContent.Create(new AddBranchOfficeRequest(
                             TenantId,
                             Name: $"Branch {ShortCode()}",
-                            PhoneNumber: "+34 911 000 000",
+                            PhoneNumber: "34911000000",
                             CorporateCustomerId: corporateCustomerId)),
                         Put: id => JsonContent.Create(new UpdateBranchOfficeRequest(
                             Id: id,
                             TenantId: TenantId,
                             Name: $"Branch {ShortCode()}",
-                            PhoneNumber: "+34 911 000 001",
+                            PhoneNumber: "34911000001",
                             CorporateCustomerId: corporateCustomerId)),
                         Patch: _ => JsonContent.Create(new PatchBranchOfficeRequest(
                             TenantId,
                             Name: $"Branch {ShortCode()}",
-                            PhoneNumber: "+34 911 000 002",
+                            PhoneNumber: "34911000002",
                             CorporateCustomerId: corporateCustomerId)));
                 }
             case "BranchOfficeAddress":
@@ -173,7 +173,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 000",
+                            Phone: "34600000000",
                             StatusId: statusId,
                             LegalName: $"Contoso {ShortCode()}",
                             TaxIdentification: $"B{RandomDigits(8)}")),
@@ -181,7 +181,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 001",
+                            Phone: "34600000001",
                             StatusId: statusId,
                             LegalName: $"Contoso {ShortCode()}",
                             TaxIdentification: $"B{RandomDigits(8)}")),
@@ -189,7 +189,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 002",
+                            Phone: "34600000002",
                             StatusId: statusId,
                             LegalName: $"Contoso {ShortCode()}",
                             TaxIdentification: $"B{RandomDigits(8)}")));
@@ -252,20 +252,20 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 010",
+                            Phone: "34600000010",
                             StatusId: statusId)),
                         Put: id => JsonContent.Create(new UpdateCustomerRequest(
                             Id: id,
                             TenantId: TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 011",
+                            Phone: "34600000011",
                             StatusId: statusId)),
                         Patch: _ => JsonContent.Create(new PatchCustomerRequest(
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 012",
+                            Phone: "34600000012",
                             StatusId: statusId)));
                 }
             case "CustomerAddress":
@@ -307,7 +307,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 020",
+                            Phone: "34600000020",
                             StatusId: statusId,
                             FirstName: "Jane",
                             LastName: "Doe",
@@ -318,7 +318,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 021",
+                            Phone: "34600000021",
                             StatusId: statusId,
                             FirstName: "Jane",
                             LastName: "Doe",
@@ -329,7 +329,7 @@ public static class StressPayloads
                             TenantId,
                             Code: ShortCode(),
                             Email: $"{ShortCode()}@example.com",
-                            Phone: "+34 600 000 022",
+                            Phone: "34600000022",
                             StatusId: statusId,
                             FirstName: "Jane",
                             LastName: "Doe",
@@ -572,3 +572,4 @@ public static class StressPayloads
     private static string GenerateIban()
         => $"ES{RandomDigits(22)}";
 }
+

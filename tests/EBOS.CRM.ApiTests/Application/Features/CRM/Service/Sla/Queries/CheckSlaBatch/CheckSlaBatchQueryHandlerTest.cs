@@ -70,12 +70,16 @@ public class CheckSlaBatchQueryHandlerTest
         var slaRepositoryMock = new Mock<ISlaRepository>();
 
         caseRepositoryMock
-            .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(cases);
+            .Setup(r => r.GetOpenSlaBatchAsync(1, 1, 10, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cases.Where(c => c.TenantId == 1 && c.Status == CaseEntity.StatusOpen).ToList());
+
+        caseRepositoryMock
+            .Setup(r => r.CountOpenSlaBatchAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         slaRepositoryMock
-            .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(slas);
+            .Setup(r => r.GetByIdsAsync(It.IsAny<IReadOnlyCollection<long>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(slas.Where(s => s.TenantId == 1).ToList());
 
         var handler = new CheckSlaBatchQueryHandler(caseRepositoryMock.Object, slaRepositoryMock.Object);
         var request = new CheckSlaBatchRequest(TenantId: 1, Now: now, PageNumber: 1, PageSize: 10);

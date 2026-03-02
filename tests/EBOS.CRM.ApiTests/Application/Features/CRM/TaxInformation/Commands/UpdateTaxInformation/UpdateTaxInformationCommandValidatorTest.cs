@@ -9,11 +9,11 @@ public class UpdateTaxInformationCommandValidatorTest
     private readonly UpdateTaxInformationCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateTaxInformationCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
@@ -26,5 +26,7 @@ public class UpdateTaxInformationCommandValidatorTest
             CustomerId: 1
         );
 }
+
+
 
 

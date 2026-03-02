@@ -17,10 +17,12 @@ public class CustomerPreferenceConfiguration : IEntityTypeConfiguration<Customer
         builder.Property(x => x.Preferred).IsRequired();
         builder.Property(x => x.UpdatedAt).IsRequired();
         builder.Property(x => x.UpdatedBy).IsRequired();
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.CustomerId, x.ChannelId })
             .IsUnique()
+            .HasFilter("[Erased] = 0")
             .HasDatabaseName("UX_CustomerPreference_TenantId_Customer_Channel");
 
         builder.HasOne(x => x.Customer)
@@ -34,3 +36,5 @@ public class CustomerPreferenceConfiguration : IEntityTypeConfiguration<Customer
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+

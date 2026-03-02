@@ -43,7 +43,7 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
             TenantId: 1,
             Code: $"IND-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"ind{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 555 000",
+            Phone: "34600555000",
             StatusId: statusId,
             FirstName: "Jane",
             LastName: "Doe",
@@ -61,7 +61,7 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
             TenantId: 1,
             Code: $"IND-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"ind{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 777 000",
+            Phone: "34600777000",
             StatusId: statusId,
             FirstName: "Jane",
             LastName: "Doe",
@@ -77,6 +77,7 @@ public class IndividualCustomerTest(CustomWebApplicationFactory factory) : IClas
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
+
 
 
 

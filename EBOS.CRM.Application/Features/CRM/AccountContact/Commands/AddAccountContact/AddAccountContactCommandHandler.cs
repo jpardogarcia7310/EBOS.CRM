@@ -40,13 +40,14 @@ public class AddAccountContactCommandHandler(
             throw new InvalidOperationException("Individual customer tenant mismatch.");
         }
 
-        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountContact>(entityRequest);
-        entity.Assign(entityRequest.CorporateCustomerId, entityRequest.IndividualCustomerId, entityRequest.StartAt);
-        if (entityRequest.EndAt.HasValue)
-        {
-            entity.Unassign(entityRequest.EndAt.Value);
-        }
-        entity.SetPrimary(entityRequest.IsPrimary);
+        var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountContact.Create(
+            entityRequest.TenantId,
+            entityRequest.CorporateCustomerId,
+            entityRequest.IndividualCustomerId,
+            entityRequest.IsPrimary,
+            entityRequest.StartAt,
+            entityRequest.EndAt,
+            currentUser.UserId);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -59,6 +60,7 @@ public class AddAccountContactCommandHandler(
                 foreach (var contact in existing)
                 {
                     contact.SetPrimary(false);
+                    contact.Touch(currentUser.UserId);
                     await repository.UpdateAsync(contact, cancellationToken);
                 }
             }

@@ -9,31 +9,31 @@ public class UpdateBankInformationCommandValidatorTest
     private readonly UpdateBankInformationCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateBankInformationCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new UpdateBankInformationCommand(1, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new UpdateBankInformationCommand(1, null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BankInformationRequest);
     }
@@ -41,31 +41,31 @@ public class UpdateBankInformationCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyIban_Fails(string value)
+    public async Task Validate_EmptyIban_Fails(string value)
     {
         var command = new UpdateBankInformationCommand(1, BuildUpdateRequest() with { Iban = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BankInformationRequest.Iban);
     }
 
     [Fact]
-    public void Validate_BicTooLong_Fails()
+    public async Task Validate_BicTooLong_Fails()
     {
         var command = new UpdateBankInformationCommand(1, BuildUpdateRequest() with { Bic = new string('a', 501) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BankInformationRequest.Bic);
     }
 
     [Fact]
-    public void Validate_BankNameTooLong_Fails()
+    public async Task Validate_BankNameTooLong_Fails()
     {
         var command = new UpdateBankInformationCommand(1, BuildUpdateRequest() with { BankName = new string('a', 501) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BankInformationRequest.BankName);
     }
@@ -73,11 +73,11 @@ public class UpdateBankInformationCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidCustomerId_Fails(long value)
+    public async Task Validate_InvalidCustomerId_Fails(long value)
     {
         var command = new UpdateBankInformationCommand(1, BuildUpdateRequest() with { CustomerId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BankInformationRequest.CustomerId);
     }
@@ -90,5 +90,7 @@ public class UpdateBankInformationCommandValidatorTest
             CustomerId: 1
         );
 }
+
+
 
 

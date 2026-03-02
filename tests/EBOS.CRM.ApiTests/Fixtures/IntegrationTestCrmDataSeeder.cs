@@ -71,7 +71,7 @@ public static class IntegrationTestCrmDataSeeder
             {
                 Code = "CORP-001",
                 Email = "accounting@contoso.com",
-                Phone = "+34 911 000 111",
+                Phone = "34911000111",
                 CreatedAt = DateTime.UtcNow.AddDays(-30),
                 StatusId = statusActiveId,
                 LegalName = "Contoso S.A.",
@@ -82,7 +82,7 @@ public static class IntegrationTestCrmDataSeeder
             {
                 Code = "IND-001",
                 Email = "jane.doe@example.com",
-                Phone = "+34 600 123 456",
+                Phone = "34600123456",
                 CreatedAt = DateTime.UtcNow.AddDays(-10),
                 StatusId = statusActiveId,
                 FirstName = "Jane",
@@ -195,7 +195,7 @@ public static class IntegrationTestCrmDataSeeder
             context.BranchOffices.Add(new BranchOffice
             {
                 Name = "HQ Madrid",
-                PhoneNumber = "+34 911 000 222",
+                PhoneNumber = "34911000222",
                 CorporateCustomerId = corporateCustomerId
             });
         }
@@ -377,5 +377,6 @@ public static class IntegrationTestCrmDataSeeder
         context.SaveChanges();
     }
 }
+
 
 

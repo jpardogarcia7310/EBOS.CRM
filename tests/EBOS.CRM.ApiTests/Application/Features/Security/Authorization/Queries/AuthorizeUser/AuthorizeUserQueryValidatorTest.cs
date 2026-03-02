@@ -9,31 +9,31 @@ public class AuthorizeUserQueryValidatorTest
     private readonly AuthorizeUserQueryValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var query = new AuthorizeUserQuery(BuildRequest());
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_InvalidUserId_Fails()
+    public async Task Validate_InvalidUserId_Fails()
     {
         var query = new AuthorizeUserQuery(BuildRequest() with { UserId = 0 });
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(x => x.Request.UserId);
     }
 
     [Fact]
-    public void Validate_EmptyPolicyCode_Fails()
+    public async Task Validate_EmptyPolicyCode_Fails()
     {
         var query = new AuthorizeUserQuery(BuildRequest() with { PolicyCode = "" });
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(x => x.Request.PolicyCode);
     }
@@ -42,3 +42,5 @@ public class AuthorizeUserQueryValidatorTest
         UserId: 1,
         PolicyCode: "crm.customer.access");
 }
+
+

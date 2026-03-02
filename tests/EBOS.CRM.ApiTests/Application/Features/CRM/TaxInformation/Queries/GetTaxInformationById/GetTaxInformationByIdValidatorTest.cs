@@ -10,14 +10,16 @@ public class GetTaxInformationByIdQueryValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidId_Fails(long id)
+    public async Task Validate_InvalidId_Fails(long id)
     {
         var query = new GetTaxInformationByIdQuery(id);
 
-        var result = _validator.TestValidate(query);
+        var result = await _validator.TestValidateAsync(query);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+
 
 

@@ -6,19 +6,54 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 public class AccountContact : ErasableEntity, ITenantScopedEntity
 {
     public long TenantId { get; set; }
-    public long CorporateCustomerId { get; set; }
-    public CorporateCustomer CorporateCustomer { get; set; } = null!;
-    public long IndividualCustomerId { get; set; }
-    public IndividualCustomer IndividualCustomer { get; set; } = null!;
-    public bool IsPrimary { get; set; }
-    public DateTime StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public long CreatedBy { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public long? UpdatedBy { get; set; }
+    public long CorporateCustomerId { get; private set; }
+    public CorporateCustomer CorporateCustomer { get; private set; } = null!;
+    public long IndividualCustomerId { get; private set; }
+    public IndividualCustomer IndividualCustomer { get; private set; } = null!;
+    public bool IsPrimary { get; private set; }
+    public DateTime StartAt { get; private set; }
+    public DateTime? EndAt { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public long CreatedBy { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
+    public long? UpdatedBy { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     public ICollection<AccountContactRole> Roles { get; set; } = new List<AccountContactRole>();
+
+    private AccountContact()
+    {
+    }
+
+    public static AccountContact Create(long tenantId, long corporateCustomerId, long individualCustomerId,
+        bool isPrimary, DateTime startAt, DateTime? endAt, long createdBy, DateTime? createdAt = null)
+    {
+        if (tenantId <= 0)
+        {
+            throw new InvalidOperationException("TenantId must be a positive value.");
+        }
+
+        if (createdBy <= 0)
+        {
+            throw new InvalidOperationException("CreatedBy must be a positive value.");
+        }
+
+        var entity = new AccountContact
+        {
+            TenantId = tenantId,
+            CreatedBy = createdBy,
+            CreatedAt = createdAt ?? DateTime.UtcNow
+        };
+
+        entity.Assign(corporateCustomerId, individualCustomerId, startAt);
+        if (endAt.HasValue)
+        {
+            entity.Unassign(endAt.Value);
+        }
+
+        entity.SetPrimary(isPrimary);
+        return entity;
+    }
 
     public void Assign(long corporateCustomerId, long individualCustomerId, DateTime startAt)
     {
@@ -38,6 +73,17 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
         EndAt = null;
     }
 
+    public void ReassignCustomers(long corporateCustomerId, long individualCustomerId)
+    {
+        if (corporateCustomerId <= 0 || individualCustomerId <= 0)
+        {
+            throw new InvalidOperationException("Customer ids must be positive values.");
+        }
+
+        CorporateCustomerId = corporateCustomerId;
+        IndividualCustomerId = individualCustomerId;
+    }
+
     public void Unassign(DateTime endAt)
     {
         if (endAt < StartAt)
@@ -52,6 +98,17 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     public void SetPrimary(bool isPrimary)
     {
         IsPrimary = isPrimary;
+    }
+
+    public void Touch(long updatedBy, DateTime? updatedAt = null)
+    {
+        if (updatedBy <= 0)
+        {
+            throw new InvalidOperationException("UpdatedBy must be a positive value.");
+        }
+
+        UpdatedBy = updatedBy;
+        UpdatedAt = updatedAt ?? DateTime.UtcNow;
     }
 
     public void SetPrimaryRole(long accountContactRoleId)

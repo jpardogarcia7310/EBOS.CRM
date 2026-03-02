@@ -3,6 +3,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -12,6 +13,7 @@ public class RevokeCustomerConsentCommandHandler(
     ICustomerConsentRepository repository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
+    ICustomer360Metrics metrics,
     IMapper mapper)
     : IRequestHandler<RevokeCustomerConsentCommand, CustomerConsentResponse?>
 {
@@ -58,6 +60,7 @@ public class RevokeCustomerConsentCommandHandler(
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
+            metrics.RecordConsentEvent(newEvent.TenantId, newEvent.ConsentType, newEvent.Granted);
         }
         catch
         {

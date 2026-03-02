@@ -35,7 +35,12 @@ public class AddAccountHierarchyCommandHandler(IAccountHierarchyRepository repos
             throw new InvalidOperationException("Child corporate customer tenant mismatch.");
         }
 
-        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy>(entityRequest);
+        var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy.Create(
+            entityRequest.TenantId,
+            entityRequest.ParentCorporateCustomerId,
+            entityRequest.ChildCorporateCustomerId,
+            entityRequest.RelationType,
+            entityRequest.ValidFrom);
         await entity.AssignParentAsync(entityRequest.TenantId, entityRequest.ParentCorporateCustomerId,
             entityRequest.ChildCorporateCustomerId, entityRequest.RelationType, entityRequest.ValidFrom,
             hierarchyInvariant, cancellationToken);

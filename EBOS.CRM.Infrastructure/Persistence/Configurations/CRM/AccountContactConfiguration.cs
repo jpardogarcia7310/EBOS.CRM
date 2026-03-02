@@ -23,12 +23,21 @@ public class AccountContactConfiguration : IEntityTypeConfiguration<AccountConta
         builder.Property(x => x.CreatedBy).IsRequired();
         builder.Property(x => x.UpdatedAt);
         builder.Property(x => x.UpdatedBy);
+        builder.Property(x => x.RowVersion).IsRowVersion().IsConcurrencyToken();
         builder.Property(x => x.Erased).IsRequired();
 
         builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId })
             .HasDatabaseName("IX_AccountContact_TenantId_CorporateCustomerId");
         builder.HasIndex(x => new { x.TenantId, x.IndividualCustomerId })
             .HasDatabaseName("IX_AccountContact_TenantId_IndividualCustomerId");
+        builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId, x.IndividualCustomerId })
+            .IsUnique()
+            .HasFilter("[Erased] = 0")
+            .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Individual_Active");
+        builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId })
+            .IsUnique()
+            .HasFilter("[IsPrimary] = 1 AND [Erased] = 0")
+            .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Primary_Active");
 
         builder.HasOne(x => x.CorporateCustomer)
             .WithMany(c => c.AccountContacts)

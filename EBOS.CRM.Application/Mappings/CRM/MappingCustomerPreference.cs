@@ -13,15 +13,20 @@ public class MappingCustomerPreference : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<UpsertCustomerPreferenceRequest, CustomerPreference>()
+            .ConstructUsing(src => CustomerPreference.Create(
+                src.TenantId,
+                src.CustomerId,
+                src.ChannelId,
+                src.Preferred,
+                DateTime.UtcNow,
+                1))
             .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.CustomerId, src => src.CustomerId)
-            .Map(dest => dest.ChannelId, src => src.ChannelId)
-            .Map(dest => dest.Preferred, src => src.Preferred)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.UpdatedAt)
             .Ignore(dest => dest.UpdatedBy)
             .Ignore(dest => dest.Customer)
-            .Ignore(dest => dest.Channel);
+            .Ignore(dest => dest.Channel)
+            .Ignore(dest => dest.RowVersion);
     }
 }

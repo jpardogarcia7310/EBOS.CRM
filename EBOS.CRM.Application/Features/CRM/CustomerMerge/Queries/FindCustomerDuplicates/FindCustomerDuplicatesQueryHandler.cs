@@ -10,7 +10,8 @@ namespace EBOS.CRM.Application.Features.CRM.CustomerMerge.Queries.FindCustomerDu
 
 public class FindCustomerDuplicatesQueryHandler(
     ICustomerDedupeRepository dedupeRepository,
-    ICustomerDedupeNormalizationService normalizationService)
+    ICustomerDedupeNormalizationService normalizationService,
+    ICustomer360Metrics metrics)
     : IRequestHandler<FindCustomerDuplicatesQuery, PagedResult<CustomerDuplicateCandidateResponse>>
 {
     public async Task<PagedResult<CustomerDuplicateCandidateResponse>> Handle(FindCustomerDuplicatesQuery request,
@@ -33,6 +34,7 @@ public class FindCustomerDuplicatesQueryHandler(
 
         var items = candidates.Select(x => new CustomerDuplicateCandidateResponse(x.CustomerId, x.MatchReason, x.Score))
             .ToList();
+        metrics.RecordDedupeQuery(criteria.TenantId, items.Count, items.Count == 0 ? 0 : items.Max(x => x.Score));
 
         return new PagedResult<CustomerDuplicateCandidateResponse>(items, total);
     }

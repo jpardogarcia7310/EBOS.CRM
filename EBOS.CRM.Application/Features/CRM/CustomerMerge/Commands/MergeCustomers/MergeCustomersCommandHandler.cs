@@ -4,6 +4,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Application.Options;
 using MediatR;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ public class MergeCustomersCommandHandler(
     IAccountContactRoleRepository accountContactRoleRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
+    ICustomer360Metrics metrics,
     IOptions<CustomerMergeOptions> mergeOptions)
     : IRequestHandler<MergeCustomersCommand, CustomerMergeResultResponse>
 {
@@ -35,6 +37,10 @@ public class MergeCustomersCommandHandler(
         cancellationToken.ThrowIfCancellationRequested();
 
         var mergeRequest = request.Request ?? throw new ArgumentNullException(nameof(request.Request));
+        if (string.IsNullOrWhiteSpace(mergeRequest.Reason))
+        {
+            throw new InvalidOperationException("Merge reason is required.");
+        }
 
         var winner = await customerRepository.GetByIdAsync(mergeRequest.WinnerCustomerId, cancellationToken)
             ?? throw new InvalidOperationException("Winner customer not found.");
@@ -140,10 +146,12 @@ public class MergeCustomersCommandHandler(
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await customerRepository.CommitAsync(cancellationToken);
+            metrics.RecordMerge(mergeRequest.TenantId, merged.Count, true);
         }
         catch
         {
             await customerRepository.RollbackAsync(cancellationToken);
+            metrics.RecordMerge(mergeRequest.TenantId, 0, false);
             throw;
         }
 
@@ -443,9 +451,7 @@ public class MergeCustomersCommandHandler(
             {
                 if (preference.UpdatedAt > winnerPreference.UpdatedAt)
                 {
-                    winnerPreference.Preferred = preference.Preferred;
-                    winnerPreference.UpdatedAt = preference.UpdatedAt;
-                    winnerPreference.UpdatedBy = preference.UpdatedBy;
+                    winnerPreference.MergeFrom(preference);
                     await customerPreferenceRepository.UpdateAsync(winnerPreference, cancellationToken);
                 }
 
@@ -454,7 +460,7 @@ public class MergeCustomersCommandHandler(
                 continue;
             }
 
-            preference.CustomerId = winnerId;
+            preference.ReassignCustomer(winnerId);
             await customerPreferenceRepository.UpdateAsync(preference, cancellationToken);
             winnerPreferences[preference.ChannelId] = preference;
         }
@@ -524,25 +530,24 @@ public class MergeCustomersCommandHandler(
 
                 if (contact.IsPrimary && !existingContact.IsPrimary)
                 {
-                    existingContact.IsPrimary = true;
+                    existingContact.SetPrimary(true);
                     await accountContactRepository.UpdateAsync(existingContact, cancellationToken);
                 }
 
-                contact.IsPrimary = false;
+                contact.SetPrimary(false);
                 contact.Erased = true;
                 await accountContactRepository.UpdateAsync(contact, cancellationToken);
                 continue;
             }
 
-            contact.CorporateCustomerId = newCorporateId;
-            contact.IndividualCustomerId = newIndividualId;
+            contact.ReassignCustomers(newCorporateId, newIndividualId);
 
             if (contact.IsPrimary)
             {
                 if (primaryByCorporate.TryGetValue(newCorporateId, out var primaryContactId) &&
                     primaryContactId != contact.Id)
                 {
-                    contact.IsPrimary = false;
+                    contact.SetPrimary(false);
                 }
                 else
                 {
@@ -589,14 +594,14 @@ public class MergeCustomersCommandHandler(
 
             if (role.IsPrimary && targetHasPrimary)
             {
-                role.IsPrimary = false;
+                role.SetPrimary(false);
             }
             else if (role.IsPrimary)
             {
                 targetHasPrimary = true;
             }
 
-            role.AccountContactId = target.Id;
+            role.ReassignAccountContact(target.Id);
             await accountContactRoleRepository.UpdateAsync(role, cancellationToken);
             existingCodes.Add(role.RoleCode);
         }

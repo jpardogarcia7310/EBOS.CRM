@@ -9,7 +9,7 @@ public class PatchCreditAccountCommandValidatorTest
     private readonly PatchCreditAccountCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_NoPatchFields_ReturnsError()
+    public async Task Validate_NoPatchFields_ReturnsError()
     {
         var request = new PatchCreditAccountRequest(
             TenantId: 1,
@@ -18,9 +18,11 @@ public class PatchCreditAccountCommandValidatorTest
             CustomerId: null);
         var command = new PatchCreditAccountCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CreditAccountRequest)
             .WithErrorMessage("At least one field must be provided.");
     }
 }
+
+

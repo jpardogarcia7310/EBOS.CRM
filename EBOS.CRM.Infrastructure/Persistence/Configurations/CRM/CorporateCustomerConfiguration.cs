@@ -37,6 +37,7 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(c => new { c.TenantId, c.TaxIdentification })
-            .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification");
+            .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification")
+            .HasFilter("[CustomerType] = 'Corporate' AND [Erased] = 0");
     }
 }

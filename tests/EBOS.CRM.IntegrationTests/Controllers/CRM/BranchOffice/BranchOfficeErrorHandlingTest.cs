@@ -35,7 +35,7 @@ public class BranchOfficeErrorHandlingTest(BranchOfficeErrorHandlingTest.Failing
         var request = new AddBranchOfficeRequest(
             TenantId: 1,
             Name: "Branch A",
-            PhoneNumber: "+1 555 0101",
+            PhoneNumber: "15550101",
             CorporateCustomerId: 1);
 
         var response = await _client.PostAsJsonAsync($"/api/v{_version}/BranchOffice", request);
@@ -49,7 +49,7 @@ public class BranchOfficeErrorHandlingTest(BranchOfficeErrorHandlingTest.Failing
             Id: 1,
             TenantId: 1,
             Name: "Branch A",
-            PhoneNumber: "+1 555 0101",
+            PhoneNumber: "15550101",
             CorporateCustomerId: 1);
 
         var response = await _client.PutAsJsonAsync($"/api/v{_version}/BranchOffice/1", request);
@@ -77,6 +77,7 @@ public class BranchOfficeErrorHandlingTest(BranchOfficeErrorHandlingTest.Failing
         }
     }
 }
+
 
 
 

@@ -53,6 +53,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
 
@@ -72,10 +78,17 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("IndividualCustomerId");
 
                     b.HasIndex("TenantId", "CorporateCustomerId")
-                        .HasDatabaseName("IX_AccountContact_TenantId_CorporateCustomerId");
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Primary_Active")
+                        .HasFilter("[IsPrimary] = 1 AND [Erased] = 0");
 
                     b.HasIndex("TenantId", "IndividualCustomerId")
                         .HasDatabaseName("IX_AccountContact_TenantId_IndividualCustomerId");
+
+                    b.HasIndex("TenantId", "CorporateCustomerId", "IndividualCustomerId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Individual_Active")
+                        .HasFilter("[Erased] = 0");
 
                     b.ToTable("AccountContacts", "CRM");
                 });
@@ -102,6 +115,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<long>("TenantId")
                         .HasColumnType("bigint");
 
@@ -116,7 +135,14 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("AccountContactId");
 
                     b.HasIndex("TenantId", "AccountContactId")
-                        .HasDatabaseName("IX_AccountContactRole_TenantId_AccountContactId");
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountContactRole_Tenant_AccountContact_Primary_Active")
+                        .HasFilter("[IsPrimary] = 1 AND [Erased] = 0");
+
+                    b.HasIndex("TenantId", "AccountContactId", "RoleCode")
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountContactRole_Tenant_AccountContact_Role_Active")
+                        .HasFilter("[Erased] = 0");
 
                     b.ToTable("AccountContactRoles", "CRM");
                 });
@@ -146,6 +172,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<long>("TenantId")
                         .HasColumnType("bigint");
 
@@ -167,7 +199,15 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "ParentCorporateCustomerId")
                         .HasDatabaseName("IX_AccountHierarchy_TenantId_ParentCorporateCustomerId");
 
-                    b.ToTable("AccountHierarchies", "CRM");
+                    b.HasIndex("TenantId", "ParentCorporateCustomerId", "ChildCorporateCustomerId", "RelationType")
+                        .IsUnique()
+                        .HasDatabaseName("UX_AccountHierarchy_Tenant_Parent_Child_Relation_Current")
+                        .HasFilter("[IsCurrent] = 1 AND [Erased] = 0");
+
+                    b.ToTable("AccountHierarchies", "CRM", t =>
+                        {
+                            t.HasCheckConstraint("CK_AccountHierarchy_Parent_Child_Different", "[ParentCorporateCustomerId] <> [ChildCorporateCustomerId]");
+                        });
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Address", b =>
@@ -793,10 +833,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UX_Customer_TenantId_Code");
 
                     b.HasIndex("TenantId", "Email")
-                        .HasDatabaseName("IX_Customer_TenantId_Email");
+                        .HasDatabaseName("IX_Customer_TenantId_Email")
+                        .HasFilter("[Erased] = 0");
 
                     b.HasIndex("TenantId", "Phone")
-                        .HasDatabaseName("IX_Customer_TenantId_Phone");
+                        .HasDatabaseName("IX_Customer_TenantId_Phone")
+                        .HasFilter("[Erased] = 0");
 
                     b.ToTable("Customers", "CRM", t =>
                         {
@@ -903,6 +945,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -917,6 +965,9 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "CustomerId")
                         .HasDatabaseName("IX_CustomerConsent_TenantId_CustomerId");
+
+                    b.HasIndex("TenantId", "CustomerId", "ConsentType", "GrantedAt")
+                        .HasDatabaseName("IX_CustomerConsent_Tenant_Customer_ConsentType_GrantedAt");
 
                     b.ToTable("CustomerConsents", "CRM");
                 });
@@ -941,6 +992,12 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Property<bool>("Preferred")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<long>("TenantId")
                         .HasColumnType("bigint");
 
@@ -958,7 +1015,8 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "CustomerId", "ChannelId")
                         .IsUnique()
-                        .HasDatabaseName("UX_CustomerPreference_TenantId_Customer_Channel");
+                        .HasDatabaseName("UX_CustomerPreference_TenantId_Customer_Channel")
+                        .HasFilter("[Erased] = 0");
 
                     b.ToTable("CustomerPreferences", "CRM");
                 });
@@ -1560,6 +1618,49 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AddressTypes", "EBOS");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.AuditOutboxMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("NextAttemptAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcessedAt", "NextAttemptAt")
+                        .HasDatabaseName("IX_AuditOutbox_Pending");
+
+                    b.ToTable("AuditOutboxMessages", "EBOS");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.EBOS.ChannelCountry", b =>
@@ -2652,7 +2753,8 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasIndex("TenantId", "TaxIdentification")
-                        .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification");
+                        .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification")
+                        .HasFilter("[CustomerType] = 'Corporate' AND [Erased] = 0");
 
                     b.ToTable("Customers", "CRM", t =>
                         {
@@ -2695,7 +2797,8 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("IX_IndividualCustomer_IdentificationTypeId");
 
                     b.HasIndex("TenantId", "IdentificationNumber")
-                        .HasDatabaseName("IX_IndividualCustomer_TenantId_IdentificationNumber");
+                        .HasDatabaseName("IX_IndividualCustomer_TenantId_IdentificationNumber")
+                        .HasFilter("[CustomerType] = 'Individual' AND [Erased] = 0");
 
                     b.ToTable(t =>
                         {

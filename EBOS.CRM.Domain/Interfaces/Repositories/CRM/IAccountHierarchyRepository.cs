@@ -7,5 +7,7 @@ public interface IAccountHierarchyRepository : IPagedRepository<AccountHierarchy
 {
     Task<IReadOnlyCollection<AccountHierarchy>> GetByAccountPagedAsync(long tenantId, long corporateCustomerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<long>> GetParentIdsByChildIdsAsync(long tenantId, IReadOnlyCollection<long> childCorporateCustomerIds,
+        CancellationToken cancellationToken = default);
     Task<int> CountByAccountAsync(long tenantId, long corporateCustomerId, CancellationToken cancellationToken = default);
 }

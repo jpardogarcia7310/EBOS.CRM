@@ -13,191 +13,191 @@ public class AddAddressCommandValidatorTest
     private readonly AddAddressCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = BuildValidCommand();
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new AddAddressCommand(null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest);
     }
 
     [Fact]
-    public void Validate_EmptyStreet_Fails()
+    public async Task Validate_EmptyStreet_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Street = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Street);
     }
 
     [Fact]
-    public void Validate_StreetTooLong_Fails()
+    public async Task Validate_StreetTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Street = new string('a', 201) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Street);
     }
 
     [Fact]
-    public void Validate_EmptyExternalNumber_Fails()
+    public async Task Validate_EmptyExternalNumber_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { ExternalNumber = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.ExternalNumber);
     }
 
     [Fact]
-    public void Validate_ExternalNumberTooLong_Fails()
+    public async Task Validate_ExternalNumberTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { ExternalNumber = new string('a', 21) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.ExternalNumber);
     }
 
     [Fact]
-    public void Validate_InternalNumberTooLong_Fails()
+    public async Task Validate_InternalNumberTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { InternalNumber = new string('a', 21) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.InternalNumber);
     }
 
     [Fact]
-    public void Validate_BetweenStreet1TooLong_Fails()
+    public async Task Validate_BetweenStreet1TooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { BetweenStreet1 = new string('a', 201) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.BetweenStreet1);
     }
 
     [Fact]
-    public void Validate_BetweenStreet2TooLong_Fails()
+    public async Task Validate_BetweenStreet2TooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { BetweenStreet2 = new string('a', 201) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.BetweenStreet2);
     }
 
     [Fact]
-    public void Validate_NeighbourhoodTooLong_Fails()
+    public async Task Validate_NeighbourhoodTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Neighbourhood = new string('a', 201) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Neighbourhood);
     }
 
     [Fact]
-    public void Validate_EmptyCity_Fails()
+    public async Task Validate_EmptyCity_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { City = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.City);
     }
 
     [Fact]
-    public void Validate_CityTooLong_Fails()
+    public async Task Validate_CityTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { City = new string('a', 151) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.City);
     }
 
     [Fact]
-    public void Validate_EmptyState_Fails()
+    public async Task Validate_EmptyState_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { StateOrProvince = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.StateOrProvince);
     }
 
     [Fact]
-    public void Validate_StateTooLong_Fails()
+    public async Task Validate_StateTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { StateOrProvince = new string('a', 151) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.StateOrProvince);
     }
 
     [Fact]
-    public void Validate_ShortPostalCode_Fails()
+    public async Task Validate_ShortPostalCode_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { PostalCode = "1" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.PostalCode);
     }
 
     [Fact]
-    public void Validate_EmptyPostalCode_Fails()
+    public async Task Validate_EmptyPostalCode_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { PostalCode = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.PostalCode);
     }
 
     [Fact]
-    public void Validate_PostalCodeTooLong_Fails()
+    public async Task Validate_PostalCodeTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { PostalCode = new string('a', 21) });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.PostalCode);
     }
 
     [Fact]
-    public void Validate_InvalidGoogleMapsUrl_Fails()
+    public async Task Validate_InvalidGoogleMapsUrl_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { GoogleMapsUrl = "https://example.com" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.GoogleMapsUrl);
     }
 
     [Fact]
-    public void Validate_GoogleMapsUrlTooLong_Fails()
+    public async Task Validate_GoogleMapsUrlTooLong_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { GoogleMapsUrl = $"https://maps.{new string('a', 490)}" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.GoogleMapsUrl);
     }
@@ -205,21 +205,21 @@ public class AddAddressCommandValidatorTest
     [Theory]
     [InlineData("91")]
     [InlineData("-91")]
-    public void Validate_InvalidLatitude_Fails(string value)
+    public async Task Validate_InvalidLatitude_Fails(string value)
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Latitude = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Latitude);
     }
 
     [Fact]
-    public void Validate_NonNumericLatitude_Fails()
+    public async Task Validate_NonNumericLatitude_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Latitude = "nope" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Latitude);
     }
@@ -227,27 +227,27 @@ public class AddAddressCommandValidatorTest
     [Theory]
     [InlineData("181")]
     [InlineData("-181")]
-    public void Validate_InvalidLongitude_Fails(string value)
+    public async Task Validate_InvalidLongitude_Fails(string value)
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Longitude = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Longitude);
     }
 
     [Fact]
-    public void Validate_NonNumericLongitude_Fails()
+    public async Task Validate_NonNumericLongitude_Fails()
     {
         var command = new AddAddressCommand(AddressRequest: BuildValidRequest() with { Longitude = "bad" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.Longitude);
     }
 
     [Fact]
-    public void Validate_InvalidIds_Fail()
+    public async Task Validate_InvalidIds_Fail()
     {
         var request = BuildValidRequest() with
         {
@@ -256,7 +256,7 @@ public class AddAddressCommandValidatorTest
         };
         var command = new AddAddressCommand(request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.CountryId);
         result.ShouldHaveValidationErrorFor(x => x.AddressRequest.AddressTypeId);
@@ -299,6 +299,8 @@ public class AddAddressCommandValidatorTest
         return new AddAddressCommandValidator(countryRepo.Object, addressTypeRepo.Object, validationCatalog.Object);
     }
 }
+
+
 
 
 

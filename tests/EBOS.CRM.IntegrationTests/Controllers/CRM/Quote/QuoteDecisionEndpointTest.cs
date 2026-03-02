@@ -41,7 +41,7 @@ public class QuoteDecisionEndpointTest(CustomWebApplicationFactory factory)
             TenantId = 1,
             Code = "CORP-QT",
             Email = "quote@contoso.com",
-            Phone = "+34 911 000 444",
+            Phone = "34911000444",
             StatusId = statusId,
             LegalName = "Quote Corp",
             TaxIdentification = "B87654321",
@@ -92,3 +92,4 @@ public class QuoteDecisionEndpointTest(CustomWebApplicationFactory factory)
         return quote.Id;
     }
 }
+

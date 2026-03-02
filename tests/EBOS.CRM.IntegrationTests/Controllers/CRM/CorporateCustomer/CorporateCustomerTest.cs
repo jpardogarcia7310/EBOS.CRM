@@ -40,7 +40,7 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
             TenantId: 1,
             Code: $"CORP-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"corp{Guid.NewGuid():N}@example.com",
-            Phone: "+34 911 000 111",
+            Phone: "34911000111",
             StatusId: statusId,
             LegalName: "Contoso S.A.",
             TaxIdentification: "B12345678");
@@ -55,7 +55,7 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
             TenantId: 1,
             Code: $"CORP-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"corp{Guid.NewGuid():N}@example.com",
-            Phone: "+34 911 000 999",
+            Phone: "34911000999",
             StatusId: statusId,
             LegalName: "Contoso Updated",
             TaxIdentification: "B99999999");
@@ -68,6 +68,7 @@ public class CorporateCustomerTest(CustomWebApplicationFactory factory) : IClass
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
+
 
 
 
