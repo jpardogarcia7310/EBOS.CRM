@@ -4,6 +4,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using Microsoft.Extensions.Logging;
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
@@ -11,6 +12,7 @@ public sealed class AuditOutboxService(
     CrmDbContext dbContext,
     IHttpClientFactory httpClientFactory,
     IOptions<AuditOutboxOptions> outboxOptions,
+    ILogger<AuditOutboxService> logger,
     ICustomer360Metrics metrics) : IAuditOutboxService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -86,11 +88,20 @@ public sealed class AuditOutboxService(
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
                 RegisterFailure(message, $"HTTP {(int)response.StatusCode}: {error}");
                 metrics.RecordAuditOutboxDispatch(message.Operation, false);
+                logger.LogWarning(
+                    "Audit outbox dispatch failed for message {MessageId} operation {Operation}. Status={StatusCode}",
+                    message.Id,
+                    message.Operation,
+                    (int)response.StatusCode);
             }
             catch (Exception ex)
             {
                 RegisterFailure(message, ex.Message);
                 metrics.RecordAuditOutboxDispatch(message.Operation, false);
+                logger.LogWarning(ex,
+                    "Audit outbox dispatch threw for message {MessageId} operation {Operation}.",
+                    message.Id,
+                    message.Operation);
             }
         }
 

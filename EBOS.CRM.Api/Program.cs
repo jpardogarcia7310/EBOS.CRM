@@ -3,6 +3,7 @@ using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Api.HostedServices;
+using EBOS.CRM.Api.Infrastructure.HealthChecks;
 using EBOS.CRM.Api.Infrastructure;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
@@ -21,6 +22,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -58,6 +60,8 @@ if (builder.Environment.IsDevelopment())
     services.AddHostedService<LookupSeedHostedService>();
 }
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<OperationalReadinessOptions>(
+    builder.Configuration.GetSection(OperationalReadinessOptions.SectionName));
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
@@ -87,6 +91,11 @@ services.AddOptions<MultiTenantOptions>()
         "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
     .ValidateOnStart();
 services.AddLocalization();
+services.AddHealthChecks()
+    .AddCheck<Customer360OperationalReadinessHealthCheck>(
+        "customer360_operability",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["ready"]);
 
 var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
     .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
@@ -386,6 +395,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
 
 await app.RunAsync();
 

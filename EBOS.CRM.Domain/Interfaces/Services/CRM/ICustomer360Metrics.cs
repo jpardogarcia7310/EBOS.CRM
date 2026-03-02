@@ -7,4 +7,6 @@ public interface ICustomer360Metrics
     void RecordConsentEvent(long tenantId, string consentType, bool granted);
     void RecordAuditOutboxEnqueue(string operation);
     void RecordAuditOutboxDispatch(string operation, bool success);
+    void RecordConcurrencyConflict(bool exhaustedRetries);
+    Customer360MetricsSnapshot GetSnapshot();
 }

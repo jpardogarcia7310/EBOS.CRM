@@ -24,6 +24,10 @@
     <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
   </Folder>
+  <Folder Name="/documentation/RunBooks/">
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook_ES.md" />
+  </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path=".gitignore" />

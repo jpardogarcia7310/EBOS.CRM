@@ -1,11 +1,13 @@
 using EBOS.CRM.Domain.Interfaces.Services;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Infrastructure.Services.Audit;
 
 public sealed class AuditOutboxDispatcher(
     IServiceScopeFactory scopeFactory,
+    ILogger<AuditOutboxDispatcher> logger,
     IOptions<AuditOutboxOptions> options) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,7 +24,7 @@ public sealed class AuditOutboxDispatcher(
             }
             catch
             {
-                // no-op to keep background dispatcher alive
+                logger.LogWarning("Audit outbox dispatcher iteration failed. Dispatcher will continue with next cycle.");
             }
 
             await Task.Delay(interval, stoppingToken);
