@@ -29,6 +29,14 @@ public class AccountContactConfiguration : IEntityTypeConfiguration<AccountConta
             .HasDatabaseName("IX_AccountContact_TenantId_CorporateCustomerId");
         builder.HasIndex(x => new { x.TenantId, x.IndividualCustomerId })
             .HasDatabaseName("IX_AccountContact_TenantId_IndividualCustomerId");
+        builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId, x.IndividualCustomerId })
+            .IsUnique()
+            .HasFilter("[Erased] = 0")
+            .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Individual_Active");
+        builder.HasIndex(x => new { x.TenantId, x.CorporateCustomerId })
+            .IsUnique()
+            .HasFilter("[IsPrimary] = 1 AND [Erased] = 0")
+            .HasDatabaseName("UX_AccountContact_Tenant_Corporate_Primary_Active");
 
         builder.HasOne(x => x.CorporateCustomer)
             .WithMany(c => c.AccountContacts)

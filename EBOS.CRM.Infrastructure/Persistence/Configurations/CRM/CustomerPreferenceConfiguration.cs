@@ -21,6 +21,7 @@ public class CustomerPreferenceConfiguration : IEntityTypeConfiguration<Customer
 
         builder.HasIndex(x => new { x.TenantId, x.CustomerId, x.ChannelId })
             .IsUnique()
+            .HasFilter("[Erased] = 0")
             .HasDatabaseName("UX_CustomerPreference_TenantId_Customer_Channel");
 
         builder.HasOne(x => x.Customer)

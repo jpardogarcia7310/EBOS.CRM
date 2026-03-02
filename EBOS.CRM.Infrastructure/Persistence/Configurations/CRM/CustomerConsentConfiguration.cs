@@ -27,6 +27,8 @@ public class CustomerConsentConfiguration : IEntityTypeConfiguration<CustomerCon
 
         builder.HasIndex(x => new { x.TenantId, x.CustomerId })
             .HasDatabaseName("IX_CustomerConsent_TenantId_CustomerId");
+        builder.HasIndex(x => new { x.TenantId, x.CustomerId, x.ConsentType, x.GrantedAt })
+            .HasDatabaseName("IX_CustomerConsent_Tenant_Customer_ConsentType_GrantedAt");
 
         builder.HasOne(x => x.Customer)
             .WithMany(c => c.Consents)

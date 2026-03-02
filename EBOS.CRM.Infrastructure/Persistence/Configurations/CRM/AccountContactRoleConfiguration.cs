@@ -23,6 +23,14 @@ public class AccountContactRoleConfiguration : IEntityTypeConfiguration<AccountC
 
         builder.HasIndex(x => new { x.TenantId, x.AccountContactId })
             .HasDatabaseName("IX_AccountContactRole_TenantId_AccountContactId");
+        builder.HasIndex(x => new { x.TenantId, x.AccountContactId, x.RoleCode })
+            .IsUnique()
+            .HasFilter("[Erased] = 0")
+            .HasDatabaseName("UX_AccountContactRole_Tenant_AccountContact_Role_Active");
+        builder.HasIndex(x => new { x.TenantId, x.AccountContactId })
+            .IsUnique()
+            .HasFilter("[IsPrimary] = 1 AND [Erased] = 0")
+            .HasDatabaseName("UX_AccountContactRole_Tenant_AccountContact_Primary_Active");
 
         builder.HasOne(x => x.AccountContact)
             .WithMany(c => c.Roles)
