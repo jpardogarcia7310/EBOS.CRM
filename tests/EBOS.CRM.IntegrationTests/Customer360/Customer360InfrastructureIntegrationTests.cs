@@ -26,24 +26,8 @@ public class Customer360InfrastructureIntegrationTests(CustomWebApplicationFacto
         await db.SaveChangesAsync();
 
         db.AccountHierarchies.AddRange(
-            new AccountHierarchy
-            {
-                TenantId = 1,
-                ParentCorporateCustomerId = a.Id,
-                ChildCorporateCustomerId = b.Id,
-                RelationType = "HOLDING",
-                ValidFrom = DateTime.UtcNow.AddDays(-10),
-                IsCurrent = true
-            },
-            new AccountHierarchy
-            {
-                TenantId = 1,
-                ParentCorporateCustomerId = b.Id,
-                ChildCorporateCustomerId = c.Id,
-                RelationType = "HOLDING",
-                ValidFrom = DateTime.UtcNow.AddDays(-9),
-                IsCurrent = true
-            });
+            AccountHierarchy.Create(1, a.Id, b.Id, "HOLDING", DateTime.UtcNow.AddDays(-10)),
+            AccountHierarchy.Create(1, b.Id, c.Id, "HOLDING", DateTime.UtcNow.AddDays(-9)));
         await db.SaveChangesAsync();
 
         var createsCycle = await guard.CreatesCycleAsync(1, c.Id, a.Id);

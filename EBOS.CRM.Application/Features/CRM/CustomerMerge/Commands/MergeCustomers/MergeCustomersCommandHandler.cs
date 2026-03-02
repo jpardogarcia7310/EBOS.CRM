@@ -594,14 +594,14 @@ public class MergeCustomersCommandHandler(
 
             if (role.IsPrimary && targetHasPrimary)
             {
-                role.IsPrimary = false;
+                role.SetPrimary(false);
             }
             else if (role.IsPrimary)
             {
                 targetHasPrimary = true;
             }
 
-            role.AccountContactId = target.Id;
+            role.ReassignAccountContact(target.Id);
             await accountContactRoleRepository.UpdateAsync(role, cancellationToken);
             existingCodes.Add(role.RoleCode);
         }

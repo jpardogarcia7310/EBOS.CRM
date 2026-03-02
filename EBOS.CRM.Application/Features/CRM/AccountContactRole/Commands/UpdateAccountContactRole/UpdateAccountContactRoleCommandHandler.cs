@@ -37,13 +37,13 @@ public class UpdateAccountContactRoleCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        mapper.Map(entityRequest, entity);
-        entity.Activate(entityRequest.ValidFrom);
-        if (entityRequest.ValidTo.HasValue)
-        {
-            entity.Deactivate(entityRequest.ValidTo.Value);
-        }
-        entity.SetPrimary(entityRequest.IsPrimary);
+        entity.Update(
+            entityRequest.TenantId,
+            entityRequest.AccountContactId,
+            entityRequest.RoleCode,
+            entityRequest.IsPrimary,
+            entityRequest.ValidFrom,
+            entityRequest.ValidTo);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

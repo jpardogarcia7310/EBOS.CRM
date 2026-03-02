@@ -13,24 +13,26 @@ public class MappingAccountContactRole : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddAccountContactRoleRequest, AccountContactRole>()
-            .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.AccountContactId, src => src.AccountContactId)
-            .Map(dest => dest.RoleCode, src => src.RoleCode)
-            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
-            .Map(dest => dest.ValidFrom, src => src.ValidFrom)
-            .Map(dest => dest.ValidTo, src => src.ValidTo)
-            .Map(dest => dest.Erased, _ => false)
+            .ConstructUsing(src => AccountContactRole.Create(
+                src.TenantId,
+                src.AccountContactId,
+                src.RoleCode,
+                src.IsPrimary,
+                src.ValidFrom,
+                src.ValidTo))
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.AccountContact);
 
         config.NewConfig<UpdateAccountContactRoleRequest, AccountContactRole>()
-            .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.AccountContactId, src => src.AccountContactId)
-            .Map(dest => dest.RoleCode, src => src.RoleCode)
-            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
-            .Map(dest => dest.ValidFrom, src => src.ValidFrom)
-            .Map(dest => dest.ValidTo, src => src.ValidTo)
+            .ConstructUsing(src => AccountContactRole.Create(
+                src.TenantId,
+                src.AccountContactId,
+                src.RoleCode,
+                src.IsPrimary,
+                src.ValidFrom,
+                src.ValidTo))
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.RowVersion)

@@ -32,13 +32,13 @@ public class AddAccountContactRoleCommandHandler(
             throw new InvalidOperationException("Account contact tenant mismatch.");
         }
 
-        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.AccountContactRole>(entityRequest);
-        entity.Activate(entityRequest.ValidFrom);
-        if (entityRequest.ValidTo.HasValue)
-        {
-            entity.Deactivate(entityRequest.ValidTo.Value);
-        }
-        entity.SetPrimary(entityRequest.IsPrimary);
+        var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountContactRole.Create(
+            entityRequest.TenantId,
+            entityRequest.AccountContactId,
+            entityRequest.RoleCode,
+            entityRequest.IsPrimary,
+            entityRequest.ValidFrom,
+            entityRequest.ValidTo);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

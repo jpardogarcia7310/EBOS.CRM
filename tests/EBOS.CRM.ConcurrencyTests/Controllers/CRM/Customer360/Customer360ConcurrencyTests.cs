@@ -122,24 +122,8 @@ public class Customer360ConcurrencyTests(ConcurrencyWebApplicationFactory<Progra
         await db.SaveChangesAsync();
 
         db.AccountHierarchies.AddRange(
-            new AccountHierarchy
-            {
-                TenantId = 1,
-                ParentCorporateCustomerId = a.Id,
-                ChildCorporateCustomerId = b.Id,
-                RelationType = "HOLDING",
-                ValidFrom = DateTime.UtcNow.AddDays(-5),
-                IsCurrent = true
-            },
-            new AccountHierarchy
-            {
-                TenantId = 1,
-                ParentCorporateCustomerId = b.Id,
-                ChildCorporateCustomerId = c.Id,
-                RelationType = "HOLDING",
-                ValidFrom = DateTime.UtcNow.AddDays(-4),
-                IsCurrent = true
-            });
+            AccountHierarchy.Create(1, a.Id, b.Id, "HOLDING", DateTime.UtcNow.AddDays(-5)),
+            AccountHierarchy.Create(1, b.Id, c.Id, "HOLDING", DateTime.UtcNow.AddDays(-4)));
         await db.SaveChangesAsync();
 
         return (a.Id, c.Id);

@@ -13,14 +13,15 @@ public class MappingAccountHierarchy : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddAccountHierarchyRequest, AccountHierarchy>()
-            .Map(dest => dest.TenantId, src => src.TenantId)
-            .Map(dest => dest.ParentCorporateCustomerId, src => src.ParentCorporateCustomerId)
-            .Map(dest => dest.ChildCorporateCustomerId, src => src.ChildCorporateCustomerId)
-            .Map(dest => dest.RelationType, src => src.RelationType)
-            .Map(dest => dest.ValidFrom, src => src.ValidFrom)
-            .Map(dest => dest.IsCurrent, _ => true)
-            .Map(dest => dest.Erased, _ => false)
+            .ConstructUsing(src => AccountHierarchy.Create(
+                src.TenantId,
+                src.ParentCorporateCustomerId,
+                src.ChildCorporateCustomerId,
+                src.RelationType,
+                src.ValidFrom))
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.IsCurrent)
+            .Ignore(dest => dest.Erased)
             .Ignore(dest => dest.RowVersion)
             .Ignore(dest => dest.ValidTo!)
             .Ignore(dest => dest.ParentCorporateCustomer)
