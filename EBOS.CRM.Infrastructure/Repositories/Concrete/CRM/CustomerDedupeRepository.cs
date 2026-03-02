@@ -30,7 +30,7 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
 
         return results.Select(x => new CustomerDuplicateCandidate(
             x.CustomerId,
-            BuildReason(x.EmailMatch, x.PhoneMatch, x.TaxIdMatch, x.IdentificationMatch),
+            BuildReason(x.EmailMatch, x.PhoneMatch, x.PhoneApproxMatch, x.TaxIdMatch, x.IdentificationMatch),
             x.Score)).ToList();
     }
 
@@ -50,15 +50,19 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
         var phone = criteria.Phone;
         var taxId = criteria.TaxId;
         var idNumber = criteria.IdentificationNumber;
+        var phoneSuffix = ResolvePhoneSuffix(phone);
 
         var query = from customer in customers
-            where customer.TenantId == criteria.TenantId
+            where customer.TenantId == criteria.TenantId && !customer.Erased
             join corp in corporateCustomers on customer.Id equals corp.Id into corpJoin
             from corp in corpJoin.DefaultIfEmpty()
             join ind in individualCustomers on customer.Id equals ind.Id into indJoin
             from ind in indJoin.DefaultIfEmpty()
             let emailMatch = !string.IsNullOrWhiteSpace(email) && customer.Email == email
             let phoneMatch = !string.IsNullOrWhiteSpace(phone) && customer.Phone == phone
+            let phoneApproxMatch = phoneSuffix != null
+                                   && !phoneMatch
+                                   && customer.Phone.EndsWith(phoneSuffix)
             let taxIdMatch = corp != null
                              && !string.IsNullOrWhiteSpace(taxId)
                              && corp.TaxIdentification != null
@@ -69,35 +73,64 @@ public class CustomerDedupeRepository(CrmDbContext context, IOptions<CustomerDed
                                       && ind.IdentificationNumber == idNumber
             let score = (emailMatch ? _options.EmailWeight : 0)
                         + (phoneMatch ? _options.PhoneWeight : 0)
+                        + (phoneApproxMatch ? _options.PhoneApproxWeight : 0)
                         + (taxIdMatch ? _options.TaxIdWeight : 0)
                         + (identificationMatch ? _options.IdentificationNumberWeight : 0)
-            where score > 0
-            select new DedupeProjection(
-                customer.Id,
-                score,
-                emailMatch,
-                phoneMatch,
-                taxIdMatch,
-                identificationMatch);
+            where score >= _options.MinScore
+            select new DedupeProjection
+            {
+                CustomerId = customer.Id,
+                Score = score,
+                EmailMatch = emailMatch,
+                PhoneMatch = phoneMatch,
+                PhoneApproxMatch = phoneApproxMatch,
+                TaxIdMatch = taxIdMatch,
+                IdentificationMatch = identificationMatch
+            };
 
         return query;
     }
 
-    private static string BuildReason(bool emailMatch, bool phoneMatch, bool taxIdMatch, bool identificationMatch)
+    private string? ResolvePhoneSuffix(string? phone)
     {
-        var reasons = new List<string>(4);
+        if (!_options.EnablePhoneSuffixFallback)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return null;
+        }
+
+        if (_options.PhoneSuffixLength <= 0 || phone.Length < _options.PhoneSuffixLength)
+        {
+            return null;
+        }
+
+        return phone[^_options.PhoneSuffixLength..];
+    }
+
+    private static string BuildReason(bool emailMatch, bool phoneMatch, bool phoneApproxMatch, bool taxIdMatch,
+        bool identificationMatch)
+    {
+        var reasons = new List<string>(5);
         if (emailMatch) reasons.Add("Email");
         if (phoneMatch) reasons.Add("Phone");
+        if (phoneApproxMatch) reasons.Add("PhoneApprox");
         if (taxIdMatch) reasons.Add("TaxId");
         if (identificationMatch) reasons.Add("IdentificationNumber");
         return string.Join(",", reasons);
     }
 
-    private sealed record DedupeProjection(
-        long CustomerId,
-        int Score,
-        bool EmailMatch,
-        bool PhoneMatch,
-        bool TaxIdMatch,
-        bool IdentificationMatch);
+    private sealed class DedupeProjection
+    {
+        public long CustomerId { get; init; }
+        public int Score { get; init; }
+        public bool EmailMatch { get; init; }
+        public bool PhoneMatch { get; init; }
+        public bool PhoneApproxMatch { get; init; }
+        public bool TaxIdMatch { get; init; }
+        public bool IdentificationMatch { get; init; }
+    }
 }

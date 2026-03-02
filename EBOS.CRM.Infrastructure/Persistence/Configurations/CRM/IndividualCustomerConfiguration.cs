@@ -37,6 +37,7 @@ public class IndividualCustomerConfiguration : IEntityTypeConfiguration<Individu
             .HasDatabaseName("IX_IndividualCustomer_IdentificationTypeId");
 
         builder.HasIndex(c => new { c.TenantId, c.IdentificationNumber })
-            .HasDatabaseName("IX_IndividualCustomer_TenantId_IdentificationNumber");
+            .HasDatabaseName("IX_IndividualCustomer_TenantId_IdentificationNumber")
+            .HasFilter("[CustomerType] = 'Individual' AND [Erased] = 0");
     }
 }
