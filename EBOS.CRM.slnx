@@ -24,6 +24,14 @@
     <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
   </Folder>
+  <Folder Name="/documentation/RunBooks/">
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook_ES.md" />
+  </Folder>
+  <Folder Name="/documentation/Observability/">
+    <File Path="documentation/Observability/README.md" />
+    <File Path="documentation/Observability/README_ES.md" />
+  </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path=".gitignore" />
@@ -33,6 +41,28 @@
   </Folder>
   <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/">
+    <File Path="documentation/Observability/.env.alerting" />
+    <File Path="documentation/Observability/docker-compose.observability.yml" />
+    <File Path="documentation/Observability/start-observability.ps1" />
+    <File Path="documentation/Observability/start-observability.sh" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/Grafana/">
+    <File Path="documentation/Observability/grafana/customer360-operability-dashboard.json" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/" />
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Dashboards/">
+    <File Path="documentation/Observability/grafana/provisioning/dashboards/dashboards.yml" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Datasources/">
+    <File Path="documentation/Observability/grafana/provisioning/datasources/datasource.yml" />
+  </Folder>
+
+  <Folder Name="/Elementos de la solución/Observability/Prometheus/">
+    <File Path="documentation/Observability/prometheus/alertmanager.yml" />
+    <File Path="documentation/Observability/prometheus/customer360-alert-rules.yml" />
+    <File Path="documentation/Observability/prometheus/prometheus.yml" />
   </Folder>
   <Folder Name="/source/">
     <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" Id="b94674de-a33b-4841-b1af-7cfbd17e3871" />

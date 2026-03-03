@@ -322,6 +322,29 @@ public class CrmEntityConfigurationTests
         AssertCheckConstraints(entity, "CK_CreditTransaction_Amount_NotZero", "CK_CreditTransaction_Type_Valid");
     }
 
+    [Fact]
+    public void CustomerPrivacyRequest_Config_Is_Correct()
+    {
+        using var context = CreateContext();
+        var entity = GetEntityType<CustomerPrivacyRequest>(context);
+
+        AssertTable(entity, "CustomerPrivacyRequests", "CRM");
+        AssertProperty(entity, "RequestType", required: true, maxLength: 40);
+        AssertProperty(entity, "Status", required: true, maxLength: 40);
+        AssertProperty(entity, "Reason", required: false, maxLength: 1000);
+        AssertProperty(entity, "FailureCode", required: false, maxLength: 100);
+        AssertProperty(entity, "FailureReason", required: false, maxLength: 2000);
+        AssertProperty(entity, "CorrelationId", required: false, maxLength: 100);
+        AssertProperty(entity, "RequestedBy", required: true);
+        AssertProperty(entity, "RequestedAt", required: true);
+        AssertProperty(entity, "Erased", required: true);
+
+        AssertIndexes(entity,
+            "IX_CustomerPrivacyRequest_Tenant_Customer_RequestedAt",
+            "IX_CustomerPrivacyRequest_Tenant_Status_RequestedAt",
+            "UX_CustomerPrivacyRequest_ActiveByType");
+    }
+
     private static IEntityType GetEntityType<T>(DbContext context)
     {
         var model = context.GetService<IDesignTimeModel>().Model;

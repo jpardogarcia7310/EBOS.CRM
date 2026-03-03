@@ -5,7 +5,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class AccountContact : ErasableEntity, ITenantScopedEntity
 {
-    public long TenantId { get; set; }
+    public long TenantId { get; private set; }
     public long CorporateCustomerId { get; private set; }
     public CorporateCustomer CorporateCustomer { get; private set; } = null!;
     public long IndividualCustomerId { get; private set; }
@@ -19,7 +19,13 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     public long? UpdatedBy { get; private set; }
     public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
-    public ICollection<AccountContactRole> Roles { get; set; } = new List<AccountContactRole>();
+    public ICollection<AccountContactRole> Roles { get; private set; } = new List<AccountContactRole>();
+
+    long ITenantScopedEntity.TenantId
+    {
+        get => TenantId;
+        set => TenantId = value;
+    }
 
     private AccountContact()
     {
@@ -80,6 +86,11 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
             throw new InvalidOperationException("Customer ids must be positive values.");
         }
 
+        if (EndAt.HasValue)
+        {
+            throw new InvalidOperationException("Cannot reassign an unassigned account contact. Assign it first.");
+        }
+
         CorporateCustomerId = corporateCustomerId;
         IndividualCustomerId = individualCustomerId;
     }
@@ -97,6 +108,11 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
 
     public void SetPrimary(bool isPrimary)
     {
+        if (isPrimary && EndAt.HasValue)
+        {
+            throw new InvalidOperationException("Cannot set as primary when account contact is unassigned.");
+        }
+
         IsPrimary = isPrimary;
     }
 

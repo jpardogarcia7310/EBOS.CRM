@@ -972,6 +972,54 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.ToTable("CustomerConsents", "CRM");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerMergeHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("MergedCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WinnerCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MergedCustomerId");
+
+                    b.HasIndex("WinnerCustomerId");
+
+                    b.HasIndex("TenantId", "MergedCustomerId")
+                        .HasDatabaseName("IX_CustomerMergeHistory_Tenant_Merged");
+
+                    b.HasIndex("TenantId", "WinnerCustomerId", "CreatedAt")
+                        .HasDatabaseName("IX_CustomerMergeHistory_Tenant_Winner_CreatedAt");
+
+                    b.ToTable("CustomerMergeHistories", "CRM");
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPreference", b =>
                 {
                     b.Property<long>("Id")
@@ -1019,6 +1067,87 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                         .HasFilter("[Erased] = 0");
 
                     b.ToTable("CustomerPreferences", "CRM");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPrivacyRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Erased")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FailureCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("ProcessedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("RequestType")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<long>("RequestedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId", "CustomerId", "RequestType")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CustomerPrivacyRequest_ActiveByType")
+                        .HasFilter("[Erased] = 0 AND [Status] IN ('PENDING','IN_PROGRESS')");
+
+                    b.HasIndex("TenantId", "CustomerId", "RequestedAt")
+                        .HasDatabaseName("IX_CustomerPrivacyRequest_Tenant_Customer_RequestedAt");
+
+                    b.HasIndex("TenantId", "Status", "RequestedAt")
+                        .HasDatabaseName("IX_CustomerPrivacyRequest_Tenant_Status_RequestedAt");
+
+                    b.ToTable("CustomerPrivacyRequests", "CRM");
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Lead", b =>
@@ -3017,6 +3146,21 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerMergeHistory", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("MergedCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("WinnerCustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPreference", b =>
                 {
                     b.HasOne("EBOS.CRM.Domain.Entities.EBOS.ChannelType", "Channel")
@@ -3034,6 +3178,15 @@ namespace EBOS.CRM.Infrastructure.Persistence.Migrations
                     b.Navigation("Channel");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.CustomerPrivacyRequest", b =>
+                {
+                    b.HasOne("EBOS.CRM.Domain.Entities.CRM.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EBOS.CRM.Domain.Entities.CRM.Opportunity", b =>

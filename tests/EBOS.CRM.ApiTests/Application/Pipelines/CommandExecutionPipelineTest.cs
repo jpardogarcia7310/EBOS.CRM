@@ -3,6 +3,7 @@ using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
@@ -135,12 +136,13 @@ public class CommandExecutionPipelineTest
 
     private static CommandExecutionPipeline CreatePipeline(IAuditService auditService, int retryCount)
     {
+        var metrics = new Mock<ICustomer360Metrics>();
         var options = Microsoft.Extensions.Options.Options.Create(new CommandExecutionOptions
         {
             ConcurrencyRetryCount = retryCount,
             ConcurrencyRetryDelayMs = 1
         });
 
-        return new CommandExecutionPipeline(auditService, options);
+        return new CommandExecutionPipeline(auditService, metrics.Object, options);
     }
 }

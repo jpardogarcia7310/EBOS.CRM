@@ -18,6 +18,7 @@ public class MergeCustomersCommandHandler(
     ICustomerAddressRepository customerAddressRepository,
     ICustomerPreferenceRepository customerPreferenceRepository,
     ICustomerConsentRepository customerConsentRepository,
+    ICustomerMergeHistoryRepository customerMergeHistoryRepository,
     IAccountContactRepository accountContactRepository,
     IAccountContactRoleRepository accountContactRoleRepository,
     IAuditService auditService,
@@ -122,6 +123,14 @@ public class MergeCustomersCommandHandler(
 
                 entity.Erased = true;
                 await customerRepository.UpdateAsync(entity, cancellationToken);
+                await customerMergeHistoryRepository.AddAsync(
+                    Domain.Entities.CRM.CustomerMergeHistory.Create(
+                        mergeRequest.TenantId,
+                        winner.Id,
+                        entity.Id,
+                        mergeRequest.Reason,
+                        currentUser.UserId),
+                    cancellationToken);
                 merged.Add(entity.Id);
             }
 

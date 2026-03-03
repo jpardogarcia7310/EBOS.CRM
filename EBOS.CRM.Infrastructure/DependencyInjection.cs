@@ -94,6 +94,8 @@ public static class DependencyInjection
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
         services.AddScoped<ICustomerConsentRepository, CustomerConsentRepository>();
         services.AddScoped<ICustomerDedupeRepository, CustomerDedupeRepository>();
+        services.AddScoped<ICustomerMergeHistoryRepository, CustomerMergeHistoryRepository>();
+        services.AddScoped<ICustomerPrivacyRequestRepository, CustomerPrivacyRequestRepository>();
         services.AddScoped<ICustomerPreferenceRepository, CustomerPreferenceRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
