@@ -6,7 +6,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class CustomerPreference : ErasableEntity, ITenantScopedEntity
 {
-    public long TenantId { get; set; }
+    public long TenantId { get; private set; }
     public long CustomerId { get; private set; }
     public Customer Customer { get; private set; } = null!;
     public long ChannelId { get; private set; }
@@ -15,6 +15,12 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
     public DateTime UpdatedAt { get; private set; }
     public long UpdatedBy { get; private set; }
     public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
+
+    long ITenantScopedEntity.TenantId
+    {
+        get => TenantId;
+        set => TenantId = value;
+    }
 
     private CustomerPreference()
     {
@@ -71,6 +77,11 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
         if (customerId <= 0)
         {
             throw new InvalidOperationException("CustomerId must be a positive value.");
+        }
+
+        if (customerId == CustomerId)
+        {
+            return;
         }
 
         CustomerId = customerId;
