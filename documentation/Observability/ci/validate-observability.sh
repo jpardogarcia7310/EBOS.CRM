@@ -4,7 +4,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 OBS_DIR="${REPO_ROOT}/documentation/Observability"
-PROM_DIR="${OBS_DIR}/Prometheus"
+if [[ -d "${OBS_DIR}/Prometheus" ]]; then
+  PROM_DIR="${OBS_DIR}/Prometheus"
+elif [[ -d "${OBS_DIR}/prometheus" ]]; then
+  PROM_DIR="${OBS_DIR}/prometheus"
+else
+  echo "[observability-ci] ERROR: Prometheus config folder not found under ${OBS_DIR}" >&2
+  exit 1
+fi
 
 echo "[observability-ci] Validating Prometheus config..."
 docker run --rm \
