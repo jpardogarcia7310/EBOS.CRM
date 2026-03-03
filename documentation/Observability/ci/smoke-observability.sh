@@ -63,7 +63,8 @@ echo "[observability-ci] Starting API for smoke test..."
   cd "${REPO_ROOT}"
   ASPNETCORE_ENVIRONMENT=Development \
   Authentication__Enabled=false \
-  dotnet run --project "${API_PROJECT}" --launch-profile http --no-build
+  ASPNETCORE_URLS="http://0.0.0.0:${API_PORT}" \
+  dotnet run --project "${API_PROJECT}" --no-build
 ) > "${OBS_DIR}/.ci-api.log" 2>&1 &
 API_PID=$!
 
