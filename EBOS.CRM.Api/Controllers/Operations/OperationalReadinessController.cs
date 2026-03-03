@@ -1,7 +1,9 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
+using EBOS.CRM.Domain.Identity;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -11,6 +13,7 @@ namespace EBOS.CRM.Api.Controllers.Operations;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
+[Authorize(Policy = PolicyKeys.Operations.ObservabilityRead)]
 public sealed class OperationalReadinessController(
     CrmDbContext dbContext,
     ICustomer360Metrics metrics,

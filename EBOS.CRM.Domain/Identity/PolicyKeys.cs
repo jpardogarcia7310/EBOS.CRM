@@ -2,6 +2,12 @@ namespace EBOS.CRM.Domain.Identity;
 
 public static class PolicyKeys
 {
+    public static class Operations
+    {
+        public const string ObservabilityRead = "Policy.Operations.Observability.Read";
+        public const string ReadinessRead = "Policy.Operations.Readiness.Read";
+    }
+
     public static class Crm
     {
         public const string CountryRead = "Policy.Crm.Country.Read";

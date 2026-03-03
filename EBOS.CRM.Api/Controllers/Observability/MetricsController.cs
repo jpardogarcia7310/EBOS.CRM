@@ -1,4 +1,5 @@
 using System.Text;
+using EBOS.CRM.Domain.Identity;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace EBOS.CRM.Api.Controllers.Observability;
 
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
-[AllowAnonymous]
+[Authorize(Policy = PolicyKeys.Operations.ObservabilityRead)]
 public sealed class MetricsController(ICustomer360Metrics metrics) : ControllerBase
 {
     [HttpGet]

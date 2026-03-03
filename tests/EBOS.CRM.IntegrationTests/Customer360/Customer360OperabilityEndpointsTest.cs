@@ -13,9 +13,18 @@ public class Customer360OperabilityEndpointsTest(CustomWebApplicationFactory fac
     private readonly string _version = ApiVersionHelper.GetLatestVersion(factory, "OperationalReadiness");
 
     [Fact]
-    public async Task Dashboard_And_Alerts_Endpoints_Return_Success()
+    public async Task Dashboard_And_Alerts_Require_Observability_Policy()
     {
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.AuthModeHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.RolesHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.PermissionsHeader);
+
         var dashboard = await _client.GetAsync($"/api/v{_version}/OperationalReadiness/dashboard");
+        dashboard.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        _client.DefaultRequestHeaders.Add(TestAuthHandler.PermissionsHeader, "ops.observability.read");
+
+        dashboard = await _client.GetAsync($"/api/v{_version}/OperationalReadiness/dashboard");
         dashboard.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var dashboardBody = await dashboard.Content.ReadAsStringAsync();
@@ -34,12 +43,43 @@ public class Customer360OperabilityEndpointsTest(CustomWebApplicationFactory fac
     }
 
     [Fact]
-    public async Task Health_Endpoints_Are_Exposed()
+    public async Task Metrics_And_Ready_Health_Require_Auth_And_Policy()
     {
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.AuthModeHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.RolesHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.PermissionsHeader);
+
+        _client.DefaultRequestHeaders.Add(TestAuthHandler.AuthModeHeader, "none");
+        var unauthorizedMetrics = await _client.GetAsync("/metrics");
+        unauthorizedMetrics.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var unauthorizedReady = await _client.GetAsync("/health/ready");
+        unauthorizedReady.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.AuthModeHeader);
+        var forbiddenMetrics = await _client.GetAsync("/metrics");
+        forbiddenMetrics.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var forbiddenReady = await _client.GetAsync("/health/ready");
+        forbiddenReady.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        _client.DefaultRequestHeaders.Add(TestAuthHandler.PermissionsHeader, "ops.observability.read,ops.readiness.read");
+        var authorizedMetrics = await _client.GetAsync("/metrics");
+        authorizedMetrics.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var authorizedReady = await _client.GetAsync("/health/ready");
+        authorizedReady.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
+    }
+
+    [Fact]
+    public async Task Live_Health_Remains_Exposed()
+    {
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.AuthModeHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.RolesHeader);
+        _client.DefaultRequestHeaders.Remove(TestAuthHandler.PermissionsHeader);
+
+        _client.DefaultRequestHeaders.Add(TestAuthHandler.AuthModeHeader, "none");
         var live = await _client.GetAsync("/health/live");
         live.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
-
-        var ready = await _client.GetAsync("/health/ready");
-        ready.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
     }
 }

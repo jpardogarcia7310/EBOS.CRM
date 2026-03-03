@@ -169,6 +169,24 @@ services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiUser", policy =>
         policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Operations.ObservabilityRead, policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("OpsObserver") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "ops.observability.read", StringComparison.OrdinalIgnoreCase))));
+    options.AddPolicy(PolicyKeys.Operations.ReadinessRead, policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("OpsObserver") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "ops.readiness.read", StringComparison.OrdinalIgnoreCase))));
     options.AddPolicy(PolicyKeys.Crm.CountryRead, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryCreate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryUpdate, policy => policy.RequireAuthenticatedUser());
@@ -409,7 +427,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health/live");
-app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health/ready").RequireAuthorization(PolicyKeys.Operations.ReadinessRead);
 
 await app.RunAsync();
 
