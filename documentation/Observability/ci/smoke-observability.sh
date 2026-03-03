@@ -144,8 +144,26 @@ echo "[observability-ci] Starting prometheus..."
   docker compose -f "${COMPOSE_FILE}" up -d prometheus)
 
 echo "[observability-ci] Waiting for Prometheus readiness..."
-wait_until 180 2 "Prometheus did not become ready." \
-  "curl -fsS 'http://localhost:9090/-/ready'"
+prom_ready=false
+for _ in $(seq 1 120); do
+  if curl -fsS "http://localhost:9090/-/ready" >/dev/null 2>&1; then
+    prom_ready=true
+    break
+  fi
+  sleep 2
+done
+
+if [[ "${prom_ready}" != "true" ]]; then
+  echo "[observability-ci] ERROR: Prometheus did not become ready." >&2
+  echo "[observability-ci] DEBUG: docker ps:" >&2
+  docker ps -a >&2 || true
+  echo "[observability-ci] DEBUG: docker compose status:" >&2
+  (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
+    docker compose -f "${COMPOSE_FILE}" ps) >&2 || true
+  echo "[observability-ci] DEBUG: Prometheus logs:" >&2
+  docker logs ebos-prometheus --tail 300 >&2 || true
+  exit 1
+fi
 
 QUERY="up{job=\"${JOB_NAME}\"}"
 ENCODED_QUERY="$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "${QUERY}")"
