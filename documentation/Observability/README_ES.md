@@ -118,3 +118,14 @@ up{job="ebos-crm-api"}
   - Slack (canal warning)
   - Teams (webhook warning)
   - Email warning
+
+## Seguimiento Operativo
+
+- Runbook:
+  - `documentation/RunBooks/Customer360-Operability-RunBook_ES.md`
+- Checklist post-deploy obligatorio:
+  - `documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md`
+- Cadencia recomendada de drills:
+  - Drill mensual de fallo/recuperación de outbox
+  - Drill trimestral de migración+rollback
+  - Drill trimestral de routing de alertas

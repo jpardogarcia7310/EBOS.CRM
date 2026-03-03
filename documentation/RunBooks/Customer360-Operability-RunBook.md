@@ -4,6 +4,17 @@
 - Customer 360 dedupe, merge, consent, and audit outbox operability.
 - Applies to `EBOS.CRM.Api` and dependent infrastructure services.
 
+## Service Objectives (SLO)
+- RTO (service recovery):
+  - P1 (Customer 360 API unavailable): <= 30 minutes
+  - P2 (degraded outbox/merge/consent): <= 4 hours
+- RPO (acceptable data loss):
+  - API + CRM DB: <= 5 minutes (transactional writes)
+  - Audit outbox dispatch state: <= 15 minutes (retry window)
+- Escalation:
+  - P1 -> on-call immediately, incident channel, status updates every 15 minutes.
+  - P2 -> business-hours response, status updates every 60 minutes.
+
 ## Operational Endpoints
 - Readiness dashboard:
   - `GET /api/v2.0/OperationalReadiness/dashboard`
@@ -73,18 +84,37 @@
 4. Validate health endpoints and primary Customer 360 flows.
 5. Reprocess outbox backlog if pending messages remain.
 
-## Troubleshooting
+## Incident Playbooks
 - Readiness degraded/unhealthy:
   - check `/api/v2.0/OperationalReadiness/dashboard`
   - inspect `outbox.pending`, `outbox.failed`, and stale dispatch
+  - if DB/migrations related, stop rollout and execute rollback.
 - Outbox failures increasing:
   - validate `AuditService:BaseUrl`
   - verify network connectivity and auth to audit service
   - inspect `AuditOutboxMessage.LastError`
+  - pause non-critical writes if backlog grows above critical threshold.
 - High concurrency failures:
   - identify hot aggregates/endpoints
   - tune `CommandExecution` retry settings
   - review conflicting writes and business workflow
+  - enable temporary traffic shaping for conflicting endpoints if needed.
+
+## Operational Drills
+- Frequency:
+  - Monthly: outbox failure simulation and recovery.
+  - Quarterly: migration + rollback rehearsal in staging-like environment.
+  - Quarterly: alert routing verification (warning + critical end-to-end).
+- Minimum evidence to store:
+  - execution date/time, operator, simulated scenario, detection time, recovery time, lessons learned.
+- Exit criteria:
+  - alert fired and routed correctly,
+  - runbook steps reproducible by another operator,
+  - measured RTO/RPO within objective.
+
+## Post-Deploy Checklist
+- Run: `documentation/RunBooks/Customer360-PostDeploy-Checklist.md`
+- Mark each item as `PASS/FAIL/N/A` and attach evidence links (logs, screenshots, query results).
 
 ## Verification Checklist
 - `dotnet build EBOS.CRM.slnx -c Debug`

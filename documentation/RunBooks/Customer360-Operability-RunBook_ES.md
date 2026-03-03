@@ -4,6 +4,17 @@
 - Operabilidad de dedupe, merge, consent y audit outbox de Customer 360.
 - Aplica a `EBOS.CRM.Api` y a los servicios de infraestructura dependientes.
 
+## Objetivos de Servicio (SLO)
+- RTO (recuperación del servicio):
+  - P1 (API Customer 360 no disponible): <= 30 minutos
+  - P2 (degradación outbox/merge/consent): <= 4 horas
+- RPO (pérdida de datos aceptable):
+  - API + DB CRM: <= 5 minutos (escrituras transaccionales)
+  - estado de dispatch de outbox de auditoría: <= 15 minutos (ventana de reintentos)
+- Escalado:
+  - P1 -> guardia inmediata, canal de incidente, actualizaciones cada 15 minutos.
+  - P2 -> respuesta en horario hábil, actualizaciones cada 60 minutos.
+
 ## Endpoints Operativos
 - Dashboard de readiness:
   - `GET /api/v2.0/OperationalReadiness/dashboard`
@@ -73,18 +84,37 @@
 4. Validar health endpoints y flujos principales de Customer 360.
 5. Reprocesar backlog de outbox si quedan mensajes pendientes.
 
-## Troubleshooting
+## Playbooks de Incidente
 - Readiness degraded/unhealthy:
   - revisar `/api/v2.0/OperationalReadiness/dashboard`
   - inspeccionar `outbox.pending`, `outbox.failed` y stale dispatch
+  - si está relacionado con DB/migraciones, detener despliegue y ejecutar rollback.
 - Incremento de fallos de outbox:
   - validar `AuditService:BaseUrl`
   - verificar conectividad de red y autenticación contra servicio de auditoría
   - revisar `AuditOutboxMessage.LastError`
+  - pausar escrituras no críticas si el backlog supera umbral crítico.
 - Alto volumen de fallos por concurrencia:
   - identificar aggregates/endpoints con más contención
   - ajustar retries en `CommandExecution`
   - revisar flujos de negocio con escrituras conflictivas
+  - activar temporalmente limitación de tráfico en endpoints conflictivos si aplica.
+
+## Drills Operativos
+- Frecuencia:
+  - Mensual: simulación de fallo de outbox y recuperación.
+  - Trimestral: ensayo de migración + rollback en entorno tipo staging.
+  - Trimestral: verificación de routing de alertas (warning + critical end-to-end).
+- Evidencia mínima a guardar:
+  - fecha/hora de ejecución, operador, escenario simulado, tiempo de detección, tiempo de recuperación, lecciones aprendidas.
+- Criterios de salida:
+  - alerta disparada y enrutada correctamente,
+  - pasos del runbook reproducibles por otro operador,
+  - RTO/RPO medidos dentro del objetivo.
+
+## Checklist Post-Deploy
+- Ejecutar: `documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md`
+- Marcar cada ítem como `PASS/FAIL/N/A` y adjuntar evidencias (logs, capturas, resultados de consultas).
 
 ## Checklist de Verificación
 - `dotnet build EBOS.CRM.slnx -c Debug`
