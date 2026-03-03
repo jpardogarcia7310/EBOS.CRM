@@ -373,6 +373,47 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
         foreignItems.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task CustomerPrivacyRetention_E2E_DryRunAndExecute_Works()
+    {
+        var customer = await CreateCustomerAsync(_tenant1, tenantId: 1, forcedEmail: $"ret-{Guid.NewGuid():N}@example.com");
+
+        var registerResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/register",
+            new RegisterCustomerPrivacyRequestRequest(
+                TenantId: 1,
+                CustomerId: customer.Id,
+                RequestType: "ANONYMIZE",
+                Reason: "retention test",
+                ExecuteNow: true));
+        registerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var dryRunResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/retention/run",
+            new RunCustomerPrivacyRetentionRequest(TenantId: 1, DryRun: true, RetentionDays: 0, BatchSize: 100));
+        dryRunResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var dryRun = await dryRunResponse.Content.ReadFromJsonAsync<CustomerPrivacyRetentionRunResponse>();
+        dryRun.Should().NotBeNull();
+        dryRun!.DryRun.Should().BeTrue();
+        dryRun.Candidates.Should().BeGreaterThan(0);
+        dryRun.Affected.Should().Be(0);
+
+        var executeResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/retention/run",
+            new RunCustomerPrivacyRetentionRequest(TenantId: 1, DryRun: false, RetentionDays: 0, BatchSize: 100));
+        executeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var execute = await executeResponse.Content.ReadFromJsonAsync<CustomerPrivacyRetentionRunResponse>();
+        execute.Should().NotBeNull();
+        execute!.DryRun.Should().BeFalse();
+        execute.Affected.Should().BeGreaterThan(0);
+
+        var listAfterResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-customer/{customer.Id}?tenantId=1");
+        listAfterResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var listAfter = await listAfterResponse.Content.ReadItemsAsync<CustomerPrivacyRequestResponse>();
+        listAfter.Should().BeEmpty();
+    }
+
     private async Task<CustomerResponse> CreateCustomerAsync(HttpClient client, long tenantId, string? forcedEmail = null)
     {
         var statusId = await LookupHelper.GetStatusIdAsync(client, _statusVersion);

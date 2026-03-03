@@ -2,10 +2,12 @@ using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.ExecuteCustomerPrivacyRequest;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RegisterCustomerPrivacyRequest;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Queries.GetCustomerPrivacyRequestsByCustomer;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Identity;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -17,7 +19,8 @@ namespace EBOS.CRM.Api.Controllers.CRM.CustomerPrivacy;
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
 [Authorize(Policy = "ApiUser")]
-public class CustomerPrivacyController(IMediator mediator) : ControllerBase
+public class CustomerPrivacyController(IMediator mediator, CustomerPrivacyRetentionService retentionService,
+    ICurrentUserContext currentUser) : ControllerBase
 {
     #region Queries
     [HttpGet("by-customer/{customerId:long}")]
@@ -62,6 +65,23 @@ public class CustomerPrivacyController(IMediator mediator) : ControllerBase
                 title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CustomerPrivacyRequest with id {id} not found."));
         }
 
+        return Ok(response);
+    }
+
+    [HttpPost("retention/run")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerPatch)]
+    [ProducesResponseType(typeof(CustomerPrivacyRetentionRunResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RunRetentionAsync([FromBody] RunCustomerPrivacyRetentionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await retentionService.RunAsync(
+            request.TenantId,
+            request.DryRun,
+            request.RetentionDays,
+            request.BatchSize,
+            currentUser.UserId,
+            currentUser.CorrelationId,
+            cancellationToken);
         return Ok(response);
     }
     #endregion

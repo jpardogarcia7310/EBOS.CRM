@@ -59,9 +59,12 @@ if (builder.Environment.IsDevelopment())
 {
     services.AddHostedService<LookupSeedHostedService>();
 }
+services.AddHostedService<CustomerPrivacyRetentionHostedService>();
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
 services.Configure<OperationalReadinessOptions>(
     builder.Configuration.GetSection(OperationalReadinessOptions.SectionName));
+services.Configure<CustomerPrivacyRetentionJobOptions>(
+    builder.Configuration.GetSection(CustomerPrivacyRetentionJobOptions.SectionName));
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()

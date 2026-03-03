@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddOptions<CaseWorkflowOptions>();
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
         services.AddScoped<CustomerPrivacyExecutionService>();
+        services.AddScoped<CustomerPrivacyRetentionService>();
 
         return services;
     }
