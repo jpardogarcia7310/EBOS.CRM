@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Options;
 
 namespace EBOS.CRM.Application;
@@ -24,6 +25,7 @@ public static class DependencyInjection
         services.AddOptions<CommandExecutionOptions>();
         services.AddOptions<CaseWorkflowOptions>();
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
+        services.AddScoped<CustomerPrivacyExecutionService>();
 
         return services;
     }

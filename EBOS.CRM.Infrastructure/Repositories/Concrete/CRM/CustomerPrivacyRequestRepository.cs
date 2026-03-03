@@ -22,6 +22,13 @@ public class CustomerPrivacyRequestRepository(CrmDbContext context)
             .ToListAsync(cancellationToken);
     }
 
+    public Task<int> CountByCustomerAsync(long tenantId, long customerId, CancellationToken cancellationToken = default)
+    {
+        return AsQueryable()
+            .Where(x => x.TenantId == tenantId && x.CustomerId == customerId)
+            .CountAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<CustomerPrivacyRequest>> GetByStatusPagedAsync(long tenantId, string status,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {

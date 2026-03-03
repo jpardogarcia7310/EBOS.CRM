@@ -15,6 +15,7 @@ public class Customer360ApiEndpointsSmokeTest(CustomWebApplicationFactory factor
     private readonly string _customerPreferenceVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerPreference");
     private readonly string _customerConsentVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerConsent");
     private readonly string _customerMergeVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerMerge");
+    private readonly string _customerPrivacyVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerPrivacy");
 
     [Fact]
     public async Task Customer360_GetRoutes_AreExposed()
@@ -32,6 +33,7 @@ public class Customer360ApiEndpointsSmokeTest(CustomWebApplicationFactory factor
 
         await AssertRouteExposedAsync($"/api/v{_customerPreferenceVersion}/CustomerPreference/by-customer/1?tenantId=1");
         await AssertRouteExposedAsync($"/api/v{_customerConsentVersion}/CustomerConsent/by-customer/1?tenantId=1");
+        await AssertRouteExposedAsync($"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-customer/1?tenantId=1");
         await AssertRouteExposedAsync(
             $"/api/v{_customerMergeVersion}/CustomerMerge/duplicates?tenantId=1&email=someone@example.com");
         await AssertRouteExposedAsync(

@@ -7,6 +7,7 @@ public interface ICustomerPrivacyRequestRepository : IPagedRepository<CustomerPr
 {
     Task<IReadOnlyCollection<CustomerPrivacyRequest>> GetByCustomerPagedAsync(long tenantId, long customerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<int> CountByCustomerAsync(long tenantId, long customerId, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<CustomerPrivacyRequest>> GetByStatusPagedAsync(long tenantId, string status,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<int> CountByStatusAsync(long tenantId, string status, CancellationToken cancellationToken = default);

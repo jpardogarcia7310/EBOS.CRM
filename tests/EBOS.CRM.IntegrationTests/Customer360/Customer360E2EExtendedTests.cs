@@ -7,6 +7,7 @@ using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerConsent;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerMerge;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPreference;
 using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Contracts.Responses.CRM;
@@ -35,6 +36,7 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
     private readonly string _customerPreferenceVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerPreference");
     private readonly string _customerConsentVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerConsent");
     private readonly string _customerMergeVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerMerge");
+    private readonly string _customerPrivacyVersion = ApiVersionHelper.GetLatestVersion(factory, "CustomerPrivacy");
     private readonly string _statusVersion = ApiVersionHelper.GetLatestVersion(factory, "Status");
     private readonly string _identificationTypeVersion = ApiVersionHelper.GetLatestVersion(factory, "IdentificationType");
 
@@ -332,6 +334,43 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
                 $"/api/v{_customerMergeVersion}/CustomerMerge/duplicates?tenantId=1&email={Uri.EscapeDataString(winner.Email)}"));
         var concurrentResults = await Task.WhenAll(concurrentReads);
         concurrentResults.Should().OnlyContain(r => (int)r.StatusCode < 500);
+    }
+
+    [Fact]
+    public async Task CustomerPrivacy_E2E_RegisterAndExecuteForget_Works()
+    {
+        var customer = await CreateCustomerAsync(_tenant1, tenantId: 1, forcedEmail: $"pii-{Guid.NewGuid():N}@example.com");
+        var registerResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/register",
+            new RegisterCustomerPrivacyRequestRequest(
+                TenantId: 1,
+                CustomerId: customer.Id,
+                RequestType: "ANONYMIZE",
+                Reason: "GDPR test",
+                ExecuteNow: true));
+        registerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var privacyResponse = await registerResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        privacyResponse.Should().NotBeNull();
+        privacyResponse!.Status.Should().Be("COMPLETED");
+
+        var customerAfterResponse = await _tenant1.GetAsync($"/api/v{_customerVersion}/Customer/{customer.Id}");
+        customerAfterResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var customerAfter = await customerAfterResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+        customerAfter.Should().NotBeNull();
+        customerAfter!.Email.Should().Contain("@redacted.local");
+        customerAfter.Phone.Should().MatchRegex("^[0-9]{12}$");
+
+        var byCustomerResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-customer/{customer.Id}?tenantId=1");
+        byCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var items = await byCustomerResponse.Content.ReadItemsAsync<CustomerPrivacyRequestResponse>();
+        items.Should().ContainSingle(x => x.Id == privacyResponse.Id && x.Status == "COMPLETED");
+
+        var foreignTenantList = await _tenant2.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-customer/{customer.Id}?tenantId=2");
+        foreignTenantList.StatusCode.Should().Be(HttpStatusCode.OK);
+        var foreignItems = await foreignTenantList.Content.ReadItemsAsync<CustomerPrivacyRequestResponse>();
+        foreignItems.Should().BeEmpty();
     }
 
     private async Task<CustomerResponse> CreateCustomerAsync(HttpClient client, long tenantId, string? forcedEmail = null)
