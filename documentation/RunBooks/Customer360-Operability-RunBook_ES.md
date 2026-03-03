@@ -107,6 +107,7 @@
   - Trimestral: verificación de routing de alertas (warning + critical end-to-end).
 - Evidencia mínima a guardar:
   - fecha/hora de ejecución, operador, escenario simulado, tiempo de detección, tiempo de recuperación, lecciones aprendidas.
+  - usar plantilla: `documentation/RunBooks/Customer360-Drill-Record-Template_ES.md`
 - Criterios de salida:
   - alerta disparada y enrutada correctamente,
   - pasos del runbook reproducibles por otro operador,

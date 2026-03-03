@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 jobs:
   validate-observability-config:
@@ -35,3 +36,10 @@ jobs:
       - name: Run observability smoke
         run: bash documentation/Observability/ci/smoke-observability.sh
 
+      - name: Upload smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observability-smoke-logs
+          path: documentation/Observability/.ci-api.log
+          if-no-files-found: ignore

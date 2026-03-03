@@ -129,3 +129,5 @@ up{job="ebos-crm-api"}
   - Monthly outbox failure/recovery drill
   - Quarterly migration+rollback drill
   - Quarterly alert-routing drill
+- CI workflow:
+  - GitHub Actions workflow `Observability CI` can run on PR/push and manually (`workflow_dispatch`).

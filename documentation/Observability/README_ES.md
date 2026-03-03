@@ -129,3 +129,5 @@ up{job="ebos-crm-api"}
   - Drill mensual de fallo/recuperación de outbox
   - Drill trimestral de migración+rollback
   - Drill trimestral de routing de alertas
+- Workflow de CI:
+  - El workflow de GitHub Actions `Observability CI` se ejecuta en PR/push y también manualmente (`workflow_dispatch`).
