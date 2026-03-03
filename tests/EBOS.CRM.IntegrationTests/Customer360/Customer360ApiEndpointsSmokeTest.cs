@@ -34,6 +34,10 @@ public class Customer360ApiEndpointsSmokeTest(CustomWebApplicationFactory factor
         await AssertRouteExposedAsync($"/api/v{_customerConsentVersion}/CustomerConsent/by-customer/1?tenantId=1");
         await AssertRouteExposedAsync(
             $"/api/v{_customerMergeVersion}/CustomerMerge/duplicates?tenantId=1&email=someone@example.com");
+        await AssertRouteExposedAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-winner/1?tenantId=1");
+        await AssertRouteExposedAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-merged/1?tenantId=1");
     }
 
     private async Task AssertRouteExposedAsync(string path)

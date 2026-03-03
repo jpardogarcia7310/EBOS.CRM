@@ -15,6 +15,7 @@ using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
 using EBOS.CRM.IntegrationTests.TestUtils;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EBOS.CRM.IntegrationTests.Customer360;
@@ -271,12 +272,55 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
         mergeResult.Should().NotBeNull();
         mergeResult!.WinnerCustomerId.Should().Be(winner.Id);
         mergeResult.MergedCustomerIds.Should().Contain(duplicate.Id);
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+            var mergedEntity = await db.Customers.FindAsync(duplicate.Id);
+            mergedEntity.Should().NotBeNull();
+            mergedEntity!.Erased.Should().BeTrue();
+
+            var mergeHistory = await db.CustomerMergeHistories
+                .Where(h => h.TenantId == 1 && h.WinnerCustomerId == winner.Id && h.MergedCustomerId == duplicate.Id)
+                .ToListAsync();
+            mergeHistory.Should().ContainSingle();
+            mergeHistory[0].Reason.Should().Be("E2E merge validation");
+        }
+
+        var historyResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-winner/{winner.Id}?tenantId=1");
+        historyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var historyItems = await historyResponse.Content.ReadItemsAsync<CustomerMergeHistoryResponse>();
+        historyItems.Should().ContainSingle(x =>
+            x.WinnerCustomerId == winner.Id &&
+            x.MergedCustomerId == duplicate.Id &&
+            x.TenantId == 1);
+
+        var historyByMergedResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-merged/{duplicate.Id}?tenantId=1");
+        historyByMergedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var historyByMergedItems = await historyByMergedResponse.Content.ReadItemsAsync<CustomerMergeHistoryResponse>();
+        historyByMergedItems.Should().ContainSingle(x =>
+            x.WinnerCustomerId == winner.Id &&
+            x.MergedCustomerId == duplicate.Id &&
+            x.TenantId == 1);
 
         var foreignTenantFind = await _tenant2.GetAsync(
             $"/api/v{_customerMergeVersion}/CustomerMerge/duplicates?tenantId=2&email={Uri.EscapeDataString(winner.Email)}");
         foreignTenantFind.StatusCode.Should().Be(HttpStatusCode.OK);
         var foreignDuplicates = await foreignTenantFind.Content.ReadItemsAsync<CustomerDuplicateCandidateResponse>();
         foreignDuplicates.Should().BeEmpty();
+
+        var foreignTenantHistory = await _tenant2.GetAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-winner/{winner.Id}?tenantId=2");
+        foreignTenantHistory.StatusCode.Should().Be(HttpStatusCode.OK);
+        var foreignHistoryItems = await foreignTenantHistory.Content.ReadItemsAsync<CustomerMergeHistoryResponse>();
+        foreignHistoryItems.Should().BeEmpty();
+
+        var foreignTenantHistoryByMerged = await _tenant2.GetAsync(
+            $"/api/v{_customerMergeVersion}/CustomerMerge/history/by-merged/{duplicate.Id}?tenantId=2");
+        foreignTenantHistoryByMerged.StatusCode.Should().Be(HttpStatusCode.OK);
+        var foreignHistoryByMergedItems = await foreignTenantHistoryByMerged.Content.ReadItemsAsync<CustomerMergeHistoryResponse>();
+        foreignHistoryByMergedItems.Should().BeEmpty();
 
         var badTenantMerge = await _tenant1.PostAsJsonAsync(
             $"/api/v{_customerMergeVersion}/CustomerMerge/merge",
