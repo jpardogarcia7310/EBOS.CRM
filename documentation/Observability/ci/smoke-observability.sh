@@ -16,7 +16,8 @@ cleanup() {
   if [[ -n "${API_PID}" ]] && kill -0 "${API_PID}" >/dev/null 2>&1; then
     kill "${API_PID}" >/dev/null 2>&1 || true
   fi
-  docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1 || true
+  (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
+    docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1) || true
 }
 trap cleanup EXIT
 
@@ -39,6 +40,24 @@ wait_until() {
   done
 }
 
+if [[ -d "${OBS_DIR}/Prometheus" ]]; then
+  OBS_PROM_DIR="Prometheus"
+elif [[ -d "${OBS_DIR}/prometheus" ]]; then
+  OBS_PROM_DIR="prometheus"
+else
+  echo "[observability-ci] ERROR: Prometheus folder not found under ${OBS_DIR}" >&2
+  exit 1
+fi
+
+if [[ -d "${OBS_DIR}/Grafana" ]]; then
+  OBS_GRAFANA_DIR="Grafana"
+elif [[ -d "${OBS_DIR}/grafana" ]]; then
+  OBS_GRAFANA_DIR="grafana"
+else
+  echo "[observability-ci] ERROR: Grafana folder not found under ${OBS_DIR}" >&2
+  exit 1
+fi
+
 echo "[observability-ci] Starting API for smoke test..."
 (
   cd "${REPO_ROOT}"
@@ -53,7 +72,8 @@ wait_until 180 2 "API /metrics did not become ready." \
   "curl -fsS 'http://localhost:${API_PORT}/metrics' | grep -q 'customer360_merge_total'"
 
 echo "[observability-ci] Starting observability stack..."
-docker compose -f "${COMPOSE_FILE}" up -d
+(cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
+  docker compose -f "${COMPOSE_FILE}" up -d)
 
 echo "[observability-ci] Waiting for Prometheus readiness..."
 wait_until 180 2 "Prometheus did not become ready." \
@@ -72,4 +92,3 @@ wait_until 120 2 "Prometheus rules group customer360-operability was not loaded.
   "curl -fsS 'http://localhost:9090/api/v1/rules' | grep -q 'customer360-operability'"
 
 echo "[observability-ci] Smoke test passed."
-
