@@ -144,6 +144,29 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         FailureReason = NormalizeOrNull(reason);
     }
 
+    public void MarkPendingForRetry(long processedBy, string? reason = null)
+    {
+        if (!string.Equals(Status, StatusFailed, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Only failed requests can be retried.");
+        }
+
+        if (processedBy <= 0)
+        {
+            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+        }
+
+        Status = StatusPending;
+        ProcessedBy = processedBy;
+        ProcessedAt = DateTime.UtcNow;
+        FailureCode = null;
+        FailureReason = null;
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            Reason = NormalizeOrNull(reason);
+        }
+    }
+
     private static void ValidateTenantAndCustomer(long tenantId, long customerId)
     {
         if (tenantId <= 0)

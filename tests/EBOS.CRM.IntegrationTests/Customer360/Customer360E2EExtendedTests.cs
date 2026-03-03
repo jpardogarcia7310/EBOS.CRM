@@ -11,6 +11,7 @@ using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPreference;
 using EBOS.CRM.Contracts.Requests.CRM.IndividualCustomer;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Infrastructure.Persistence;
 using EBOS.CRM.IntegrationTests.Infrastructure;
@@ -443,6 +444,80 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
             $"/api/v{_individualVersion}/IndividualCustomer/{created.Id}?includePii=true");
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task CustomerPrivacy_E2E_ById_ByStatus_Retry_And_IdempotentExecute_Works()
+    {
+        var customer = await CreateCustomerAsync(_tenant1, tenantId: 1, forcedEmail: $"flow-{Guid.NewGuid():N}@example.com");
+
+        var registerPendingResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/register",
+            new RegisterCustomerPrivacyRequestRequest(
+                TenantId: 1,
+                CustomerId: customer.Id,
+                RequestType: "ANONYMIZE",
+                Reason: "flow test",
+                ExecuteNow: false));
+        registerPendingResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var pending = await registerPendingResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        pending.Should().NotBeNull();
+        pending!.Status.Should().Be("PENDING");
+
+        var executeResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/{pending.Id}/execute",
+            new ExecuteCustomerPrivacyRequestRequest(1));
+        executeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var executed = await executeResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        executed.Should().NotBeNull();
+        executed!.Status.Should().Be("COMPLETED");
+
+        var executeAgainResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/{pending.Id}/execute",
+            new ExecuteCustomerPrivacyRequestRequest(1));
+        executeAgainResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var executedAgain = await executeAgainResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        executedAgain.Should().NotBeNull();
+        executedAgain!.Status.Should().Be("COMPLETED");
+
+        var byIdResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/{pending.Id}?tenantId=1");
+        byIdResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var byId = await byIdResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        byId.Should().NotBeNull();
+        byId!.Id.Should().Be(pending.Id);
+
+        var byStatusResponse = await _tenant1.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-status/COMPLETED?tenantId=1");
+        byStatusResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var byStatus = await byStatusResponse.Content.ReadItemsAsync<CustomerPrivacyRequestResponse>();
+        byStatus.Should().Contain(x => x.Id == pending.Id);
+
+        var byStatusOtherTenant = await _tenant2.GetAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/by-status/COMPLETED?tenantId=2");
+        byStatusOtherTenant.StatusCode.Should().Be(HttpStatusCode.OK);
+        var byStatusOther = await byStatusOtherTenant.Content.ReadItemsAsync<CustomerPrivacyRequestResponse>();
+        byStatusOther.Should().NotContain(x => x.Id == pending.Id);
+
+        long failedId;
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+            var failed = CustomerPrivacyRequest.Create(1, customer.Id, CustomerPrivacyRequest.TypeAnonymize, 1, "failed flow", "it");
+            failed.MarkInProgress(1);
+            failed.MarkFailed(1, "SIMULATED", "simulated fail");
+            db.CustomerPrivacyRequests.Add(failed);
+            await db.SaveChangesAsync();
+            failedId = failed.Id;
+        }
+
+        var retryResponse = await _tenant1.PostAsJsonAsync(
+            $"/api/v{_customerPrivacyVersion}/CustomerPrivacy/{failedId}/retry",
+            new RetryCustomerPrivacyRequestRequest(1, "retry now"));
+        retryResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var retried = await retryResponse.Content.ReadFromJsonAsync<CustomerPrivacyRequestResponse>();
+        retried.Should().NotBeNull();
+        retried!.Status.Should().Be("COMPLETED");
     }
 
     private async Task<CustomerResponse> CreateCustomerAsync(HttpClient client, long tenantId, string? forcedEmail = null)

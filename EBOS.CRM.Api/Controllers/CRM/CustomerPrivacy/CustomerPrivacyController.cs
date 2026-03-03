@@ -2,8 +2,11 @@ using EBOS.CRM.Api.Constants;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.ExecuteCustomerPrivacyRequest;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RegisterCustomerPrivacyRequest;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RetryCustomerPrivacyRequest;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Queries.GetCustomerPrivacyRequestById;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Queries.GetCustomerPrivacyRequestsByCustomer;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Queries.GetCustomerPrivacyRequestsByStatus;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Identity;
@@ -39,6 +42,40 @@ public class CustomerPrivacyController(IMediator mediator, CustomerPrivacyRetent
         Response.Headers["X-Total-Count"] = result.Total.ToString();
         return Ok(result.Items);
     }
+
+    [HttpGet("{id:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
+    [ProducesResponseType(typeof(CustomerPrivacyRequestResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] long id, [FromQuery] long tenantId,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await mediator.Send(new GetCustomerPrivacyRequestByIdQuery(id, tenantId), cancellationToken);
+        if (response is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound,
+                title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CustomerPrivacyRequest with id {id} not found."));
+        }
+
+        return Ok(response);
+    }
+
+    [HttpGet("by-status/{status}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CustomerPrivacyRequestResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByStatusAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromRoute] string status, [FromQuery] long tenantId, [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        var result = await mediator.Send(
+            new GetCustomerPrivacyRequestsByStatusQuery(tenantId, status, safePageNumber, safePageSize),
+            cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
+    }
     #endregion
 
     #region Commands
@@ -59,6 +96,23 @@ public class CustomerPrivacyController(IMediator mediator, CustomerPrivacyRetent
         CancellationToken cancellationToken = default)
     {
         var response = await mediator.Send(new ExecuteCustomerPrivacyRequestCommand(id, request), cancellationToken);
+        if (response is null)
+        {
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound,
+                title: ProblemDetailsDefaults.NotFoundTitle, detail: $"CustomerPrivacyRequest with id {id} not found."));
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost("{id:long}/retry")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerPatch)]
+    [ProducesResponseType(typeof(CustomerPrivacyRequestResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RetryAsync([FromRoute] long id, [FromBody] RetryCustomerPrivacyRequestRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await mediator.Send(new RetryCustomerPrivacyRequestCommand(id, request), cancellationToken);
         if (response is null)
         {
             return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound,
