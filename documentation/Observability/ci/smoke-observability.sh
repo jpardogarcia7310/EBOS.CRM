@@ -68,8 +68,7 @@ cp "${SOURCE_PROM_DIR}/prometheus.yml" "${CI_PROM_DIR_PATH}/prometheus.yml"
 cp "${SOURCE_PROM_DIR}/customer360-alert-rules.yml" "${CI_PROM_DIR_PATH}/customer360-alert-rules.yml"
 cp "${SOURCE_PROM_DIR}/alertmanager.yml" "${CI_PROM_DIR_PATH}/alertmanager.yml"
 
-docker network create observability_default >/dev/null 2>&1 || true
-DOCKER_GATEWAY_IP="$(docker network inspect observability_default -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null || true)"
+DOCKER_GATEWAY_IP="$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null || true)"
 if [[ -n "${DOCKER_GATEWAY_IP}" ]]; then
   echo "[observability-ci] Using Docker gateway fallback target: ${DOCKER_GATEWAY_IP}:${API_PORT}"
   sed -i "/host.docker.internal:${API_PORT}/a\\          - \"${DOCKER_GATEWAY_IP}:${API_PORT}\"" \
