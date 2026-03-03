@@ -5,19 +5,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 OBS_DIR="${REPO_ROOT}/documentation/Observability"
 API_PROJECT="${REPO_ROOT}/EBOS.CRM.Api/EBOS.CRM.Api.csproj"
+API_PROJECT_REL="EBOS.CRM.Api/EBOS.CRM.Api.csproj"
 COMPOSE_FILE="${OBS_DIR}/docker-compose.observability.yml"
 API_PORT="${API_PORT:-5013}"
 JOB_NAME="ebos-crm-api"
 CI_PROM_DIR_NAME=".ci-prometheus"
 CI_PROM_DIR_PATH="${OBS_DIR}/${CI_PROM_DIR_NAME}"
+API_CONTAINER_NAME="ebos-crm-api-smoke"
+COMPOSE_NETWORK_NAME="observability_default"
 
 API_PID=""
 
 cleanup() {
   set +e
-  if [[ -n "${API_PID}" ]] && kill -0 "${API_PID}" >/dev/null 2>&1; then
-    kill "${API_PID}" >/dev/null 2>&1 || true
-  fi
+  docker rm -f "${API_CONTAINER_NAME}" >/dev/null 2>&1 || true
   (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
     docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1) || true
   rm -rf "${CI_PROM_DIR_PATH}" >/dev/null 2>&1 || true
@@ -68,25 +69,35 @@ cp "${SOURCE_PROM_DIR}/prometheus.yml" "${CI_PROM_DIR_PATH}/prometheus.yml"
 cp "${SOURCE_PROM_DIR}/customer360-alert-rules.yml" "${CI_PROM_DIR_PATH}/customer360-alert-rules.yml"
 cp "${SOURCE_PROM_DIR}/alertmanager.yml" "${CI_PROM_DIR_PATH}/alertmanager.yml"
 
+# Ensure Prometheus scrapes the API container running inside compose network.
+sed -i "/targets:/a\\          - \"${API_CONTAINER_NAME}:${API_PORT}\"" "${CI_PROM_DIR_PATH}/prometheus.yml"
+
 OBS_PROM_DIR="${CI_PROM_DIR_NAME}"
 
-echo "[observability-ci] Starting API for smoke test..."
-(
-  cd "${REPO_ROOT}"
-  ASPNETCORE_ENVIRONMENT=Development \
-  Authentication__Enabled=false \
-  ASPNETCORE_URLS="http://0.0.0.0:${API_PORT}" \
-  dotnet run --project "${API_PROJECT}" --no-build
-) > "${OBS_DIR}/.ci-api.log" 2>&1 &
-API_PID=$!
-
-echo "[observability-ci] Waiting for API metrics..."
-wait_until 180 2 "API /metrics did not become ready." \
-  "curl -fsS 'http://localhost:${API_PORT}/metrics' | grep -q 'customer360_merge_total'"
-
-echo "[observability-ci] Starting observability stack..."
+echo "[observability-ci] Starting alertmanager+grafana..."
 (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
-  docker compose -f "${COMPOSE_FILE}" up -d)
+  docker compose -f "${COMPOSE_FILE}" up -d alertmanager grafana)
+
+echo "[observability-ci] Starting API container inside compose network..."
+docker run -d \
+  --name "${API_CONTAINER_NAME}" \
+  --network "${COMPOSE_NETWORK_NAME}" \
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  -e Authentication__Enabled=false \
+  -e ASPNETCORE_URLS="http://0.0.0.0:${API_PORT}" \
+  -e ConnectionStrings__CrmConnection="Server=localhost;Database=crm_smoke;User Id=sa;Password=StrongP@ssw0rd123;TrustServerCertificate=true;" \
+  -v "${REPO_ROOT}:/src" \
+  -w /src \
+  mcr.microsoft.com/dotnet/sdk:8.0 \
+  bash -lc "dotnet run --project ${API_PROJECT_REL} --no-build" > "${OBS_DIR}/.ci-api.log" 2>&1
+
+echo "[observability-ci] Waiting for API metrics from compose network..."
+wait_until 240 2 "API /metrics did not become ready from compose network." \
+  "docker run --rm --network ${COMPOSE_NETWORK_NAME} curlimages/curl:8.10.1 -fsS http://${API_CONTAINER_NAME}:${API_PORT}/metrics | grep -q 'customer360_merge_total'"
+
+echo "[observability-ci] Starting prometheus..."
+(cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
+  docker compose -f "${COMPOSE_FILE}" up -d prometheus)
 
 echo "[observability-ci] Waiting for Prometheus readiness..."
 wait_until 180 2 "Prometheus did not become ready." \
@@ -112,7 +123,7 @@ if [[ "${query_ok}" != "true" ]]; then
   echo "[observability-ci] DEBUG: Prometheus targets payload:" >&2
   curl -fsS "http://localhost:9090/api/v1/targets" >&2 || true
   echo "[observability-ci] DEBUG: Last API logs:" >&2
-  tail -n 200 "${OBS_DIR}/.ci-api.log" >&2 || true
+  docker logs "${API_CONTAINER_NAME}" --tail 200 >&2 || true
   exit 1
 fi
 
