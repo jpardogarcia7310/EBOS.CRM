@@ -73,7 +73,9 @@ cp "${SOURCE_PROM_DIR}/customer360-alert-rules.yml" "${CI_PROM_DIR_PATH}/custome
 cp "${SOURCE_PROM_DIR}/alertmanager.yml" "${CI_PROM_DIR_PATH}/alertmanager.yml"
 
 # Ensure Prometheus scrapes the API container running inside compose network.
-sed -i "/targets:/a\\          - \"${API_CONTAINER_NAME}:${API_PORT}\"" "${CI_PROM_DIR_PATH}/prometheus.yml"
+# Insert right after the known scrape target line to avoid touching alertmanager targets.
+sed -i "/host\.docker\.internal:${API_PORT}/a\\          - \"${API_CONTAINER_NAME}:${API_PORT}\"" \
+  "${CI_PROM_DIR_PATH}/prometheus.yml"
 
 OBS_PROM_DIR="${CI_PROM_DIR_NAME}"
 
