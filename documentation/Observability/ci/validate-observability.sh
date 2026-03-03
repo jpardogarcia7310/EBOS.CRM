@@ -16,23 +16,23 @@ fi
 echo "[observability-ci] Validating Prometheus config..."
 docker run --rm \
   --entrypoint promtool \
-  -v "${PROM_DIR}:/work:ro" \
+  -v "${PROM_DIR}:/etc/prometheus:ro" \
   prom/prometheus:v2.55.1 \
-  check config /work/prometheus.yml
+  check config /etc/prometheus/prometheus.yml
 
 echo "[observability-ci] Validating Prometheus alert rules..."
 docker run --rm \
   --entrypoint promtool \
-  -v "${PROM_DIR}:/work:ro" \
+  -v "${PROM_DIR}:/etc/prometheus:ro" \
   prom/prometheus:v2.55.1 \
-  check rules /work/customer360-alert-rules.yml
+  check rules /etc/prometheus/customer360-alert-rules.yml
 
 echo "[observability-ci] Validating Alertmanager config..."
 docker run --rm \
   --entrypoint amtool \
-  -v "${PROM_DIR}:/work:ro" \
+  -v "${PROM_DIR}:/etc/alertmanager:ro" \
   prom/alertmanager:v0.27.0 \
-  check-config /work/alertmanager.yml
+  check-config /etc/alertmanager/alertmanager.yml
 
 echo "[observability-ci] Validating Grafana dashboard JSON..."
 python3 "${SCRIPT_DIR}/validate-dashboard.py"
