@@ -61,19 +61,12 @@ else
   exit 1
 fi
 
-# Prepare CI-specific Prometheus config with Docker network gateway fallback target.
+# Prepare CI-specific Prometheus config.
 rm -rf "${CI_PROM_DIR_PATH}"
 mkdir -p "${CI_PROM_DIR_PATH}"
 cp "${SOURCE_PROM_DIR}/prometheus.yml" "${CI_PROM_DIR_PATH}/prometheus.yml"
 cp "${SOURCE_PROM_DIR}/customer360-alert-rules.yml" "${CI_PROM_DIR_PATH}/customer360-alert-rules.yml"
 cp "${SOURCE_PROM_DIR}/alertmanager.yml" "${CI_PROM_DIR_PATH}/alertmanager.yml"
-
-DOCKER_GATEWAY_IP="$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null || true)"
-if [[ -n "${DOCKER_GATEWAY_IP}" ]]; then
-  echo "[observability-ci] Using Docker gateway fallback target: ${DOCKER_GATEWAY_IP}:${API_PORT}"
-  sed -i "/host.docker.internal:${API_PORT}/a\\          - \"${DOCKER_GATEWAY_IP}:${API_PORT}\"" \
-    "${CI_PROM_DIR_PATH}/prometheus.yml"
-fi
 
 OBS_PROM_DIR="${CI_PROM_DIR_NAME}"
 
@@ -104,8 +97,24 @@ ENCODED_QUERY="$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(s
 PROM_QUERY_URL="http://localhost:9090/api/v1/query?query=${ENCODED_QUERY}"
 
 echo "[observability-ci] Validating exact matcher query: ${QUERY}"
-wait_until 180 2 "Prometheus query did not return up=1 for ${JOB_NAME}." \
-  "curl -fsS '${PROM_QUERY_URL}' | grep -q '\"job\":\"${JOB_NAME}\"' && curl -fsS '${PROM_QUERY_URL}' | grep -q '\"1\"'"
+query_ok=false
+for _ in $(seq 1 90); do
+  payload="$(curl -fsS "${PROM_QUERY_URL}" || true)"
+  if [[ "${payload}" == *"\"job\":\"${JOB_NAME}\""* && "${payload}" == *"\"1\""* ]]; then
+    query_ok=true
+    break
+  fi
+  sleep 2
+done
+
+if [[ "${query_ok}" != "true" ]]; then
+  echo "[observability-ci] ERROR: Prometheus query did not return up=1 for ${JOB_NAME}." >&2
+  echo "[observability-ci] DEBUG: Prometheus targets payload:" >&2
+  curl -fsS "http://localhost:9090/api/v1/targets" >&2 || true
+  echo "[observability-ci] DEBUG: Last API logs:" >&2
+  tail -n 200 "${OBS_DIR}/.ci-api.log" >&2 || true
+  exit 1
+fi
 
 echo "[observability-ci] Validating alert rules group is loaded..."
 wait_until 120 2 "Prometheus rules group customer360-operability was not loaded." \
