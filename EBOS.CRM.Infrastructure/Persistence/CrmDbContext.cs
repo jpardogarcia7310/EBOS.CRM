@@ -38,6 +38,7 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
     public DbSet<CustomerConsent> CustomerConsents => Set<CustomerConsent>();
     public DbSet<CustomerMergeHistory> CustomerMergeHistories => Set<CustomerMergeHistory>();
+    public DbSet<CustomerPrivacyRequest> CustomerPrivacyRequests => Set<CustomerPrivacyRequest>();
     public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
