@@ -4,7 +4,9 @@ using EBOS.CRM.Application.Features.CRM.CustomerPreference.Commands.UpsertCustom
 using EBOS.CRM.Application.Features.CRM.CustomerPreference.Queries.GetCustomerPreferencesByCustomer;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPreference;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Identity;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CustomerPreference;
@@ -13,10 +15,12 @@ namespace EBOS.CRM.Api.Controllers.CRM.CustomerPreference;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
+[Authorize(Policy = "ApiUser")]
 public class CustomerPreferenceController(IMediator mediator) : ControllerBase
 {
     #region Queries
     [HttpGet("by-customer/{customerId:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(IReadOnlyCollection<CustomerPreferenceResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByCustomerAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromRoute] long customerId, [FromQuery] long tenantId, [FromQuery] int pageNumber = 1,
@@ -35,6 +39,7 @@ public class CustomerPreferenceController(IMediator mediator) : ControllerBase
 
     #region Commands
     [HttpPut]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerUpdate)]
     [ProducesResponseType(typeof(CustomerPreferenceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpsertAsync([FromBody] UpsertCustomerPreferenceRequest request,
         CancellationToken cancellationToken = default)

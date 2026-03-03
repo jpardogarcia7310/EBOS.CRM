@@ -5,7 +5,9 @@ using EBOS.CRM.Application.Features.CRM.CustomerConsent.Commands.RevokeCustomerC
 using EBOS.CRM.Application.Features.CRM.CustomerConsent.Queries.GetCustomerConsentsByCustomer;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerConsent;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Identity;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CustomerConsent;
@@ -14,10 +16,12 @@ namespace EBOS.CRM.Api.Controllers.CRM.CustomerConsent;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
+[Authorize(Policy = "ApiUser")]
 public class CustomerConsentController(IMediator mediator) : ControllerBase
 {
     #region Queries
     [HttpGet("by-customer/{customerId:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(IReadOnlyCollection<CustomerConsentResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByCustomerAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromRoute] long customerId, [FromQuery] long tenantId, [FromQuery] int pageNumber = 1,
@@ -35,6 +39,7 @@ public class CustomerConsentController(IMediator mediator) : ControllerBase
 
     #region Commands
     [HttpPost]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerCreate)]
     [ProducesResponseType(typeof(CustomerConsentResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddAsync([FromBody] AddCustomerConsentRequest request,
         CancellationToken cancellationToken = default)
@@ -43,6 +48,7 @@ public class CustomerConsentController(IMediator mediator) : ControllerBase
     }
 
     [HttpPatch("{id:long}/revoke")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerPatch)]
     [ProducesResponseType(typeof(CustomerConsentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RevokeAsync([FromRoute] long id, [FromBody] RevokeCustomerConsentRequest request,

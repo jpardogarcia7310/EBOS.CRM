@@ -9,7 +9,9 @@ using EBOS.CRM.Application.Features.CRM.AccountContact.Queries.GetAccountContact
 using EBOS.CRM.Application.Features.CRM.AccountContact.Queries.GetAllAccountContacts;
 using EBOS.CRM.Contracts.Requests.CRM.AccountContact;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Identity;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.AccountContact;
@@ -18,10 +20,12 @@ namespace EBOS.CRM.Api.Controllers.CRM.AccountContact;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
+[Authorize(Policy = "ApiUser")]
 public class AccountContactController(IMediator mediator) : ControllerBase
 {
     #region Queries
     [HttpGet]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AccountContactResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] long tenantId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50,
@@ -36,6 +40,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(AccountContactResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken = default)
@@ -51,6 +56,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("by-account/{corporateCustomerId:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AccountContactResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByAccountAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromRoute] long corporateCustomerId, [FromQuery] long tenantId, [FromQuery] int pageNumber = 1,
@@ -69,6 +75,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
 
     #region Commands
     [HttpPost]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerCreate)]
     [ProducesResponseType(typeof(AccountContactResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddAsync([FromBody] AddAccountContactRequest request,
         CancellationToken cancellationToken = default)
@@ -77,6 +84,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerUpdate)]
     [ProducesResponseType(typeof(AccountContactResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] UpdateAccountContactRequest request,
@@ -93,6 +101,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
     }
 
     [HttpPatch("{id:long}/primary")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerPatch)]
     [ProducesResponseType(typeof(AccountContactResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetPrimaryAsync([FromRoute] long id, [FromBody] SetPrimaryAccountContactRequest request,
@@ -109,6 +118,7 @@ public class AccountContactController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerDelete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync([FromRoute] long id, [FromQuery] long tenantId,

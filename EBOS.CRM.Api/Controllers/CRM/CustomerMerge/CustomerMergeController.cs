@@ -4,7 +4,9 @@ using EBOS.CRM.Application.Features.CRM.CustomerMerge.Commands.MergeCustomers;
 using EBOS.CRM.Application.Features.CRM.CustomerMerge.Queries.FindCustomerDuplicates;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerMerge;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Identity;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.CustomerMerge;
@@ -13,10 +15,12 @@ namespace EBOS.CRM.Api.Controllers.CRM.CustomerMerge;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
+[Authorize(Policy = "ApiUser")]
 public class CustomerMergeController(IMediator mediator) : ControllerBase
 {
     #region Queries
     [HttpGet("duplicates")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerRead)]
     [ProducesResponseType(typeof(IReadOnlyCollection<CustomerDuplicateCandidateResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FindDuplicatesAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] long tenantId, [FromQuery] string? email, [FromQuery] string? phone, [FromQuery] string? taxId,
@@ -37,6 +41,7 @@ public class CustomerMergeController(IMediator mediator) : ControllerBase
 
     #region Commands
     [HttpPost("merge")]
+    [Authorize(Policy = PolicyKeys.Crm.CustomerUpdate)]
     [ProducesResponseType(typeof(CustomerMergeResultResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> MergeAsync([FromBody] MergeCustomersRequest request,
         CancellationToken cancellationToken = default)

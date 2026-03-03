@@ -43,11 +43,22 @@
     <File Path=".github/CODEOWNERS" />
   </Folder>
   <Folder Name="/Elementos de la solución/Observability/">
+    <File Path="documentation/Observability/.env.alerting" />
     <File Path="documentation/Observability/docker-compose.observability.yml" />
+    <File Path="documentation/Observability/start-observability.ps1" />
+    <File Path="documentation/Observability/start-observability.sh" />
   </Folder>
   <Folder Name="/Elementos de la solución/Observability/Grafana/">
     <File Path="documentation/Observability/grafana/customer360-operability-dashboard.json" />
   </Folder>
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/" />
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Dashboards/">
+    <File Path="documentation/Observability/grafana/provisioning/dashboards/dashboards.yml" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Datasources/">
+    <File Path="documentation/Observability/grafana/provisioning/datasources/datasource.yml" />
+  </Folder>
+
   <Folder Name="/Elementos de la solución/Observability/Prometheus/">
     <File Path="documentation/Observability/prometheus/alertmanager.yml" />
     <File Path="documentation/Observability/prometheus/customer360-alert-rules.yml" />
