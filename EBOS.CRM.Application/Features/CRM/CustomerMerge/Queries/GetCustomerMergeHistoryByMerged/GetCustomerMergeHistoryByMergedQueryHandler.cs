@@ -30,9 +30,7 @@ public class GetCustomerMergeHistoryByMergedQueryHandler(ICustomerMergeHistoryRe
                 x.TenantId,
                 x.WinnerCustomerId,
                 x.MergedCustomerId,
-                x.Reason,
-                x.CreatedBy,
-                x.CreatedAt))
+                x.Reason))
             .ToList();
 
         return new PagedResult<CustomerMergeHistoryResponse>(items, total);

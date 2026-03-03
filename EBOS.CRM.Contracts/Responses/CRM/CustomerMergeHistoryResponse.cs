@@ -5,6 +5,4 @@ public sealed record CustomerMergeHistoryResponse(
     long TenantId,
     long WinnerCustomerId,
     long MergedCustomerId,
-    string Reason,
-    long CreatedBy,
-    DateTime CreatedAt);
+    string Reason);

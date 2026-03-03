@@ -54,6 +54,7 @@ services.AddInfrastructure(builder.Configuration);
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ICurrentUserContext>());
+services.AddScoped<ICustomerPiiMaskingService, CustomerPiiMaskingService>();
 services.AddSingleton<ProblemDetailsFactory, CrmProblemDetailsFactory>();
 if (builder.Environment.IsDevelopment())
 {

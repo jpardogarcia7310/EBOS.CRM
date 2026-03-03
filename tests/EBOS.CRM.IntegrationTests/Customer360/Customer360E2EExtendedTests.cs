@@ -414,6 +414,24 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
         listAfter.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task Customer360_PiiMasking_E2E_Works_WhenRequested()
+    {
+        var statusId = await LookupHelper.GetStatusIdAsync(_tenant1, _statusVersion);
+        var idTypeId = await LookupHelper.GetIdentificationTypeIdAsync(_tenant1, _identificationTypeVersion);
+        var created = await CreateIndividualAsync(_tenant1, statusId, idTypeId, 1);
+
+        var maskedResponse = await _tenant1.GetAsync(
+            $"/api/v{_individualVersion}/IndividualCustomer/{created.Id}?applyPiiMasking=true");
+        maskedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var masked = await maskedResponse.Content.ReadFromJsonAsync<IndividualCustomerResponse>();
+        masked.Should().NotBeNull();
+
+        masked!.Email.Should().NotBe(created.Email);
+        masked.Phone.Should().NotBe(created.Phone);
+        masked.IdentificationNumber.Should().NotBe(created.IdentificationNumber);
+    }
+
     private async Task<CustomerResponse> CreateCustomerAsync(HttpClient client, long tenantId, string? forcedEmail = null)
     {
         var statusId = await LookupHelper.GetStatusIdAsync(client, _statusVersion);
