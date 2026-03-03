@@ -89,11 +89,27 @@ docker run -d \
   -v "${REPO_ROOT}:/src" \
   -w /src \
   mcr.microsoft.com/dotnet/sdk:8.0 \
-  bash -lc "dotnet run --project ${API_PROJECT_REL} --no-build" > "${OBS_DIR}/.ci-api.log" 2>&1
+  bash -lc "dotnet run --project ${API_PROJECT_REL}" > "${OBS_DIR}/.ci-api.log" 2>&1
 
 echo "[observability-ci] Waiting for API metrics from compose network..."
-wait_until 240 2 "API /metrics did not become ready from compose network." \
-  "docker run --rm --network ${COMPOSE_NETWORK_NAME} curlimages/curl:8.10.1 -fsS http://${API_CONTAINER_NAME}:${API_PORT}/metrics | grep -q 'customer360_merge_total'"
+api_ready=false
+for _ in $(seq 1 180); do
+  if docker run --rm --network "${COMPOSE_NETWORK_NAME}" curlimages/curl:8.10.1 -fsS \
+      "http://${API_CONTAINER_NAME}:${API_PORT}/metrics" | grep -q 'customer360_merge_total'; then
+    api_ready=true
+    break
+  fi
+  sleep 2
+done
+
+if [[ "${api_ready}" != "true" ]]; then
+  echo "[observability-ci] ERROR: API /metrics did not become ready from compose network." >&2
+  echo "[observability-ci] DEBUG: API container state:" >&2
+  docker ps -a --filter "name=${API_CONTAINER_NAME}" >&2 || true
+  echo "[observability-ci] DEBUG: Last API logs:" >&2
+  docker logs "${API_CONTAINER_NAME}" --tail 300 >&2 || true
+  exit 1
+fi
 
 echo "[observability-ci] Starting prometheus..."
 (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
