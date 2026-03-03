@@ -11,7 +11,12 @@ def fail(message: str) -> None:
 
 
 repo_root = Path(__file__).resolve().parents[3]
-dashboard_path = repo_root / "documentation" / "Observability" / "Grafana" / "customer360-operability-dashboard.json"
+obs_root = repo_root / "documentation" / "Observability"
+candidate_paths = [
+    obs_root / "Grafana" / "customer360-operability-dashboard.json",
+    obs_root / "grafana" / "customer360-operability-dashboard.json",
+]
+dashboard_path = next((path for path in candidate_paths if path.exists()), candidate_paths[0])
 
 if not dashboard_path.exists():
     fail(f"Dashboard file not found: {dashboard_path}")
@@ -54,4 +59,3 @@ if any(re.search(r'job\s*=~', expr) for expr in expressions):
     fail("Dashboard contains regex matcher for job label (job=~...). Use exact matcher.")
 
 print("[observability-ci] Dashboard JSON validation passed.")
-
