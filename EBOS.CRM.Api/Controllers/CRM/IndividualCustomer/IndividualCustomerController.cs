@@ -9,6 +9,8 @@ using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Queries.GetAllIndivid
 using MediatR;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
+using EBOS.CRM.Domain.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.IndividualCustomer;
@@ -17,7 +19,8 @@ namespace EBOS.CRM.Api.Controllers.CRM.IndividualCustomer;
 [ApiVersion("2.0")]
 [Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
-public class IndividualCustomerController(IMediator mediator, ICustomerPiiMaskingService piiMaskingService) : ControllerBase
+public class IndividualCustomerController(IMediator mediator, ICustomerPiiMaskingService piiMaskingService,
+    IAuthorizationService authorizationService) : ControllerBase
 {
     #region Commands
     [HttpPost]
@@ -64,14 +67,20 @@ public class IndividualCustomerController(IMediator mediator, ICustomerPiiMaskin
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] long id, [FromQuery] bool applyPiiMasking = false,
+        [FromQuery] bool includePii = false,
         CancellationToken cancellationToken = default)
     {
+        if (includePii && !(await authorizationService.AuthorizeAsync(User, PolicyKeys.Crm.CustomerPiiRead)).Succeeded)
+        {
+            return Forbid();
+        }
+
         var dto = await mediator.Send(new GetIndividualCustomerByIdQuery(id), cancellationToken);
         if (dto is null)
         {
             return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"IndividualCustomer with id {id} not found."));
         }
-        return Ok(piiMaskingService.Mask(dto, applyPiiMasking));
+        return Ok(includePii ? dto : piiMaskingService.Mask(dto, applyPiiMasking));
     }
     /// <summary>
     /// Returns all resources (paginated).
@@ -80,6 +89,7 @@ public class IndividualCustomerController(IMediator mediator, ICustomerPiiMaskin
     /// <param name="pageNumber">1-based page number.</param>
     /// <param name="pageSize">Page size (must be &lt;= configured max).</param>
     /// <param name="applyPiiMasking">If true, sensitive fields are masked unless caller has PII-read permission/role.</param>
+    /// <param name="includePii">If true, returns unmasked PII and requires Policy.Crm.Customer.Pii.Read authorization.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <response code="200">List of resources. Adds X-Total-Count header.</response>
     /// <response code="400">Invalid pageSize.</response>
@@ -89,14 +99,20 @@ public class IndividualCustomerController(IMediator mediator, ICustomerPiiMaskin
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
         [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, [FromQuery] bool applyPiiMasking = false,
+        [FromQuery] bool includePii = false,
         CancellationToken cancellationToken = default)
     {
+        if (includePii && !(await authorizationService.AuthorizeAsync(User, PolicyKeys.Crm.CustomerPiiRead)).Succeeded)
+        {
+            return Forbid();
+        }
+
         var settings = paginationOptions.Value;
         var safePageNumber = Math.Max(1, pageNumber);
         var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
         var result = await mediator.Send(new GetAllIndividualCustomersQuery(safePageNumber, safePageSize), cancellationToken);
         Response.Headers["X-Total-Count"] = result.Total.ToString();
-        return Ok(piiMaskingService.Mask(result.Items, applyPiiMasking));
+        return Ok(includePii ? result.Items : piiMaskingService.Mask(result.Items, applyPiiMasking));
     }
     #endregion
 }

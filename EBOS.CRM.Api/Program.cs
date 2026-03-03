@@ -225,6 +225,15 @@ services.AddAuthorization(options =>
     options.AddPolicy(PolicyKeys.Crm.CreditTransactionDelete, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CreditTransactionPatch, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CustomerPiiRead, policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("PIIReader") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "crm.customer.pii.read", StringComparison.OrdinalIgnoreCase))));
     options.AddPolicy(PolicyKeys.Crm.CustomerCreate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerUpdate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerDelete, policy => policy.RequireAuthenticatedUser());

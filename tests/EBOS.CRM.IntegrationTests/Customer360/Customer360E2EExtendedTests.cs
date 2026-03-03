@@ -432,6 +432,19 @@ public class Customer360E2EExtendedTests(CustomWebApplicationFactory factory)
         masked.IdentificationNumber.Should().NotBe(created.IdentificationNumber);
     }
 
+    [Fact]
+    public async Task Customer360_PiiRead_RequiresPolicy_WhenIncludePiiRequested()
+    {
+        var statusId = await LookupHelper.GetStatusIdAsync(_tenant1, _statusVersion);
+        var idTypeId = await LookupHelper.GetIdentificationTypeIdAsync(_tenant1, _identificationTypeVersion);
+        var created = await CreateIndividualAsync(_tenant1, statusId, idTypeId, 1);
+
+        var response = await _tenant1.GetAsync(
+            $"/api/v{_individualVersion}/IndividualCustomer/{created.Id}?includePii=true");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
     private async Task<CustomerResponse> CreateCustomerAsync(HttpClient client, long tenantId, string? forcedEmail = null)
     {
         var statusId = await LookupHelper.GetStatusIdAsync(client, _statusVersion);

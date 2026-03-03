@@ -5,6 +5,7 @@ namespace EBOS.CRM.Api.Services;
 
 public interface ICustomerPiiMaskingService
 {
+    bool CanReadPii();
     CustomerResponse Mask(CustomerResponse response, bool applyMasking);
     CorporateCustomerResponse Mask(CorporateCustomerResponse response, bool applyMasking);
     IndividualCustomerResponse Mask(IndividualCustomerResponse response, bool applyMasking);
@@ -86,7 +87,7 @@ public sealed class CustomerPiiMaskingService(IHttpContextAccessor accessor) : I
         return !CanReadPii();
     }
 
-    private bool CanReadPii()
+    public bool CanReadPii()
     {
         var user = accessor.HttpContext?.User;
         if (user is null || user.Identity?.IsAuthenticated != true)
