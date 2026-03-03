@@ -46,6 +46,8 @@ tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
 rendered_alertmanager="${tmp_dir}/alertmanager.rendered.yml"
 cp "${PROM_DIR}/alertmanager.yml" "${rendered_alertmanager}"
+chmod 755 "${tmp_dir}"
+chmod 644 "${rendered_alertmanager}"
 
 replace_var() {
   local key="$1"
