@@ -8,6 +8,8 @@ API_PROJECT="${REPO_ROOT}/EBOS.CRM.Api/EBOS.CRM.Api.csproj"
 COMPOSE_FILE="${OBS_DIR}/docker-compose.observability.yml"
 API_PORT="${API_PORT:-5013}"
 JOB_NAME="ebos-crm-api"
+CI_PROM_DIR_NAME=".ci-prometheus"
+CI_PROM_DIR_PATH="${OBS_DIR}/${CI_PROM_DIR_NAME}"
 
 API_PID=""
 
@@ -18,6 +20,7 @@ cleanup() {
   fi
   (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
     docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1) || true
+  rm -rf "${CI_PROM_DIR_PATH}" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
@@ -41,9 +44,9 @@ wait_until() {
 }
 
 if [[ -d "${OBS_DIR}/Prometheus" ]]; then
-  OBS_PROM_DIR="Prometheus"
+  SOURCE_PROM_DIR="${OBS_DIR}/Prometheus"
 elif [[ -d "${OBS_DIR}/prometheus" ]]; then
-  OBS_PROM_DIR="prometheus"
+  SOURCE_PROM_DIR="${OBS_DIR}/prometheus"
 else
   echo "[observability-ci] ERROR: Prometheus folder not found under ${OBS_DIR}" >&2
   exit 1
@@ -57,6 +60,23 @@ else
   echo "[observability-ci] ERROR: Grafana folder not found under ${OBS_DIR}" >&2
   exit 1
 fi
+
+# Prepare CI-specific Prometheus config with Docker network gateway fallback target.
+rm -rf "${CI_PROM_DIR_PATH}"
+mkdir -p "${CI_PROM_DIR_PATH}"
+cp "${SOURCE_PROM_DIR}/prometheus.yml" "${CI_PROM_DIR_PATH}/prometheus.yml"
+cp "${SOURCE_PROM_DIR}/customer360-alert-rules.yml" "${CI_PROM_DIR_PATH}/customer360-alert-rules.yml"
+cp "${SOURCE_PROM_DIR}/alertmanager.yml" "${CI_PROM_DIR_PATH}/alertmanager.yml"
+
+docker network create observability_default >/dev/null 2>&1 || true
+DOCKER_GATEWAY_IP="$(docker network inspect observability_default -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null || true)"
+if [[ -n "${DOCKER_GATEWAY_IP}" ]]; then
+  echo "[observability-ci] Using Docker gateway fallback target: ${DOCKER_GATEWAY_IP}:${API_PORT}"
+  sed -i "/host.docker.internal:${API_PORT}/a\\          - \"${DOCKER_GATEWAY_IP}:${API_PORT}\"" \
+    "${CI_PROM_DIR_PATH}/prometheus.yml"
+fi
+
+OBS_PROM_DIR="${CI_PROM_DIR_NAME}"
 
 echo "[observability-ci] Starting API for smoke test..."
 (
