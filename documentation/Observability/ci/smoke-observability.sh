@@ -12,13 +12,16 @@ JOB_NAME="ebos-crm-api"
 CI_PROM_DIR_NAME=".ci-prometheus"
 CI_PROM_DIR_PATH="${OBS_DIR}/${CI_PROM_DIR_NAME}"
 API_CONTAINER_NAME="ebos-crm-api-smoke"
+SQL_CONTAINER_NAME="ebos-crm-sql-smoke"
 COMPOSE_NETWORK_NAME="observability_default"
+SQL_SA_PASSWORD="${SQL_SA_PASSWORD:-StrongP@ssw0rd123!}"
 
 API_PID=""
 
 cleanup() {
   set +e
   docker rm -f "${API_CONTAINER_NAME}" >/dev/null 2>&1 || true
+  docker rm -f "${SQL_CONTAINER_NAME}" >/dev/null 2>&1 || true
   (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
     docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1) || true
   rm -rf "${CI_PROM_DIR_PATH}" >/dev/null 2>&1 || true
@@ -78,6 +81,31 @@ echo "[observability-ci] Starting alertmanager+grafana..."
 (cd "${OBS_DIR}" && OBS_PROM_DIR="${OBS_PROM_DIR}" OBS_GRAFANA_DIR="${OBS_GRAFANA_DIR}" \
   docker compose -f "${COMPOSE_FILE}" up -d alertmanager grafana)
 
+echo "[observability-ci] Starting SQL Server container..."
+docker run -d \
+  --name "${SQL_CONTAINER_NAME}" \
+  --network "${COMPOSE_NETWORK_NAME}" \
+  -e ACCEPT_EULA=Y \
+  -e MSSQL_SA_PASSWORD="${SQL_SA_PASSWORD}" \
+  -e MSSQL_PID=Developer \
+  mcr.microsoft.com/mssql/server:2022-latest > /dev/null
+
+echo "[observability-ci] Waiting for SQL Server readiness..."
+sql_ready=false
+for _ in $(seq 1 120); do
+  if docker logs "${SQL_CONTAINER_NAME}" 2>&1 | grep -q "SQL Server is now ready for client connections"; then
+    sql_ready=true
+    break
+  fi
+  sleep 2
+done
+
+if [[ "${sql_ready}" != "true" ]]; then
+  echo "[observability-ci] ERROR: SQL Server did not become ready." >&2
+  docker logs "${SQL_CONTAINER_NAME}" --tail 200 >&2 || true
+  exit 1
+fi
+
 echo "[observability-ci] Starting API container inside compose network..."
 docker run -d \
   --name "${API_CONTAINER_NAME}" \
@@ -85,7 +113,7 @@ docker run -d \
   -e ASPNETCORE_ENVIRONMENT=Development \
   -e Authentication__Enabled=false \
   -e ASPNETCORE_URLS="http://0.0.0.0:${API_PORT}" \
-  -e ConnectionStrings__CrmConnection="Server=localhost;Database=crm_smoke;User Id=sa;Password=StrongP@ssw0rd123;TrustServerCertificate=true;" \
+  -e ConnectionStrings__CrmConnection="Server=${SQL_CONTAINER_NAME},1433;Database=crm_smoke;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=true;Encrypt=false;" \
   -v "${REPO_ROOT}:/src" \
   -w /src \
   mcr.microsoft.com/dotnet/sdk:8.0 \
