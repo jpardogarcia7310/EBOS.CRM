@@ -80,7 +80,7 @@ wait_until 180 2 "Prometheus did not become ready." \
   "curl -fsS 'http://localhost:9090/-/ready'"
 
 QUERY="up{job=\"${JOB_NAME}\"}"
-ENCODED_QUERY="$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=\"\"))' "${QUERY}")"
+ENCODED_QUERY="$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "${QUERY}")"
 PROM_QUERY_URL="http://localhost:9090/api/v1/query?query=${ENCODED_QUERY}"
 
 echo "[observability-ci] Validating exact matcher query: ${QUERY}"
