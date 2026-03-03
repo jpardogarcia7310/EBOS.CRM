@@ -30,6 +30,19 @@ docker run --rm \
 echo "[observability-ci] Validating Alertmanager config..."
 docker run --rm \
   --entrypoint amtool \
+  -e SMTP_SMARTHOST="${SMTP_SMARTHOST:-smtp.example.com:587}" \
+  -e SMTP_FROM="${SMTP_FROM:-noreply@example.com}" \
+  -e SMTP_AUTH_USERNAME="${SMTP_AUTH_USERNAME:-user}" \
+  -e SMTP_AUTH_PASSWORD="${SMTP_AUTH_PASSWORD:-password}" \
+  -e SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-https://hooks.slack.test/services/T000/B000/XXXX}" \
+  -e SLACK_DEFAULT_CHANNEL="${SLACK_DEFAULT_CHANNEL:-#alerts}" \
+  -e SLACK_WARNING_CHANNEL="${SLACK_WARNING_CHANNEL:-#alerts-warning}" \
+  -e SLACK_CRITICAL_CHANNEL="${SLACK_CRITICAL_CHANNEL:-#alerts-critical}" \
+  -e TEAMS_WARNING_WEBHOOK_URL="${TEAMS_WARNING_WEBHOOK_URL:-https://example.test/teams/warning}" \
+  -e TEAMS_CRITICAL_WEBHOOK_URL="${TEAMS_CRITICAL_WEBHOOK_URL:-https://example.test/teams/critical}" \
+  -e WARNING_EMAIL_TO="${WARNING_EMAIL_TO:-warning@example.com}" \
+  -e CRITICAL_EMAIL_TO="${CRITICAL_EMAIL_TO:-critical@example.com}" \
+  -e PAGERDUTY_ROUTING_KEY="${PAGERDUTY_ROUTING_KEY:-dummy-routing-key}" \
   -v "${PROM_DIR}:/etc/alertmanager:ro" \
   prom/alertmanager:v0.27.0 \
   check-config /etc/alertmanager/alertmanager.yml
