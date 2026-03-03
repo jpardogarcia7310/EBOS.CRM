@@ -37,6 +37,8 @@ No. Prometheus se despliega como servicio independiente y hace `scrape` del endp
 - `http://<host-api>:<puerto>/metrics`
 
 En este repo la API ya expone `/metrics`.
+Para trazas distribuidas, habilita OpenTelemetry en `EBOS.CRM.Api/appsettings*.json`:
+`OpenTelemetry:Enabled=true` y define `OpenTelemetry:OtlpEndpoint` (por ejemplo `http://localhost:4317`).
 
 ## Puesta en marcha rápida local (Docker)
 

@@ -25,6 +25,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using EBOS.CRM.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -66,6 +70,8 @@ services.Configure<OperationalReadinessOptions>(
     builder.Configuration.GetSection(OperationalReadinessOptions.SectionName));
 services.Configure<CustomerPrivacyRetentionJobOptions>(
     builder.Configuration.GetSection(CustomerPrivacyRetentionJobOptions.SectionName));
+services.Configure<OpenTelemetryOptions>(
+    builder.Configuration.GetSection(OpenTelemetryOptions.SectionName));
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
@@ -100,6 +106,43 @@ services.AddHealthChecks()
         "customer360_operability",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["ready"]);
+
+var openTelemetryOptions = builder.Configuration.GetSection(OpenTelemetryOptions.SectionName)
+    .Get<OpenTelemetryOptions>() ?? new OpenTelemetryOptions();
+if (openTelemetryOptions.Enabled)
+{
+    services.AddOpenTelemetry()
+        .ConfigureResource(resource =>
+            resource.AddService(
+                serviceName: openTelemetryOptions.ServiceName,
+                serviceVersion: openTelemetryOptions.ServiceVersion))
+        .WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddSource(TelemetryNames.Customer360ActivitySource)
+                .AddSource(TelemetryNames.AuditActivitySource);
+
+            if (!string.IsNullOrWhiteSpace(openTelemetryOptions.OtlpEndpoint))
+            {
+                tracing.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(openTelemetryOptions.OtlpEndpoint); });
+            }
+        })
+        .WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddMeter(TelemetryNames.Customer360Meter);
+
+            if (!string.IsNullOrWhiteSpace(openTelemetryOptions.OtlpEndpoint))
+            {
+                metrics.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(openTelemetryOptions.OtlpEndpoint); });
+            }
+        });
+}
 
 var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
     .Get<AuthenticationOptions>() ?? new AuthenticationOptions();

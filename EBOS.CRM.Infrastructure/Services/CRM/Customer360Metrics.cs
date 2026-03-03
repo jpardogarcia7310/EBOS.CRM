@@ -1,11 +1,12 @@
 using System.Diagnostics.Metrics;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Infrastructure.Observability;
 
 namespace EBOS.CRM.Infrastructure.Services.CRM;
 
 public sealed class Customer360Metrics : ICustomer360Metrics
 {
-    private static readonly Meter Meter = new("EBOS.CRM.Customer360", "1.0.0");
+    private static readonly Meter Meter = new(TelemetryNames.Customer360Meter, "1.0.0");
     private static readonly Counter<long> MergeCounter = Meter.CreateCounter<long>("customer360.merge.total");
     private static readonly Counter<long> DedupeCounter = Meter.CreateCounter<long>("customer360.dedupe.query.total");
     private static readonly Counter<long> ConsentCounter = Meter.CreateCounter<long>("customer360.consent.event.total");
