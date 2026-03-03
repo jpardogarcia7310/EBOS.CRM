@@ -146,6 +146,7 @@ if (openTelemetryOptions.Enabled)
 
 var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
     .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
+var authDisabled = !authOptions.Enabled;
 
 services.AddAuthentication(options =>
     {
@@ -211,8 +212,23 @@ services.AddAuthentication(options =>
 services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiUser", policy =>
-        policy.RequireAuthenticatedUser());
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
+        policy.RequireAuthenticatedUser();
+    });
     options.AddPolicy(PolicyKeys.Operations.ObservabilityRead, policy =>
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
         policy.RequireAuthenticatedUser()
             .RequireAssertion(context =>
                 context.User.IsInRole("Admin") ||
@@ -220,8 +236,16 @@ services.AddAuthorization(options =>
                 context.User.Claims.Any(c =>
                     (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
-                    string.Equals(c.Value, "ops.observability.read", StringComparison.OrdinalIgnoreCase))));
+                    string.Equals(c.Value, "ops.observability.read", StringComparison.OrdinalIgnoreCase)));
+    });
     options.AddPolicy(PolicyKeys.Operations.ReadinessRead, policy =>
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
         policy.RequireAuthenticatedUser()
             .RequireAssertion(context =>
                 context.User.IsInRole("Admin") ||
@@ -229,7 +253,8 @@ services.AddAuthorization(options =>
                 context.User.Claims.Any(c =>
                     (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
-                    string.Equals(c.Value, "ops.readiness.read", StringComparison.OrdinalIgnoreCase))));
+                    string.Equals(c.Value, "ops.readiness.read", StringComparison.OrdinalIgnoreCase)));
+    });
     options.AddPolicy(PolicyKeys.Crm.CountryRead, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryCreate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryUpdate, policy => policy.RequireAuthenticatedUser());

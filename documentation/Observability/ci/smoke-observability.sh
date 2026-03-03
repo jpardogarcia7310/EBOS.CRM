@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+OBS_DIR="${REPO_ROOT}/documentation/Observability"
+API_PROJECT="${REPO_ROOT}/EBOS.CRM.Api/EBOS.CRM.Api.csproj"
+COMPOSE_FILE="${OBS_DIR}/docker-compose.observability.yml"
+API_PORT="${API_PORT:-5013}"
+JOB_NAME="ebos-crm-api"
+
+API_PID=""
+
+cleanup() {
+  set +e
+  if [[ -n "${API_PID}" ]] && kill -0 "${API_PID}" >/dev/null 2>&1; then
+    kill "${API_PID}" >/dev/null 2>&1 || true
+  fi
+  docker compose -f "${COMPOSE_FILE}" down -v >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+wait_until() {
+  local timeout_seconds="$1"
+  local sleep_seconds="$2"
+  local message="$3"
+  local command="$4"
+  local start_ts
+  start_ts="$(date +%s)"
+  while true; do
+    if bash -c "${command}" >/dev/null 2>&1; then
+      return 0
+    fi
+    if (( "$(date +%s)" - start_ts >= timeout_seconds )); then
+      echo "[observability-ci] ERROR: ${message}" >&2
+      exit 1
+    fi
+    sleep "${sleep_seconds}"
+  done
+}
+
+echo "[observability-ci] Starting API for smoke test..."
+(
+  cd "${REPO_ROOT}"
+  ASPNETCORE_ENVIRONMENT=Development \
+  Authentication__Enabled=false \
+  dotnet run --project "${API_PROJECT}" --launch-profile http --no-build
+) > "${OBS_DIR}/.ci-api.log" 2>&1 &
+API_PID=$!
+
+echo "[observability-ci] Waiting for API metrics..."
+wait_until 180 2 "API /metrics did not become ready." \
+  "curl -fsS 'http://localhost:${API_PORT}/metrics' | grep -q 'customer360_merge_total'"
+
+echo "[observability-ci] Starting observability stack..."
+docker compose -f "${COMPOSE_FILE}" up -d
+
+echo "[observability-ci] Waiting for Prometheus readiness..."
+wait_until 180 2 "Prometheus did not become ready." \
+  "curl -fsS 'http://localhost:9090/-/ready'"
+
+QUERY="up{job=\"${JOB_NAME}\"}"
+ENCODED_QUERY="$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=\"\"))' "${QUERY}")"
+PROM_QUERY_URL="http://localhost:9090/api/v1/query?query=${ENCODED_QUERY}"
+
+echo "[observability-ci] Validating exact matcher query: ${QUERY}"
+wait_until 180 2 "Prometheus query did not return up=1 for ${JOB_NAME}." \
+  "curl -fsS '${PROM_QUERY_URL}' | grep -q '\"job\":\"${JOB_NAME}\"' && curl -fsS '${PROM_QUERY_URL}' | grep -q '\"1\"'"
+
+echo "[observability-ci] Validating alert rules group is loaded..."
+wait_until 120 2 "Prometheus rules group customer360-operability was not loaded." \
+  "curl -fsS 'http://localhost:9090/api/v1/rules' | grep -q 'customer360-operability'"
+
+echo "[observability-ci] Smoke test passed."
+

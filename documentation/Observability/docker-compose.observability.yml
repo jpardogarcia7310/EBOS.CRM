@@ -8,9 +8,11 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/customer360-alert-rules.yml:/etc/prometheus/customer360-alert-rules.yml:ro
+      - ./Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./Prometheus/customer360-alert-rules.yml:/etc/prometheus/customer360-alert-rules.yml:ro
       - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
@@ -23,7 +25,7 @@ services:
     env_file:
       - .env.alerting
     volumes:
-      - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./Prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
 
   grafana:
@@ -37,9 +39,9 @@ services:
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=10s
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./grafana/customer360-operability-dashboard.json:/var/lib/grafana/dashboards/customer360-operability-dashboard.json:ro
+      - ./Grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./Grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./Grafana/customer360-operability-dashboard.json:/var/lib/grafana/dashboards/customer360-operability-dashboard.json:ro
 
 volumes:
   prometheus_data:
