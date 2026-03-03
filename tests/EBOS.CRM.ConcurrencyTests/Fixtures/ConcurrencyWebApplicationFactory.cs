@@ -1,7 +1,9 @@
 using EBOS.CRM.Api.Constants;
 using EBOS.CRM.ApiTests.Fixtures;
+using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +47,14 @@ public sealed class ConcurrencyWebApplicationFactory<TProgram> : WebApplicationF
                 services.Remove(currentUserDescriptor);
             }
             services.AddScoped<ICurrentUserContext>(_ => new TestCurrentUserContext());
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                    options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+                    options.DefaultScheme = TestAuthHandler.SchemeName;
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.SchemeName, _ => { });
 
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<CrmDbContext>));
