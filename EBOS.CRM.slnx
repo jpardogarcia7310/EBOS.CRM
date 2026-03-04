@@ -63,20 +63,22 @@
     <File Path="documentation/RunBooks/Drills/README.md" />
   </Folder>
   <Folder Name="/documentation/RunBooks/Drills/Customer360/" >
-    <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template.md" />
-    <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template_ES.md" />
+    <File Path="documentation/RunBooks/Drills/Customer360/Customer360-Drill-Execution-Template.md" />
+    <File Path="documentation/RunBooks/Drills/Customer360/Customer360-Drill-Execution-Template_ES.md" />
   </Folder>
 
-  <Folder Name="/documentation/RunBooks/Drills/Records/" >
-    <File Path="documentation/RunBooks/Drills/Records/2026-03-C360-DRILL-MONTHLY-OUTBOX-001.md" />
-    <File Path="documentation/RunBooks/Drills/Records/2026-Q1-C360-DRILL-QUARTERLY-ALERT-ROUTING-001.md" />
-    <File Path="documentation/RunBooks/Drills/Records/2026-Q1-C360-DRILL-QUARTERLY-MIGRATION-ROLLBACK-001.md" />
+  <Folder Name="/documentation/RunBooks/Drills/Records/" />
+  <Folder Name="/documentation/RunBooks/Drills/Records/Customer360/">
+    <File Path="documentation/RunBooks/Drills/Records/Customer360/2026-03-C360-DRILL-MONTHLY-OUTBOX-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records/Customer360/2026-Q1-C360-DRILL-QUARTERLY-ALERT-ROUTING-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records/Customer360/2026-Q1-C360-DRILL-QUARTERLY-MIGRATION-ROLLBACK-001.md" />
   </Folder>
 
-  <Folder Name="/documentation/RunBooks/Drills/Records_ES/" >
-    <File Path="documentation/RunBooks/Drills/Records_ES/2026-03-C360-DRILL-MENSUAL-OUTBOX-001.md" />
-    <File Path="documentation/RunBooks/Drills/Records_ES/2026-Q1-C360-DRILL-TRIMESTRAL-ALERT-ROUTING-001.md" />
-    <File Path="documentation/RunBooks/Drills/Records_ES/2026-Q1-C360-DRILL-TRIMESTRAL-MIGRACION-ROLLBACK-001.md" />
+  <Folder Name="/documentation/RunBooks/Drills/Records_ES/" />
+  <Folder Name="/documentation/RunBooks/Drills/Records_ES/Customer360/">
+    <File Path="documentation/RunBooks/Drills/Records_ES/Customer360/2026-03-C360-DRILL-MENSUAL-OUTBOX-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records_ES/Customer360/2026-Q1-C360-DRILL-TRIMESTRAL-ALERT-ROUTING-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records_ES/Customer360/2026-Q1-C360-DRILL-TRIMESTRAL-MIGRACION-ROLLBACK-001.md" />
   </Folder>
 
   <Folder Name="/Elementos de la solución/">
