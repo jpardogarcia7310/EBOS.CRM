@@ -9,8 +9,6 @@
     <File Path="documentation/Internal.md" />
     <File Path="documentation/Roadmap.md" />
     <File Path="documentation/Roadmap_ES.md" />
-    <File Path="documentation/Authentication_Oidc.md" />
-    <File Path="documentation/Authentication_Oidc_ES.md" />
   </Folder>
 
   <Folder Name="/documentation/CI/">
