@@ -107,7 +107,9 @@
   - Quarterly: alert routing verification (warning + critical end-to-end).
 - Minimum evidence to store:
   - execution date/time, operator, simulated scenario, detection time, recovery time, lessons learned.
-  - use template: `documentation/RunBooks/Customer360-Drill-Record-Template.md`
+  - use execution template: `documentation/RunBooks/Drills/Customer360-Drill-Execution-Template.md`
+  - store each execution record under: `documentation/RunBooks/Drills/Records/`
+  - index/reference records in: `documentation/RunBooks/Drills/README.md`
 - Exit criteria:
   - alert fired and routed correctly,
   - runbook steps reproducible by another operator,

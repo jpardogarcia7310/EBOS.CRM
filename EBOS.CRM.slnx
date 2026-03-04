@@ -1,37 +1,53 @@
 <Solution>
   <Folder Name="/documentation/">
-    <File Path="documentation/Internal.md" />
     <File Path="documentation/AGENTS.md" />
     <File Path="documentation/AGENTS_ES.md" />
+    <File Path="documentation/Authentication_Oidc.md" />
+    <File Path="documentation/Authentication_Oidc_ES.md" />
     <File Path="documentation/Contributing.md" />
     <File Path="documentation/Code of conduct.md" />
+    <File Path="documentation/Internal.md" />
     <File Path="documentation/Roadmap.md" />
     <File Path="documentation/Roadmap_ES.md" />
     <File Path="documentation/Authentication_Oidc.md" />
     <File Path="documentation/Authentication_Oidc_ES.md" />
   </Folder>
+
+  <Folder Name="/documentation/CI/">
+    <File Path="documentation/ci/set-branch-protection.ps1" />
+    <File Path="documentation/ci/set-branch-protection.sh" />
+  </Folder>
+
   <Folder Name="/documentation/Features/">
     <File Path="documentation/Features/Features.md" />
     <File Path="documentation/Features/Features_ES.md" />
   </Folder>
+  
   <Folder Name="/documentation/Features/Backlogs/">
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
     <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance.md" />
     <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance_ES.md" />
     <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog_ES.md" />
     <File Path="documentation/Features/Backlogs/Service-MVP-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Service-MVP-Backlog_ES.md" />
-    <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
-    <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
   </Folder>
+  
   <Folder Name="/documentation/RunBooks/">
+    <File Path="documentation/RunBooks/Customer360-Drill-Record-Template.md" />
+    <File Path="documentation/RunBooks/Customer360-Drill-Record-Template_ES.md" />
     <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
     <File Path="documentation/RunBooks/Customer360-Operability-RunBook_ES.md" />
+    <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist.md" />
+    <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md" />
   </Folder>
+  
   <Folder Name="/documentation/Observability/">
     <File Path="documentation/Observability/README.md" />
     <File Path="documentation/Observability/README_ES.md" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path="NuGet.config" />
@@ -40,27 +56,35 @@
     <File Path="README.md" />
     <File Path="README_ES.md" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/.github/workflows/">
     <File Path=".github/workflows/customer360-suites-ci.yml" />
     <File Path=".github/workflows/observability-ci.yml" />
+    <File Path=".github/workflows/openapi-compatibility-gate.yml" />
     <File Path=".github/workflows/validate-branch-protection.yml" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/Observability/">
     <File Path="documentation/Observability/.env.alerting" />
     <File Path="documentation/Observability/docker-compose.observability.yml" />
     <File Path="documentation/Observability/start-observability.ps1" />
     <File Path="documentation/Observability/start-observability.sh" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/Observability/Grafana/">
     <File Path="documentation/Observability/grafana/customer360-operability-dashboard.json" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/" />
+  
   <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Dashboards/">
     <File Path="documentation/Observability/grafana/provisioning/dashboards/dashboards.yml" />
   </Folder>
+  
   <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Datasources/">
     <File Path="documentation/Observability/grafana/provisioning/datasources/datasource.yml" />
   </Folder>
@@ -70,6 +94,13 @@
     <File Path="documentation/Observability/prometheus/customer360-alert-rules.yml" />
     <File Path="documentation/Observability/prometheus/prometheus.yml" />
   </Folder>
+
+  <Folder Name="/Elementos de la solución/Observability/CI/">
+    <File Path="documentation/Observability/ci/smoke-observability.sh" />
+    <File Path="documentation/Observability/ci/validate-dashboard.py" />
+    <File Path="documentation/Observability/ci/validate-observability.sh" />
+  </Folder>
+
   <Folder Name="/source/">
     <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" />
     <Project Path="EBOS.CRM.Application/EBOS.CRM.Application.csproj" />
