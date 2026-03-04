@@ -12,6 +12,7 @@ public class TenantScopedEntityCoverageTest
         var entityTypes = assembly.GetTypes()
             .Where(t => t is { IsClass: true, IsAbstract: false })
             .Where(t => string.Equals(t.Namespace, "EBOS.CRM.Domain.Entities.CRM", StringComparison.Ordinal))
+            .Where(t => !t.Name.StartsWith("<", StringComparison.Ordinal))
             .ToList();
 
         Assert.NotEmpty(entityTypes);

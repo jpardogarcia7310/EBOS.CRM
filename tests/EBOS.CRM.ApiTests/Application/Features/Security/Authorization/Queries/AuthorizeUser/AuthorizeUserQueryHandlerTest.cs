@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Requests.Security;
 using EBOS.CRM.Contracts.Responses.Security;
 using EBOS.CRM.Application.Features.Security.Authorization.Queries.AuthorizeUser;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.Identity;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.Security.Authorization.Queries.AuthorizeUser;

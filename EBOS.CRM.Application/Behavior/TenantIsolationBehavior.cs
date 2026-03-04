@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;

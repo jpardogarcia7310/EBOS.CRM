@@ -1,0 +1,41 @@
+using EBOS.CRM.Domain.Entities.CRM;
+
+namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
+
+public class AccountContactRoleTests
+{
+    [Fact]
+    public void Create_NormalizesRoleCode_AndSetsPrimary()
+    {
+        var entity = AccountContactRole.Create(1, 2, " legal_rep ", true, DateTime.UtcNow, null);
+
+        Assert.Equal("LEGAL_REP", entity.RoleCode);
+        Assert.True(entity.IsPrimary);
+        Assert.Null(entity.ValidTo);
+    }
+
+    [Fact]
+    public void Create_WithInvalidRoleCode_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+            AccountContactRole.Create(1, 2, "   ", true, DateTime.UtcNow, null));
+    }
+
+    [Fact]
+    public void Deactivate_WithValidToBeforeValidFrom_Throws()
+    {
+        var validFrom = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
+        var entity = AccountContactRole.Create(1, 2, "LEGAL_REP", false, validFrom, null);
+
+        Assert.Throws<InvalidOperationException>(() => entity.Deactivate(validFrom.AddMinutes(-1)));
+    }
+
+    [Fact]
+    public void SetPrimary_WhenInactive_Throws()
+    {
+        var validFrom = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
+        var entity = AccountContactRole.Create(1, 2, "LEGAL_REP", false, validFrom, validFrom.AddDays(1));
+
+        Assert.Throws<InvalidOperationException>(() => entity.SetPrimary(true));
+    }
+}

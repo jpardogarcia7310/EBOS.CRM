@@ -1,0 +1,121 @@
+name: validate-branch-protection
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to validate"
+        required: false
+        default: "main"
+      owner:
+        description: "Repository owner (optional)"
+        required: false
+        default: ""
+      repo:
+        description: "Repository name (optional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate branch protection policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve repo metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          OWNER_INPUT="${{ github.event.inputs.owner }}"
+          REPO_INPUT="${{ github.event.inputs.repo }}"
+          BRANCH_INPUT="${{ github.event.inputs.branch }}"
+
+          if [[ -z "$OWNER_INPUT" ]]; then
+            OWNER_INPUT="${{ github.repository_owner }}"
+          fi
+          if [[ -z "$REPO_INPUT" ]]; then
+            REPO_INPUT="${{ github.event.repository.name }}"
+          fi
+          if [[ -z "$BRANCH_INPUT" ]]; then
+            BRANCH_INPUT="main"
+          fi
+
+          echo "owner=$OWNER_INPUT" >> "$GITHUB_OUTPUT"
+          echo "repo=$REPO_INPUT" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH_INPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Validate protection settings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = "${{ steps.meta.outputs.owner }}";
+            const repo = "${{ steps.meta.outputs.repo }}";
+            const branch = "${{ steps.meta.outputs.branch }}";
+
+            const expectedContexts = [
+              "API suite",
+              "Integration suite",
+              "Concurrency suite",
+              "Stress suite",
+              "Test summary"
+            ].sort();
+
+            const { data } = await github.rest.repos.getBranchProtection({
+              owner,
+              repo,
+              branch
+            });
+
+            const actualContexts = (data.required_status_checks?.contexts ?? []).slice().sort();
+            const strict = data.required_status_checks?.strict === true;
+            const enforceAdmins = data.enforce_admins?.enabled === true;
+            const linearHistory = data.required_linear_history?.enabled === true;
+            const conversationResolution = data.required_conversation_resolution?.enabled === true;
+            const allowForcePushes = data.allow_force_pushes?.enabled === true;
+            const allowDeletions = data.allow_deletions?.enabled === true;
+            const requiredApprovals = data.required_pull_request_reviews?.required_approving_review_count ?? 0;
+            const dismissStale = data.required_pull_request_reviews?.dismiss_stale_reviews === true;
+
+            const summary = [
+              `owner/repo: ${owner}/${repo}`,
+              `branch: ${branch}`,
+              `strict checks: ${strict}`,
+              `enforce admins: ${enforceAdmins}`,
+              `linear history: ${linearHistory}`,
+              `conversation resolution: ${conversationResolution}`,
+              `allow force pushes: ${allowForcePushes}`,
+              `allow deletions: ${allowDeletions}`,
+              `required approvals: ${requiredApprovals}`,
+              `dismiss stale reviews: ${dismissStale}`,
+              `actual contexts: ${JSON.stringify(actualContexts)}`
+            ];
+
+            core.summary
+              .addHeading("Branch protection validation")
+              .addCodeBlock(summary.join("\n"))
+              .write();
+
+            const mismatches = [];
+            if (!strict) mismatches.push("required_status_checks.strict must be true");
+            if (!enforceAdmins) mismatches.push("enforce_admins must be enabled");
+            if (!linearHistory) mismatches.push("required_linear_history must be enabled");
+            if (!conversationResolution) mismatches.push("required_conversation_resolution must be enabled");
+            if (allowForcePushes) mismatches.push("allow_force_pushes must be disabled");
+            if (allowDeletions) mismatches.push("allow_deletions must be disabled");
+            if (requiredApprovals < 1) mismatches.push("required_approving_review_count must be >= 1");
+            if (!dismissStale) mismatches.push("dismiss_stale_reviews must be true");
+
+            if (expectedContexts.length !== actualContexts.length ||
+                expectedContexts.some((v, i) => v !== actualContexts[i])) {
+              mismatches.push(`required_status_checks.contexts mismatch. expected=${JSON.stringify(expectedContexts)} actual=${JSON.stringify(actualContexts)}`);
+            }
+
+            if (mismatches.length > 0) {
+              core.setFailed(`Branch protection policy mismatch:\n- ${mismatches.join("\n- ")}`);
+            }

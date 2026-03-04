@@ -1,2 +1,7 @@
 # Default reviewers for all files
 * @JuanMa7310
+
+# Observability and operations ownership
+documentation/Observability/** @JuanMa7310
+documentation/RunBooks/** @JuanMa7310
+.github/workflows/observability-ci.yml @JuanMa7310

@@ -40,7 +40,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
             TenantId: 1,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"user{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 123 456",
+            Phone: "34600123456",
             StatusId: statusId);
 
         var addResponse = await _client.PostAsJsonAsync($"/api/v{_version}/Customer", addRequest);
@@ -54,7 +54,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
             TenantId: 1,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"user{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 999 000",
+            Phone: "34600999000",
             StatusId: statusId);
 
         var updateResponse =
@@ -65,6 +65,7 @@ public class CustomerTest(CustomWebApplicationFactory factory) : IClassFixture<C
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
+
 
 
 

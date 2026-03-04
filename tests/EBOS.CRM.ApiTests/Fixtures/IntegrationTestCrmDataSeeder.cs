@@ -60,8 +60,23 @@ public static class IntegrationTestCrmDataSeeder
 
         context.SaveChanges();
 
+        if (!context.ChannelTypes.Any())
+        {
+            context.ChannelTypes.Add(new ChannelType
+            {
+                Descripcion = "Email",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = 1
+            });
+            context.SaveChanges();
+        }
+
         var statusActiveId = context.Statuses.First().Id;
         var countrySpainId = context.Countries.First().Id;
+        var channelTypeId = context.ChannelTypes.First().Id;
         var addressTypeHomeId = context.AddressTypes.First().Id;
         var idTypeDniId = context.IdentificationTypes.First().Id;
 
@@ -71,7 +86,7 @@ public static class IntegrationTestCrmDataSeeder
             {
                 Code = "CORP-001",
                 Email = "accounting@contoso.com",
-                Phone = "+34 911 000 111",
+                Phone = "34911000111",
                 CreatedAt = DateTime.UtcNow.AddDays(-30),
                 StatusId = statusActiveId,
                 LegalName = "Contoso S.A.",
@@ -82,7 +97,7 @@ public static class IntegrationTestCrmDataSeeder
             {
                 Code = "IND-001",
                 Email = "jane.doe@example.com",
-                Phone = "+34 600 123 456",
+                Phone = "34600123456",
                 CreatedAt = DateTime.UtcNow.AddDays(-10),
                 StatusId = statusActiveId,
                 FirstName = "Jane",
@@ -94,6 +109,16 @@ public static class IntegrationTestCrmDataSeeder
 
             context.CorporateCustomers.Add(corp);
             context.IndividualCustomers.Add(indiv);
+            context.CorporateCustomers.Add(new CorporateCustomer
+            {
+                Code = "CORP-002",
+                Email = "finance@fabrikam.com",
+                Phone = "34911000999",
+                CreatedAt = DateTime.UtcNow.AddDays(-20),
+                StatusId = statusActiveId,
+                LegalName = "Fabrikam S.L.",
+                TaxIdentification = "B87654321"
+            });
             context.SaveChanges();
         }
 
@@ -139,6 +164,7 @@ public static class IntegrationTestCrmDataSeeder
         }
 
         var corporateCustomerId = context.CorporateCustomers.Select(c => c.Id).First();
+        var secondCorporateCustomerId = context.CorporateCustomers.Select(c => c.Id).Skip(1).FirstOrDefault();
         var individualCustomerId = context.IndividualCustomers.Select(c => c.Id).First();
         var addressId = context.Addresses.Select(a => a.Id).First();
 
@@ -195,7 +221,7 @@ public static class IntegrationTestCrmDataSeeder
             context.BranchOffices.Add(new BranchOffice
             {
                 Name = "HQ Madrid",
-                PhoneNumber = "+34 911 000 222",
+                PhoneNumber = "34911000222",
                 CorporateCustomerId = corporateCustomerId
             });
         }
@@ -270,6 +296,112 @@ public static class IntegrationTestCrmDataSeeder
         }
 
         context.SaveChanges();
+
+        if (!context.ChannelCountries.Any())
+        {
+            context.ChannelCountries.Add(new ChannelCountry
+            {
+                ChannelTypeId = channelTypeId,
+                CountryId = countrySpainId,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = 1
+            });
+        }
+
+        if (!context.Queues.Any())
+        {
+            context.Queues.Add(new Queue
+            {
+                TenantId = 1,
+                Name = "Soporte",
+                Code = "SUP",
+                IsActive = true,
+                DefaultOwnerUserId = 10,
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                CreatedBy = 1
+            });
+        }
+
+        if (!context.Slas.Any())
+        {
+            context.Slas.Add(new Sla
+            {
+                TenantId = 1,
+                Name = "SLA Standard",
+                TargetMinutes = 120,
+                WarningMinutes = 90,
+                IsActive = true,
+                ActiveFrom = DateTime.UtcNow.AddDays(-60),
+                ActiveTo = null,
+                CreatedAt = DateTime.UtcNow.AddDays(-60),
+                CreatedBy = 1
+            });
+        }
+
+        context.SaveChanges();
+
+        var queueId = context.Queues.Select(q => q.Id).First();
+        var slaId = context.Slas.Select(s => s.Id).First();
+
+        if (!context.Cases.Any())
+        {
+            context.Cases.Add(new Case
+            {
+                TenantId = 1,
+                Title = "Caso seed",
+                Description = "Seed case",
+                Status = Case.StatusOpen,
+                Priority = Case.PriorityLow,
+                OwnerUserId = 10,
+                QueueId = queueId,
+                SlaId = slaId,
+                DueAt = DateTime.UtcNow.AddDays(2),
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                CreatedBy = 1
+            });
+        }
+
+        if (!context.AccountContacts.Any())
+        {
+            var accountContact = AccountContact.Create(
+                tenantId: 1,
+                corporateCustomerId: corporateCustomerId,
+                individualCustomerId: individualCustomerId,
+                isPrimary: true,
+                startAt: DateTime.UtcNow.AddDays(-30),
+                endAt: null,
+                createdBy: 1);
+            context.AccountContacts.Add(accountContact);
+        }
+
+        context.SaveChanges();
+
+        if (!context.AccountContactRoles.Any())
+        {
+            var accountContactId = context.AccountContacts.Select(x => x.Id).First();
+            var role = AccountContactRole.Create(
+                tenantId: 1,
+                accountContactId: accountContactId,
+                roleCode: "LEGAL_REP",
+                isPrimary: true,
+                validFrom: DateTime.UtcNow.AddDays(-30),
+                validTo: null);
+            context.AccountContactRoles.Add(role);
+        }
+
+        if (!context.AccountHierarchies.Any() && secondCorporateCustomerId > 0)
+        {
+            var hierarchy = AccountHierarchy.Create(
+                tenantId: 1,
+                parentCorporateCustomerId: corporateCustomerId,
+                childCorporateCustomerId: secondCorporateCustomerId,
+                relationType: "SUBSIDIARY",
+                validFrom: DateTime.UtcNow.AddDays(-15));
+            context.AccountHierarchies.Add(hierarchy);
+        }
 
         var stageId = context.OpportunityStages.Select(s => s.Id).First();
 
@@ -377,5 +509,6 @@ public static class IntegrationTestCrmDataSeeder
         context.SaveChanges();
     }
 }
+
 
 

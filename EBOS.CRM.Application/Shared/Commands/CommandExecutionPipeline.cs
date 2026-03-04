@@ -1,5 +1,6 @@
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -7,6 +8,7 @@ namespace EBOS.CRM.Application.Shared.Commands;
 
 public sealed class CommandExecutionPipeline(
     IAuditService auditService,
+    ICustomer360Metrics metrics,
     IOptions<CommandExecutionOptions> options)
     : ICommandExecutionPipeline
 {
@@ -40,8 +42,10 @@ public sealed class CommandExecutionPipeline(
             catch (DbUpdateConcurrencyException ex)
             {
                 await unitOfWork.RollbackAsync(cancellationToken);
+                var exhaustedRetries = attempt >= retries;
+                metrics.RecordConcurrencyConflict(exhaustedRetries);
 
-                if (attempt >= retries)
+                if (exhaustedRetries)
                 {
                     throw new CommandConcurrencyException(
                         "Command failed due to concurrent updates after retries.",

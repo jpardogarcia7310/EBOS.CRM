@@ -27,10 +27,10 @@ Legend:
 - [ ] Enterprise: Access Auditing (Medium / Medium)
 
 ### 2) Multi-tenant and Governance
-- [ ] MVP: TenantId in entities + global filters (High / High)
-- [ ] Enterprise: Schema/DB isolation (High / High)
-- [ ] Enterprise: Config per tenant (fields, layouts, rules) (High / High)
-- [ ] Best: Metrics/quota/billing per tenant (Medium / High)
+- [x] MVP: TenantId in entities + global filters (High / High)
+- [x] Enterprise: Schema/DB isolation (High / High)
+- [x] Enterprise: Config per tenant (fields, layouts, rules) (High / High)
+- [x] Best: Metrics/quota/billing per tenant (Medium / High)
 
 ### 3) Customer 360 (Core CRM)
 - [ ] MVP: Contacts and roles inside accounts (High / Medium)
@@ -39,19 +39,19 @@ Legend:
 - [ ] Enterprise: Channel preferences and consents (High / Medium)
 
 ### 4) Sales Pipeline
-- [ ] MVP: Leads (CRUD + conversion) (High / Medium)
-- [ ] MVP: Staged Opportunities (High / Medium)
-- [ ] MVP: Basic Forecast (Medium / Medium)
-- [ ] Enterprise: Quotes and Discounts (High / High)
-- [ ] Enterprise: Price Approvals (Medium / High)
-- [ ] Best: Full CPQ (Medium / High)
+- [x] MVP: Leads (CRUD + conversion) (High / Medium)
+- [x] MVP: Staged Opportunities (High / Medium)
+- [x] MVP: Basic Forecast (Medium / Medium)
+- [x] Enterprise: Quotes and Discounts (High / High)
+- [x] Enterprise: Price Approvals (Medium / High)
+- [x] Best: Full CPQ (Medium / High)
 
 ### 5) Service (Cases)
-- [ ] MVP: Cases/tickets + statuses (High / Medium)
-- [ ] MVP: Basic SLA (High / Medium)
-- [ ] Enterprise: Queues, routing, escalation (High / High)
-- [ ] Enterprise: Knowledge base (Medium / Medium)
-- [ ] Best: Omnichannel (email/chat/voice) (High / High)
+- [x] MVP: Cases/tickets + statuses (High / Medium)
+- [x] MVP: Basic SLA (High / Medium)
+- [x] Enterprise: Queues, routing, escalation (High / High)
+- [x] Enterprise: Knowledge base (Medium / Medium)
+- [x] Best: Omnichannel (email/chat/voice) (High / High)
 
 ### 6) Marketing
 - [ ] MVP: Simple Segmentation (Medium / Medium)
@@ -81,11 +81,11 @@ Legend:
 Format: M (1-2 weeks), L (3-5 weeks), XL (6-10 weeks), S (<=1 week).
 
 ### Milestone 1 - Foundation (Security + Multi-tenant base)
-- [ ] JWT/OIDC Auth + UseAuthentication - M
-- [ ] Basic RBAC per module - M
-- [ ] TenantId + global filters in EF - L
-- [ ] Access Auditing - M
-- [ ] Health checks - S
+- [x] JWT/OIDC Auth + UseAuthentication - M
+- [x] Basic RBAC per module - M
+- [x] TenantId + global filters in EF - L
+- [x] Access Auditing - M
+- [x] Health checks - S
 
 ### Milestone 2 - Customer 360
 - [ ] Contacts + roles - M
@@ -94,16 +94,16 @@ Format: M (1-2 weeks), L (3-5 weeks), XL (6-10 weeks), S (<=1 week).
 - [ ] Dedupe + merge (golden record) - XL
 
 ### Milestone 3 - Sales (MVP)
-- [ ] Leads + conversion - M
-- [ ] Opportunities + stages - M
-- [ ] Basic forecast - M
-- [ ] Quotes and discounts - L
+- [x] Leads + conversion - M
+- [x] Opportunities + stages - M
+- [x] Basic forecast - M
+- [x] Quotes and discounts - L
 
 ### Milestone 4 - Service (MVP)
-- [ ] Cases + States - M
-- [ ] Basic SLA - M
-- [ ] Queues and Routing - L
-- [ ] Knowledge Base - M
+- [x] Cases + States - M
+- [x] Basic SLA - M
+- [x] Queues and Routing - L
+- [x] Knowledge Base - M
 
 ### Milestone 5 - Marketing (MVP)
 - [ ] Simple Segmentation - M

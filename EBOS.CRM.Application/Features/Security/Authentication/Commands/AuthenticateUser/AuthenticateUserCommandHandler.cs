@@ -1,6 +1,7 @@
 using EBOS.CRM.Contracts.Requests.Security;
 using EBOS.CRM.Contracts.Responses.Security;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.Identity;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.Security.Authentication.Commands.AuthenticateUser;

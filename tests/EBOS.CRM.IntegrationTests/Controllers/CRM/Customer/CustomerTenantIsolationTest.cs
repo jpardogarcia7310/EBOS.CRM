@@ -106,7 +106,7 @@ public class CustomerTenantIsolationTest(CustomWebApplicationFactory factory)
             TenantId: 0,
             Code: $"CUST-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"auto{Guid.NewGuid():N}@example.com",
-            Phone: "+34 600 555 555",
+            Phone: "34600555555",
             StatusId: statusId);
 
         var addResponse = await client.PostAsJsonAsync($"/api/v{_version}/Customer", addRequest);
@@ -156,5 +156,6 @@ public class CustomerTenantIsolationTest(CustomWebApplicationFactory factory)
     }
 
 }
+
 
 

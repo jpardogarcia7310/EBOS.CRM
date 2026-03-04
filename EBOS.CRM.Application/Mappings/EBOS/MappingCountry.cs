@@ -32,7 +32,8 @@ public sealed class MappingCountry : IRegister
             .Ignore(dest => dest.CreatedAt)
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.UpdatedAt!)
-            .Ignore(dest => dest.UpdatedBy!);
+            .Ignore(dest => dest.UpdatedBy!)
+            .Ignore(dest => dest.ChannelCountries);
     }
 }
 

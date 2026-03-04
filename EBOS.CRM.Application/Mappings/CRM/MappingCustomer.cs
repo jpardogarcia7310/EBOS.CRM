@@ -38,7 +38,12 @@ public class MappingCustomer : IRegister
             .Ignore(dest => dest.TaxInformation!)
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
-            .Ignore(dest => dest.CustomerAddresses);
+            .Ignore(dest => dest.CustomerAddresses)
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
+            .Ignore(dest => dest.Source!)
+            .Ignore(dest => dest.Confidentiality!);
 
         config.NewConfig<UpdateCustomerRequest, Customer>()
             .Map(dest => dest.Id, src => src.Id)
@@ -60,7 +65,12 @@ public class MappingCustomer : IRegister
             .Ignore(dest => dest.TaxInformation!)
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
-            .Ignore(dest => dest.CustomerAddresses);
+            .Ignore(dest => dest.CustomerAddresses)
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
+            .Ignore(dest => dest.Source!)
+            .Ignore(dest => dest.Confidentiality!);
     }
 }
 

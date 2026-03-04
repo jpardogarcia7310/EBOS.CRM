@@ -1,113 +1,113 @@
 # Hoja de ruta EBOS.CRM
 
-Este roadmap se deriva de `documentation/Features.md` y esta pensado para GitHub. Agrupa el trabajo por modulo y luego por hitos con estimacion de esfuerzo.
+Esta hoja de ruta se deriva de `documentation/Features.md` y está pensada para GitHub. Agrupa el trabajo por módulo y luego por hitos con estimación de esfuerzo.
 
 Leyenda:
-- Niveles: MVP, Enterprise, Best-in-Class
+- Niveles: MVP, Empresarial, Mejor en su clase
 - Esfuerzo: S (≤1 semana), M (1–2 semanas), L (3–5 semanas), XL (6–10 semanas)
 
 ## Alcance general
 
-- Ventas: Lead → Oportunidad → Cotizacion → Pedido/Contrato → Renovacion, forecast, pipeline, aprobaciones, descuentos.
-- Servicio: Casos/tickets, SLA, colas/escalado, base de conocimiento, omnicanal, metricas.
-- Marketing: Segmentacion, campanas multicanal, journeys, scoring, consentimientos/opt-out, atribucion.
+- Ventas: Prospecto → Oportunidad → Cotización → Pedido/Contrato → Renovación, pronóstico, embudo, aprobaciones, descuentos.
+- Servicio: Casos/tickets, SLA, colas/escalado, base de conocimiento, omnicanal, métricas.
+- Marketing: Segmentación, campañas multicanal, recorridos, puntuación, consentimientos/baja, atribución.
 
-## Checklist por modulo (priorizado)
+## Checklist por módulo (priorizado)
 
 1) Seguridad e identidad (bloqueante)
-- [ ] MVP: Autenticacion JWT/OIDC + UseAuthentication (Alto Impacto / Esfuerzo Medio)
-- [ ] MVP: RBAC basico (roles por modulo) (Alto / Medio)
-- [ ] Enterprise: ABAC por entidad/registro (Alto / Alto)
-- [ ] Enterprise: MFA + SSO empresarial (Alto / Alto)
-- [ ] Enterprise: Auditoria de accesos (Medio / Medio)
+- [ ] MVP: Autenticación JWT/OIDC + UseAuthentication (Alto Impacto / Esfuerzo Medio)
+- [ ] MVP: RBAC básico (roles por módulo) (Alto / Medio)
+- [ ] Empresarial: ABAC por entidad/registro (Alto / Alto)
+- [ ] Empresarial: MFA + SSO empresarial (Alto / Alto)
+- [ ] Empresarial: Auditoría de accesos (Medio / Medio)
 
 2) Multi-tenant y gobernanza
 - [x] MVP: TenantId en entidades + filtros globales (Alto / Alto)
-- [x] Enterprise: Aislamiento por esquema/BD (Alto / Alto)
-- [x] Enterprise: Configuracion por tenant (campos, layouts, reglas) (Alto / Alto)
-- [x] Best: Metricas/cuotas/facturacion por tenant (Medio / Alto)
+- [x] Empresarial: Aislamiento por esquema/BD (Alto / Alto)
+- [x] Empresarial: Configuración por tenant (campos, layouts, reglas) (Alto / Alto)
+- [x] Mejor en su clase: Métricas/cuotas/facturación por tenant (Medio / Alto)
 
-3) Customer 360 (Core CRM)
+3) Customer 360 (CRM central)
 - [ ] MVP: Contactos y roles dentro de cuentas (Alto / Medio)
-- [ ] MVP: Relacion cuenta‑cuenta (holding/sucursal) (Medio / Medio)
-- [ ] Enterprise: Dedupe + merge + golden record (Alto / Alto)
-- [ ] Enterprise: Preferencias y consentimientos por canal (Alto / Medio)
+- [ ] MVP: Relación cuenta‑cuenta (holding/sucursal) (Medio / Medio)
+- [ ] Empresarial: Deduplicación + fusión + registro maestro (Alto / Alto)
+- [ ] Empresarial: Preferencias y consentimientos por canal (Alto / Medio)
 
-4) Pipeline de ventas
-- [ ] MVP: Leads (CRUD + conversion) (Alto / Medio)
+4) Embudo de ventas
+- [ ] MVP: Prospectos (CRUD + conversión) (Alto / Medio)
 - [ ] MVP: Oportunidades por etapas (Alto / Medio)
-- [ ] MVP: Forecast basico (Medio / Medio)
-- [ ] Enterprise: Cotizaciones y descuentos (Alto / Alto)
-- [ ] Enterprise: Aprobaciones de precio (Medio / Alto)
-- [ ] Best: CPQ completo (Medio / Alto)
+- [ ] MVP: Pronóstico básico (Medio / Medio)
+- [ ] Empresarial: Cotizaciones y descuentos (Alto / Alto)
+- [ ] Empresarial: Aprobaciones de precio (Medio / Alto)
+- [ ] Mejor en su clase: CPQ completo (Medio / Alto)
 
 5) Servicio (Casos)
 - [ ] MVP: Casos/tickets + estados (Alto / Medio)
-- [ ] MVP: SLA basico (Alto / Medio)
-- [ ] Enterprise: Colas, enrutamiento, escalado (Alto / Alto)
-- [ ] Enterprise: Base de conocimiento (Medio / Medio)
-- [ ] Best: Omnicanal (email/chat/voz) (Alto / Alto)
+- [ ] MVP: SLA básico (Alto / Medio)
+- [ ] Empresarial: Colas, enrutamiento, escalado (Alto / Alto)
+- [ ] Empresarial: Base de conocimiento (Medio / Medio)
+- [ ] Mejor en su clase: Omnicanal (email/chat/voz) (Alto / Alto)
 
 6) Marketing
-- [ ] MVP: Segmentacion simple (Medio / Medio)
-- [ ] MVP: Campanas y mailings basicos (Medio / Medio)
-- [ ] Enterprise: Journeys + Triggers (Alto / Alto)
-- [ ] Enterprise: Scoring y atribucion (Medio / Alto)
-- [ ] Best: CDP basico (Medio / Alto)
+- [ ] MVP: Segmentación simple (Medio / Medio)
+- [ ] MVP: Campañas y envíos básicos (Medio / Medio)
+- [ ] Empresarial: Recorridos + Disparadores (Alto / Alto)
+- [ ] Empresarial: Puntuación y atribución (Medio / Alto)
+- [ ] Mejor en su clase: CDP básico (Medio / Alto)
 
 7) Integraciones
-- [ ] MVP: Webhooks + Domain Events (Medio / Medio)
-- [ ] Enterprise: Integracion Email/Calendario (Medio / Alto)
-- [ ] Enterprise: ERP/Facturacion (Alto / Alto)
+- [ ] MVP: Ganchos web + eventos de dominio (Medio / Medio)
+- [ ] Empresarial: Integración correo/calendario (Medio / Alto)
+- [ ] Empresarial: ERP/Facturación (Alto / Alto)
 
 8) Observabilidad y resiliencia
-- [ ] MVP: Health checks BD/servicios (Medio / Bajo)
-- [ ] MVP: Logs estructurados + correlacion (Medio / Medio)
-- [ ] Enterprise: Trazas (OpenTelemetry) (Medio / Medio)
-- [ ] Enterprise: Rate limiting, retries, circuit breakers (Alto / Alto)
+- [ ] MVP: Comprobaciones de salud BD/servicios (Medio / Bajo)
+- [ ] MVP: Registros estructurados + correlación (Medio / Medio)
+- [ ] Empresarial: Trazas (OpenTelemetry) (Medio / Medio)
+- [ ] Empresarial: Limitación de tasa, reintentos, cortacircuitos (Alto / Alto)
 
-9) Cumplimiento y auditoria
-- [ ] MVP: Auditoria de cambios por entidad (Alto / Alto)
-- [ ] Enterprise: GDPR/LPDP (borrado/portabilidad) (Alto / Alto)
-- [ ] Enterprise: Retencion de datos (Medio / Medio)
+9) Cumplimiento y auditoría
+- [ ] MVP: Auditoría de cambios por entidad (Alto / Alto)
+- [ ] Empresarial: GDPR/LPDP (borrado/portabilidad) (Alto / Alto)
+- [ ] Empresarial: Retención de datos (Medio / Medio)
 
 ## Hitos (GitHub-ready)
 
-Hito 1 — Fundacion (Seguridad + base multi-tenant)
+Hito 1 — Fundación (Seguridad + base multi-tenant)
 - [ ] JWT/OIDC Auth + UseAuthentication — M
-- [ ] RBAC basico por modulo — M
+- [ ] RBAC básico por módulo — M
 - [x] TenantId + filtros globales en EF — L
-- [ ] Auditoria de accesos — M
+- [ ] Auditoría de accesos — M
 - [ ] Health checks — S
 
 Hito 2 — Customer 360
 - [ ] Contactos + roles — M
-- [ ] Jerarquias de cuentas — M
+- [ ] Jerarquías de cuentas — M
 - [ ] Preferencias/consentimientos — M
 - [ ] Dedupe + merge (golden record) — XL
 
 Hito 3 — Ventas (MVP)
-- [ ] Leads + conversion — M
+- [ ] Prospectos + conversión — M
 - [ ] Oportunidades + etapas — M
-- [ ] Forecast basico — M
+- [ ] Pronóstico básico — M
 - [ ] Cotizaciones y descuentos — L
 
 Hito 4 — Servicio (MVP)
 - [ ] Casos + estados — M
-- [ ] SLA basico — M
+- [ ] SLA básico — M
 - [ ] Colas y enrutamiento — L
 - [ ] Base de conocimiento — M
 
 Hito 5 — Marketing (MVP)
-- [ ] Segmentacion simple — M
-- [ ] Campanas basicas — M
-- [ ] Journeys + Triggers — L
-- [ ] Scoring + Atribucion — L
+- [ ] Segmentación simple — M
+- [ ] Campañas básicas — M
+- [ ] Recorridos + Disparadores — L
+- [ ] Puntuación + Atribución — L
 
-Hito 6 — Operaciones Enterprise
-- [ ] Observabilidad (logs estructurados + trazas) — M
-- [ ] Rate limiting + retries + circuit breakers — M
-- [ ] GDPR/LPDP + retencion — L
-- [ ] Webhooks + eventos — M
-- [ ] Integracion Email/Calendario — L
-- [ ] Integracion ERP — XL
+Hito 6 — Operaciones empresariales
+- [ ] Observabilidad (registros estructurados + trazas) — M
+- [ ] Limitación de tasa + reintentos + cortacircuitos — M
+- [ ] GDPR/LPDP + retención — L
+- [ ] Ganchos web + eventos — M
+- [ ] Integración correo/calendario — L
+- [ ] Integración ERP — XL

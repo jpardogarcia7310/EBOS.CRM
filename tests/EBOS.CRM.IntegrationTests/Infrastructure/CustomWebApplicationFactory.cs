@@ -22,6 +22,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     private readonly IContainer? _sqlContainer;
     private readonly string? _connectionString;
     private readonly string _inMemoryDbName;
+    private readonly string _sqlDatabaseName;
 
     private const string SaPassword = "StrongP@ssw0rd2025!";
 
@@ -32,6 +33,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             "true",
             StringComparison.OrdinalIgnoreCase);
         _inMemoryDbName = $"IntegrationTestsDb-{Guid.NewGuid():N}";
+        _sqlDatabaseName = $"TestCrmDb_{Guid.NewGuid():N}";
 
         if (_useTestcontainers)
         {
@@ -66,7 +68,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 DataSource = $"{host},{mappedPort}",
                 UserID = "sa",
                 Password = SaPassword,
-                InitialCatalog = "TestCrmDb",
+                InitialCatalog = _sqlDatabaseName,
                 TrustServerCertificate = true,
                 Encrypt = false
             };
@@ -123,7 +125,15 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
-            db.Database.EnsureCreated();
+            if (_useTestcontainers)
+            {
+                db.Database.EnsureDeleted();
+                db.Database.Migrate();
+            }
+            else
+            {
+                db.Database.EnsureCreated();
+            }
             var normalizer = scope.ServiceProvider.GetRequiredService<ILookupNormalizationService>();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();

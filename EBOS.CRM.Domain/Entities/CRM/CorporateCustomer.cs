@@ -12,6 +12,8 @@ public class CorporateCustomer : Customer
     public string TaxIdentification { get; set; } = null!;
 
     public ICollection<BranchOffice> BranchOffices { get; set; } = new List<BranchOffice>();
+    public ICollection<AccountHierarchy> ParentRelationships { get; set; } = new List<AccountHierarchy>();
+    public ICollection<AccountHierarchy> ChildRelationships { get; set; } = new List<AccountHierarchy>();
 }
 
 

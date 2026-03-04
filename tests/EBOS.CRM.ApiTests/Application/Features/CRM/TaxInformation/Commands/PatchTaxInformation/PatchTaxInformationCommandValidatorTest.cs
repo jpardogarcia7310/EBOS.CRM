@@ -9,7 +9,7 @@ public class PatchTaxInformationCommandValidatorTest
     private readonly PatchTaxInformationCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_NoPatchFields_ReturnsError()
+    public async Task Validate_NoPatchFields_ReturnsError()
     {
         var request = new PatchTaxInformationRequest(
             TenantId: 1,
@@ -18,9 +18,11 @@ public class PatchTaxInformationCommandValidatorTest
             CustomerId: null);
         var command = new PatchTaxInformationCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.TaxInformationRequest)
             .WithErrorMessage("At least one field must be provided.");
     }
 }
+
+

@@ -4,6 +4,16 @@ public static class StressHelper
 {
     private const int Parallelism = 100;
 
+    public static async Task AssertEndpointStressAsync(HttpClient client, params string[] urls)
+    {
+        var tasks = Enumerable.Range(0, Parallelism)
+            .SelectMany(_ => urls.Select(client.GetAsync))
+            .ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+        Assert.All(responses, response => Assert.True((int)response.StatusCode < 500));
+    }
+
     public static async Task AssertReadStressAsync(HttpClient client, string baseUrl, long id)
     {
         var tasks = Enumerable.Range(0, Parallelism)

@@ -2,6 +2,12 @@ namespace EBOS.CRM.Domain.Identity;
 
 public static class PolicyKeys
 {
+    public static class Operations
+    {
+        public const string ObservabilityRead = "Policy.Operations.Observability.Read";
+        public const string ReadinessRead = "Policy.Operations.Readiness.Read";
+    }
+
     public static class Crm
     {
         public const string CountryRead = "Policy.Crm.Country.Read";
@@ -71,6 +77,7 @@ public static class PolicyKeys
         public const string CreditTransactionPatch = "Policy.Crm.CreditTransaction.Patch";
 
         public const string CustomerRead = "Policy.Crm.Customer.Read";
+        public const string CustomerPiiRead = "Policy.Crm.Customer.Pii.Read";
         public const string CustomerCreate = "Policy.Crm.Customer.Create";
         public const string CustomerUpdate = "Policy.Crm.Customer.Update";
         public const string CustomerDelete = "Policy.Crm.Customer.Delete";

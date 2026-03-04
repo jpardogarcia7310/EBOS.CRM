@@ -3,6 +3,7 @@ using System.Text.Json;
 using EBOS.CRM.Api.Extensions;
 using EBOS.CRM.Api.Filters;
 using EBOS.CRM.Api.HostedServices;
+using EBOS.CRM.Api.Infrastructure.HealthChecks;
 using EBOS.CRM.Api.Infrastructure;
 using EBOS.CRM.Api.Options;
 using EBOS.CRM.Api.Services;
@@ -12,6 +13,7 @@ using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Domain.Identity;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Infrastructure;
 using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Persistence;
@@ -20,8 +22,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using EBOS.CRM.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
 // Short aliases
@@ -51,12 +58,20 @@ services.AddInfrastructure(builder.Configuration);
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ICurrentUserContext>());
+services.AddScoped<ICustomerPiiMaskingService, CustomerPiiMaskingService>();
 services.AddSingleton<ProblemDetailsFactory, CrmProblemDetailsFactory>();
 if (builder.Environment.IsDevelopment())
 {
     services.AddHostedService<LookupSeedHostedService>();
 }
+services.AddHostedService<CustomerPrivacyRetentionHostedService>();
 services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+services.Configure<OperationalReadinessOptions>(
+    builder.Configuration.GetSection(OperationalReadinessOptions.SectionName));
+services.Configure<CustomerPrivacyRetentionJobOptions>(
+    builder.Configuration.GetSection(CustomerPrivacyRetentionJobOptions.SectionName));
+services.Configure<OpenTelemetryOptions>(
+    builder.Configuration.GetSection(OpenTelemetryOptions.SectionName));
 services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.SectionName));
 services.Configure<TenantResolutionOptions>(builder.Configuration.GetSection(TenantResolutionOptions.SectionName));
 services.AddOptions<TenantIsolationOptions>()
@@ -86,9 +101,52 @@ services.AddOptions<MultiTenantOptions>()
         "MultiTenant:SchemaPrefix is required when Strategy is Schema.")
     .ValidateOnStart();
 services.AddLocalization();
+services.AddHealthChecks()
+    .AddCheck<Customer360OperationalReadinessHealthCheck>(
+        "customer360_operability",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["ready"]);
+
+var openTelemetryOptions = builder.Configuration.GetSection(OpenTelemetryOptions.SectionName)
+    .Get<OpenTelemetryOptions>() ?? new OpenTelemetryOptions();
+if (openTelemetryOptions.Enabled)
+{
+    services.AddOpenTelemetry()
+        .ConfigureResource(resource =>
+            resource.AddService(
+                serviceName: openTelemetryOptions.ServiceName,
+                serviceVersion: openTelemetryOptions.ServiceVersion))
+        .WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddSource(TelemetryNames.Customer360ActivitySource)
+                .AddSource(TelemetryNames.AuditActivitySource);
+
+            if (!string.IsNullOrWhiteSpace(openTelemetryOptions.OtlpEndpoint))
+            {
+                tracing.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(openTelemetryOptions.OtlpEndpoint); });
+            }
+        })
+        .WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddMeter(TelemetryNames.Customer360Meter);
+
+            if (!string.IsNullOrWhiteSpace(openTelemetryOptions.OtlpEndpoint))
+            {
+                metrics.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(openTelemetryOptions.OtlpEndpoint); });
+            }
+        });
+}
 
 var authOptions = builder.Configuration.GetSection(AuthenticationOptions.SectionName)
     .Get<AuthenticationOptions>() ?? new AuthenticationOptions();
+var authDisabled = !authOptions.Enabled;
 
 services.AddAuthentication(options =>
     {
@@ -154,7 +212,49 @@ services.AddAuthentication(options =>
 services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiUser", policy =>
-        policy.RequireAuthenticatedUser());
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
+        policy.RequireAuthenticatedUser();
+    });
+    options.AddPolicy(PolicyKeys.Operations.ObservabilityRead, policy =>
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("OpsObserver") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "ops.observability.read", StringComparison.OrdinalIgnoreCase)));
+    });
+    options.AddPolicy(PolicyKeys.Operations.ReadinessRead, policy =>
+    {
+        if (authDisabled)
+        {
+            policy.RequireAssertion(_ => true);
+            return;
+        }
+
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("OpsObserver") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "ops.readiness.read", StringComparison.OrdinalIgnoreCase)));
+    });
     options.AddPolicy(PolicyKeys.Crm.CountryRead, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryCreate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CountryUpdate, policy => policy.RequireAuthenticatedUser());
@@ -211,6 +311,15 @@ services.AddAuthorization(options =>
     options.AddPolicy(PolicyKeys.Crm.CreditTransactionDelete, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CreditTransactionPatch, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerRead, policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy(PolicyKeys.Crm.CustomerPiiRead, policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireAssertion(context =>
+                context.User.IsInRole("Admin") ||
+                context.User.IsInRole("PIIReader") ||
+                context.User.Claims.Any(c =>
+                    (string.Equals(c.Type, "permissions", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "permission", StringComparison.OrdinalIgnoreCase)) &&
+                    string.Equals(c.Value, "crm.customer.pii.read", StringComparison.OrdinalIgnoreCase))));
     options.AddPolicy(PolicyKeys.Crm.CustomerCreate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerUpdate, policy => policy.RequireAuthenticatedUser());
     options.AddPolicy(PolicyKeys.Crm.CustomerDelete, policy => policy.RequireAuthenticatedUser());
@@ -385,6 +494,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready").RequireAuthorization(PolicyKeys.Operations.ReadinessRead);
 
 await app.RunAsync();
 

@@ -41,7 +41,7 @@ public class OpportunityOutcomeEndpointTest(CustomWebApplicationFactory factory)
             TenantId = 1,
             Code = "CORP-OUT",
             Email = "outcome@contoso.com",
-            Phone = "+34 911 000 333",
+            Phone = "34911000333",
             StatusId = statusId,
             LegalName = "Outcome Corp",
             TaxIdentification = "B12345678",
@@ -78,3 +78,4 @@ public class OpportunityOutcomeEndpointTest(CustomWebApplicationFactory factory)
         return (opportunity.Id, stage.Id);
     }
 }
+

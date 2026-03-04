@@ -36,7 +36,7 @@ public class CustomerErrorHandlingTest(CustomerErrorHandlingTest.FailingCustomer
             TenantId: 1,
             Code: "CUS-001",
             Email: "customer@example.com",
-            Phone: "+1 555 0000",
+            Phone: "15550000",
             StatusId: 1);
 
         var response = await _client.PostAsJsonAsync($"/api/v{_version}/Customer", request);
@@ -51,7 +51,7 @@ public class CustomerErrorHandlingTest(CustomerErrorHandlingTest.FailingCustomer
             TenantId: 1,
             Code: "CUS-001",
             Email: "customer@example.com",
-            Phone: "+1 555 0000",
+            Phone: "15550000",
             StatusId: 1);
 
         var response = await _client.PutAsJsonAsync($"/api/v{_version}/Customer/1", request);
@@ -79,6 +79,7 @@ public class CustomerErrorHandlingTest(CustomerErrorHandlingTest.FailingCustomer
         }
     }
 }
+
 
 
 

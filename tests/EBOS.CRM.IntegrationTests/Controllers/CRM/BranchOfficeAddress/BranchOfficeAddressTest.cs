@@ -84,7 +84,7 @@ public class BranchOfficeAddressTest(CustomWebApplicationFactory factory) : ICla
         var request = new AddBranchOfficeRequest(
             TenantId: 1,
             Name: "Sucursal Norte",
-            PhoneNumber: "+34 911 000 333",
+            PhoneNumber: "34911000333",
             CorporateCustomerId: corporateCustomerId);
 
         var response = await _client.PostAsJsonAsync($"/api/v{_branchOfficeVersion}/BranchOffice", request);
@@ -103,7 +103,7 @@ public class BranchOfficeAddressTest(CustomWebApplicationFactory factory) : ICla
             TenantId: 1,
             Code: $"CORP-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"corp{Guid.NewGuid():N}@example.com",
-            Phone: "+34 911 000 111",
+            Phone: "34911000111",
             StatusId: statusId,
             LegalName: "Contoso S.A.",
             TaxIdentification: "B12345678");
@@ -147,6 +147,7 @@ public class BranchOfficeAddressTest(CustomWebApplicationFactory factory) : ICla
         return created.Id;
     }
 }
+
 
 
 

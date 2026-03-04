@@ -1,29 +1,33 @@
 using EBOS.CRM.Contracts.Requests.CRM.Customer;
 using EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Customer.Commands.AddCustomer;
 
 public class AddCustomerCommandValidatorTest
 {
-    private readonly AddCustomerCommandValidator _validator = new();
+    private readonly AddCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddCustomerCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new AddCustomerCommand(null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest);
     }
@@ -31,11 +35,11 @@ public class AddCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyCode_Fails(string value)
+    public async Task Validate_EmptyCode_Fails(string value)
     {
         var command = new AddCustomerCommand(BuildAddRequest() with { Code = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Code);
     }
@@ -43,11 +47,11 @@ public class AddCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyEmail_Fails(string value)
+    public async Task Validate_EmptyEmail_Fails(string value)
     {
         var command = new AddCustomerCommand(BuildAddRequest() with { Email = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Email);
     }
@@ -55,11 +59,11 @@ public class AddCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhone_Fails(string value)
+    public async Task Validate_EmptyPhone_Fails(string value)
     {
         var command = new AddCustomerCommand(BuildAddRequest() with { Phone = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.Phone);
     }
@@ -67,11 +71,11 @@ public class AddCustomerCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidStatus_Fails(long value)
+    public async Task Validate_InvalidStatus_Fails(long value)
     {
         var command = new AddCustomerCommand(BuildAddRequest() with { StatusId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CustomerRequest.StatusId);
     }
@@ -83,6 +87,21 @@ public class AddCustomerCommandValidatorTest
             Phone: "123",
             StatusId: 1
         );
+
+    private static AddCustomerCommandValidator CreateValidator()
+    {
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        var countryRepository = new Mock<ICountryRepository>();
+        countryRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Country)null!);
+
+        return new AddCustomerCommandValidator(validationCatalog.Object, countryRepository.Object);
+    }
 }
+
+
 
 
