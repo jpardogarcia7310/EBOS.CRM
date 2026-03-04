@@ -1,29 +1,33 @@
 using EBOS.CRM.Contracts.Requests.CRM.CorporateCustomer;
 using EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
 using FluentValidation.TestHelper;
+using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.CorporateCustomer.Commands.AddCorporateCustomer;
 
 public class AddCorporateCustomerCommandValidatorTest
 {
-    private readonly AddCorporateCustomerCommandValidator _validator = new();
+    private readonly AddCorporateCustomerCommandValidator _validator = CreateValidator();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new AddCorporateCustomerCommand(null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest);
     }
@@ -31,11 +35,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyCode_Fails(string value)
+    public async Task Validate_EmptyCode_Fails(string value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { Code = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Code);
     }
@@ -43,11 +47,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyEmail_Fails(string value)
+    public async Task Validate_EmptyEmail_Fails(string value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { Email = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Email);
     }
@@ -55,11 +59,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhone_Fails(string value)
+    public async Task Validate_EmptyPhone_Fails(string value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { Phone = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.Phone);
     }
@@ -67,11 +71,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyLegalName_Fails(string value)
+    public async Task Validate_EmptyLegalName_Fails(string value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { LegalName = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.LegalName);
     }
@@ -79,11 +83,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyTaxIdentification_Fails(string value)
+    public async Task Validate_EmptyTaxIdentification_Fails(string value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { TaxIdentification = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.TaxIdentification);
     }
@@ -91,11 +95,11 @@ public class AddCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidStatus_Fails(long value)
+    public async Task Validate_InvalidStatus_Fails(long value)
     {
         var command = new AddCorporateCustomerCommand(BuildAddRequest() with { StatusId = value });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.CorporateCustomerRequest.StatusId);
     }
@@ -109,6 +113,35 @@ public class AddCorporateCustomerCommandValidatorTest
             LegalName: "Corp",
             TaxIdentification: "TAX999"
         );
+
+    private static AddCorporateCustomerCommandValidator CreateValidator()
+    {
+        var countryRepo = new Mock<ICountryRepository>();
+        countryRepo.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Country
+            {
+                Id = 1,
+                Iso31661A2Code = "EC",
+                Name = "Ecuador",
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1,
+                Currency = "USD",
+                CurrencyCode = "USD",
+                Domain = ".ec",
+                InternationalPhoneCode = "593",
+                Iso31661A3Code = "ECU",
+                Iso31661NumCode = "218"
+            });
+
+        var validationCatalog = new Mock<IValidationCatalogService>();
+        validationCatalog.Setup(s => s.GetPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        return new AddCorporateCustomerCommandValidator(countryRepo.Object, validationCatalog.Object);
+    }
 }
+
+
+
 
 

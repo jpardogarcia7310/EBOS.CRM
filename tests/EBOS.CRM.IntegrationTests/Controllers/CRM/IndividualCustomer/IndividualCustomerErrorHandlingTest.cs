@@ -37,7 +37,7 @@ public class IndividualCustomerErrorHandlingTest(
             TenantId: 1,
             Code: "IND-001",
             Email: "ind@example.com",
-            Phone: "+1 555 1111",
+            Phone: "15551111",
             StatusId: 1,
             FirstName: "Ana",
             LastName: "Garcia",
@@ -56,7 +56,7 @@ public class IndividualCustomerErrorHandlingTest(
             TenantId: 1,
             Code: "IND-001",
             Email: "ind@example.com",
-            Phone: "+1 555 1111",
+            Phone: "15551111",
             StatusId: 1,
             FirstName: "Ana",
             LastName: "Garcia",
@@ -89,6 +89,7 @@ public class IndividualCustomerErrorHandlingTest(
         }
     }
 }
+
 
 
 

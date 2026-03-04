@@ -232,6 +232,33 @@ Example:
 }
 ```
 
+## CI workflows and purpose
+
+The repository uses dedicated CI workflows to isolate risks, improve feedback speed, and keep enterprise-level quality gates explicit.
+
+- `customer360-suites-ci.yml`:
+  - `api-tests`: validates API layer behavior (controllers/contracts) quickly.
+  - `integration-tests`: validates cross-layer business flows in integration mode.
+  - `concurrency-tests`: detects race conditions and concurrent access regressions.
+  - `stress-tests`: validates behavior under load (timeouts, 5xx regressions, baseline performance).
+  - `integration-sqlserver-tests`: runs SQL Server real-engine scenarios with Testcontainers (`USE_TESTCONTAINERS=true`) for migrations, transactional behavior, and SQL-specific hardening.
+  - `summary`: consolidates TRX results from all suites into a single report.
+
+- `observability-ci.yml`:
+  - validates Prometheus/Alertmanager/Grafana configuration and smoke checks observability integration.
+  - prevents breaking monitoring and alerting behavior through configuration changes.
+
+- `openapi-compatibility-gate.yml`:
+  - runs OpenAPI snapshot compatibility checks.
+  - fails on API contract drift (potential breaking changes) unless snapshot is intentionally updated.
+
+Why this split is needed:
+
+- clear ownership and diagnosis per risk area.
+- faster feedback via parallel jobs.
+- fewer false positives by running each suite in the environment it actually requires.
+- stronger enterprise gates for API compatibility, SQL Server real behavior, concurrency, stress, and operability.
+
 ## Main technologies
 
 - ASP.NET Core 8

@@ -9,41 +9,41 @@ public class AuthenticateUserCommandValidatorTest
     private readonly AuthenticateUserCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AuthenticateUserCommand(BuildRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
-    public void Validate_EmptyExternalId_Fails()
+    public async Task Validate_EmptyExternalId_Fails()
     {
         var command = new AuthenticateUserCommand(BuildRequest() with { ExternalId = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Request.ExternalId);
     }
 
     [Fact]
-    public void Validate_InvalidEmail_Fails()
+    public async Task Validate_InvalidEmail_Fails()
     {
         var command = new AuthenticateUserCommand(BuildRequest() with { Email = "not-an-email" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Request.Email);
     }
 
     [Fact]
-    public void Validate_EmptyDisplayName_Fails()
+    public async Task Validate_EmptyDisplayName_Fails()
     {
         var command = new AuthenticateUserCommand(BuildRequest() with { DisplayName = "" });
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Request.DisplayName);
     }
@@ -55,3 +55,5 @@ public class AuthenticateUserCommandValidatorTest
         DisplayName: "John Doe",
         IsActive: true);
 }
+
+

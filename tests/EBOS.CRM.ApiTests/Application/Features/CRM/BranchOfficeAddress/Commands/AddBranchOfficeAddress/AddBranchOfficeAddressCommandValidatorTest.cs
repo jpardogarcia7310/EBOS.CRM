@@ -9,11 +9,11 @@ public class AddBranchOfficeAddressCommandValidatorTest
     private readonly AddBranchOfficeAddressCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddBranchOfficeAddressCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -28,5 +28,7 @@ public class AddBranchOfficeAddressCommandValidatorTest
             IsCurrent: true
         );
 }
+
+
 
 

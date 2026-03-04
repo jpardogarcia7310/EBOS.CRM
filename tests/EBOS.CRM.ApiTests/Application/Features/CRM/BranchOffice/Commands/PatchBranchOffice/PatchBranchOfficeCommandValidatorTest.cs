@@ -9,7 +9,7 @@ public class PatchBranchOfficeCommandValidatorTest
     private readonly PatchBranchOfficeCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -18,23 +18,23 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(0, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
-    public void Validate_NullRequest_Fails()
+    public async Task Validate_NullRequest_Fails()
     {
         var command = new PatchBranchOfficeCommand(1, null!);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest);
     }
 
     [Fact]
-    public void Validate_NoPatchFields_ReturnsError()
+    public async Task Validate_NoPatchFields_ReturnsError()
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -43,7 +43,7 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest)
             .WithErrorMessage("At least one field must be provided.");
@@ -52,7 +52,7 @@ public class PatchBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyName_Fails(string value)
+    public async Task Validate_EmptyName_Fails(string value)
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -61,13 +61,13 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.Name);
     }
 
     [Fact]
-    public void Validate_NameTooLong_Fails()
+    public async Task Validate_NameTooLong_Fails()
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -76,7 +76,7 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.Name);
     }
@@ -84,7 +84,7 @@ public class PatchBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Validate_EmptyPhoneNumber_Fails(string value)
+    public async Task Validate_EmptyPhoneNumber_Fails(string value)
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -93,13 +93,13 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.PhoneNumber);
     }
 
     [Fact]
-    public void Validate_PhoneNumberTooLong_Fails()
+    public async Task Validate_PhoneNumberTooLong_Fails()
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -108,7 +108,7 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: null);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.PhoneNumber);
     }
@@ -116,7 +116,7 @@ public class PatchBranchOfficeCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidCorporateCustomerId_Fails(long value)
+    public async Task Validate_InvalidCorporateCustomerId_Fails(long value)
     {
         var request = new PatchBranchOfficeRequest(
             TenantId: 1,
@@ -125,8 +125,10 @@ public class PatchBranchOfficeCommandValidatorTest
             CorporateCustomerId: value);
         var command = new PatchBranchOfficeCommand(1, request);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.BranchOfficeRequest.CorporateCustomerId!.Value);
     }
 }
+
+

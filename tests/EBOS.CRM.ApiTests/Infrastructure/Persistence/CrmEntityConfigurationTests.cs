@@ -55,6 +55,8 @@ public class CrmEntityConfigurationTests
         AssertProperty(entity, "Code", required: true, maxLength: 50);
         AssertProperty(entity, "Email", required: true, maxLength: 100);
         AssertProperty(entity, "Phone", required: true, maxLength: 12);
+        AssertProperty(entity, "Source", required: false, maxLength: 100);
+        AssertProperty(entity, "Confidentiality", required: false, maxLength: 50);
         AssertProperty(entity, "CreatedAt", required: true);
         AssertProperty(entity, "CreatedBy", required: true);
         AssertProperty(entity, "Erased", required: true);
@@ -318,6 +320,29 @@ public class CrmEntityConfigurationTests
         AssertIndexes(entity, "IX_CreditTransaction_Date_Account", "IX_CreditTransaction_Account_Date",
             "IX_CreditTransaction_TenantId", "IX_CreditTransactions_CreditAccountId");
         AssertCheckConstraints(entity, "CK_CreditTransaction_Amount_NotZero", "CK_CreditTransaction_Type_Valid");
+    }
+
+    [Fact]
+    public void CustomerPrivacyRequest_Config_Is_Correct()
+    {
+        using var context = CreateContext();
+        var entity = GetEntityType<CustomerPrivacyRequest>(context);
+
+        AssertTable(entity, "CustomerPrivacyRequests", "CRM");
+        AssertProperty(entity, "RequestType", required: true, maxLength: 40);
+        AssertProperty(entity, "Status", required: true, maxLength: 40);
+        AssertProperty(entity, "Reason", required: false, maxLength: 1000);
+        AssertProperty(entity, "FailureCode", required: false, maxLength: 100);
+        AssertProperty(entity, "FailureReason", required: false, maxLength: 2000);
+        AssertProperty(entity, "CorrelationId", required: false, maxLength: 100);
+        AssertProperty(entity, "RequestedBy", required: true);
+        AssertProperty(entity, "RequestedAt", required: true);
+        AssertProperty(entity, "Erased", required: true);
+
+        AssertIndexes(entity,
+            "IX_CustomerPrivacyRequest_Tenant_Customer_RequestedAt",
+            "IX_CustomerPrivacyRequest_Tenant_Status_RequestedAt",
+            "UX_CustomerPrivacyRequest_ActiveByType");
     }
 
     private static IEntityType GetEntityType<T>(DbContext context)

@@ -41,7 +41,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
         var addRequest = new AddBranchOfficeRequest(
             TenantId: 1,
             Name: "HQ Madrid",
-            PhoneNumber: "+34 911 000 222",
+            PhoneNumber: "34911000222",
             CorporateCustomerId: corporateCustomerId);
 
         var addResponse = await _client.PostAsJsonAsync($"/api/v{_version}/BranchOffice", addRequest);
@@ -54,7 +54,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
             Id: created.Id,
             TenantId: 1,
             Name: "HQ Updated",
-            PhoneNumber: "+34 911 999 000",
+            PhoneNumber: "34911999000",
             CorporateCustomerId: corporateCustomerId);
 
         var updateResponse =
@@ -73,7 +73,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
             TenantId: 1,
             Code: $"CORP-{Guid.NewGuid():N}".Substring(0, 12),
             Email: $"corp{Guid.NewGuid():N}@example.com",
-            Phone: "+34 911 000 111",
+            Phone: "34911000111",
             StatusId: statusId,
             LegalName: "Contoso S.A.",
             TaxIdentification: "B12345678");
@@ -86,6 +86,7 @@ public class BranchOfficeTest(CustomWebApplicationFactory factory) : IClassFixtu
         return created.Id;
     }
 }
+
 
 
 

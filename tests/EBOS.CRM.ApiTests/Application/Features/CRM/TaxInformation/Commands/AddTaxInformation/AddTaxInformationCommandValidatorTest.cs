@@ -9,11 +9,11 @@ public class AddTaxInformationCommandValidatorTest
     private readonly AddTaxInformationCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddTaxInformationCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -25,5 +25,7 @@ public class AddTaxInformationCommandValidatorTest
             CustomerId: 1
         );
 }
+
+
 
 

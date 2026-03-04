@@ -1,0 +1,53 @@
+name: openapi-compatibility-gate
+
+on:
+  pull_request:
+    paths:
+      - "EBOS.CRM.Api/**"
+      - "EBOS.CRM.Application/**"
+      - "EBOS.CRM.Contracts/**"
+      - "tests/EBOS.CRM.IntegrationTests/Swagger/**"
+      - ".github/workflows/openapi-compatibility-gate.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "EBOS.CRM.Api/**"
+      - "EBOS.CRM.Application/**"
+      - "EBOS.CRM.Contracts/**"
+      - "tests/EBOS.CRM.IntegrationTests/Swagger/**"
+      - ".github/workflows/openapi-compatibility-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  openapi-gate:
+    name: OpenAPI snapshot compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Integration tests
+        run: dotnet restore tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+      - name: Run OpenAPI compatibility gate
+        run: >
+          dotnet test tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=openapi-gate.trx"
+          --results-directory ./artifacts/test-results/openapi
+          --filter "FullyQualifiedName~OpenApiCompatibilitySnapshotTest"
+          -v minimal
+      - name: Upload OpenAPI gate results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-gate-trx
+          path: artifacts/test-results/openapi/*.trx
+          if-no-files-found: warn
+

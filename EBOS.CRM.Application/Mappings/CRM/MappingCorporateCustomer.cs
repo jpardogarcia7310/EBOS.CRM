@@ -40,7 +40,14 @@ public class MappingCorporateCustomer : IRegister
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
             .Ignore(dest => dest.CustomerAddresses)
-            .Ignore(dest => dest.BranchOffices);
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
+            .Ignore(dest => dest.BranchOffices)
+            .Ignore(dest => dest.ParentRelationships)
+            .Ignore(dest => dest.ChildRelationships)
+            .Ignore(dest => dest.Source!)
+            .Ignore(dest => dest.Confidentiality!);
 
         config.NewConfig<UpdateCorporateCustomerRequest, CorporateCustomer>()
             .Map(dest => dest.TenantId, src => src.TenantId)
@@ -62,7 +69,14 @@ public class MappingCorporateCustomer : IRegister
             .Ignore(dest => dest.BankInformation!)
             .Ignore(dest => dest.Addresses)
             .Ignore(dest => dest.CustomerAddresses)
-            .Ignore(dest => dest.BranchOffices);
+            .Ignore(dest => dest.AccountContacts)
+            .Ignore(dest => dest.Preferences)
+            .Ignore(dest => dest.Consents)
+            .Ignore(dest => dest.BranchOffices)
+            .Ignore(dest => dest.ParentRelationships)
+            .Ignore(dest => dest.ChildRelationships)
+            .Ignore(dest => dest.Source!)
+            .Ignore(dest => dest.Confidentiality!);
     }
 }
 

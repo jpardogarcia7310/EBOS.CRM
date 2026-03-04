@@ -1,0 +1,58 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: ebos-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./${OBS_PROM_DIR:-Prometheus}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./${OBS_PROM_DIR:-Prometheus}/customer360-alert-rules.yml:/etc/prometheus/customer360-alert-rules.yml:ro
+      - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: ebos-alertmanager
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --config.expand-env
+    ports:
+      - "9093:9093"
+    env_file:
+      - .env.alerting
+    volumes:
+      - ./${OBS_PROM_DIR:-Prometheus}/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: ebos-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=10s
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./${OBS_GRAFANA_DIR:-Grafana}/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./${OBS_GRAFANA_DIR:-Grafana}/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./${OBS_GRAFANA_DIR:-Grafana}/customer360-operability-dashboard.json:/var/lib/grafana/dashboards/customer360-operability-dashboard.json:ro
+
+volumes:
+  prometheus_data:
+  alertmanager_data:
+  grafana_data:
+
+networks:
+  default:
+    name: observability_default
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
