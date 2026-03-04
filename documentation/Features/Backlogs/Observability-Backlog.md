@@ -181,17 +181,17 @@ It also defines test coverage for:
 ## Runbooks
 
 - Main runbook (English):
-  - `documentation/RunBooks/Observability-Operability-RunBook.md`
+  - `documentation/RunBooks/Observability/Observability-Operability-RunBook.md`
 - Main runbook (Spanish):
-  - `documentation/RunBooks/Observability-Operability-RunBook_ES.md`
+  - `documentation/RunBooks/Observability/Observability-Operability-RunBook_ES.md`
 - Post-deploy checklist (English):
-  - `documentation/RunBooks/Observability-PostDeploy-Checklist.md`
+  - `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist.md`
 - Post-deploy checklist (Spanish):
-  - `documentation/RunBooks/Observability-PostDeploy-Checklist_ES.md`
+  - `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist_ES.md`
 - Drill record template (English):
-  - `documentation/RunBooks/Observability-Drill-Record-Template.md`
+  - `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template.md`
 - Drill record template (Spanish):
-  - `documentation/RunBooks/Observability-Drill-Record-Template_ES.md`
+  - `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template_ES.md`
 
 Runbook scope to keep updated with implementation:
 - Incident triage flow using `correlationId` and `traceId` from failing requests.

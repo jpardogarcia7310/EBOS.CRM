@@ -153,11 +153,11 @@
   - recuperacion medida dentro de objetivos SLO.
 
 ## Plantilla de Registro de Drill
-- Usar: `documentation/RunBooks/Observability-Drill-Record-Template_ES.md`
-- Guardar registros completados en: `documentation/RunBooks/Drills/Records_ES/`
+- Usar: `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template_ES.md`
+- Guardar registros completados en: `documentation/RunBooks/Drills/Records_ES/Observability/`
 
 ## Checklist Post-Deploy
-- Usar: `documentation/RunBooks/Observability-PostDeploy-Checklist_ES.md`
+- Usar: `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist_ES.md`
 - Marcar cada item como `PASS/FAIL/N/A` y adjuntar enlaces de evidencia.
 
 ## Checklist de Verificacion

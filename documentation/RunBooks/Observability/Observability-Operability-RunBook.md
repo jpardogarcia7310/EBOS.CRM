@@ -153,11 +153,11 @@
   - measured recovery within SLO targets.
 
 ## Drill Record Template
-- Use: `documentation/RunBooks/Observability-Drill-Record-Template.md`
-- Store completed records under: `documentation/RunBooks/Drills/Records/`
+- Use: `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template.md`
+- Store completed records under: `documentation/RunBooks/Drills/Records/Observability/`
 
 ## Post-Deploy Checklist
-- Use: `documentation/RunBooks/Observability-PostDeploy-Checklist.md`
+- Use: `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist.md`
 - Mark each item as `PASS/FAIL/N/A` and attach evidence links.
 
 ## Verification Checklist

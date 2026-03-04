@@ -181,17 +181,17 @@ Tambien define la cobertura de pruebas para:
 ## Runbooks
 
 - Runbook principal (ingles):
-  - `documentation/RunBooks/Observability-Operability-RunBook.md`
+  - `documentation/RunBooks/Observability/Observability-Operability-RunBook.md`
 - Runbook principal (castellano):
-  - `documentation/RunBooks/Observability-Operability-RunBook_ES.md`
+  - `documentation/RunBooks/Observability/Observability-Operability-RunBook_ES.md`
 - Checklist post-deploy (ingles):
-  - `documentation/RunBooks/Observability-PostDeploy-Checklist.md`
+  - `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist.md`
 - Checklist post-deploy (castellano):
-  - `documentation/RunBooks/Observability-PostDeploy-Checklist_ES.md`
+  - `documentation/RunBooks/Observability/Observability-PostDeploy-Checklist_ES.md`
 - Plantilla de evidencia de drill (ingles):
-  - `documentation/RunBooks/Observability-Drill-Record-Template.md`
+  - `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template.md`
 - Plantilla de evidencia de drill (castellano):
-  - `documentation/RunBooks/Observability-Drill-Record-Template_ES.md`
+  - `documentation/RunBooks/Drills/Observability/Observability-Drill-Execution-Template_ES.md`
 
 Alcance de runbook a mantener actualizado con la implementacion:
 - Flujo de triage de incidentes usando `correlationId` y `traceId` desde solicitudes fallidas.
