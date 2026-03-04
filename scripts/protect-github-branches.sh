@@ -71,6 +71,12 @@ gh api --method PUT "repos/$OWNER/$REPO/branches/develop/protection" \
   --header "Accept: application/vnd.github+json" \
   --input "$develop_tmp" >/dev/null
 
+# Evita el borrado automatico de ramas origen al mergear PRs
+gh api --method PATCH "repos/$OWNER/$REPO" \
+  --header "Accept: application/vnd.github+json" \
+  --field delete_branch_on_merge=false >/dev/null
+
 echo "Protección aplicada:"
 echo "- main: solo PR + check obligatorio + sin borrado"
 echo "- develop: sin borrado + sin force-push"
+echo "- repo: auto-delete de rama origen desactivado"
