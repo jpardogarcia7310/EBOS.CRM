@@ -68,8 +68,10 @@ public class Customer360ConcurrencyTests(ConcurrencyWebApplicationFactory<Progra
 
         var revokedAt = DateTime.UtcNow.AddDays(-1);
         db.CustomerConsents.AddRange(
-            CustomerConsent.Create(1, customer.Id, "MARKETING_EMAIL", true, DateTime.UtcNow.AddDays(-10), "seed", null),
-            CustomerConsent.CreateRevoked(1, customer.Id, "MARKETING_EMAIL", revokedAt, "seed", revokedAt));
+            global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.Create(1, customer.Id, "MARKETING_EMAIL", true,
+                DateTime.UtcNow.AddDays(-10), "seed", null),
+            global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.CreateRevoked(1, customer.Id, "MARKETING_EMAIL",
+                revokedAt, "seed", revokedAt));
         await db.SaveChangesAsync();
 
         return customer.Id;
@@ -122,8 +124,10 @@ public class Customer360ConcurrencyTests(ConcurrencyWebApplicationFactory<Progra
         await db.SaveChangesAsync();
 
         db.AccountHierarchies.AddRange(
-            AccountHierarchy.Create(1, a.Id, b.Id, "HOLDING", DateTime.UtcNow.AddDays(-5)),
-            AccountHierarchy.Create(1, b.Id, c.Id, "HOLDING", DateTime.UtcNow.AddDays(-4)));
+            global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy.Create(1, a.Id, b.Id, "HOLDING",
+                DateTime.UtcNow.AddDays(-5)),
+            global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy.Create(1, b.Id, c.Id, "HOLDING",
+                DateTime.UtcNow.AddDays(-4)));
         await db.SaveChangesAsync();
 
         return (a.Id, c.Id);

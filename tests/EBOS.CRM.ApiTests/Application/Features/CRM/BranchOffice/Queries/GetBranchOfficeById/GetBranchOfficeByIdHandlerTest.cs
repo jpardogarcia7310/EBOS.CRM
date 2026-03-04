@@ -26,6 +26,30 @@ public class GetBranchOfficeByIdQueryHandlerTest
 
         _mapperMock.Verify(m => m.Map<BranchOfficeResponse>(entity), Times.Once);
     }
+
+    [Fact]
+    public async Task Handle_WhenNotFound_ReturnsNull()
+    {
+        var handler = new GetBranchOfficeByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((global::EBOS.CRM.Domain.Entities.CRM.BranchOffice?)null);
+
+        var result = await handler.Handle(new GetBranchOfficeByIdQuery(99), CancellationToken.None);
+
+        Assert.Null(result);
+        _mapperMock.Verify(m => m.Map<BranchOfficeResponse>(It.IsAny<global::EBOS.CRM.Domain.Entities.CRM.BranchOffice>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_WhenCanceled_ThrowsOperationCanceled()
+    {
+        var handler = new GetBranchOfficeByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            handler.Handle(new GetBranchOfficeByIdQuery(1), cts.Token));
+    }
 }
 
 

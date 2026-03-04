@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text;
+using System.Collections.Concurrent;
 using EBOS.CRM.Contracts.Requests.CRM.Address;
 using EBOS.CRM.Contracts.Requests.CRM.BankInformation;
 using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
@@ -27,7 +28,7 @@ public sealed record StressPayloadFactories(
 public static class StressPayloads
 {
     private const long TenantId = 1;
-    private static readonly Dictionary<string, long> IdCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, long> IdCache = new(StringComparer.OrdinalIgnoreCase);
 
     public static async Task<StressPayloadFactories> GetPayloadFactoriesAsync(
         HttpClient client,
@@ -551,7 +552,7 @@ public static class StressPayloads
         }
 
         var resolvedId = await StressEndpoints.GetFirstIdAsync(client, version, route);
-        IdCache[route] = resolvedId;
+        IdCache.TryAdd(route, resolvedId);
         return resolvedId;
     }
 

@@ -48,12 +48,14 @@ public class Customer360StressTests(CustomWebApplicationFactory<Program> factory
         db.Customers.Add(customer);
         await db.SaveChangesAsync();
 
-        var consents = new List<CustomerConsent>();
+        var consents = new List<global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent>();
         for (var i = 0; i < 80; i++)
         {
             var when = DateTime.UtcNow.AddMinutes(-i);
-            consents.Add(CustomerConsent.Create(1, customer.Id, "MARKETING_EMAIL", true, when, "stress", null));
-            consents.Add(CustomerConsent.Create(1, customer.Id, "PRODUCT_UPDATES_SMS", true, when, "stress", null));
+            consents.Add(global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.Create(1, customer.Id, "MARKETING_EMAIL",
+                true, when, "stress", null));
+            consents.Add(global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.Create(1, customer.Id,
+                "PRODUCT_UPDATES_SMS", true, when, "stress", null));
         }
 
         db.CustomerConsents.AddRange(consents);

@@ -145,6 +145,37 @@ jobs:
           path: artifacts/test-results/stress/*.trx
           if-no-files-found: warn
 
+  integration-sqlserver-tests:
+    name: Integration SQL Server suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Integration tests
+        run: dotnet restore tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+      - name: Run SQL Server integration hardening tests
+        env:
+          USE_TESTCONTAINERS: "true"
+        run: >
+          dotnet test tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=integration-sqlserver-tests.trx"
+          --results-directory ./artifacts/test-results/integration-sqlserver
+          --filter
+          "FullyQualifiedName~SqlServerMigrationHardeningTests|FullyQualifiedName~Customer360SqlServerIdempotencyTests"
+          -v minimal
+      - name: Upload Integration SQL Server test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-sqlserver-tests-trx
+          path: artifacts/test-results/integration-sqlserver/*.trx
+          if-no-files-found: warn
+
   summary:
     name: Test summary
     runs-on: ubuntu-latest
@@ -155,6 +186,7 @@ jobs:
       - integration-tests
       - concurrency-tests
       - stress-tests
+      - integration-sqlserver-tests
     steps:
       - name: Download API artifact
         continue-on-error: true
@@ -180,6 +212,12 @@ jobs:
         with:
           name: stress-tests-trx
           path: artifacts/summary/stress
+      - name: Download Integration SQL Server artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: integration-sqlserver-tests-trx
+          path: artifacts/summary/integration-sqlserver
       - name: Publish consolidated summary
         shell: bash
         run: |
@@ -220,6 +258,7 @@ jobs:
           echo "|---|---:|---:|---:|---:|" >> "$GITHUB_STEP_SUMMARY"
           write_row "API" "artifacts/summary/api"
           write_row "Integration" "artifacts/summary/integration"
+          write_row "Integration-SqlServer" "artifacts/summary/integration-sqlserver"
           write_row "Concurrency" "artifacts/summary/concurrency"
           write_row "Stress" "artifacts/summary/stress"
 

@@ -123,7 +123,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
-            db.Database.EnsureCreated();
+            if (_useTestcontainers)
+            {
+                db.Database.Migrate();
+            }
+            else
+            {
+                db.Database.EnsureCreated();
+            }
             var normalizer = scope.ServiceProvider.GetRequiredService<ILookupNormalizationService>();
             normalizer.NormalizeAsync().GetAwaiter().GetResult();
             TestDataSeeder.SeedCountriesAsync(db).GetAwaiter().GetResult();

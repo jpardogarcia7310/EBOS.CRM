@@ -6,13 +6,24 @@ public static class ConcurrencyHelper
 {
     private const int Parallelism = 100;
 
+    public static async Task AssertEndpointConcurrencyAsync(HttpClient client, params string[] urls)
+    {
+        var tasks = Enumerable.Range(0, Parallelism)
+            .SelectMany(_ => urls.Select(client.GetAsync))
+            .ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+        Assert.All(responses, response => Assert.True((int)response.StatusCode < 500));
+    }
+
     public static async Task AssertReadConcurrencyAsync(HttpClient client, string baseUrl, long id)
     {
+        var byIdUrl = BuildByIdUrl(baseUrl, id);
         var tasks = Enumerable.Range(0, Parallelism)
             .SelectMany(_ => new[]
             {
                 client.GetAsync(baseUrl),
-                client.GetAsync($"{baseUrl}/{id}")
+                client.GetAsync(byIdUrl)
             })
             .ToArray();
 
@@ -46,17 +57,17 @@ public static class ConcurrencyHelper
         var putTasks = payloads.Put is null
             ? Enumerable.Empty<Task<HttpResponseMessage>>()
             : Enumerable.Range(0, Parallelism)
-                .Select(_ => client.PutAsync($"{baseUrl}/{id}", payloads.Put(id)));
+                .Select(_ => client.PutAsync(BuildByIdUrl(baseUrl, id), payloads.Put(id)));
         var patchTasks = payloads.Patch is null
             ? Enumerable.Empty<Task<HttpResponseMessage>>()
             : Enumerable.Range(0, Parallelism)
-                .Select(_ => client.SendAsync(new HttpRequestMessage(new HttpMethod("PATCH"), $"{baseUrl}/{id}")
+                .Select(_ => client.SendAsync(new HttpRequestMessage(new HttpMethod("PATCH"), BuildByIdUrl(baseUrl, id))
                 {
                     Content = payloads.Patch(id)
                 }));
         var deleteTasks = payloads.AllowDelete
             ? Enumerable.Range(0, Parallelism)
-                .Select(_ => client.DeleteAsync($"{baseUrl}/{id}"))
+                .Select(_ => client.DeleteAsync(BuildByIdUrl(baseUrl, id)))
             : Enumerable.Empty<Task<HttpResponseMessage>>();
 
         var responses = await Task.WhenAll(postTasks.Concat(putTasks).Concat(patchTasks).Concat(deleteTasks));
@@ -87,12 +98,12 @@ public static class ConcurrencyHelper
 
         if (payloads.Put is not null)
         {
-            responses.Add(await client.PutAsync($"{baseUrl}/{id}", payloads.Put(id)));
+            responses.Add(await client.PutAsync(BuildByIdUrl(baseUrl, id), payloads.Put(id)));
         }
 
         if (payloads.Patch is not null)
         {
-            responses.Add(await client.SendAsync(new HttpRequestMessage(new HttpMethod("PATCH"), $"{baseUrl}/{id}")
+            responses.Add(await client.SendAsync(new HttpRequestMessage(new HttpMethod("PATCH"), BuildByIdUrl(baseUrl, id))
             {
                 Content = payloads.Patch(id)
             }));
@@ -100,7 +111,7 @@ public static class ConcurrencyHelper
 
         if (payloads.AllowDelete)
         {
-            responses.Add(await client.DeleteAsync($"{baseUrl}/{id}"));
+            responses.Add(await client.DeleteAsync(BuildByIdUrl(baseUrl, id)));
         }
 
         return responses;
@@ -147,5 +158,18 @@ public static class ConcurrencyHelper
         }
 
         return 0;
+    }
+
+    private static string BuildByIdUrl(string baseUrl, long id)
+    {
+        var queryIndex = baseUrl.IndexOf('?', StringComparison.Ordinal);
+        if (queryIndex < 0)
+        {
+            return $"{baseUrl}/{id}";
+        }
+
+        var path = baseUrl[..queryIndex];
+        var query = baseUrl[queryIndex..];
+        return $"{path}/{id}{query}";
     }
 }

@@ -26,6 +26,30 @@ public class GetCorporateCustomerByIdQueryHandlerTest
 
         _mapperMock.Verify(m => m.Map<CorporateCustomerResponse>(entity), Times.Once);
     }
+
+    [Fact]
+    public async Task Handle_WhenNotFound_ReturnsNull()
+    {
+        var handler = new GetCorporateCustomerByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+        _repositoryMock.Setup(r => r.GetByIdAsync(99, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer?)null);
+
+        var result = await handler.Handle(new GetCorporateCustomerByIdQuery(99), CancellationToken.None);
+
+        Assert.Null(result);
+        _mapperMock.Verify(m => m.Map<CorporateCustomerResponse>(It.IsAny<global::EBOS.CRM.Domain.Entities.CRM.CorporateCustomer>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_WhenCanceled_ThrowsOperationCanceled()
+    {
+        var handler = new GetCorporateCustomerByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            handler.Handle(new GetCorporateCustomerByIdQuery(1), cts.Token));
+    }
 }
 
 

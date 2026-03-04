@@ -17,7 +17,7 @@ public class CustomerMergeControllerTest(CustomWebApplicationFactory<Program> fa
     public async Task FindDuplicates_ReturnsSuccess()
     {
         var response = await _client.GetAsync(
-            $"/api/v{_version}/CustomerMerge/duplicates?tenantId=1&pageNumber=1&pageSize=10");
+            $"/api/v{_version}/CustomerMerge/duplicates?tenantId=1&email=duplicate@example.com&pageNumber=1&pageSize=10");
         response.EnsureSuccessStatusCode();
     }
 
@@ -27,10 +27,17 @@ public class CustomerMergeControllerTest(CustomWebApplicationFactory<Program> fa
         var customers = await _client.GetAsync($"/api/v{_customerVersion}/Customer");
         customers.EnsureSuccessStatusCode();
         var list = (await customers.Content.ReadItemsAsync<CustomerResponse>()).ToList();
-        Assert.True(list.Count >= 2);
+        Assert.True(list.Count >= 2, "Expected at least two customers for merge test.");
 
-        var winnerId = list[0].Id;
-        var mergedId = list[1].Id;
+        var byPrefix = list
+            .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+            .GroupBy(x => x.Code.Split('-', 2)[0], StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(g => g.Count() >= 2);
+
+        Assert.NotNull(byPrefix);
+        var candidates = byPrefix!.Take(2).ToList();
+        var winnerId = candidates[0].Id;
+        var mergedId = candidates[1].Id;
 
         var mergeRequest = new MergeCustomersRequest(
             TenantId: 1,

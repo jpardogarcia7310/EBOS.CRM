@@ -34,6 +34,7 @@
   </Folder>
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
+    <File Path="NuGet.config" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
@@ -42,8 +43,10 @@
   <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
   </Folder>
-  <Folder Name="/Elementos de la solución/.github/workflows">
-    <File Path=".github/workflows/customer-360-suites-ci.yml" />
+  <Folder Name="/Elementos de la solución/.github/workflows/">
+    <File Path=".github/workflows/customer360-suites-ci.yml" />
+    <File Path=".github/workflows/observability-ci.yml" />
+    <File Path=".github/workflows/validate-branch-protection.yml" />
   </Folder>
   <Folder Name="/Elementos de la solución/Observability/">
     <File Path="documentation/Observability/.env.alerting" />
