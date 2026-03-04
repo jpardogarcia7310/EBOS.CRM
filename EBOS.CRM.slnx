@@ -103,6 +103,7 @@
   <Folder Name="/Elementos de la solución/.github/workflows/">
     <File Path=".github/workflows/customer360-suites-ci.yml" />
     <File Path=".github/workflows/observability-ci.yml" />
+    <File Path=".github/workflows/observability_reliability-suites-ci.yml" />
     <File Path=".github/workflows/openapi-compatibility-gate.yml" />
     <File Path=".github/workflows/validate-branch-protection.yml" />
     <File Path=".github/workflows/WFProtectBranchMain.yml" />

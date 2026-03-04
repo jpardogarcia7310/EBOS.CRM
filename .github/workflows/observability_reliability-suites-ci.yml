@@ -1,0 +1,274 @@
+name: observability-reliability-suites-ci
+
+on:
+  pull_request:
+    paths:
+      - "tests/**"
+      - "EBOS.CRM.Api/**"
+      - "EBOS.CRM.Application/**"
+      - "EBOS.CRM.Domain/**"
+      - "EBOS.CRM.Infrastructure/**"
+      - ".github/workflows/observability_reliability-suites-ci.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "tests/**"
+      - "EBOS.CRM.Api/**"
+      - "EBOS.CRM.Application/**"
+      - "EBOS.CRM.Domain/**"
+      - "EBOS.CRM.Infrastructure/**"
+      - ".github/workflows/observability_reliability-suites-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: observability-reliability-suites-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-tests:
+    name: API suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore API tests
+        run: dotnet restore tests/EBOS.CRM.ApiTests/EBOS.CRM.ApiTests.csproj
+      - name: Run API tests (explicit filters)
+        run: >
+          dotnet test tests/EBOS.CRM.ApiTests/EBOS.CRM.ApiTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=api-tests.trx"
+          --results-directory ./artifacts/test-results/api
+          --filter
+          "FullyQualifiedName~MetricsControllerTest|FullyQualifiedName~OperationalReadinessControllerTest|FullyQualifiedName~OperationalReadinessResponseContractsTest|FullyQualifiedName~CrmProblemDetailsFactoryTest|FullyQualifiedName~ProblemDetailsDefaultsTest|FullyQualifiedName~InfrastructureOptionsAndTelemetryTest|FullyQualifiedName~OpenTelemetryOptionsTest|FullyQualifiedName~Customer360OperationalReadinessHealthCheckTest|FullyQualifiedName~Resilience_"
+          -v minimal
+      - name: Upload API test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-tests-trx
+          path: artifacts/test-results/api/*.trx
+          if-no-files-found: warn
+
+  integration-tests:
+    name: Integration suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Integration tests
+        run: dotnet restore tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+      - name: Run Integration tests (explicit filters)
+        run: >
+          dotnet test tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=integration-tests.trx"
+          --results-directory ./artifacts/test-results/integration
+          --filter
+          "FullyQualifiedName~MetricsEndpointTest|FullyQualifiedName~OperationalReadinessEndpointTest"
+          -v minimal
+      - name: Upload Integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-tests-trx
+          path: artifacts/test-results/integration/*.trx
+          if-no-files-found: warn
+
+  concurrency-tests:
+    name: Concurrency suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Concurrency tests
+        run: dotnet restore tests/EBOS.CRM.ConcurrencyTests/EBOS.CRM.ConcurrencyTests.csproj
+      - name: Run Concurrency tests (explicit filters)
+        run: >
+          dotnet test tests/EBOS.CRM.ConcurrencyTests/EBOS.CRM.ConcurrencyTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=concurrency-tests.trx"
+          --results-directory ./artifacts/test-results/concurrency
+          --filter
+          "FullyQualifiedName~MetricsConcurrencyTests|FullyQualifiedName~OperationalReadinessConcurrencyTests"
+          -v minimal
+      - name: Upload Concurrency test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: concurrency-tests-trx
+          path: artifacts/test-results/concurrency/*.trx
+          if-no-files-found: warn
+
+  stress-tests:
+    name: Stress suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Stress tests
+        run: dotnet restore tests/EBOS.CRM.StressTests/EBOS.CRM.StressTests.csproj
+      - name: Run Stress tests (explicit filters)
+        run: >
+          dotnet test tests/EBOS.CRM.StressTests/EBOS.CRM.StressTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=stress-tests.trx"
+          --results-directory ./artifacts/test-results/stress
+          --filter
+          "FullyQualifiedName~MetricsStressTests|FullyQualifiedName~OperationalReadinessStressTests"
+          -v minimal
+      - name: Upload Stress test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-tests-trx
+          path: artifacts/test-results/stress/*.trx
+          if-no-files-found: warn
+
+  integration-sqlserver-tests:
+    name: Integration SQL Server suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore Integration tests
+        run: dotnet restore tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+      - name: Run SQL Server integration observability tests
+        env:
+          USE_TESTCONTAINERS: "true"
+        run: >
+          dotnet test tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj
+          -c Release
+          --no-restore
+          --logger "trx;LogFileName=integration-sqlserver-tests.trx"
+          --results-directory ./artifacts/test-results/integration-sqlserver
+          --filter
+          "FullyQualifiedName~OperationalReadinessEndpointTest|FullyQualifiedName~MetricsEndpointTest"
+          -v minimal
+      - name: Upload Integration SQL Server test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-sqlserver-tests-trx
+          path: artifacts/test-results/integration-sqlserver/*.trx
+          if-no-files-found: warn
+
+  summary:
+    name: Test summary
+    runs-on: ubuntu-latest
+    if: always()
+    timeout-minutes: 10
+    needs:
+      - api-tests
+      - integration-tests
+      - concurrency-tests
+      - stress-tests
+      - integration-sqlserver-tests
+    steps:
+      - name: Download API artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: api-tests-trx
+          path: artifacts/summary/api
+      - name: Download Integration artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: integration-tests-trx
+          path: artifacts/summary/integration
+      - name: Download Concurrency artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: concurrency-tests-trx
+          path: artifacts/summary/concurrency
+      - name: Download Stress artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: stress-tests-trx
+          path: artifacts/summary/stress
+      - name: Download Integration SQL Server artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: integration-sqlserver-tests-trx
+          path: artifacts/summary/integration-sqlserver
+      - name: Publish consolidated summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          parse_trx() {
+            local trx_file="$1"
+            local counters
+            counters=$(sed -n 's/.*<Counters[^>]*total="\([0-9]\+\)"[^>]*executed="\([0-9]\+\)"[^>]*passed="\([0-9]\+\)"[^>]*failed="\([0-9]\+\)".*/\1 \2 \3 \4/p' "$trx_file" | head -n1)
+            if [[ -z "$counters" ]]; then
+              echo "0 0 0 0"
+            else
+              echo "$counters"
+            fi
+          }
+
+          write_row() {
+            local suite="$1"
+            local dir="$2"
+            local trx
+            trx=$(find "$dir" -type f -name "*.trx" | head -n1 || true)
+            if [[ -z "$trx" ]]; then
+              echo "| $suite | n/a | n/a | n/a | n/a |" >> "$GITHUB_STEP_SUMMARY"
+              SUITES_WITHOUT_RESULTS="${SUITES_WITHOUT_RESULTS} ${suite}"
+              return
+            fi
+            read -r total executed passed failed < <(parse_trx "$trx")
+            echo "| $suite | $total | $executed | $passed | $failed |" >> "$GITHUB_STEP_SUMMARY"
+            TOTAL_FAILED=$((TOTAL_FAILED + failed))
+          }
+
+          TOTAL_FAILED=0
+          SUITES_WITHOUT_RESULTS=""
+
+          echo "## Observability & Reliability suites summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Suite | Total | Executed | Passed | Failed |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|---:|---:|---:|" >> "$GITHUB_STEP_SUMMARY"
+          write_row "API" "artifacts/summary/api"
+          write_row "Integration" "artifacts/summary/integration"
+          write_row "Integration-SqlServer" "artifacts/summary/integration-sqlserver"
+          write_row "Concurrency" "artifacts/summary/concurrency"
+          write_row "Stress" "artifacts/summary/stress"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Total failed tests: ${TOTAL_FAILED}" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "${SUITES_WITHOUT_RESULTS// }" ]]; then
+            echo "- Suites without trx results:${SUITES_WITHOUT_RESULTS}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [[ $TOTAL_FAILED -gt 0 ]]; then
+            echo "Quality gate failed: ${TOTAL_FAILED} tests failed."
+            exit 1
+          fi
