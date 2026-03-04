@@ -1,0 +1,181 @@
+name: branch-protection-drift-monitor
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    name: Validate expected branch protection state
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate policies and alert on drift
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            async function getProtection(branch) {
+              const { data } = await github.rest.repos.getBranchProtection({
+                owner,
+                repo,
+                branch
+              });
+              return data;
+            }
+
+            function collectMismatchesForMain(data) {
+              const mismatches = [];
+              const contexts = (data.required_status_checks?.contexts ?? []).slice().sort();
+              const expectedContexts = ["Validate source branch is develop"];
+
+              if (data.required_status_checks?.strict !== true) {
+                mismatches.push("main.required_status_checks.strict must be true");
+              }
+              if (JSON.stringify(contexts) !== JSON.stringify(expectedContexts)) {
+                mismatches.push(`main.required_status_checks.contexts mismatch. expected=${JSON.stringify(expectedContexts)} actual=${JSON.stringify(contexts)}`);
+              }
+              if (data.enforce_admins?.enabled !== true) {
+                mismatches.push("main.enforce_admins must be enabled");
+              }
+              if ((data.required_pull_request_reviews?.required_approving_review_count ?? 0) < 1) {
+                mismatches.push("main.required_approving_review_count must be >= 1");
+              }
+              if (data.required_pull_request_reviews?.dismiss_stale_reviews !== true) {
+                mismatches.push("main.dismiss_stale_reviews must be true");
+              }
+              if (data.required_pull_request_reviews?.require_code_owner_reviews !== true) {
+                mismatches.push("main.require_code_owner_reviews must be true");
+              }
+              if (data.required_linear_history?.enabled !== true) {
+                mismatches.push("main.required_linear_history must be enabled");
+              }
+              if (data.required_conversation_resolution?.enabled !== true) {
+                mismatches.push("main.required_conversation_resolution must be enabled");
+              }
+              if (data.allow_force_pushes?.enabled !== false) {
+                mismatches.push("main.allow_force_pushes must be disabled");
+              }
+              if (data.allow_deletions?.enabled !== false) {
+                mismatches.push("main.allow_deletions must be disabled");
+              }
+
+              return mismatches;
+            }
+
+            function collectMismatchesForDevelop(data) {
+              const mismatches = [];
+              if (data.enforce_admins?.enabled !== true) {
+                mismatches.push("develop.enforce_admins must be enabled");
+              }
+              if (data.allow_force_pushes?.enabled !== false) {
+                mismatches.push("develop.allow_force_pushes must be disabled");
+              }
+              if (data.allow_deletions?.enabled !== false) {
+                mismatches.push("develop.allow_deletions must be disabled");
+              }
+              return mismatches;
+            }
+
+            let mainProtection;
+            let developProtection;
+            const mismatches = [];
+
+            try {
+              mainProtection = await getProtection("main");
+            } catch (error) {
+              mismatches.push(`Cannot read branch protection for main: ${error.message}`);
+            }
+
+            try {
+              developProtection = await getProtection("develop");
+            } catch (error) {
+              mismatches.push(`Cannot read branch protection for develop: ${error.message}`);
+            }
+
+            if (mainProtection) {
+              mismatches.push(...collectMismatchesForMain(mainProtection));
+            }
+            if (developProtection) {
+              mismatches.push(...collectMismatchesForDevelop(developProtection));
+            }
+
+            const title = "[SECURITY] Branch protection drift detected";
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const existing = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: "open",
+              labels: "security,branch-protection-audit",
+              per_page: 100
+            });
+
+            const duplicate = existing.data.find((i) => i.title === title);
+            if (mismatches.length === 0) {
+              if (duplicate) {
+                const resolvedBody = [
+                  "No se detecta drift en esta ejecución. Se cierra la alerta.",
+                  "",
+                  `- Repository: \`${owner}/${repo}\``,
+                  `- Fecha (UTC): \`${new Date().toISOString()}\``,
+                  `- Workflow run: ${runUrl}`
+                ].join("\n");
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: duplicate.number,
+                  body: resolvedBody
+                });
+
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: duplicate.number,
+                  state: "closed"
+                });
+
+                core.info(`Closed drift alert issue #${duplicate.number}.`);
+              } else {
+                core.info("No drift detected in branch protection.");
+              }
+              return;
+            }
+
+            const body = [
+              "Se detectó drift entre la política esperada y la protección actual de ramas.",
+              "",
+              `- Repository: \`${owner}/${repo}\``,
+              `- Fecha (UTC): \`${new Date().toISOString()}\``,
+              `- Workflow run: ${runUrl}`,
+              "",
+              "Desviaciones detectadas:",
+              ...mismatches.map((m) => `- ${m}`)
+            ].join("\n");
+
+            if (!duplicate) {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+                labels: ["security", "branch-protection-audit"]
+              });
+              core.info("Created drift alert issue.");
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: duplicate.number,
+                body
+              });
+              core.info(`Updated existing issue #${duplicate.number} with new drift details.`);
+            }
+
+            core.setFailed(`Branch protection drift detected:\n- ${mismatches.join("\n- ")}`);

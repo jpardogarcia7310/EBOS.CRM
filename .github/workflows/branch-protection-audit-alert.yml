@@ -1,0 +1,81 @@
+name: branch-protection-audit-alert
+
+on:
+  branch_protection_rule:
+    types: [created, edited, deleted]
+  repository_ruleset:
+    types: [created, edited, deleted]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Optional reason for manual test"
+        required: false
+        default: "manual trigger"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  notify:
+    name: Audit and notify protection changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build event summary
+        id: summary
+        shell: bash
+        run: |
+          {
+            echo "event_name=${{ github.event_name }}"
+            echo "action=${{ github.event.action }}"
+            echo "actor=${{ github.actor }}"
+            echo "repo=${{ github.repository }}"
+            echo "run_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "reason=${{ github.event.inputs.reason }}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create alert issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eventName = "${{ steps.summary.outputs.event_name }}";
+            const action = "${{ steps.summary.outputs.action }}" || "n/a";
+            const actor = "${{ steps.summary.outputs.actor }}";
+            const repo = "${{ steps.summary.outputs.repo }}";
+            const runUrl = "${{ steps.summary.outputs.run_url }}";
+            const manualReason = "${{ steps.summary.outputs.reason }}";
+
+            const now = new Date().toISOString();
+            const title = `[SECURITY] Branch protection change detected (${eventName}/${action})`;
+
+            const payload = JSON.stringify(context.payload, null, 2);
+            const body = [
+              "Se detectó un intento/cambio sobre reglas de protección de ramas.",
+              "",
+              `- Repository: \`${repo}\``,
+              `- Event: \`${eventName}\``,
+              `- Action: \`${action}\``,
+              `- Actor: \`${actor}\``,
+              `- Fecha (UTC): \`${now}\``,
+              `- Workflow run: ${runUrl}`,
+              manualReason ? `- Motivo manual: ${manualReason}` : null,
+              "",
+              "> Nota: GitHub Actions recibe eventos cuando el cambio se aplica. Los intentos bloqueados por permisos pueden no emitir evento.",
+              "",
+              "<details><summary>Payload del evento</summary>",
+              "",
+              "```json",
+              payload,
+              "```",
+              "",
+              "</details>"
+            ].filter(Boolean).join("\n");
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ["security", "branch-protection-audit"]
+            });
+

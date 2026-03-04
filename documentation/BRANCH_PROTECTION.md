@@ -10,6 +10,27 @@ Este repositorio aplica esta politica:
 
 El workflow `.github/workflows/WFProtectBranchMain.yml` falla cualquier PR a `main` cuyo origen no sea `develop`.
 
+## 1.1) Auditoria y notificacion de cambios de reglas
+
+El workflow `.github/workflows/branch-protection-audit-alert.yml` crea un issue de alerta cuando GitHub detecta cambios en:
+
+- reglas de proteccion de ramas (`branch_protection_rule`)
+- rulesets del repositorio (`repository_ruleset`)
+
+## 1.2) Monitoreo periodico de drift (cron)
+
+El workflow `.github/workflows/branch-protection-drift-monitor.yml` corre cada hora (`0 * * * *`) y valida que `main` y `develop` mantengan la configuracion esperada.
+
+Si detecta drift:
+
+- crea (o actualiza) un issue con etiqueta `security` y `branch-protection-audit`
+- marca el workflow como fallido para dejar evidencia en Actions
+
+Si el drift desaparece:
+
+- cierra automaticamente el issue abierto de drift
+- agrega comentario de resolucion con fecha y enlace a la ejecucion
+
 ## 2) Aplicar proteccion de ramas en GitHub
 
 Requisitos:
