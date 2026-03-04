@@ -9,6 +9,7 @@ using FluentAssertions;
 
 namespace EBOS.CRM.IntegrationTests.Customer360;
 
+[Collection("SqlServerIntegration")]
 public sealed class Customer360SqlServerIdempotencyTests(CustomWebApplicationFactory factory)
     : IClassFixture<CustomWebApplicationFactory>
 {

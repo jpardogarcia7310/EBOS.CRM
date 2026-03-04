@@ -10,6 +10,7 @@ using System.Data;
 
 namespace EBOS.CRM.IntegrationTests.Infrastructure;
 
+[Collection("SqlServerIntegration")]
 public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
 {
     private const string SaPassword = "StrongP@ssw0rd2025!";
@@ -20,6 +21,7 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
     public async Task Migrations_ApplyLatest_AndCreateCustomer360Artifacts()
     {
         await using var db = CreateContext();
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
         var expectedTables = new[]
@@ -48,6 +50,7 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
     public async Task Migrations_CanRollbackOneStep_AndReapplyLatest()
     {
         await using var db = CreateContext();
+        await db.Database.EnsureDeletedAsync();
         var migrator = db.Database.GetService<IMigrator>();
         var migrations = db.Database.GetMigrations().ToArray();
         migrations.Length.Should().BeGreaterThan(1);
@@ -70,6 +73,7 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
     public async Task SqlServer_WriteContention_OnSameResource_ProducesTimeoutThenRecovers()
     {
         await using var db = CreateContext();
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
         var statusId = await EnsureStatusAsync("WriteContention-Active");
@@ -131,6 +135,7 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
     public async Task SqlServer_EfExecutionStrategy_RetriesOnTransientDeadlockError()
     {
         await using var db = CreateContextWithRetry();
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
         var strategy = db.Database.CreateExecutionStrategy();
@@ -163,6 +168,7 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
     public async Task SqlServer_TransactionRollback_PreservesConsistencyAfterFailure()
     {
         await using var db = CreateContext();
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
         var statusId = await EnsureStatusAsync("Rollback-Active");
