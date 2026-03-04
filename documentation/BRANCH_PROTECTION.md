@@ -31,6 +31,19 @@ Si el drift desaparece:
 - cierra automaticamente el issue abierto de drift
 - agrega comentario de resolucion con fecha y enlace a la ejecucion
 
+## 1.3) Guard post-merge para `develop`
+
+El workflow `.github/workflows/develop-branch-guard.yml` se ejecuta cuando se cierra un PR hacia `main` (solo si fue mergeado) y valida que la rama `develop` exista.
+
+Si `develop` no existe:
+
+- crea/actualiza issue `[SECURITY] develop branch is missing`
+- marca el workflow como fallido
+
+Si `develop` vuelve a existir:
+
+- comenta y cierra automaticamente el issue abierto
+
 ## 2) Aplicar proteccion de ramas en GitHub
 
 Requisitos:
@@ -54,3 +67,4 @@ El script configura:
 
 - `main`: requiere PR, bloqueo de borrado, sin force-push, review obligatoria, y check `Validate source branch is develop`.
 - `develop`: bloqueo de borrado y sin force-push.
+- repositorio: desactiva `Automatically delete head branches` (`delete_branch_on_merge=false`).
