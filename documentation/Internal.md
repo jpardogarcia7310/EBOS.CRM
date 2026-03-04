@@ -1,147 +1,126 @@
-# EBOS.CRM.Api structure
+# EBOS.CRM Internal Architecture (Current)
 
-This document describes folders, namespaces, and responsibilities in EBOS.CRM.Api.
+This document is the internal technical reference for the current enterprise baseline of the EBOS.CRM solution.
 
-## Folder tree
+## Solution Modules
 
-```
-EBOS.CRM.Api
-|
-|-- Controllers
-|   |-- AddressType
-|   |   `-- AddressTypeController.cs
-|   |-- Country
-|   |   `-- CountryController.cs
-|   |-- CRM
-|   |   |-- Address
-|   |   |   `-- AddressController.cs
-|   |   |-- BankInformation
-|   |   |   `-- BankInformationController.cs
-|   |   |-- BranchOffice
-|   |   |   `-- BranchOfficeController.cs
-|   |   |-- BranchOfficeAddress
-|   |   |   `-- BranchOfficeAddressController.cs
-|   |   |-- CorporateCustomer
-|   |   |   `-- CorporateCustomerController.cs
-|   |   |-- CreditAccount
-|   |   |   `-- CreditAccountController.cs
-|   |   |-- CreditTransaction
-|   |   |   `-- CreditTransactionController.cs
-|   |   |-- Customer
-|   |   |   `-- CustomerController.cs
-|   |   |-- CustomerAddress
-|   |   |   `-- CustomerAddressController.cs
-|   |   |-- IndividualCustomer
-|   |   |   `-- IndividualCustomerController.cs
-|   |   |-- TaxInformation
-|   |   |   `-- TaxInformationController.cs
-|   |   `-- TaxInformationAddress
-|   |       `-- TaxInformationAddressController.cs
-|   |-- IdentificationType
-|   |   `-- IdentificationTypeController.cs
-|   `-- Status
-|       `-- StatusController.cs
-|
-|-- Extensions
-|   |-- ApiBehaviorConfig.cs
-|   |-- ConfigureSwaggerOptions.cs
-|   |-- CorrelationIdExtensions.cs
-|   |-- ServiceCollectionExtensions.cs
-|   `-- SwaggerConfig.cs
-|
-|-- Middleware
-|   |-- CorrelationIdMiddleware.cs
-|   `-- ErrorHandlingMiddleware.cs
-|
-|-- Services
-|   `-- HttpContextCurrentUserContext.cs
-|
-|-- Swagger
-|   |-- DebugGroupNameOperationFilter.cs
-|   |-- ErrorResponsesOperationFilter.cs
-|   |-- ValidationProblemDetailsOperationFilter.cs
-|   `-- ValidationProblemDetailsSchemaFilter.cs
-|
-|-- appsettings.Development.json
-|-- appsettings.json
-|-- appsettings.Staging.json
-|-- EBOS.CRM.Api.csproj
-|-- EBOS.CRM.Api.csproj.user
-|-- EBOS.CRM.Api.http
-`-- Program.cs
-```
+- `EBOS.CRM.Api`
+  - HTTP surface, versioned endpoints, policies, middleware, Swagger, health/readiness, metrics endpoint.
+- `EBOS.CRM.Application`
+  - Use cases (commands/queries), validators, handlers, orchestration rules.
+- `EBOS.CRM.Domain`
+  - Aggregates/entities, invariants, domain services, domain contracts.
+- `EBOS.CRM.Infrastructure`
+  - EF Core persistence, migrations, repositories, outbox, integrations, telemetry wiring.
+- `EBOS.CRM.Contracts`
+  - API/application DTO contracts and compatibility-critical payload models.
 
-## Namespaces and responsibilities
+## API Layer (EBOS.CRM.Api)
 
-### EBOS.CRM.Api.Extensions
-- ApiBehaviorConfig.cs
-  - Centralizes ApiBehaviorOptions configuration and builds ValidationProblemDetails.
-  - Usage example:
-    - Registered in Program.cs: services.Configure<ApiBehaviorOptions>(ApiBehaviorConfig.Configure)
+- Controllers are split by domain:
+  - `Controllers/CRM/*`
+  - `Controllers/EBOS/*`
+  - `Controllers/Observability/*`
+  - `Controllers/Operations/*`
+- Standards:
+  - versioned routes (`/api/v{version}/...`)
+  - centralized error handling middleware
+  - correlation ID middleware
+  - policy-based authorization (including Customer 360 sensitive operations)
+  - OpenAPI generated and guarded with snapshot compatibility tests
 
-- ConfigureSwaggerOptions.cs
-  - Builds Swagger documents per API version and applies filters.
-  - Usage example:
-    - Registered in Program.cs: services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-    - Requires SwaggerGen: services.AddSwaggerGen();
+## Application Layer (EBOS.CRM.Application)
 
-- CorrelationIdExtensions.cs
-  - Registers correlation ID middleware and related services.
-  - Usage example:
-    - app.UseCorrelationId()
+- Pattern:
+  - command/query DTO
+  - validator
+  - handler
+  - repository abstractions + tenant/current-user context
+- Scope:
+  - CRM modules (Customer 360, Sales, Service, master entities)
+  - EBOS governance modules
+  - privacy workflows (request, execute, retention)
+  - merge lineage and dedupe operations
 
-- SwaggerConfig.cs
-  - Central Swagger/OpenAPI configuration.
-  - Usage example:
-    - Called from Program.cs: SwaggerConfig.ApiVersioning(services)
-    - Typical setup:
-      - services.AddApiVersioning(...)
-      - services.AddVersionedApiExplorer(...)
+## Domain Layer (EBOS.CRM.Domain)
 
-- ServiceCollectionExtensions.cs
-  - Extension methods for app configuration.
-  - Usage example:
-    - app.UseApiErrorHandling()
+- Enterprise focus:
+  - invariants enforced by domain methods
+  - transition-based state changes
+  - reduced anemic mutability in key Customer 360 entities
+  - concurrency-aware entities (row version where required)
 
-### EBOS.CRM.Api.Middleware
-- CorrelationIdMiddleware.cs
-  - Ensures each request has a correlation ID and adds it to responses.
-  - Usage example:
-    - app.UseCorrelationId()
+## Infrastructure Layer (EBOS.CRM.Infrastructure)
 
-- ErrorHandlingMiddleware.cs
-  - Global exception handling and consistent JSON errors.
-  - Usage example:
-    - app.UseApiErrorHandling()
+- EF Core:
+  - mappings per aggregate
+  - SQL Server migrations
+  - snapshot/designer artifacts
+- Repositories:
+  - CRM and EBOS repository implementations
+  - base repository contract behavior (tenant, pagination, soft-delete/erased filters)
+- Customer 360 hardening:
+  - merge lineage persistence (`CustomerMergeHistories`)
+  - privacy request persistence (`CustomerPrivacyRequests`)
+  - outbox persistence (`AuditOutboxMessages`)
+  - dedupe strategy/index hardening
+- Outbox:
+  - dispatch service + dispatcher background process
+  - retry/transient-failure behavior covered by tests
 
-### EBOS.CRM.Api.Services
-- HttpContextCurrentUserContext.cs
-  - Resolves the current user context from the HTTP request.
-  - Usage example:
-    - services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+## Testing Suites
 
-### EBOS.CRM.Api.Swagger
-- DebugGroupNameOperationFilter.cs
-  - Adds diagnostic metadata to Swagger operations.
-- ValidationProblemDetailsSchemaFilter.cs
-  - Documents ValidationProblemDetails in Swagger.
-- ValidationProblemDetailsOperationFilter.cs
-  - Adds validation error responses.
-- ErrorResponsesOperationFilter.cs
-  - Adds common error responses (400, 404, 500).
+- `tests/EBOS.CRM.ApiTests`
+  - controller tests, validators/handlers tests, domain invariants tests, contract tests, infra/service unit tests.
+- `tests/EBOS.CRM.IntegrationTests`
+  - endpoint behavior, auth/tenant isolation, Customer 360 E2E, SQL Server hardening/idempotency, OpenAPI compatibility.
+- `tests/EBOS.CRM.ConcurrencyTests`
+  - endpoint and infra/app concurrency scenarios (outbox dispatcher, retention service, repository conflicts).
+- `tests/EBOS.CRM.StressTests`
+  - high-volume Customer 360 scenarios (outbox backlog, merge/dedupe, retention throughput/latency).
 
-### EBOS.CRM.Api.Controllers
-- Domain-focused API controllers.
-- CRM controllers live under Controllers/CRM and share the same route pattern.
-- All routes are singular and versioned: /api/v{version}/{Controller}
-- Usage examples:
-  - GET /api/v1/Country
-  - GET /api/v1/Status
-  - GET /api/v1/AddressType
-  - GET /api/v2/IdentificationType
+## CI/CD Quality Gates
 
-## Design benefits
-- Clarity: each folder maps to a single responsibility.
-- Maintainability: Program.cs stays thin.
-- Scalability: easy to add new middleware and Swagger filters.
-- Consistency: namespaces follow EBOS.CRM.Api.[Area].
+- Workflow: `.github/workflows/customer360-suites-ci.yml`
+- Separate jobs:
+  - API suite
+  - Integration suite
+  - Concurrency suite
+  - Stress suite
+  - Integration SQL Server suite (`USE_TESTCONTAINERS=true`)
+- SQL Server hardening includes:
+  - migration apply/rollback checks
+  - write contention and consistency scenarios
+  - idempotency checks
+  - migration duplicate `CreateTable` guard test
+
+## Observability and Operability
+
+- Assets:
+  - `documentation/Observability/prometheus/*`
+  - `documentation/Observability/grafana/*`
+  - `documentation/Observability/docker-compose.observability.yml`
+- Provisioning:
+  - Grafana datasource + dashboard provisioning
+  - Prometheus alert rules + Alertmanager routing
+- CI validation scripts:
+  - `documentation/Observability/ci/validate-observability.sh`
+  - `documentation/Observability/ci/smoke-observability.sh`
+
+## Runbooks and Operational Documents
+
+- `documentation/RunBooks/Customer360-Operability-RunBook.md`
+- `documentation/RunBooks/Customer360-PostDeploy-Checklist.md`
+- Legacy single-file drill template:
+  - `documentation/RunBooks/Customer360-Drill-Record-Template.md`
+- Per-execution drill model (recommended):
+  - `documentation/RunBooks/Drills/README.md`
+  - `documentation/RunBooks/Drills/Customer360-Drill-Execution-Template.md`
+  - `documentation/RunBooks/Drills/Records/`
+- Spanish counterparts available under the same folder with `_ES` suffix.
+
+## Internal Notes
+
+- Treat migrations as immutable historical artifacts; fix forward where possible.
+- Keep security/policy checks strict in tests; avoid disabling global audit/auth unless explicitly scoped for a test fixture.
+- Prefer deterministic tests over timing-sensitive behavior for CI stability.

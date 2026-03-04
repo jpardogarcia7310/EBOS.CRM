@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Queries.GetTaxInformationAddressById;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
@@ -15,7 +15,7 @@ public class GetTaxInformationAddressByIdQueryHandlerTest
     public async Task Handle_WhenFound_Maps()
     {
         var handler = new GetTaxInformationAddressByIdQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entity = new EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress();
+        var entity = new global::EBOS.CRM.Domain.Entities.CRM.TaxInformationAddress();
 
         _repositoryMock.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);

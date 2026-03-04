@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -19,6 +17,15 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
             .IsRequired();
         builder.Property(ca => ca.IsCurrent)
             .IsRequired();
+        builder.Property(ca => ca.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ca => ca.CreatedBy)
+            .IsRequired();
+        builder.Property(ca => ca.UpdatedAt);
+        builder.Property(ca => ca.UpdatedBy);
+        builder.Property(ca => ca.Erased)
+            .IsRequired();
 
         builder.HasOne(ca => ca.Customer)
             .WithMany(c => c.CustomerAddresses)
@@ -32,6 +39,8 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
 
         builder.HasIndex(ca => new { ca.CustomerId, ca.IsCurrent, ca.IsPrimary })
             .HasDatabaseName("IX_CustomerAddress_Current_Primary");
+        builder.HasIndex(ca => ca.TenantId)
+            .HasDatabaseName("IX_CustomerAddress_TenantId");
 
         builder.ToTable("CustomerAddresses", "CRM", ca =>
         {

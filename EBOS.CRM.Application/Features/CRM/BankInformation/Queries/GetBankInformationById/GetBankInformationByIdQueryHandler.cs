@@ -1,18 +1,19 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Queries.GetBankInformationById;
 
 public class GetBankInformationByIdQueryHandler(IBankInformationRepository repository, IMapper mapper)
     : IRequestHandler<GetBankInformationByIdQuery, BankInformationResponse?>
 {
-    private readonly IBankInformationRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IBankInformationRepository _repository = repository ??
+                                                              throw new ArgumentNullException(nameof(repository));
     private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-    public async Task<BankInformationResponse?> Handle(GetBankInformationByIdQuery request, CancellationToken cancellationToken)
+    public async Task<BankInformationResponse?> Handle(GetBankInformationByIdQuery request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

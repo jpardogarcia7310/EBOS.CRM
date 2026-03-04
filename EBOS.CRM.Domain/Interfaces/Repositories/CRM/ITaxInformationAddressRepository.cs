@@ -1,12 +1,14 @@
+using System.Threading;
+using System.Threading.Tasks;
 using EBOS.Core.Primitives.Interfaces;
 using EBOS.CRM.Domain.Entities.CRM;
 
-
 namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
-public interface ITaxInformationAddressRepository : IRepository<TaxInformationAddress>, IUnitOfWork
+public interface ITaxInformationAddressRepository : IPagedRepository<TaxInformationAddress>, IUnitOfWork
 {
-    Task<TaxInformationAddress?> GetCurrentPrimaryAsync(long taxInformationId, CancellationToken cancellationToken = default);
+    Task<TaxInformationAddress?> GetCurrentPrimaryAsync(long taxInformationId,
+        CancellationToken cancellationToken = default);
 }
 
 

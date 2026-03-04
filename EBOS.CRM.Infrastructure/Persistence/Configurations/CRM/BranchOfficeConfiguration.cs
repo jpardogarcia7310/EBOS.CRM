@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -19,6 +17,13 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
         builder.Property(bo => bo.PhoneNumber)
             .IsRequired()
             .HasMaxLength(20);
+        builder.Property(bo => bo.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(bo => bo.CreatedBy)
+            .IsRequired();
+        builder.Property(bo => bo.UpdatedAt);
+        builder.Property(bo => bo.UpdatedBy);
         builder.Property(bo => bo.Erased)
             .IsRequired();
 
@@ -29,5 +34,7 @@ public class BranchOfficeConfiguration : IEntityTypeConfiguration<BranchOffice>
 
         builder.HasIndex(bo => bo.CorporateCustomerId)
             .HasDatabaseName("IX_BranchOffice_CorporateCustomerId");
+        builder.HasIndex(bo => bo.TenantId)
+            .HasDatabaseName("IX_BranchOffice_TenantId");
     }
 }

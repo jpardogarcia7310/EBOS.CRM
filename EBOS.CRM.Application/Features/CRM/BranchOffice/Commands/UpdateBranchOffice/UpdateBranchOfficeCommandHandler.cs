@@ -1,22 +1,23 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
 
 public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
 {
-    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request, CancellationToken cancellationToken)
+    public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entityRequest = request.BranchOfficeRequest ??
+                            throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
@@ -35,7 +36,7 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
                 UserId: currentUser.UserId,
                 TimeStamp: DateTimeOffset.UtcNow,
                 Action: AuditActions.Update,
-                Entity: nameof(EBOS.CRM.Domain.Entities.CRM.BranchOffice),
+                Entity: nameof(global::EBOS.CRM.Domain.Entities.CRM.BranchOffice),
                 RegisterId: entity.Id,
                 OldValues: oldValues,
                 NewValues: AuditSerialization.Serialize(entity),

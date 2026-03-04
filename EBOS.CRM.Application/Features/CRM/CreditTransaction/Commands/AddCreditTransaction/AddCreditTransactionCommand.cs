@@ -1,11 +1,11 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Responses.CRM;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
 
-public record AddCreditTransactionCommand(AddCreditTransactionRequest CreditTransactionRequest) : IRequest<CreditTransactionResponse>;
+public record AddCreditTransactionCommand(AddCreditTransactionRequest CreditTransactionRequest) :
+    IRequest<CreditTransactionResponse>;
 
 
 

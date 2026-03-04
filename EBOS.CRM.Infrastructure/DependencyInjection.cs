@@ -1,13 +1,19 @@
-using EBOS.CRM.Application.Services.Interfaces;
-using EBOS.CRM.Domain.Interfaces.Repositories;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
-using EBOS.CRM.Infrastructure.Persistence;
-using EBOS.CRM.Infrastructure.Repositories.Concrete;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.Identity;
+using EBOS.CRM.Application.Options;
+using EBOS.CRM.Infrastructure.Options;
 using EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
+using EBOS.CRM.Infrastructure.Repositories.Concrete.EBOS;
 using EBOS.CRM.Infrastructure.Services.Audit;
-using Microsoft.EntityFrameworkCore;
+using EBOS.CRM.Infrastructure.Services.Security;
+using EBOS.CRM.Infrastructure.Services.CRM;
+using EBOS.CRM.Infrastructure.Services.Lookup;
+using EBOS.CRM.Infrastructure.Services.Validation;
 using Microsoft.Extensions.Configuration;
-
 
 namespace EBOS.CRM.Infrastructure;
 
@@ -15,12 +21,31 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
+
         // DbContext registration
-        services.AddDbContext<CrmDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("CrmConnection")));
+        services.AddDbContext<CrmDbContext>((sp, options) =>
+        {
+            var tenantContext = sp.GetService<ITenantContext>();
+            var multiTenantOptions = sp.GetService<IOptions<MultiTenantOptions>>()?.Value
+                                     ?? new MultiTenantOptions();
+            var baseConnectionString = configuration.GetConnectionString("CrmConnection")
+                                       ?? string.Empty;
+            var connectionString = ResolveConnectionString(baseConnectionString, tenantContext, multiTenantOptions);
+
+            options.UseSqlServer(connectionString);
+        });
 
         services.AddOptions<AuditServiceOptions>()
             .Bind(configuration.GetSection(AuditServiceOptions.SectionName));
+        services.AddOptions<AuditOutboxOptions>()
+            .Bind(configuration.GetSection(AuditOutboxOptions.SectionName));
+        services.AddOptions<CustomerDedupeOptions>()
+            .Bind(configuration.GetSection(CustomerDedupeOptions.SectionName));
+        services.AddOptions<CustomerMergeOptions>()
+            .Bind(configuration.GetSection(CustomerMergeOptions.SectionName));
+        services.AddOptions<ValidationCatalogOptions>()
+            .Bind(configuration.GetSection(ValidationCatalogOptions.SectionName));
         services.AddHttpClient<IAuditService, AuditServiceClient>(client =>
         {
             var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
@@ -28,30 +53,106 @@ public static class DependencyInjection
             client.BaseAddress = new Uri(options.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
+        services.AddHttpClient(nameof(AuditServiceClient), client =>
+        {
+            var options = configuration.GetSection(AuditServiceOptions.SectionName).Get<AuditServiceOptions>()
+                          ?? new AuditServiceOptions();
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+        });
+
+        // Authentication and authorization services.
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IPolicyService, PolicyService>();
 
         // Repositories base (AddScoped for per-request lifetime)
+        services.AddScoped<IAccountContactPrimaryGuard, AccountContactPrimaryGuard>();
+        services.AddSingleton<ICustomer360Metrics, Customer360Metrics>();
+        services.AddScoped<IAccountContactRolePrimaryGuard, AccountContactRolePrimaryGuard>();
+        services.AddScoped<IAccountContactRepository, AccountContactRepository>();
+        services.AddScoped<IAccountContactRoleRepository, AccountContactRoleRepository>();
+        services.AddScoped<IAccountHierarchyAcyclicInvariant, AccountHierarchyCycleGuard>();
+        services.AddScoped<IAccountHierarchyCycleGuard, AccountHierarchyCycleGuard>();
+        services.AddScoped<IAccountHierarchyRepository, AccountHierarchyRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
         services.AddScoped<IBankInformationRepository, BankInformationRepository>();
-        services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
         services.AddScoped<IBranchOfficeAddressRepository, BranchOfficeAddressRepository>();
+        services.AddScoped<IBranchOfficeRepository, BranchOfficeRepository>();
+        services.AddScoped<ICaseActivityRepository, CaseActivityRepository>();
+        services.AddScoped<ICaseRepository, CaseRepository>();
+        services.AddScoped<ICaseRoutingService, CaseRoutingService>();
+        services.AddScoped<ICaseWorkflowService, CaseWorkflowService>();
+        services.AddScoped<IChannelCountryRepository, ChannelCountryRepository>();
+        services.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
+        services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICreditAccountRepository, CreditAccountRepository>();
         services.AddScoped<ICreditTransactionRepository, CreditTransactionRepository>();
-        services.AddScoped<ICorporateCustomerRepository, CorporateCustomerRepository>();
+        services.AddScoped<ICustomerDedupeNormalizationService, CustomerDedupeNormalizationService>();
         services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+        services.AddScoped<ICustomerConsentRepository, CustomerConsentRepository>();
+        services.AddScoped<ICustomerDedupeRepository, CustomerDedupeRepository>();
+        services.AddScoped<ICustomerMergeHistoryRepository, CustomerMergeHistoryRepository>();
+        services.AddScoped<ICustomerPrivacyRequestRepository, CustomerPrivacyRequestRepository>();
+        services.AddScoped<ICustomerPreferenceRepository, CustomerPreferenceRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
         services.AddScoped<IIndividualCustomerRepository, IndividualCustomerRepository>();
+        services.AddScoped<ILeadDebtorCheckService, LeadDebtorCheckService>();
+        services.AddScoped<ILeadRepository, LeadRepository>();
+        services.AddScoped<ILookupNormalizationService, LookupNormalizationService>();
+        services.AddScoped<ILookupSeedService, LookupSeedService>();
+        services.AddScoped<IOpportunityRepository, OpportunityRepository>();
+        services.AddScoped<IOpportunityStageRepository, OpportunityStageRepository>();
+        services.AddScoped<IQueueRepository, QueueRepository>();
+        services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddScoped<ISlaRepository, SlaRepository>();
+        services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<ITaxInformationAddressRepository, TaxInformationAddressRepository>();
         services.AddScoped<ITaxInformationRepository, TaxInformationRepository>();
-        services.AddScoped<IAddressTypeRepository, AddressTypeRepository>();
-        services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<IIdentificationTypeRepository, IdentificationTypeRepository>();
-        services.AddScoped<IStatusRepository, StatusRepository>();
+        services.AddScoped<ITenantConfigurationRepository, TenantConfigurationRepository>();
+        services.AddScoped<ITenantQuotaRepository, TenantQuotaRepository>();
+        services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
+        services.AddScoped<IValidationCatalogService, ValidationCatalogService>();
+        services.AddScoped<IValidationRuleRepository, ValidationRuleRepository>();
+        services.AddScoped<IAuditOutboxService, AuditOutboxService>();
+        services.AddHostedService<AuditOutboxDispatcher>();
 
         // Register Handlers or Infrastructure-specific services (if any, e.g. messaging services, file storage, etc.)
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
         return services;
+    }
+
+    private static string ResolveConnectionString(string baseConnectionString, ITenantContext? tenantContext,
+        MultiTenantOptions options)
+    {
+        var tenantId = tenantContext?.TenantId ?? 0;
+
+        if (options.Strategy != MultiTenantStrategy.Database || tenantId <= 0)
+        {
+            return baseConnectionString;
+        }
+
+        if (string.IsNullOrWhiteSpace(options.ConnectionStringTemplate))
+        {
+            throw new InvalidOperationException(
+                "MultiTenant:ConnectionStringTemplate is required for Database strategy.");
+        }
+
+        var template = options.ConnectionStringTemplate!;
+
+        if (!template.Contains("{tenantId}", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "MultiTenant:ConnectionStringTemplate must include '{tenantId}'.");
+        }
+
+        return template.Replace("{tenantId}", tenantId.ToString(),
+            StringComparison.OrdinalIgnoreCase);
     }
 }
 

@@ -1,0 +1,102 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: '${SMTP_SMARTHOST}'
+  smtp_from: '${SMTP_FROM}'
+  smtp_auth_username: '${SMTP_AUTH_USERNAME}'
+  smtp_auth_password: '${SMTP_AUTH_PASSWORD}'
+  smtp_require_tls: true
+
+route:
+  receiver: 'default-warning'
+  group_by: ['alertname', 'job', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+  routes:
+    - matchers:
+        - severity="critical"
+      receiver: 'critical-pagerduty'
+      continue: true
+    - matchers:
+        - severity="critical"
+      receiver: 'critical-slack'
+      continue: true
+    - matchers:
+        - severity="critical"
+      receiver: 'critical-teams'
+      continue: true
+    - matchers:
+        - severity="critical"
+      receiver: 'critical-email'
+    - matchers:
+        - severity="warning"
+      receiver: 'warning-slack'
+      continue: true
+    - matchers:
+        - severity="warning"
+      receiver: 'warning-teams'
+      continue: true
+    - matchers:
+        - severity="warning"
+      receiver: 'warning-email'
+
+receivers:
+  - name: 'default-warning'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '${SLACK_DEFAULT_CHANNEL}'
+        send_resolved: true
+        title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }} - {{ .Annotations.description }}{{ "\n" }}{{ end }}'
+
+  - name: 'warning-slack'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '${SLACK_WARNING_CHANNEL}'
+        send_resolved: true
+        title: '[WARNING] {{ .CommonLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }} - {{ .Annotations.description }}{{ "\n" }}{{ end }}'
+
+  - name: 'critical-slack'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '${SLACK_CRITICAL_CHANNEL}'
+        send_resolved: true
+        title: '[CRITICAL] {{ .CommonLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }} - {{ .Annotations.description }}{{ "\n" }}{{ end }}'
+
+  - name: 'warning-teams'
+    webhook_configs:
+      - url: '${TEAMS_WARNING_WEBHOOK_URL}'
+        send_resolved: true
+
+  - name: 'critical-teams'
+    webhook_configs:
+      - url: '${TEAMS_CRITICAL_WEBHOOK_URL}'
+        send_resolved: true
+
+  - name: 'warning-email'
+    email_configs:
+      - to: '${WARNING_EMAIL_TO}'
+        send_resolved: true
+        headers:
+          subject: '[WARNING] {{ .CommonLabels.alertname }}'
+
+  - name: 'critical-email'
+    email_configs:
+      - to: '${CRITICAL_EMAIL_TO}'
+        send_resolved: true
+        headers:
+          subject: '[CRITICAL] {{ .CommonLabels.alertname }}'
+
+  - name: 'critical-pagerduty'
+    pagerduty_configs:
+      - routing_key: '${PAGERDUTY_ROUTING_KEY}'
+        severity: 'critical'
+        send_resolved: true
+        description: '{{ .CommonAnnotations.summary }}'
+
+inhibit_rules:
+  - source_matchers: ['severity="critical"']
+    target_matchers: ['severity="warning"']
+    equal: ['alertname', 'job']

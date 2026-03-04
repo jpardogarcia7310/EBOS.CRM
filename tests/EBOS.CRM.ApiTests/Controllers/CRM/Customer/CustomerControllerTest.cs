@@ -1,10 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
 using EBOS.CRM.ApiTests.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace EBOS.CRM.ApiTests.Controllers.CRM.Customer;
 

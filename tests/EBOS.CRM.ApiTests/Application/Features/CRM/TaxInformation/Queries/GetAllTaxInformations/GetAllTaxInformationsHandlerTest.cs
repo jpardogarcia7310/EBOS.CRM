@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Queries.GetAllTaxInformations;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using MapsterMapper;
@@ -15,23 +15,17 @@ public class GetAllTaxInformationsQueryHandlerTest
     public async Task Handle_ReturnsList()
     {
         var handler = new GetAllTaxInformationsQueryHandler(_repositoryMock.Object, _mapperMock.Object);
-        var entities = new List<EBOS.CRM.Domain.Entities.CRM.TaxInformation> { new() };
-        var dtos = new List<TaxInformationResponse>();
+        var entities = new List<global::EBOS.CRM.Domain.Entities.CRM.TaxInformation> { new() };
 
-        _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+        _repositoryMock.Setup(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.CountAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entities.Count);
         _mapperMock.Setup(m => m.Map<IReadOnlyCollection<TaxInformationResponse>>(entities))
-            .Returns(dtos);
+            .Returns(new List<TaxInformationResponse>());
 
         var result = await handler.Handle(new GetAllTaxInformationsQuery(), CancellationToken.None);
 
         Assert.NotNull(result);
     }
 }
-
-
-
-
-
-
-

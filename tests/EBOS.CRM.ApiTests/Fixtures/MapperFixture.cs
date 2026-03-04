@@ -13,7 +13,9 @@ public class MapperFixture
         var config = new TypeAdapterConfig();
 
         // Automatically scan all classes that implement IRegister (e.g., MappingCountry)
+        // Scan explicit application assembly to avoid missing mappings in isolated test runs.
         config.Scan(AppDomain.CurrentDomain.GetAssemblies());
+        config.Scan(typeof(EBOS.CRM.Application.Mappings.CRM.MappingLead).Assembly);
 
         // Compile the configuration
         config.Compile();

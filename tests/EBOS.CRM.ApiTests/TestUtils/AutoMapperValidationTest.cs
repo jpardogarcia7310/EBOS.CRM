@@ -13,6 +13,10 @@ public class MapsterValidationTest
             RequireDestinationMemberSource = true
         };
 
+        config.Default.IgnoreMember((member, side) =>
+            side == MemberSide.Destination &&
+            (member.Name is "CreatedAt" or "CreatedBy" or "UpdatedAt" or "UpdatedBy"));
+
         // Scan all classes that implement IRegister
         config.Scan(AppDomain.CurrentDomain.GetAssemblies());
 

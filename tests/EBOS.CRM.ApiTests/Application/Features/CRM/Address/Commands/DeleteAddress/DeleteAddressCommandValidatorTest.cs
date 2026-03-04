@@ -8,11 +8,11 @@ public class DeleteAddressCommandValidatorTest
     private readonly DeleteAddressCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidId_Passes()
+    public async Task Validate_ValidId_Passes()
     {
         var command = new DeleteAddressCommand(1);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
@@ -20,14 +20,16 @@ public class DeleteAddressCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidId_Fails(long id)
+    public async Task Validate_InvalidId_Fails(long id)
     {
         var command = new DeleteAddressCommand(id);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+
 
 

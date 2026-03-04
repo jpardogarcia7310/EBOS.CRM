@@ -1,11 +1,10 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.AddCustomer;
 
@@ -17,7 +16,7 @@ public class AddCustomerCommandHandler(ICustomerRepository repository, IAuditSer
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.CustomerRequest ?? throw new ArgumentNullException(nameof(request.CustomerRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.Customer>(entityRequest);
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Customer>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

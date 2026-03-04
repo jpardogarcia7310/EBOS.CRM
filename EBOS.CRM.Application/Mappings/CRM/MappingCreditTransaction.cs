@@ -1,8 +1,7 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditTransaction;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.CreditTransaction;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using Mapster;
-
 
 namespace EBOS.CRM.Application.Mappings.CRM;
 
@@ -14,6 +13,7 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.Active, src => !src.Erased);
 
         config.NewConfig<AddCreditTransactionRequest, CreditTransaction>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Date, src => src.Date)
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.Type, src => src.Type)
@@ -22,9 +22,14 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.CreditAccountId, src => src.CreditAccountId)
             .Map(dest => dest.Erased, _ => false)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CreditAccount);
 
         config.NewConfig<UpdateCreditTransactionRequest, CreditTransaction>()
+            .Map(dest => dest.TenantId, src => src.TenantId)
             .Map(dest => dest.Date, src => src.Date)
             .Map(dest => dest.Amount, src => src.Amount)
             .Map(dest => dest.Type, src => src.Type)
@@ -32,7 +37,15 @@ public class MappingCreditTransaction : IRegister
             .Map(dest => dest.Comments, src => src.Comments)
             .Map(dest => dest.CreditAccountId, src => src.CreditAccountId)
             .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.Erased)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.CreatedBy)
+            .Ignore(dest => dest.UpdatedAt!)
+            .Ignore(dest => dest.UpdatedBy!)
             .Ignore(dest => dest.CreditAccount);
     }
 }

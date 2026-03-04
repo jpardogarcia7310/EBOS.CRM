@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CustomerAddress;
+using EBOS.CRM.Contracts.Requests.CRM.CustomerAddress;
 using EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 using FluentValidation.TestHelper;
 
@@ -9,16 +9,17 @@ public class UpdateCustomerAddressCommandValidatorTest
     private readonly UpdateCustomerAddressCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateCustomerAddressCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     private static UpdateCustomerAddressRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             CustomerId: 1,
             AddressId: 1,
             IsPrimary: true,
@@ -27,5 +28,7 @@ public class UpdateCustomerAddressCommandValidatorTest
             IsCurrent: true
         );
 }
+
+
 
 

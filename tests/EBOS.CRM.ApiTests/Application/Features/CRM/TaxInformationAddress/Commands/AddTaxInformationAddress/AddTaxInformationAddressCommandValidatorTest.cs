@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformationAddress;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformationAddress;
 using EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.AddTaxInformationAddress;
 using FluentValidation.TestHelper;
 
@@ -9,16 +9,17 @@ public class AddTaxInformationAddressCommandValidatorTest
     private readonly AddTaxInformationAddressCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddTaxInformationAddressCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     private static AddTaxInformationAddressRequest BuildAddRequest() => new(
+            TenantId: 1,
             TaxInformationId: 1,
             AddressId: 1,
             IsPrimary: true,
@@ -27,5 +28,7 @@ public class AddTaxInformationAddressCommandValidatorTest
             IsCurrent: true
         );
 }
+
+
 
 

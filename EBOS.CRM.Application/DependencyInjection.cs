@@ -1,10 +1,12 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using Mapster;
 using MapsterMapper;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-
+using EBOS.CRM.Application.Shared.Commands;
+using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
+using EBOS.CRM.Application.Options;
 
 namespace EBOS.CRM.Application;
 
@@ -17,6 +19,14 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CurrentUserContextBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PolicyAuthorizationBehavior<,>));
+
+        services.AddOptions<CommandExecutionOptions>();
+        services.AddOptions<CaseWorkflowOptions>();
+        services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
+        services.AddScoped<CustomerPrivacyExecutionService>();
+        services.AddScoped<CustomerPrivacyRetentionService>();
 
         return services;
     }

@@ -1,16 +1,11 @@
-using EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class CustomerEntityFactoryTest
 {
-    public static Customer CreateValidCustomer(
-        string code = "C001",
-        string email = "a@b.com",
-        string phone = "123",
-        DateTime? createdAt = null,
-        long statusId = 1)
+    private static Customer CreateValidCustomer(string code = "C001", string email = "a@b.com", string phone = "123",
+        DateTime? createdAt = null, long statusId = 1)
     {
         return new Customer
         {

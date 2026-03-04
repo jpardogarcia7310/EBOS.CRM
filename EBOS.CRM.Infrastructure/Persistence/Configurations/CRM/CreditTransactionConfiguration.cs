@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -28,6 +26,13 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
             .HasMaxLength(200);
         builder.Property(m => m.Comments)
             .HasMaxLength(500);
+        builder.Property(m => m.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(m => m.CreatedBy)
+            .IsRequired();
+        builder.Property(m => m.UpdatedAt);
+        builder.Property(m => m.UpdatedBy);
         builder.Property(c => c.Erased)
             .IsRequired();
 
@@ -48,6 +53,8 @@ public class CreditTransactionConfiguration : IEntityTypeConfiguration<CreditTra
             .HasDatabaseName("IX_CreditTransaction_Date_Account");
         builder.HasIndex(ct => new { ct.CreditAccountId, ct.Date })
             .HasDatabaseName("IX_CreditTransaction_Account_Date");
+        builder.HasIndex(ct => ct.TenantId)
+            .HasDatabaseName("IX_CreditTransaction_TenantId");
 
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)

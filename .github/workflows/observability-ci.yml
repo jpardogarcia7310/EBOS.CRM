@@ -1,0 +1,45 @@
+name: Observability CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  validate-observability-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Prometheus, Alertmanager and Grafana assets
+        run: bash documentation/Observability/ci/validate-observability.sh
+
+  smoke-observability:
+    runs-on: ubuntu-latest
+    needs: validate-observability-config
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build API
+        run: dotnet build EBOS.CRM.Api/EBOS.CRM.Api.csproj -c Debug -v minimal
+
+      - name: Run observability smoke
+        run: bash documentation/Observability/ci/smoke-observability.sh
+
+      - name: Upload smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observability-smoke-logs
+          path: documentation/Observability/.ci-api.log
+          if-no-files-found: ignore

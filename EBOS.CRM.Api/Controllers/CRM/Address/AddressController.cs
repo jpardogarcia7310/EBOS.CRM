@@ -1,63 +1,45 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.Address;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Contracts.Requests.CRM.Address;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.DeleteAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
 using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAddressById;
 using EBOS.CRM.Application.Features.CRM.Address.Queries.GetAllAddresses;
 using MediatR;
+using EBOS.CRM.Api.Options;
+using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.Address;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
 public class AddressController(IMediator mediator) : ControllerBase
 {
-    #region Commands
     /// <summary>
     /// Creates a new address.
     /// </summary>
-    /// <example>
-    /// POST /api/v2/Address
-    /// {
-    ///   "street": "Main St",
-    ///   "externalNumber": "123",
-    ///   "city": "Quito",
-    ///   "stateOrProvince": "Pichincha",
-    ///   "postalCode": "EC17001",
-    ///   "customerId": 1,
-    ///   "countryId": 1,
-    ///   "addressTypeId": 1
-    /// }
-    /// </example>
+    /// <param name="request">Address payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <response code="200">Address created.</response>
-    /// <response code="400">Validation error.</response>
+    /// <response code="400">Invalid request.</response>
     [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddAsync([FromBody] AddAddressRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAsync([FromBody] AddAddressRequest request,
+        CancellationToken cancellationToken = default)
     {
         return Ok(await mediator.Send(new AddAddressCommand(request), cancellationToken));
     }
-
     /// <summary>
-    /// Updates an existing address.
+    /// Updates an address by id.
     /// </summary>
-    /// <example>
-    /// PUT /api/v2/Address/1
-    /// {
-    ///   "street": "Main St",
-    ///   "externalNumber": "123",
-    ///   "city": "Quito",
-    ///   "stateOrProvince": "Pichincha",
-    ///   "postalCode": "EC17001",
-    ///   "countryId": 1,
-    ///   "addressTypeId": 1
-    /// }
-    /// </example>
+    /// <param name="id">Address id.</param>
+    /// <param name="request">Address payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <response code="200">Address updated.</response>
     /// <response code="404">Address not found.</response>
     [HttpPut("{id:long}")]
@@ -70,23 +52,15 @@ public class AddressController(IMediator mediator) : ControllerBase
         var dto = await mediator.Send(new UpdateAddressCommand(id, request), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     /// <summary>
-    /// Deletes an address by its identifier.
+    /// Deletes an address by id.
     /// </summary>
-    /// <example>
-    /// DELETE /api/v2/Address/1
-    /// </example>
+    /// <param name="id">Address id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <response code="200">Address deleted.</response>
     /// <response code="404">Address not found.</response>
     [HttpDelete("{id:long}")]
@@ -97,26 +71,17 @@ public class AddressController(IMediator mediator) : ControllerBase
         var deleted = await mediator.Send(new DeleteAddressCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok();
     }
-    #endregion
-
-    #region Queries
     /// <summary>
-    /// Returns an address by its identifier.
+    /// Gets an address by id.
     /// </summary>
-    /// <example>
-    /// GET /api/v2/Address/1
-    /// </example>
+    /// <param name="id">Address id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <response code="200">Address found.</response>
+    /// <response code="400">Invalid id.</response>
     /// <response code="404">Address not found.</response>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(AddressResponse), StatusCodes.Status200OK)]
@@ -128,34 +93,37 @@ public class AddressController(IMediator mediator) : ControllerBase
         var dto = await mediator.Send(new GetAddressByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"Address with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"Address with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     /// <summary>
-    /// Returns all addresses.
+    /// Returns all resources (paginated).
     /// </summary>
-    /// <example>
-    /// GET /api/v2/Address
-    /// </example>
-    /// <response code="200">List of addresses.</response>
+    /// <param name="paginationOptions">Pagination settings.</param>
+    /// <param name="pageNumber">1-based page number.</param>
+    /// <param name="pageSize">Page size (must be &lt;= configured max).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">List of resources. Adds X-Total-Count header.</response>
+    /// <response code="400">Invalid pageSize.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<AddressResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        return Ok(await mediator.Send(new GetAllAddressQuery(), cancellationToken));
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        var result = await mediator.Send(new GetAllAddressesQuery(safePageNumber, safePageSize), cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
     }
-
-    #endregion
 }
+
+
+
 
 
 

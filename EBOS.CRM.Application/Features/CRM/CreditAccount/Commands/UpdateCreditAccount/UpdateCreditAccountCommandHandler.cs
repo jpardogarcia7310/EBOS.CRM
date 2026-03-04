@@ -1,22 +1,24 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccount;
 
 public class UpdateCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateCreditAccountCommand, CreditAccountResponse?>
+    ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<UpdateCreditAccountCommand, CreditAccountResponse?>
 {
-    public async Task<CreditAccountResponse?> Handle(UpdateCreditAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CreditAccountResponse?> Handle(UpdateCreditAccountCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CreditAccountRequest ?? throw new ArgumentNullException(nameof(request.CreditAccountRequest));
+        var entityRequest = request.CreditAccountRequest ??
+                            throw new ArgumentNullException(nameof(request.CreditAccountRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-
 namespace EBOS.CRM.Api.Extensions;
 
 public static class ApiBehaviorConfig

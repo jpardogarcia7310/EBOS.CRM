@@ -1,22 +1,24 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.IndividualCustomer.Commands.UpdateIndividualCustomer;
 
 public class UpdateIndividualCustomerCommandHandler(IIndividualCustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateIndividualCustomerCommand, IndividualCustomerResponse?>
+    ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<UpdateIndividualCustomerCommand, IndividualCustomerResponse?>
 {
-    public async Task<IndividualCustomerResponse?> Handle(UpdateIndividualCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<IndividualCustomerResponse?> Handle(UpdateIndividualCustomerCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.IndividualCustomerRequest ?? throw new ArgumentNullException(nameof(request.IndividualCustomerRequest));
+        var entityRequest = request.IndividualCustomerRequest ??
+                            throw new ArgumentNullException(nameof(request.IndividualCustomerRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

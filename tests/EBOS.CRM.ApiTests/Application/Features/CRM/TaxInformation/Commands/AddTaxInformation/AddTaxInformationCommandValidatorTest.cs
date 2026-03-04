@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
 using EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.AddTaxInformation;
 using FluentValidation.TestHelper;
 
@@ -9,20 +9,23 @@ public class AddTaxInformationCommandValidatorTest
     private readonly AddTaxInformationCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidRequest_Passes()
+    public async Task Validate_ValidRequest_Passes()
     {
         var command = new AddTaxInformationCommand(BuildAddRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
 
     private static AddTaxInformationRequest BuildAddRequest() => new(
+            TenantId: 1,
             TaxName: "Tax",
             TaxIdentificationNumber: "TAX123",
             CustomerId: 1
         );
 }
+
+
 
 

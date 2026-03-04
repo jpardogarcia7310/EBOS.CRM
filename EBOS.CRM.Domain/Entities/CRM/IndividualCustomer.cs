@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
+using EBOS.CRM.Domain.Entities.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 

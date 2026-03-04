@@ -42,9 +42,6 @@ public static class TestResponseFactory
         if (type == typeof(DateTime))
             return DateTime.UtcNow;
 
-        if (type.IsEnum)
-            return Activator.CreateInstance(type);
-
         return Activator.CreateInstance(type);
     }
 }

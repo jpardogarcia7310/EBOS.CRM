@@ -1,17 +1,11 @@
-using EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class AddressEntityFactoryTest
 {
-    public static Address CreateValidAddress(
-        string street = "Main St",
-        string externalNumber = "123",
-        string city = "Quito",
-        string stateOrProvince = "Pichincha",
-        string postalCode = "EC17001",
-        long countryId = 1,
+    private static Address CreateValidAddress(string street = "Main St", string externalNumber = "123",
+        string city = "Quito", string stateOrProvince = "Pichincha", string postalCode = "EC17001", long countryId = 1,
         long addressTypeId = 1)
     {
         return new Address
