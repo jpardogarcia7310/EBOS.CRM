@@ -7,6 +7,7 @@ on:
 
 jobs:
   validate-develop:
+    name: Validate source branch is develop
     runs-on: ubuntu-latest
     steps:
       - name: Ensure PR comes from develop
