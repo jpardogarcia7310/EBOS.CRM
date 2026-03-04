@@ -28,6 +28,8 @@
     <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
     <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance.md" />
     <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance_ES.md" />
+    <File Path="documentation/Features/Backlogs/Observability-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Observability-Backlog_ES.md" />
     <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog_ES.md" />
     <File Path="documentation/Features/Backlogs/Service-MVP-Backlog.md" />
@@ -39,7 +41,8 @@
     <File Path="documentation/Observability/README_ES.md" />
   </Folder>
 
-  <Folder Name="/documentation/RunBooks/">
+  <Folder Name="/documentation/RunBooks/" />
+  <Folder Name="/documentation/RunBooks/Customer360/">
     <File Path="documentation/RunBooks/Customer360-Drill-Record-Template.md" />
     <File Path="documentation/RunBooks/Customer360-Drill-Record-Template_ES.md" />
     <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
@@ -47,13 +50,21 @@
     <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist.md" />
     <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md" />
   </Folder>
-
-  <Folder Name="/documentation/RunBooks/Drills/" />
-
-  <Folder Name="/documentation/RunBooks/Drills">
+  <Folder Name="/documentation/RunBooks/Observability/">
+    <File Path="documentation/RunBooks/Observability-Drill-Record-Template.md" />
+    <File Path="documentation/RunBooks/Observability-Drill-Record-Template_ES.md" />
+    <File Path="documentation/RunBooks/Observability-Operability-RunBook.md" />
+    <File Path="documentation/RunBooks/Observability-Operability-RunBook_ES.md" />
+    <File Path="documentation/RunBooks/Observability-PostDeploy-Checklist.md" />
+    <File Path="documentation/RunBooks/Observability-PostDeploy-Checklist_ES.md" />
+  </Folder>
+  
+  <Folder Name="/documentation/RunBooks/Drills/">
+    <File Path="documentation/RunBooks/Drills/README.md" />
+  </Folder>
+  <Folder Name="/documentation/RunBooks/Drills/Customer360/" >
     <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template.md" />
     <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template_ES.md" />
-    <File Path="documentation/RunBooks/Drills/README.md" />
   </Folder>
 
   <Folder Name="/documentation/RunBooks/Drills/Records/" >
