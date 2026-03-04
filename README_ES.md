@@ -232,6 +232,33 @@ Ejemplo:
 }
 ```
 
+## Workflows de CI y para qué sirve cada uno
+
+El repositorio usa workflows de CI separados para aislar riesgos, acelerar el feedback y mantener puertas de calidad de nivel enterprise.
+
+- `customer360-suites-ci.yml`:
+  - `api-tests`: valida rápidamente el comportamiento de la capa API (controladores/contratos).
+  - `integration-tests`: valida flujos de negocio entre capas en modo integración.
+  - `concurrency-tests`: detecta condiciones de carrera y regresiones por acceso concurrente.
+  - `stress-tests`: valida comportamiento bajo carga (timeouts, regresiones 5xx y rendimiento base).
+  - `integration-sqlserver-tests`: ejecuta escenarios con SQL Server real usando Testcontainers (`USE_TESTCONTAINERS=true`) para migraciones, comportamiento transaccional y hardening específico de SQL.
+  - `summary`: consolida resultados TRX de todas las suites en un único reporte.
+
+- `observability-ci.yml`:
+  - valida configuración de Prometheus/Alertmanager/Grafana y ejecuta smoke tests de observabilidad.
+  - evita romper monitoreo y alertas por cambios de configuración.
+
+- `openapi-compatibility-gate.yml`:
+  - ejecuta validación de compatibilidad OpenAPI por snapshot.
+  - falla ante deriva del contrato API (posibles breaking changes) salvo actualización explícita del snapshot.
+
+Por qué esta separación es necesaria:
+
+- diagnóstico claro por área de riesgo.
+- feedback más rápido mediante ejecución en paralelo.
+- menos falsos positivos al correr cada suite en su entorno correcto.
+- gates enterprise más sólidos para compatibilidad API, comportamiento real en SQL Server, concurrencia, estrés y operabilidad.
+
 ## Tecnologías principales
 
 - ASP.NET Core 8
