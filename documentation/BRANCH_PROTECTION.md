@@ -4,20 +4,26 @@ Este repositorio aplica esta politica:
 
 - `main` solo puede actualizarse por Pull Request.
 - El PR a `main` debe venir desde `develop`.
-- `develop` no puede borrarse.
+- `develop` solo puede actualizarse por Pull Request.
+- El PR a `develop` no puede venir desde `main`.
+- `develop` no puede borrarse ni recibir force-push.
 
 ## 1) Check obligatorio en PR a main
 
 El workflow `.github/workflows/WFProtectBranchMain.yml` falla cualquier PR a `main` cuyo origen no sea `develop`.
 
-## 1.1) Auditoria y notificacion de cambios de reglas
+## 1.1) Check obligatorio en PR a develop
+
+El workflow `.github/workflows/WFProtectBranchDevelop.yml` falla cualquier PR a `develop` cuyo origen sea `main`.
+
+## 1.2) Auditoria y notificacion de cambios de reglas
 
 El workflow `.github/workflows/branch-protection-audit-alert.yml` crea un issue de alerta cuando GitHub detecta cambios en:
 
 - reglas de proteccion de ramas (`branch_protection_rule`)
 - rulesets del repositorio (`repository_ruleset`)
 
-## 1.2) Monitoreo periodico de drift (cron)
+## 1.3) Monitoreo periodico de drift (cron)
 
 El workflow `.github/workflows/branch-protection-drift-monitor.yml` corre cada hora (`0 * * * *`) y valida que `main` y `develop` mantengan la configuracion esperada.
 
@@ -31,7 +37,7 @@ Si el drift desaparece:
 - cierra automaticamente el issue abierto de drift
 - agrega comentario de resolucion con fecha y enlace a la ejecucion
 
-## 1.3) Guard post-merge para `develop`
+## 1.4) Guard post-merge para `develop`
 
 El workflow `.github/workflows/develop-branch-guard.yml` se ejecuta cuando se cierra un PR hacia `main` (solo si fue mergeado) y valida que la rama `develop` exista.
 
@@ -66,5 +72,5 @@ Opcionalmente, puedes pasar owner/repo manualmente:
 El script configura:
 
 - `main`: requiere PR, bloqueo de borrado, sin force-push, review obligatoria, y check `Validate source branch is develop`.
-- `develop`: bloqueo de borrado y sin force-push.
+- `develop`: requiere PR, check `Validate source branch is not main`, bloqueo de borrado y sin force-push.
 - repositorio: desactiva `Automatically delete head branches` (`delete_branch_on_merge=false`).

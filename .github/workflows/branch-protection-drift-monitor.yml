@@ -71,8 +71,23 @@ jobs:
 
             function collectMismatchesForDevelop(data) {
               const mismatches = [];
+              const contexts = (data.required_status_checks?.contexts ?? []).slice().sort();
+              const expectedContexts = ["Validate source branch is not main"];
+
+              if (data.required_status_checks?.strict !== true) {
+                mismatches.push("develop.required_status_checks.strict must be true");
+              }
+              if (JSON.stringify(contexts) !== JSON.stringify(expectedContexts)) {
+                mismatches.push(`develop.required_status_checks.contexts mismatch. expected=${JSON.stringify(expectedContexts)} actual=${JSON.stringify(contexts)}`);
+              }
               if (data.enforce_admins?.enabled !== true) {
                 mismatches.push("develop.enforce_admins must be enabled");
+              }
+              if ((data.required_pull_request_reviews?.required_approving_review_count ?? 0) < 1) {
+                mismatches.push("develop.required_approving_review_count must be >= 1");
+              }
+              if (data.required_pull_request_reviews?.dismiss_stale_reviews !== true) {
+                mismatches.push("develop.dismiss_stale_reviews must be true");
               }
               if (data.allow_force_pushes?.enabled !== false) {
                 mismatches.push("develop.allow_force_pushes must be disabled");

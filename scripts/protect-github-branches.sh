@@ -53,9 +53,17 @@ gh api --method PUT "repos/$OWNER/$REPO/branches/main/protection" \
 
 cat > "$develop_tmp" <<'JSON'
 {
-  "required_status_checks": null,
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["Validate source branch is not main"]
+  },
   "enforce_admins": true,
-  "required_pull_request_reviews": null,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1,
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "require_last_push_approval": false
+  },
   "restrictions": null,
   "required_linear_history": false,
   "allow_force_pushes": false,
@@ -78,5 +86,5 @@ gh api --method PATCH "repos/$OWNER/$REPO" \
 
 echo "Protección aplicada:"
 echo "- main: solo PR + check obligatorio + sin borrado"
-echo "- develop: sin borrado + sin force-push"
+echo "- develop: solo PR + check obligatorio (no main) + sin borrado + sin force-push"
 echo "- repo: auto-delete de rama origen desactivado"

@@ -52,9 +52,17 @@ gh api --method PUT "repos/$Owner/$Repo/branches/main/protection" `
 
 # develop: no borrado, no force-push
 $developProtection = @{
-  required_status_checks = $null
+  required_status_checks = @{
+    strict   = $true
+    contexts = @('Validate source branch is not main')
+  }
   enforce_admins = $true
-  required_pull_request_reviews = $null
+  required_pull_request_reviews = @{
+    required_approving_review_count = 1
+    dismiss_stale_reviews            = $true
+    require_code_owner_reviews       = $false
+    require_last_push_approval       = $false
+  }
   restrictions = $null
   required_linear_history = $false
   allow_force_pushes = $false
@@ -82,5 +90,5 @@ Remove-Item $mainTmp,$developTmp -Force
 
 Write-Host "Protección aplicada:"
 Write-Host "- main: solo PR + check obligatorio + sin borrado"
-Write-Host "- develop: sin borrado + sin force-push"
+Write-Host "- develop: solo PR + check obligatorio (no main) + sin borrado + sin force-push"
 Write-Host "- repo: auto-delete de rama origen desactivado"

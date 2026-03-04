@@ -1,0 +1,19 @@
+name: WFProtectBranchDevelop
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  validate-not-main:
+    name: Validate source branch is not main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR does not come from main
+        shell: bash
+        run: |
+          if [ "${{ github.head_ref }}" = "main" ]; then
+            echo "PR head must not be main."
+            exit 1
+          fi
