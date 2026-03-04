@@ -4,9 +4,11 @@
     <File Path="documentation/AGENTS_ES.md" />
     <File Path="documentation/Authentication_Oidc.md" />
     <File Path="documentation/Authentication_Oidc_ES.md" />
+    <File Path="documentation/BRANCH_PROTECTION.md" />
     <File Path="documentation/Contributing.md" />
     <File Path="documentation/Code of conduct.md" />
     <File Path="documentation/Internal.md" />
+    <File Path="documentation/Internal_ES.md" />
     <File Path="documentation/Roadmap.md" />
     <File Path="documentation/Roadmap_ES.md" />
   </Folder>
@@ -31,7 +33,12 @@
     <File Path="documentation/Features/Backlogs/Service-MVP-Backlog.md" />
     <File Path="documentation/Features/Backlogs/Service-MVP-Backlog_ES.md" />
   </Folder>
-  
+
+  <Folder Name="/documentation/Observability/">
+    <File Path="documentation/Observability/README.md" />
+    <File Path="documentation/Observability/README_ES.md" />
+  </Folder>
+
   <Folder Name="/documentation/RunBooks/">
     <File Path="documentation/RunBooks/Customer360-Drill-Record-Template.md" />
     <File Path="documentation/RunBooks/Customer360-Drill-Record-Template_ES.md" />
@@ -40,12 +47,27 @@
     <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist.md" />
     <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md" />
   </Folder>
-  
-  <Folder Name="/documentation/Observability/">
-    <File Path="documentation/Observability/README.md" />
-    <File Path="documentation/Observability/README_ES.md" />
+
+  <Folder Name="/documentation/RunBooks/Drills/" />
+
+  <Folder Name="/documentation/RunBooks/Drills">
+    <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template.md" />
+    <File Path="documentation/RunBooks/Drills/Customer360-Drill-Execution-Template_ES.md" />
+    <File Path="documentation/RunBooks/Drills/README.md" />
   </Folder>
-  
+
+  <Folder Name="/documentation/RunBooks/Drills/Records/" >
+    <File Path="documentation/RunBooks/Drills/Records/2026-03-C360-DRILL-MONTHLY-OUTBOX-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records/2026-Q1-C360-DRILL-QUARTERLY-ALERT-ROUTING-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records/2026-Q1-C360-DRILL-QUARTERLY-MIGRATION-ROLLBACK-001.md" />
+  </Folder>
+
+  <Folder Name="/documentation/RunBooks/Drills/Records_ES/" >
+    <File Path="documentation/RunBooks/Drills/Records_ES/2026-03-C360-DRILL-MENSUAL-OUTBOX-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records_ES/2026-Q1-C360-DRILL-TRIMESTRAL-ALERT-ROUTING-001.md" />
+    <File Path="documentation/RunBooks/Drills/Records_ES/2026-Q1-C360-DRILL-TRIMESTRAL-MIGRACION-ROLLBACK-001.md" />
+  </Folder>
+
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
     <File Path="NuGet.config" />
@@ -64,6 +86,7 @@
     <File Path=".github/workflows/observability-ci.yml" />
     <File Path=".github/workflows/openapi-compatibility-gate.yml" />
     <File Path=".github/workflows/validate-branch-protection.yml" />
+    <File Path=".github/workflows/WFProtectBranchMain.yml" />
   </Folder>
   
   <Folder Name="/Elementos de la solución/Observability/">
@@ -71,6 +94,12 @@
     <File Path="documentation/Observability/docker-compose.observability.yml" />
     <File Path="documentation/Observability/start-observability.ps1" />
     <File Path="documentation/Observability/start-observability.sh" />
+  </Folder>
+
+  <Folder Name="/Elementos de la solución/Observability/CI/">
+    <File Path="documentation/Observability/ci/smoke-observability.sh" />
+    <File Path="documentation/Observability/ci/validate-dashboard.py" />
+    <File Path="documentation/Observability/ci/validate-observability.sh" />
   </Folder>
   
   <Folder Name="/Elementos de la solución/Observability/Grafana/">
@@ -93,10 +122,9 @@
     <File Path="documentation/Observability/prometheus/prometheus.yml" />
   </Folder>
 
-  <Folder Name="/Elementos de la solución/Observability/CI/">
-    <File Path="documentation/Observability/ci/smoke-observability.sh" />
-    <File Path="documentation/Observability/ci/validate-dashboard.py" />
-    <File Path="documentation/Observability/ci/validate-observability.sh" />
+  <Folder Name="/Elementos de la solución/Scripts/">
+    <File Path="scripts/Protect-GitHubBranches.ps1" />
+    <File Path="scripts/Protect-GitHubBranches.sh" /> 
   </Folder>
 
   <Folder Name="/source/">
