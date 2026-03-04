@@ -166,7 +166,7 @@ jobs:
           --logger "trx;LogFileName=integration-sqlserver-tests.trx"
           --results-directory ./artifacts/test-results/integration-sqlserver
           --filter
-          "FullyQualifiedName~SqlServerMigrationHardeningTests|FullyQualifiedName~Customer360SqlServerIdempotencyTests"
+          "FullyQualifiedName~SqlServerMigrationHardeningTests|FullyQualifiedName~Customer360SqlServerIdempotencyTests|FullyQualifiedName~MigrationDuplicateCreateTableGuardTest"
           -v minimal
       - name: Upload Integration SQL Server test results
         if: always()
