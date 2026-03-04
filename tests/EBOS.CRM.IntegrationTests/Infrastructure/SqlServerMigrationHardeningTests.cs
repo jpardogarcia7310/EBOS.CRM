@@ -24,17 +24,17 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
         await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
-        var expectedTables = new[]
+        var expectedTables = new (string Schema, string Table)[]
         {
-            "CustomerMergeHistories",
-            "CustomerPrivacyRequests",
-            "AuditOutboxMessages"
+            ("CRM", "CustomerMergeHistories"),
+            ("CRM", "CustomerPrivacyRequests"),
+            ("EBOS", "AuditOutboxMessages")
         };
 
-        foreach (var table in expectedTables)
+        foreach (var (schema, table) in expectedTables)
         {
-            var exists = await TableExistsAsync(table);
-            exists.Should().BeTrue($"table {table} must exist after applying migrations");
+            var exists = await TableExistsAsync(schema, table);
+            exists.Should().BeTrue($"table {schema}.{table} must exist after applying migrations");
         }
 
         var migrationCount = db.Database.GetMigrations().Count();
@@ -151,9 +151,9 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
 
             if (attempts == 1)
             {
-                cmd.CommandText = "THROW 1205, 'deadlock victim test', 1;";
-                await cmd.ExecuteNonQueryAsync();
-                return 0;
+                cmd.CommandTimeout = 1;
+                cmd.CommandText = "WAITFOR DELAY '00:00:03'; SELECT 1;";
+                return Convert.ToInt32(await cmd.ExecuteScalarAsync());
             }
 
             cmd.CommandText = "SELECT 1;";
@@ -259,13 +259,14 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
         return new CrmDbContext(options);
     }
 
-    private async Task<bool> TableExistsAsync(string tableName)
+    private async Task<bool> TableExistsAsync(string schema, string tableName)
     {
         await using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
         await using var cmd = conn.CreateCommand();
         cmd.CommandText =
-            "SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = @name";
+            "SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @name";
+        cmd.Parameters.AddWithValue("@schema", schema);
         cmd.Parameters.AddWithValue("@name", tableName);
         var count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
         return count > 0;
