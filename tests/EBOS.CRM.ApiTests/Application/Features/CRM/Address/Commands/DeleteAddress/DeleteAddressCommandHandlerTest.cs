@@ -1,7 +1,8 @@
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.Address.Commands.DeleteAddress;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using Moq;
 using CRMAddress = EBOS.CRM.Domain.Entities.CRM.Address;
 
@@ -11,26 +12,25 @@ public class DeleteAddressCommandHandlerTest
 {
     private readonly Mock<IAddressRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly DeleteAddressCommandHandler _handler;
 
     public DeleteAddressCommandHandlerTest()
     {
         _repositoryMock = new Mock<IAddressRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
-        _auditServiceMock.Setup(a => a.InsertAuditAsync(It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+        _auditServiceMock.Setup(a => a.InsertAuditAsync(It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         _handler = new DeleteAddressCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object);
+            currentUserMock.Object);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class DeleteAddressCommandHandlerTest
 
         Assert.False(result);
         _repositoryMock.Verify(r => r.DeleteAsync(It.IsAny<CRMAddress>(), It.IsAny<CancellationToken>()), Times.Never);
-        _auditServiceMock.Verify(a => a.InsertAuditAsync(It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+        _auditServiceMock.Verify(a => a.InsertAuditAsync(It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -72,7 +72,7 @@ public class DeleteAddressCommandHandlerTest
         _repositoryMock.Verify(r => r.DeleteAsync(entity, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _auditServiceMock.Verify(a => a.InsertAuditAsync(
-            It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+            It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }

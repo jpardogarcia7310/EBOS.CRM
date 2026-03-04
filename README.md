@@ -17,6 +17,18 @@ This project is **Free Software**. It aims to become a comprehensive, community-
 - API versioning with `v1` and `v2` examples.
 - Problem Details (RFC 7807) error format.
 - Swagger UI with custom filters and validation details.
+- Multi-tenant base: tenant-aware domain model, validation, middleware, and data isolation.
+
+## Implemented multi-tenant features
+
+- Tenant entity and TenantId on CRM aggregates.
+- Tenant-aware invariants and enforcement on write.
+- Tenant context service abstraction.
+- Validation to enforce tenant isolation.
+- EF Core global filters by TenantId.
+- Configurable schema/database isolation strategy.
+- Tenant resolution middleware (header and subdomain).
+- Tenant context propagation across request handling.
 
 ## Roadmap (planned)
 
@@ -87,6 +99,39 @@ dotnet run --project EBOS.CRM.Api
 
 ```
 https://localhost:5001/swagger
+```
+
+## Authentication (EBOS.Auth)
+
+The IdP does not exist yet. The API supports two modes so you can work now and switch later:
+
+- Local mode (no IdP): `Enabled=false`, `UseAuthority=false`, and a symmetric `SigningKey`.
+- IdP mode (once EBOS.Auth exists): `Enabled=true`, `UseAuthority=true`, and fill `Authority`/`Audience`.
+
+Recommended local development example (no 401 in Swagger):
+
+```json
+"Authentication": {
+  "Enabled": false,
+  "UseAuthority": false,
+  "Authority": "http://localhost:5100",
+  "Audience": "ebos.crm.api",
+  "ValidIssuer": "http://localhost:5100",
+  "ValidAudiences": [ "ebos.crm.api" ],
+  "SigningKey": "dev-only-ebos-auth-signing-key-change-me"
+}
+```
+
+When EBOS.Auth is available, switch to:
+
+```json
+"Authentication": {
+  "Enabled": true,
+  "UseAuthority": true,
+  "Authority": "https://auth.your-domain.com",
+  "Audience": "ebos.crm.api",
+  "SigningKey": ""
+}
 ```
 
 ## Installation
@@ -165,6 +210,54 @@ Errors follow `application/problem+json` (RFC 7807). Example validation error:
   }
 }
 ```
+
+## Configuration
+
+### Tenant isolation
+
+`TenantIsolation:TraversalDepth` controls how deep the tenant validation scans request graphs.
+The allowed range is configured with `TenantIsolation:MinTraversalDepth` and
+`TenantIsolation:MaxTraversalDepth`.
+
+- Range: `1` to `50`
+- Default: `10`
+
+Example:
+
+```json
+"TenantIsolation": {
+  "MinTraversalDepth": 1,
+  "MaxTraversalDepth": 50,
+  "TraversalDepth": 10
+}
+```
+
+## CI workflows and purpose
+
+The repository uses dedicated CI workflows to isolate risks, improve feedback speed, and keep enterprise-level quality gates explicit.
+
+- `customer360-suites-ci.yml`:
+  - `api-tests`: validates API layer behavior (controllers/contracts) quickly.
+  - `integration-tests`: validates cross-layer business flows in integration mode.
+  - `concurrency-tests`: detects race conditions and concurrent access regressions.
+  - `stress-tests`: validates behavior under load (timeouts, 5xx regressions, baseline performance).
+  - `integration-sqlserver-tests`: runs SQL Server real-engine scenarios with Testcontainers (`USE_TESTCONTAINERS=true`) for migrations, transactional behavior, and SQL-specific hardening.
+  - `summary`: consolidates TRX results from all suites into a single report.
+
+- `observability-ci.yml`:
+  - validates Prometheus/Alertmanager/Grafana configuration and smoke checks observability integration.
+  - prevents breaking monitoring and alerting behavior through configuration changes.
+
+- `openapi-compatibility-gate.yml`:
+  - runs OpenAPI snapshot compatibility checks.
+  - fails on API contract drift (potential breaking changes) unless snapshot is intentionally updated.
+
+Why this split is needed:
+
+- clear ownership and diagnosis per risk area.
+- faster feedback via parallel jobs.
+- fewer false positives by running each suite in the environment it actually requires.
+- stronger enterprise gates for API compatibility, SQL Server real behavior, concurrency, stress, and operability.
 
 ## Main technologies
 

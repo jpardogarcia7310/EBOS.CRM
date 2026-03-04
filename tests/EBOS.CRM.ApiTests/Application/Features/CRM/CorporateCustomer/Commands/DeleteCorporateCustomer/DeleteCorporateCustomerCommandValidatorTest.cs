@@ -10,14 +10,16 @@ public class DeleteCorporateCustomerCommandValidatorTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_InvalidId_Fails(long id)
+    public async Task Validate_InvalidId_Fails(long id)
     {
         var command = new DeleteCorporateCustomerCommand(id);
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 }
+
+
 
 

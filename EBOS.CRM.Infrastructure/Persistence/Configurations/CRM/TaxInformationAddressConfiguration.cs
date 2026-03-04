@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -19,6 +17,15 @@ public class TaxInformationAddressConfiguration : IEntityTypeConfiguration<TaxIn
             .IsRequired();
         builder.Property(ta => ta.IsCurrent)
             .IsRequired();
+        builder.Property(ta => ta.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ta => ta.CreatedBy)
+            .IsRequired();
+        builder.Property(ta => ta.UpdatedAt);
+        builder.Property(ta => ta.UpdatedBy);
+        builder.Property(ta => ta.Erased)
+            .IsRequired();
 
         builder.HasOne(ta => ta.TaxInformation)
             .WithMany(ti => ti.TaxInformationAddresses)
@@ -32,5 +39,7 @@ public class TaxInformationAddressConfiguration : IEntityTypeConfiguration<TaxIn
 
         builder.HasIndex(ta => new { ta.TaxInformationId, ta.IsCurrent, ta.IsPrimary })
             .HasDatabaseName("IX_TaxInformationAddress_Current_Primary");
+        builder.HasIndex(ta => ta.TenantId)
+            .HasDatabaseName("IX_TaxInformationAddress_TenantId");
     }
 }

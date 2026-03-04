@@ -1,17 +1,17 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInformation;
 
 public class PatchTaxInformationCommandHandler(ITaxInformationRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchTaxInformationCommand, TaxInformationResponse?>
 {
-    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request, CancellationToken cancellationToken)
+    public async Task<TaxInformationResponse?> Handle(PatchTaxInformationCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -59,6 +59,7 @@ public class PatchTaxInformationCommandHandler(ITaxInformationRepository reposit
 
         return new TaxInformationResponse(
             entity.Id,
+            entity.TenantId,
             entity.TaxName,
             entity.TaxIdentificationNumber,
             entity.CustomerId,

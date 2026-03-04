@@ -1,31 +1,115 @@
 <Solution>
   <Folder Name="/documentation/">
-    <File Path="documentation/Internal.md" />
     <File Path="documentation/AGENTS.md" />
+    <File Path="documentation/AGENTS_ES.md" />
+    <File Path="documentation/Authentication_Oidc.md" />
+    <File Path="documentation/Authentication_Oidc_ES.md" />
     <File Path="documentation/Contributing.md" />
     <File Path="documentation/Code of conduct.md" />
+    <File Path="documentation/Internal.md" />
     <File Path="documentation/Roadmap.md" />
     <File Path="documentation/Roadmap_ES.md" />
   </Folder>
+
+  <Folder Name="/documentation/CI/">
+    <File Path="documentation/ci/set-branch-protection.ps1" />
+    <File Path="documentation/ci/set-branch-protection.sh" />
+  </Folder>
+
   <Folder Name="/documentation/Features/">
     <File Path="documentation/Features/Features.md" />
     <File Path="documentation/Features/Features_ES.md" />
   </Folder>
+  
+  <Folder Name="/documentation/Features/Backlogs/">
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Customer-360-Backlog_ES.md" />
+    <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance.md" />
+    <File Path="documentation/Features/Backlogs/Multi-Tenant-Governance_ES.md" />
+    <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Sales-MVP-Backlog_ES.md" />
+    <File Path="documentation/Features/Backlogs/Service-MVP-Backlog.md" />
+    <File Path="documentation/Features/Backlogs/Service-MVP-Backlog_ES.md" />
+  </Folder>
+  
+  <Folder Name="/documentation/RunBooks/">
+    <File Path="documentation/RunBooks/Customer360-Drill-Record-Template.md" />
+    <File Path="documentation/RunBooks/Customer360-Drill-Record-Template_ES.md" />
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook.md" />
+    <File Path="documentation/RunBooks/Customer360-Operability-RunBook_ES.md" />
+    <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist.md" />
+    <File Path="documentation/RunBooks/Customer360-PostDeploy-Checklist_ES.md" />
+  </Folder>
+  
+  <Folder Name="/documentation/Observability/">
+    <File Path="documentation/Observability/README.md" />
+    <File Path="documentation/Observability/README_ES.md" />
+  </Folder>
+  
   <Folder Name="/Elementos de la solución/">
     <File Path="Directory.Build.props" />
+    <File Path="NuGet.config" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="README_ES.md" />
+  </Folder>
+  
+  <Folder Name="/Elementos de la solución/.github/">
     <File Path=".github/CODEOWNERS" />
   </Folder>
+  
+  <Folder Name="/Elementos de la solución/.github/workflows/">
+    <File Path=".github/workflows/customer360-suites-ci.yml" />
+    <File Path=".github/workflows/observability-ci.yml" />
+    <File Path=".github/workflows/openapi-compatibility-gate.yml" />
+    <File Path=".github/workflows/validate-branch-protection.yml" />
+  </Folder>
+  
+  <Folder Name="/Elementos de la solución/Observability/">
+    <File Path="documentation/Observability/.env.alerting" />
+    <File Path="documentation/Observability/docker-compose.observability.yml" />
+    <File Path="documentation/Observability/start-observability.ps1" />
+    <File Path="documentation/Observability/start-observability.sh" />
+  </Folder>
+  
+  <Folder Name="/Elementos de la solución/Observability/Grafana/">
+    <File Path="documentation/Observability/grafana/customer360-operability-dashboard.json" />
+  </Folder>
+  
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/" />
+  
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Dashboards/">
+    <File Path="documentation/Observability/grafana/provisioning/dashboards/dashboards.yml" />
+  </Folder>
+  
+  <Folder Name="/Elementos de la solución/Observability/Grafana/Provisioning/Datasources/">
+    <File Path="documentation/Observability/grafana/provisioning/datasources/datasource.yml" />
+  </Folder>
+
+  <Folder Name="/Elementos de la solución/Observability/Prometheus/">
+    <File Path="documentation/Observability/prometheus/alertmanager.yml" />
+    <File Path="documentation/Observability/prometheus/customer360-alert-rules.yml" />
+    <File Path="documentation/Observability/prometheus/prometheus.yml" />
+  </Folder>
+
+  <Folder Name="/Elementos de la solución/Observability/CI/">
+    <File Path="documentation/Observability/ci/smoke-observability.sh" />
+    <File Path="documentation/Observability/ci/validate-dashboard.py" />
+    <File Path="documentation/Observability/ci/validate-observability.sh" />
+  </Folder>
+
   <Folder Name="/source/">
-    <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" Id="b94674de-a33b-4841-b1af-7cfbd17e3871" />
-    <Project Path="EBOS.CRM.Application/EBOS.CRM.Application.csproj" Id="50f27c0c-df4e-42fd-b7e3-1626584a71ac" />
-    <Project Path="EBOS.CRM.Domain/EBOS.CRM.Domain.csproj" Id="4bcb3304-c991-474f-8e08-c52a33e7beeb" />
-    <Project Path="EBOS.CRM.Infrastructure/EBOS.CRM.Infrastructure.csproj" Id="87da3024-eb11-41d6-8937-a0b2862b76c8" />
+    <Project Path="EBOS.CRM.Api/EBOS.CRM.Api.csproj" />
+    <Project Path="EBOS.CRM.Application/EBOS.CRM.Application.csproj" />
+    <Project Path="EBOS.CRM.Contracts/EBOS.CRM.Contracts.csproj" />
+    <Project Path="EBOS.CRM.Domain/EBOS.CRM.Domain.csproj" />
+    <Project Path="EBOS.CRM.Infrastructure/EBOS.CRM.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/EBOS.CRM.Api.IntegrationTests/EBOS.CRM.Api.IntegrationTests.csproj" />
-    <Project Path="tests/EBOS.CRM.ApiTests/EBOS.CRM.ApiTests.csproj" Id="be986542-7412-4716-8286-ac592b08df3b" />
+    <Project Path="tests/EBOS.CRM.ApiTests/EBOS.CRM.ApiTests.csproj" />
+    <Project Path="tests/EBOS.CRM.ConcurrencyTests/EBOS.CRM.ConcurrencyTests.csproj" />
+    <Project Path="tests/EBOS.CRM.IntegrationTests/EBOS.CRM.IntegrationTests.csproj" />
+    <Project Path="tests/EBOS.CRM.StressTests/EBOS.CRM.StressTests.csproj" />
   </Folder>
 </Solution>

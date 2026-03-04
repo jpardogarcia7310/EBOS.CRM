@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.CreditAccount;
+using EBOS.CRM.Contracts.Requests.CRM.CreditAccount;
 using EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.UpdateCreditAccount;
 using FluentValidation.TestHelper;
 
@@ -9,21 +9,24 @@ public class UpdateCreditAccountCommandValidatorTest
     private readonly UpdateCreditAccountCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateCreditAccountCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     private static UpdateCreditAccountRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Id: 1,
             MaxAmount: 1000m,
             UsedAmount: 100m,
             CustomerId: 1
         );
 }
+
+
 
 

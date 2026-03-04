@@ -1,23 +1,25 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CreditTransaction.Commands.AddCreditTransaction;
 
 public class AddCreditTransactionCommandHandler(ICreditTransactionRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddCreditTransactionCommand, CreditTransactionResponse>
+    ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<AddCreditTransactionCommand, CreditTransactionResponse>
 {
-    public async Task<CreditTransactionResponse> Handle(AddCreditTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<CreditTransactionResponse> Handle(AddCreditTransactionCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CreditTransactionRequest ?? throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
+        var entityRequest = request.CreditTransactionRequest ??
+                            throw new ArgumentNullException(nameof(request.CreditTransactionRequest));
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CreditTransaction>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

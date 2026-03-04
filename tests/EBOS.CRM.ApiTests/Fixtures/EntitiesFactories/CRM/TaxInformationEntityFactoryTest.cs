@@ -1,14 +1,11 @@
-using EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 
 namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class TaxInformationEntityFactoryTest
 {
-    public static TaxInformation CreateValidTaxInformation(
-        string taxName = "VAT",
-        string taxIdentificationNumber = "VAT-123",
-        long customerId = 1)
+    private static TaxInformation CreateValidTaxInformation(string taxName = "VAT",
+        string taxIdentificationNumber = "VAT-123", long customerId = 1)
     {
         return new TaxInformation
         {

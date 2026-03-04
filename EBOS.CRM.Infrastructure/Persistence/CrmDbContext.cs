@@ -1,28 +1,72 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using EBOS.Core.Primitives.Interfaces;
-using EBOS.CRM.Domain.Entities;
 using EBOS.CRM.Domain.Entities.CRM;
-
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Entities.Identity;
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
+using EBOS.CRM.Infrastructure.Options;
+using EBOS.CRM.Infrastructure.Services.TenantInvariants;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
-public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(options)
+public class CrmDbContext(DbContextOptions<CrmDbContext> options, ITenantContext? tenantContext = null,
+        IOptions<MultiTenantOptions>? multiTenantOptions = null) : DbContext(options)
 {
+    private readonly MultiTenantOptions _multiTenantOptions = multiTenantOptions?.Value ?? new MultiTenantOptions();
+    public long CurrentTenantId { get; } = tenantContext?.TenantId ?? 0;
+
     // DbSets
-    public DbSet<Customer> Customers => Set<Customer>();
-    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
-    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
+    public DbSet<AbacAttribute> AbacAttributes => Set<AbacAttribute>();
+    public DbSet<AuditOutboxMessage> AuditOutboxMessages => Set<AuditOutboxMessage>();
+    public DbSet<AccountContact> AccountContacts => Set<AccountContact>();
+    public DbSet<AccountContactRole> AccountContactRoles => Set<AccountContactRole>();
+    public DbSet<AccountHierarchy> AccountHierarchies => Set<AccountHierarchy>();
     public DbSet<Address> Addresses => Set<Address>();
-    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
-    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
+    public DbSet<AddressType> AddressTypes => Set<AddressType>();
     public DbSet<BankInformation> BankInformation => Set<BankInformation>();
+    public DbSet<BranchOffice> BranchOffices => Set<BranchOffice>();
+    public DbSet<CaseActivity> CaseActivities => Set<CaseActivity>();
+    public DbSet<Case> Cases => Set<Case>();
+    public DbSet<ChannelCountry> ChannelCountries => Set<ChannelCountry>();
+    public DbSet<ChannelType> ChannelTypes => Set<ChannelType>();
+    public DbSet<CorporateCustomer> CorporateCustomers => Set<CorporateCustomer>();
+    public DbSet<Country> Countries => Set<Country>();
     public DbSet<CreditAccount> CreditAccounts => Set<CreditAccount>();
     public DbSet<CreditTransaction> CreditTransactions => Set<CreditTransaction>();
-    public DbSet<Status> Statuses => Set<Status>();
-    public DbSet<Country> Countries => Set<Country>();
+    public DbSet<CustomerConsent> CustomerConsents => Set<CustomerConsent>();
+    public DbSet<CustomerMergeHistory> CustomerMergeHistories => Set<CustomerMergeHistory>();
+    public DbSet<CustomerPrivacyRequest> CustomerPrivacyRequests => Set<CustomerPrivacyRequest>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<IdentificationType> IdentificationTypes => Set<IdentificationType>();
-    public DbSet<AddressType> AddressTypes => Set<AddressType>();
+    public DbSet<IndividualCustomer> IndividualCustomers => Set<IndividualCustomer>();
+    public DbSet<Lead> Leads => Set<Lead>();
+    public DbSet<Opportunity> Opportunities => Set<Opportunity>();
+    public DbSet<OpportunityStage> OpportunityStages => Set<OpportunityStage>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<Policy> Policies => Set<Policy>();
+    public DbSet<PolicyPermission> PolicyPermissions => Set<PolicyPermission>();
+    public DbSet<PolicyRole> PolicyRoles => Set<PolicyRole>();
+    public DbSet<PolicyRuleCondition> PolicyRuleConditions => Set<PolicyRuleCondition>();
+    public DbSet<PolicyRule> PolicyRules => Set<PolicyRule>();
+    public DbSet<Queue> Queues => Set<Queue>();
+    public DbSet<Quote> Quotes => Set<Quote>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Sla> Slas => Set<Sla>();
+    public DbSet<Status> Statuses => Set<Status>();
+    public DbSet<TaxInformation> TaxInformation => Set<TaxInformation>();
+    public DbSet<TenantConfiguration> TenantConfigurations => Set<TenantConfiguration>();
+    public DbSet<TenantQuota> TenantQuotas => Set<TenantQuota>();
+    public DbSet<TenantUsageMetric> TenantUsageMetrics => Set<TenantUsageMetric>();
+    public DbSet<UserPolicy> UserPolicies => Set<UserPolicy>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<ValidationRule> ValidationRules => Set<ValidationRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +74,9 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CrmDbContext).Assembly);
 
         ApplySoftDeleteQueryFilter(modelBuilder);
+        ApplyTenantQueryFilter(modelBuilder);
+        ApplyTenantSchema(modelBuilder);
+        ApplySqliteConcurrencyCompatibility(modelBuilder);
 
         // SAFETY NET: Force DeleteBehavior.Restrict on any unconfigured FK
         _ = modelBuilder.Model
@@ -81,6 +128,160 @@ public class CrmDbContext(DbContextOptions<CrmDbContext> options) : DbContext(op
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    private void ApplySqliteConcurrencyCompatibility(ModelBuilder modelBuilder)
+    {
+        if (!string.Equals(Database.ProviderName, "Microsoft.EntityFrameworkCore.Sqlite", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        ConfigureSqliteRowVersion<AccountContact>(modelBuilder);
+        ConfigureSqliteRowVersion<AccountContactRole>(modelBuilder);
+        ConfigureSqliteRowVersion<AccountHierarchy>(modelBuilder);
+        ConfigureSqliteRowVersion<CustomerConsent>(modelBuilder);
+        ConfigureSqliteRowVersion<CustomerPreference>(modelBuilder);
+    }
+
+    private static void ConfigureSqliteRowVersion<TEntity>(ModelBuilder modelBuilder) where TEntity : class
+    {
+        modelBuilder.Entity<TEntity>()
+            .Property<byte[]>("RowVersion")
+            .IsRequired(false)
+            .ValueGeneratedNever()
+            .IsConcurrencyToken();
+    }
+
+    private void ApplyTenantSchema(ModelBuilder modelBuilder)
+    {
+        if (_multiTenantOptions.Strategy != MultiTenantStrategy.Schema || CurrentTenantId <= 0)
+        {
+            return;
+        }
+
+        var schemaName = $"{_multiTenantOptions.SchemaPrefix}{CurrentTenantId}";
+        var targets = new HashSet<string>(_multiTenantOptions.SchemaTargets, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var schema = entityType.GetSchema();
+            if (schema == null || !targets.Contains(schema))
+            {
+                continue;
+            }
+
+            entityType.SetSchema(schemaName);
+        }
+    }
+
+    private void ApplyTenantQueryFilter(ModelBuilder modelBuilder)
+    {
+        var tenantPropertyMethod = typeof(EF)
+            .GetMethod(nameof(EF.Property), BindingFlags.Static | BindingFlags.Public)?
+            .MakeGenericMethod(typeof(long));
+
+        if (tenantPropertyMethod == null)
+        {
+            return;
+        }
+
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
+            .Where(e => e.FindProperty("TenantId") != null)
+            .Where(e => e.BaseType == null)
+            .ToList();
+
+        foreach (var entityType in entityTypes)
+        {
+            var clrType = entityType.ClrType;
+            var parameter = Expression.Parameter(clrType, "e");
+
+            var convertedParam = Expression.Convert(parameter, typeof(object));
+            var tenantProperty = Expression.Call(
+                tenantPropertyMethod,
+                convertedParam,
+                Expression.Constant("TenantId"));
+            var currentTenant = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
+            var compare = Expression.Equal(tenantProperty, currentTenant);
+            var allowAllTenants = Expression.Equal(currentTenant, Expression.Constant(0L));
+            var body = Expression.OrElse(allowAllTenants, compare);
+            var lambda = Expression.Lambda(body, parameter);
+
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
+        }
+    }
+
+    public override int SaveChanges()
+    {
+        EnforceTenantInvariant();
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        EnforceTenantInvariant();
+        ApplyTenantIdToAddedEntities();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void EnforceTenantInvariant()
+    {
+        if (CurrentTenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
+        {
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
+            {
+                continue;
+            }
+
+            var tenantValue = tenantScoped.TenantId;
+            if (tenantValue > 0 && tenantValue != CurrentTenantId)
+            {
+                throw new InvalidOperationException(
+                    $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantValue} != {CurrentTenantId}.");
+            }
+
+            if (entry.State != EntityState.Added && tenantValue <= 0)
+            {
+                TenantInvariants.EnsureTenantAssigned(tenantScoped);
+            }
+        }
+    }
+
+    private void ApplyTenantIdToAddedEntities()
+    {
+        if (CurrentTenantId <= 0)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries()
+                     .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity is not ITenantScopedEntity tenantScoped)
+            {
+                continue;
+            }
+
+            if (tenantScoped.TenantId > 0)
+            {
+                if (tenantScoped.TenantId != CurrentTenantId)
+                {
+                    throw new InvalidOperationException(
+                        $"TenantId mismatch for {entry.Metadata.ClrType.Name}: {tenantScoped.TenantId} != {CurrentTenantId}.");
+                }
+
+                continue;
+            }
+
+            tenantScoped.TenantId = CurrentTenantId;
         }
     }
 }

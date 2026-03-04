@@ -1,10 +1,11 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.ApiTests.TestUtils;
-using EBOS.CRM.Application.Contracts.Responses.Services;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using Moq;
 using CRMBranchOffice = EBOS.CRM.Domain.Entities.CRM.BranchOffice;
@@ -15,7 +16,6 @@ public class UpdateBranchOfficeCommandHandlerTest
 {
     private readonly Mock<IBranchOfficeRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
-    private readonly Mock<ICurrentUserContext> _currentUserMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly UpdateBranchOfficeCommandHandler _handler;
 
@@ -23,21 +23,21 @@ public class UpdateBranchOfficeCommandHandlerTest
     {
         _repositoryMock = new Mock<IBranchOfficeRepository>();
         _auditServiceMock = new Mock<IAuditService>();
-        _currentUserMock = new Mock<ICurrentUserContext>();
+        var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
 
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-        _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
+        currentUserMock.SetupGet(x => x.UserId).Returns(1);
+        currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
 
         _auditServiceMock.Setup(a => a.InsertAuditAsync(
-                It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+                It.IsAny<AuditInsertRequest>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuditInsertResponse(true, 1));
 
         _handler = new UpdateBranchOfficeCommandHandler(
             _repositoryMock.Object,
             _auditServiceMock.Object,
-            _currentUserMock.Object,
+            currentUserMock.Object,
             _mapperMock.Object);
     }
 
@@ -52,7 +52,7 @@ public class UpdateBranchOfficeCommandHandlerTest
         Assert.Null(result);
         _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CRMBranchOffice>(), It.IsAny<CancellationToken>()), Times.Never);
         _auditServiceMock.Verify(a => a.InsertAuditAsync(
-            It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+            It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -75,7 +75,7 @@ public class UpdateBranchOfficeCommandHandlerTest
         _repositoryMock.Verify(r => r.UpdateAsync(entity, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _auditServiceMock.Verify(a => a.InsertAuditAsync(
-            It.IsAny<EBOS.CRM.Application.Contracts.Requests.Services.AuditInsertRequest>(),
+            It.IsAny<AuditInsertRequest>(),
             It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(r => r.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -99,6 +99,7 @@ public class UpdateBranchOfficeCommandHandlerTest
     }
 
     private static UpdateBranchOfficeRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             Id: 1,
             Name: "Main",
             PhoneNumber: "123",

@@ -1,22 +1,24 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
 
-
 namespace EBOS.CRM.Application.Features.CRM.TaxInformationAddress.Commands.UpdateTaxInformationAddress;
 
-public class UpdateTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateTaxInformationAddressCommand, TaxInformationAddressResponse?>
+public class UpdateTaxInformationAddressCommandHandler(ITaxInformationAddressRepository repository,
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<UpdateTaxInformationAddressCommand, TaxInformationAddressResponse?>
 {
-    public async Task<TaxInformationAddressResponse?> Handle(UpdateTaxInformationAddressCommand request, CancellationToken cancellationToken)
+    public async Task<TaxInformationAddressResponse?> Handle(UpdateTaxInformationAddressCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.TaxInformationAddressRequest ?? throw new ArgumentNullException(nameof(request.TaxInformationAddressRequest));
+        var entityRequest = request.TaxInformationAddressRequest ??
+                            throw new ArgumentNullException(nameof(request.TaxInformationAddressRequest));
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;

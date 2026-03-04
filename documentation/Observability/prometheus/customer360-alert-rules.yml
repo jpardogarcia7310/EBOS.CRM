@@ -1,0 +1,113 @@
+groups:
+  - name: customer360-operability
+    interval: 30s
+    rules:
+      - record: customer360:job_selector
+        expr: |
+          count by (job) (
+            customer360_merge_total{job="ebos-crm-api"}
+          )
+
+      - alert: Customer360OutboxDispatchFailuresHigh
+        expr: |
+          sum(rate(customer360_audit_outbox_total{
+            event="dispatch",
+            success="false",
+            job="ebos-crm-api"
+          }[5m])) by (job)
+          > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 outbox dispatch failures are elevated"
+          description: "Dispatch failure rate is above threshold for 10 minutes. Check audit outbox and downstream audit service."
+
+      - alert: Customer360OutboxDispatchFailuresCritical
+        expr: |
+          sum(rate(customer360_audit_outbox_total{
+            event="dispatch",
+            success="false",
+            job="ebos-crm-api"
+          }[5m])) by (job)
+          > 0.5
+        for: 5m
+        labels:
+          severity: critical
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 outbox dispatch failures are critical"
+          description: "Critical dispatch failure rate detected. Immediate action required on outbox pipeline."
+
+      - alert: Customer360OutboxEnqueueWithoutDispatch
+        expr: |
+          (
+            sum(increase(customer360_audit_outbox_total{
+              event="enqueue",
+              job="ebos-crm-api"
+            }[15m])) by (job)
+            -
+            sum(increase(customer360_audit_outbox_total{
+              event="dispatch",
+              success="true",
+              job="ebos-crm-api"
+            }[15m])) by (job)
+          ) > 50
+        for: 15m
+        labels:
+          severity: warning
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 outbox backlog trend detected"
+          description: "Enqueue events are outpacing successful dispatches in the last 15m."
+
+      - alert: Customer360ConcurrencyConflictsCritical
+        expr: |
+          sum(rate(customer360_concurrency_total{
+            exhausted_retries="true",
+            job="ebos-crm-api"
+          }[5m])) by (job)
+          > 0.05
+        for: 10m
+        labels:
+          severity: critical
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 concurrency retries exhausted"
+          description: "Commands are exhausting concurrency retries. Review contention hotspots and retry configuration."
+
+      - alert: Customer360MergeFailuresDetected
+        expr: |
+          sum(rate(customer360_merge_total{
+            success="false",
+            job="ebos-crm-api"
+          }[5m])) by (job)
+          > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 merge failures detected"
+          description: "Merge operations are failing. Inspect merge validation, dedupe candidates and domain invariants."
+
+      - alert: Customer360DedupeTrafficDrop
+        expr: |
+          sum(rate(customer360_dedupe_query_total{
+            job="ebos-crm-api"
+          }[30m])) by (job)
+          < 0.001
+        for: 60m
+        labels:
+          severity: info
+          service: ebos-crm
+          domain: customer360
+        annotations:
+          summary: "Customer 360 dedupe traffic is near zero"
+          description: "Dedupe query activity is unexpectedly low for the last hour. Validate ingestion and endpoint usage."

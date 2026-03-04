@@ -1,31 +1,43 @@
 # EBOS.CRM
 
-EBOS.CRM es un CRM libre y de codigo abierto basado en .NET 8. Proporciona una API REST limpia para gestionar datos maestros de clientes y esta disenado para crecer hasta convertirse en una plataforma CRM completa y modular.
+EBOS.CRM es un CRM libre y de código abierto basado en .NET 8. Proporciona una API REST limpia para gestionar datos maestros de clientes y está diseñado para crecer hasta convertirse en una plataforma CRM completa y modular.
 
-Este proyecto es **Software Libre**. Su objetivo es llegar a ser un stack CRM integral, impulsado por la comunidad, que funcione en Windows (IIS), Linux (Apache + proxy inverso) y macOS (proxy inverso).
+Este proyecto es **Software Libre**. Su objetivo es llegar a ser una pila CRM integral, impulsada por la comunidad, que funcione en Windows (IIS), Linux (Apache + proxy inverso) y macOS (proxy inverso).
 
-## Caracteristicas destacadas
+## Características destacadas
 
-- API REST enfocada en datos maestros de CRM (paises, estados, tipos de direccion, tipos de identificacion, direcciones).
-- Arquitectura limpia con separacion de capas API, Application, Domain e Infrastructure.
+- API REST enfocada en datos maestros de CRM (países, estados, tipos de dirección, tipos de identificación, direcciones).
+- Arquitectura limpia con separación de capas API, Aplicación, Dominio e Infraestructura.
 - Swagger/OpenAPI para explorar la API.
-- Construido con .NET 8 y librerias OSS comunes.
+- Construido con .NET 8 y librerías OSS comunes.
 
 ## Funcionalidades actuales
 
-- Endpoints CRUD para entidades de catalogo CRM.
+- Puntos finales CRUD para entidades de catálogo CRM.
 - Versionado de API con ejemplos `v1` y `v2`.
 - Formato de errores Problem Details (RFC 7807).
-- Swagger UI con filtros y validaciones.
+- Interfaz de Swagger con filtros y validaciones.
+- Base multi-tenant: modelo de dominio, validación, capa intermedia y aislamiento de datos.
 
-## Roadmap (futuro)
+## Funcionalidades multi-tenant implementadas
+
+- Entidad Tenant y TenantId en agregados CRM.
+- Invariantes con alcance por tenant y aplicación en escritura.
+- Abstracción de servicio de contexto de tenant.
+- Validación para imponer aislamiento de tenant.
+- Filtros globales de EF Core por TenantId.
+- Estrategia configurable de aislamiento por esquema/BD.
+- Capa intermedia de resolución de tenant (encabezado y subdominio).
+- Propagación del contexto de tenant en el manejo de solicitudes.
+
+## Hoja de ruta (futuro)
 
 - Soporte multi-tenant y aislamiento de datos.
-- Autenticacion OAuth2/OpenID Connect con roles.
-- Auditoria e historial de cambios.
-- Webhooks e integraciones con eventos.
-- Modulo UI para administracion y reporting.
-- Imagenes Docker y Helm charts para despliegues.
+- Autenticación OAuth2/OpenID Connect con roles.
+- Auditoría e historial de cambios.
+- Ganchos web e integraciones con eventos.
+- Módulo de interfaz de usuario para administración e informes.
+- Imágenes Docker y gráficos Helm para despliegues.
 
 ## Estructura del proyecto
 
@@ -46,15 +58,15 @@ EBOS.CRM.Api
 - .NET 8 SDK
 - SQL Server (local o remoto)
 
-## Obtener el codigo
+## Obtener el código
 
-### Descargar una release
+### Descargar una versión
 
-1. Ir a la pagina de Releases del repositorio.
-2. Descargar el ZIP o paquete mas reciente.
+1. Ir a la página de versiones del repositorio.
+2. Descargar el ZIP o paquete más reciente.
 3. Descomprimir y seguir los pasos de despliegue.
 
-### Descargar el codigo fuente
+### Descargar el código fuente
 
 ```bash
 git clone https://github.com/jpardogarcia7310/EBOS.CRM.git
@@ -63,7 +75,7 @@ cd EBOS.CRM
 
 ## Compilar y ejecutar
 
-1) Configura la cadena de conexion en `EBOS.CRM.Api/appsettings.json`:
+1) Configura la cadena de conexión en `EBOS.CRM.Api/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
@@ -83,13 +95,46 @@ dotnet ef database update --project EBOS.CRM.Infrastructure --startup-project EB
 dotnet run --project EBOS.CRM.Api
 ```
 
-4) Abre Swagger UI:
+4) Abre la interfaz de Swagger:
 
 ```
 https://localhost:5001/swagger
 ```
 
-## Instalacion
+## Autenticación (EBOS.Auth)
+
+El IdP aún no existe. Para que la API funcione hoy, se deja configuración lista para dos modos:
+
+- Modo local (sin IdP): `UseAuthority=false` y un `SigningKey` simétrico.
+- Modo IdP (cuando EBOS.Auth exista): `UseAuthority=true` y llenar `Authority`/`Audience`.
+
+Ejemplo recomendado para desarrollo local (sin 401 en Swagger):
+
+```json
+"Authentication": {
+  "Enabled": false,
+  "UseAuthority": false,
+  "Authority": "http://localhost:5100",
+  "Audience": "ebos.crm.api",
+  "ValidIssuer": "http://localhost:5100",
+  "ValidAudiences": [ "ebos.crm.api" ],
+  "SigningKey": "dev-only-ebos-auth-signing-key-change-me"
+}
+```
+
+Cuando EBOS.Auth esté disponible, cambia a:
+
+```json
+"Authentication": {
+  "Enabled": true,
+  "UseAuthority": true,
+  "Authority": "https://auth.tu-dominio.com",
+  "Audience": "ebos.crm.api",
+  "SigningKey": ""
+}
+```
+
+## Instalación
 
 ### Windows (IIS)
 
@@ -101,7 +146,7 @@ dotnet publish EBOS.CRM.Api -c Release -o publish
 
 2. Instala IIS y el .NET 8 Hosting Bundle.
 3. Crea un sitio en IIS apuntando a la carpeta `publish`.
-4. Configura el App Pool en **No Managed Code**.
+4. Configura el grupo de aplicaciones en **No Managed Code**.
 5. Ajusta variables de entorno y `appsettings.*.json`.
 6. Reinicia el sitio.
 
@@ -121,7 +166,7 @@ ProxyPass / http://127.0.0.1:5000/
 ProxyPassReverse / http://127.0.0.1:5000/
 ```
 
-4. Habilita modulos requeridos (`proxy`, `proxy_http`) y reinicia Apache.
+4. Habilita módulos requeridos (`proxy`, `proxy_http`) y reinicia Apache.
 
 ### macOS
 
@@ -150,7 +195,7 @@ Los errores siguen `application/problem+json` (RFC 7807). Ejemplo:
 
 ```json
 {
-  "title": "One or more validation errors occurred.",
+  "title": "One or more validation errors occurred..",
   "status": 400,
   "errors": {
     "name": [ "Name is required" ]
@@ -166,7 +211,55 @@ Los errores siguen `application/problem+json` (RFC 7807). Ejemplo:
 }
 ```
 
-## Tecnologias principales
+## Configuración
+
+### Aislamiento de tenant
+
+`TenantIsolation:TraversalDepth` controla cuán profundo se recorre el grafo de solicitudes para validar el tenant.
+El rango permitido se configura con `TenantIsolation:MinTraversalDepth` y
+`TenantIsolation:MaxTraversalDepth`.
+
+- Rango: `1` a `50`
+- Default: `10`
+
+Ejemplo:
+
+```json
+"TenantIsolation": {
+  "MinTraversalDepth": 1,
+  "MaxTraversalDepth": 50,
+  "TraversalDepth": 10
+}
+```
+
+## Workflows de CI y para qué sirve cada uno
+
+El repositorio usa workflows de CI separados para aislar riesgos, acelerar el feedback y mantener puertas de calidad de nivel enterprise.
+
+- `customer360-suites-ci.yml`:
+  - `api-tests`: valida rápidamente el comportamiento de la capa API (controladores/contratos).
+  - `integration-tests`: valida flujos de negocio entre capas en modo integración.
+  - `concurrency-tests`: detecta condiciones de carrera y regresiones por acceso concurrente.
+  - `stress-tests`: valida comportamiento bajo carga (timeouts, regresiones 5xx y rendimiento base).
+  - `integration-sqlserver-tests`: ejecuta escenarios con SQL Server real usando Testcontainers (`USE_TESTCONTAINERS=true`) para migraciones, comportamiento transaccional y hardening específico de SQL.
+  - `summary`: consolida resultados TRX de todas las suites en un único reporte.
+
+- `observability-ci.yml`:
+  - valida configuración de Prometheus/Alertmanager/Grafana y ejecuta smoke tests de observabilidad.
+  - evita romper monitoreo y alertas por cambios de configuración.
+
+- `openapi-compatibility-gate.yml`:
+  - ejecuta validación de compatibilidad OpenAPI por snapshot.
+  - falla ante deriva del contrato API (posibles breaking changes) salvo actualización explícita del snapshot.
+
+Por qué esta separación es necesaria:
+
+- diagnóstico claro por área de riesgo.
+- feedback más rápido mediante ejecución en paralelo.
+- menos falsos positivos al correr cada suite en su entorno correcto.
+- gates enterprise más sólidos para compatibilidad API, comportamiento real en SQL Server, concurrencia, estrés y operabilidad.
+
+## Tecnologías principales
 
 - ASP.NET Core 8
 - Entity Framework Core

@@ -1,10 +1,9 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
 
@@ -61,10 +60,10 @@ public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditS
 
         return new CustomerResponse(
             entity.Id,
+            entity.TenantId,
             entity.Code,
             entity.Email,
             entity.Phone,
-            entity.CreatedAt,
             entity.StatusId,
             !entity.Erased);
     }

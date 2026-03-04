@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -19,6 +17,13 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
         builder.Property(ti => ti.TaxIdentificationNumber)
             .IsRequired()
             .HasMaxLength(20);
+        builder.Property(ti => ti.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(ti => ti.CreatedBy)
+            .IsRequired();
+        builder.Property(ti => ti.UpdatedAt);
+        builder.Property(ti => ti.UpdatedBy);
         builder.Property(ti => ti.Erased)
             .IsRequired();
 
@@ -33,5 +38,8 @@ public class TaxInformationConfiguration : IEntityTypeConfiguration<TaxInformati
             .WithOne(c => c.TaxInformation)
             .HasForeignKey<TaxInformation>(ti => ti.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(ti => ti.TenantId)
+            .HasDatabaseName("IX_TaxInformation_TenantId");
     }
 }

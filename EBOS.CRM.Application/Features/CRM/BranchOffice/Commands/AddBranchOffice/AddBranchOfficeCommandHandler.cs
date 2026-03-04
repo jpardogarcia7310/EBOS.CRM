@@ -1,11 +1,10 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
 
@@ -16,8 +15,9 @@ public class AddBranchOfficeCommandHandler(IBranchOfficeRepository repository, I
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BranchOfficeRequest ?? throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entityRequest);
+        var entityRequest = request.BranchOfficeRequest ??
+                            throw new ArgumentNullException(nameof(request.BranchOfficeRequest));
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BranchOffice>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

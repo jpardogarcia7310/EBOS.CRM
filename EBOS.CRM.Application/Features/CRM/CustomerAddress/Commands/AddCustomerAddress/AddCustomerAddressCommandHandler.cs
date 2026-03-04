@@ -1,23 +1,25 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddress;
 
 public class AddCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddCustomerAddressCommand, CustomerAddressResponse>
+    ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<AddCustomerAddressCommand, CustomerAddressResponse>
 {
-    public async Task<CustomerAddressResponse> Handle(AddCustomerAddressCommand request, CancellationToken cancellationToken)
+    public async Task<CustomerAddressResponse> Handle(AddCustomerAddressCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.CustomerAddressRequest ?? throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
+        var entityRequest = request.CustomerAddressRequest ??
+                            throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

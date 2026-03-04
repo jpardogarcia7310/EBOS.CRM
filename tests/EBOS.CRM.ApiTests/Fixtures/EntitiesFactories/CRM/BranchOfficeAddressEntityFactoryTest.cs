@@ -4,13 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class BranchOfficeAddressEntityFactoryTest
 {
-    public static BranchOfficeAddress CreateValidBranchOfficeAddress(
-        long branchOfficeId = 1,
-        long addressId = 1,
-        bool isPrimary = true,
-        DateTime? validFrom = null,
-        DateTime? validTo = null,
-        bool isCurrent = true)
+    private static BranchOfficeAddress CreateValidBranchOfficeAddress(long branchOfficeId = 1, long addressId = 1,
+        bool isPrimary = true, DateTime? validFrom = null, DateTime? validTo = null, bool isCurrent = true)
     {
         return new BranchOfficeAddress
         {

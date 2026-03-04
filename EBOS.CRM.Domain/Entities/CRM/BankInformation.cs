@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EBOS.Core.Primitives;
-
+using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
 
-public class BankInformation : ErasableEntity
+public class BankInformation : ErasableEntity, ITenantScopedEntity
 {
+    public long TenantId { get; set; }
     [Required]
     [MaxLength(34)]
     public string Iban { get; set; } = null!;
@@ -14,6 +15,10 @@ public class BankInformation : ErasableEntity
     public string? Bic { get; set; }
     [MaxLength(200)]
     public string? BankName { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public long CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public long? UpdatedBy { get; set; }
 
     // Foreign Keys
     public long CustomerId { get; set; }

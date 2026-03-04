@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -42,6 +40,13 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasPrecision(10, 6);
         builder.Property(a => a.Longitude)
             .HasPrecision(10, 6);
+        builder.Property(a => a.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(a => a.CreatedBy)
+            .IsRequired();
+        builder.Property(a => a.UpdatedAt);
+        builder.Property(a => a.UpdatedBy);
         builder.Property(a => a.Erased)
             .IsRequired();
 
@@ -75,6 +80,8 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasDatabaseName("IX_Address_City_State");
         builder.HasIndex(a => new { a.CountryId, a.City })
             .HasDatabaseName("IX_Address_Country_City");
+        builder.HasIndex(a => a.TenantId)
+            .HasDatabaseName("IX_Address_TenantId");
     }
 }
 

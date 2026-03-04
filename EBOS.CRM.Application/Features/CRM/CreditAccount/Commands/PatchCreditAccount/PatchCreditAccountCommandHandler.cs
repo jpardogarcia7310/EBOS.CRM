@@ -1,17 +1,17 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.CreditAccount.Commands.PatchCreditAccount;
 
 public class PatchCreditAccountCommandHandler(ICreditAccountRepository repository, IAuditService auditService,
     ICurrentUserContext currentUser) : IRequestHandler<PatchCreditAccountCommand, CreditAccountResponse?>
 {
-    public async Task<CreditAccountResponse?> Handle(PatchCreditAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CreditAccountResponse?> Handle(PatchCreditAccountCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -59,6 +59,7 @@ public class PatchCreditAccountCommandHandler(ICreditAccountRepository repositor
 
         return new CreditAccountResponse(
             entity.Id,
+            entity.TenantId,
             entity.MaxAmount,
             entity.UsedAmount,
             entity.AvailableAmount,

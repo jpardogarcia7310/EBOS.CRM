@@ -1,17 +1,20 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOffice;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Api.Constants;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOffice;
+using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.AddBranchOffice;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.DeleteBranchOffice;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetBranchOfficeById;
 using EBOS.CRM.Application.Features.CRM.BranchOffice.Queries.GetAllBranchOffices;
 using MediatR;
+using EBOS.CRM.Api.Options;
+using Microsoft.Extensions.Options;
 
 namespace EBOS.CRM.Api.Controllers.CRM.BranchOffice;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route(ApiRouteTemplates.Versioned)]
 [Produces("application/json")]
 public class BranchOfficeController(IMediator mediator) : ControllerBase
 {
@@ -24,7 +27,6 @@ public class BranchOfficeController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new AddBranchOfficeCommand(request), cancellationToken));
     }
-
     [HttpPut("{id:long}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(BranchOfficeResponse), StatusCodes.Status200OK)]
@@ -35,17 +37,10 @@ public class BranchOfficeController(IMediator mediator) : ControllerBase
         var dto = await mediator.Send(new UpdateBranchOfficeCommand(id, request), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
     [HttpDelete("{id:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -54,18 +49,11 @@ public class BranchOfficeController(IMediator mediator) : ControllerBase
         var deleted = await mediator.Send(new DeleteBranchOfficeCommand(id), cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok();
     }
     #endregion
-
     #region Queries
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(BranchOfficeResponse), StatusCodes.Status200OK)]
@@ -77,27 +65,36 @@ public class BranchOfficeController(IMediator mediator) : ControllerBase
         var dto = await mediator.Send(new GetBranchOfficeByIdQuery(id), cancellationToken);
         if (dto is null)
         {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Resource not found",
-                Detail = $"BranchOffice with id {id} not found.",
-                Status = StatusCodes.Status404NotFound
-            });
+            return NotFound(ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode: StatusCodes.Status404NotFound, title: ProblemDetailsDefaults.NotFoundTitle, detail: $"BranchOffice with id {id} not found."));
         }
-
         return Ok(dto);
     }
-
+    /// <summary>
+    /// Returns all resources (paginated).
+    /// </summary>
+    /// <param name="paginationOptions">Pagination settings.</param>
+    /// <param name="pageNumber">1-based page number.</param>
+    /// <param name="pageSize">Page size (must be &lt;= configured max).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">List of resources. Adds X-Total-Count header.</response>
+    /// <response code="400">Invalid pageSize.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<BranchOfficeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAllAsync([FromServices] IOptions<PaginationOptions> paginationOptions,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        return Ok(await mediator.Send(new GetAllBranchOfficesQuery(), cancellationToken));
+        var settings = paginationOptions.Value;
+        var safePageNumber = Math.Max(1, pageNumber);
+        var safePageSize = pageSize <= 0 ? settings.DefaultPageSize : pageSize;
+        var result = await mediator.Send(new GetAllBranchOfficesQuery(safePageNumber, safePageSize), cancellationToken);
+        Response.Headers["X-Total-Count"] = result.Total.ToString();
+        return Ok(result.Items);
     }
-
     #endregion
 }
+
 
 
 

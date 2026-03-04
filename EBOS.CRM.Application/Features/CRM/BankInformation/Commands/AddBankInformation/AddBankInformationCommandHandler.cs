@@ -1,23 +1,25 @@
-using EBOS.CRM.Application.Contracts.Requests.Services;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
-using EBOS.CRM.Application.Services.Audit;
-using EBOS.CRM.Application.Services.Interfaces;
+using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.BankInformation.Commands.AddBankInformation;
 
 public class AddBankInformationCommandHandler(IBankInformationRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddBankInformationCommand, BankInformationResponse>
+    ICurrentUserContext currentUser, IMapper mapper) :
+    IRequestHandler<AddBankInformationCommand, BankInformationResponse>
 {
-    public async Task<BankInformationResponse> Handle(AddBankInformationCommand request, CancellationToken cancellationToken)
+    public async Task<BankInformationResponse> Handle(AddBankInformationCommand request,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entityRequest = request.BankInformationRequest ?? throw new ArgumentNullException(nameof(request.BankInformationRequest));
-        var entity = mapper.Map<EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
+        var entityRequest = request.BankInformationRequest ??
+                            throw new ArgumentNullException(nameof(request.BankInformationRequest));
+        var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.BankInformation>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
 

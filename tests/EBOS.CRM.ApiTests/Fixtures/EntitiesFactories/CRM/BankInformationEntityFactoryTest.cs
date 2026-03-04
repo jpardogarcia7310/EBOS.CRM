@@ -4,11 +4,8 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class BankInformationEntityFactoryTest
 {
-    public static BankInformation CreateValidBankInformation(
-        string iban = "ES1200000000000000000000",
-        string? bic = "BANKESMM",
-        string? bankName = "Bank",
-        long customerId = 1)
+    private static BankInformation CreateValidBankInformation(string iban = "ES1200000000000000000000",
+        string? bic = "BANKESMM", string? bankName = "Bank", long customerId = 1)
     {
         return new BankInformation
         {

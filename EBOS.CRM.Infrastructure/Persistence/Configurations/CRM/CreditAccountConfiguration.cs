@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -22,6 +20,13 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         builder.Property(c => c.UsedAmount)
                .IsRequired()
                .HasPrecision(18, 2);
+        builder.Property(c => c.CreatedAt)
+               .IsRequired()
+               .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(c => c.CreatedBy)
+               .IsRequired();
+        builder.Property(c => c.UpdatedAt);
+        builder.Property(c => c.UpdatedBy);
         builder.Property(c => c.Erased)
                .IsRequired();
 
@@ -52,6 +57,8 @@ public class CreditAccountConfiguration : IEntityTypeConfiguration<CreditAccount
         // Index for FK: CreditAccount.CustomerId
         builder.HasIndex(c => c.CustomerId)
                .HasDatabaseName("IX_CreditAccount_CustomerId");
+        builder.HasIndex(c => c.TenantId)
+               .HasDatabaseName("IX_CreditAccount_TenantId");
         // ------------------------------------------------------------
         // One-to-Many: CreditAccount (principal) → CreditTransactions (dependent)
         // FK: CreditTransactions.CreditAccountId

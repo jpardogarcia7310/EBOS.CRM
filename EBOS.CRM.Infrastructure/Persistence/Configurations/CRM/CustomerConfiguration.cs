@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -22,8 +20,17 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.Phone)
             .IsRequired()
             .HasMaxLength(12);
+        builder.Property(c => c.Source)
+            .HasMaxLength(100);
+        builder.Property(c => c.Confidentiality)
+            .HasMaxLength(50);
         builder.Property(c => c.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(c => c.CreatedBy)
             .IsRequired();
+        builder.Property(c => c.UpdatedAt);
+        builder.Property(c => c.UpdatedBy);
         builder.Property(c => c.Erased)
             .IsRequired();
 
@@ -39,6 +46,17 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.HasIndex(c => new { c.StatusId, c.CreatedAt })
             .HasDatabaseName("IX_Customer_Status_CreatedAt");
+        builder.HasIndex(c => c.TenantId)
+            .HasDatabaseName("IX_Customer_TenantId");
+        builder.HasIndex(c => new { c.TenantId, c.Code })
+            .IsUnique()
+            .HasDatabaseName("UX_Customer_TenantId_Code");
+        builder.HasIndex(c => new { c.TenantId, c.Email })
+            .HasDatabaseName("IX_Customer_TenantId_Email")
+            .HasFilter("[Erased] = 0");
+        builder.HasIndex(c => new { c.TenantId, c.Phone })
+            .HasDatabaseName("IX_Customer_TenantId_Phone")
+            .HasFilter("[Erased] = 0");
 
         builder.HasOne(c => c.Status)
             .WithMany(s => s.Customers)

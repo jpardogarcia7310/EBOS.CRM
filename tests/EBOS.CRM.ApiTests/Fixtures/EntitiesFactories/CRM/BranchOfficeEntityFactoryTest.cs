@@ -4,9 +4,7 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class BranchOfficeEntityFactoryTest
 {
-    public static BranchOffice CreateValidBranchOffice(
-        string name = "Main",
-        string phoneNumber = "123",
+    private static BranchOffice CreateValidBranchOffice(string name = "Main", string phoneNumber = "123",
         long corporateCustomerId = 1)
     {
         return new BranchOffice

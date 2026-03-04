@@ -1,0 +1,1030 @@
+{
+  "components": {
+    "schemas": {
+      "EBOS.CRM.Contracts.Responses.EBOS.AddressTypeResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "allowsMultiple": {
+            "type": "boolean"
+          },
+          "category": {
+            "nullable": true,
+            "type": "string"
+          },
+          "code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "requiresPrimary": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "EBOS.CRM.Contracts.Responses.EBOS.ChannelCountryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "channelTypeDescripcion": {
+            "nullable": true,
+            "type": "string"
+          },
+          "channelTypeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "compositeKey": {
+            "nullable": true,
+            "type": "string"
+          },
+          "countryId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "countryIso2": {
+            "nullable": true,
+            "type": "string"
+          },
+          "countryName": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "EBOS.CRM.Contracts.Responses.EBOS.CountryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "currencyCode": {
+            "nullable": true,
+            "type": "string"
+          },
+          "domain": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "internationalPhoneCode": {
+            "nullable": true,
+            "type": "string"
+          },
+          "iso31661A2Code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "iso31661A3Code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "iso31661NumCode": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "EBOS.CRM.Contracts.Responses.EBOS.IdentificationTypeResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "EBOS.CRM.Contracts.Responses.EBOS.StatusResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Microsoft.AspNetCore.Mvc.ProblemDetails": {
+        "additionalProperties": {},
+        "properties": {
+          "detail": {
+            "nullable": true,
+            "type": "string"
+          },
+          "instance": {
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Microsoft.AspNetCore.Mvc.ValidationProblemDetails": {
+        "additionalProperties": {},
+        "description": "ValidationProblemDetails with standard RFC7807 fields and an optional errorsDetailed extension.",
+        "properties": {
+          "detail": {
+            "nullable": true,
+            "type": "string"
+          },
+          "errors": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "nullable": true,
+            "type": "object"
+          },
+          "instance": {
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-errors-detailed": {
+          "iso31661A2Code": [
+            {
+              "code": "VAL_ISOA2_LENGTH",
+              "message": "El campo Iso31661A2Code debe tener 2 caracteres."
+            }
+          ],
+          "name": [
+            {
+              "code": "VAL_NAME_REQUIRED",
+              "message": "El campo Name es obligatorio."
+            }
+          ]
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "bearerFormat": "JWT",
+        "description": "JWT Authorization header using the Bearer scheme.",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "EBOS.CRM API documentation (version 1.0)",
+    "title": "EBOS.CRM API",
+    "version": "1.0"
+  },
+  "openapi": "3.0.4",
+  "paths": {
+    "/api/v1/AddressType": {
+      "get": {
+        "parameters": [
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "pageNumber",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page size (must be \u003C= configured max).",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.AddressTypeResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of resources. Adds X-Total-Count header.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Returns all resources (paginated).",
+        "tags": [
+          "V1 - AddressType"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/AddressType/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Address type id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.AddressTypeResponse"
+                }
+              }
+            },
+            "description": "Address type found.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Gets an address type by id.",
+        "tags": [
+          "V1 - AddressType"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/ChannelCountry": {
+      "get": {
+        "parameters": [
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "pageNumber",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page size (must be \u003C= configured max).",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.ChannelCountryResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of resources. Adds X-Total-Count header.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Returns all resources (paginated).",
+        "tags": [
+          "V1 - ChannelCountry"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/ChannelCountry/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "ChannelCountry id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.ChannelCountryResponse"
+                }
+              }
+            },
+            "description": "ChannelCountry found.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Gets a channel-country permission by id.",
+        "tags": [
+          "V1 - ChannelCountry"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/Country": {
+      "get": {
+        "parameters": [
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "pageNumber",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page size (must be \u003C= configured max).",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.CountryResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of resources. Adds X-Total-Count header.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Returns all resources (paginated).",
+        "tags": [
+          "V1 - Country"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/Country/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Country id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.CountryResponse"
+                }
+              }
+            },
+            "description": "Country found.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Gets a country by id.",
+        "tags": [
+          "V1 - Country"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/IdentificationType": {
+      "get": {
+        "parameters": [
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "pageNumber",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page size (must be \u003C= configured max).",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.IdentificationTypeResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of resources. Adds X-Total-Count header.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Returns all resources (paginated).",
+        "tags": [
+          "V1 - IdentificationType"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/IdentificationType/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Identification type id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.IdentificationTypeResponse"
+                }
+              }
+            },
+            "description": "Identification type found.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Gets an identification type by id.",
+        "tags": [
+          "V1 - IdentificationType"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/Status": {
+      "get": {
+        "parameters": [
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "pageNumber",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page size (must be \u003C= configured max).",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.StatusResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List of resources. Adds X-Total-Count header.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Returns all resources (paginated).",
+        "tags": [
+          "V1 - Status"
+        ],
+        "x-groupName": "v1"
+      }
+    },
+    "/api/v1/Status/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Status id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EBOS.CRM.Contracts.Responses.EBOS.StatusResponse"
+                }
+              }
+            },
+            "description": "Status found.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total items available before pagination.",
+                "schema": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ValidationProblemDetails"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "404": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "500": {
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Gets a status by id.",
+        "tags": [
+          "V1 - Status"
+        ],
+        "x-groupName": "v1"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

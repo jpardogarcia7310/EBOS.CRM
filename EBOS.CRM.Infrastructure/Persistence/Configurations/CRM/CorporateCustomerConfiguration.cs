@@ -1,6 +1,4 @@
 using EBOS.CRM.Domain.Entities.CRM;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace EBOS.CRM.Infrastructure.Persistence.Configurations.CRM;
 
@@ -37,5 +35,9 @@ public class CorporateCustomerConfiguration : IEntityTypeConfiguration<Corporate
             .WithOne(bo => bo.CorporateCustomer)
             .HasForeignKey(bo => bo.CorporateCustomerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(c => new { c.TenantId, c.TaxIdentification })
+            .HasDatabaseName("IX_CorporateCustomer_TenantId_TaxIdentification")
+            .HasFilter("[CustomerType] = 'Corporate' AND [Erased] = 0");
     }
 }

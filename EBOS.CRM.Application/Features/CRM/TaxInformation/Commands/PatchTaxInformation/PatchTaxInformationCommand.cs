@@ -1,8 +1,6 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM;
-using EBOS.CRM.Application.Contracts.Requests.CRM.TaxInformation;
-using EBOS.CRM.Application.Contracts.Responses.CRM;
+using EBOS.CRM.Contracts.Requests.CRM.TaxInformation;
+using EBOS.CRM.Contracts.Responses.CRM;
 using MediatR;
-
 
 namespace EBOS.CRM.Application.Features.CRM.TaxInformation.Commands.PatchTaxInformation;
 

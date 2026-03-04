@@ -1,5 +1,6 @@
-using EBOS.CRM.Domain.Entities;
-
+using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Entities.Identity;
 
 namespace EBOS.CRM.Infrastructure.Persistence;
 
@@ -8,6 +9,21 @@ public static class CrmDbContextSeed
     public static async Task SeedAsync(CrmDbContext context, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
+
+        if (!await context.Permissions.AnyAsync(cancellationToken))
+        {
+            await SeedPermissions(context, cancellationToken);
+        }
+
+        if (!await context.Roles.AnyAsync(cancellationToken))
+        {
+            await SeedRoles(context, cancellationToken);
+        }
+
+        if (!await context.RolePermissions.AnyAsync(cancellationToken))
+        {
+            await SeedRolePermissions(context, cancellationToken);
+        }
 
         // Seeding Countries: reduced and validated example.
         if (!await context.Countries.AnyAsync(cancellationToken))
@@ -25,6 +41,10 @@ public static class CrmDbContextSeed
         if (!await context.IdentificationTypes.AnyAsync(cancellationToken))
         {
             await SeedIdentificationTypes(context, cancellationToken);
+        }
+        if (!await context.OpportunityStages.AnyAsync(cancellationToken))
+        {
+            await SeedOpportunityStages(context, cancellationToken);
         }
     }
 
@@ -47,7 +67,8 @@ public static class CrmDbContextSeed
             .ToList();
         if (invalid.Count != 0)
         {
-            throw new InvalidOperationException("Seed data contains invalid status entries. Please validate the seed source.");
+            throw new InvalidOperationException("Seed data contains invalid status entries. " +
+                                                "Please validate the seed source.");
         }
 
         await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
@@ -126,6 +147,164 @@ public static class CrmDbContextSeed
         await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
         {
             await context.AddRangeAsync(identificationTypes, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        });
+    }
+
+    private static async Task SeedPermissions(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var resources = new[]
+        {
+            "country",
+            "status",
+            "identification-type",
+            "address-type",
+            "address",
+            "bank-information",
+            "branch-office",
+            "branch-office-address",
+            "corporate-customer",
+            "credit-account",
+            "credit-transaction",
+            "customer",
+            "customer-address",
+            "individual-customer",
+            "tax-information",
+            "tax-information-address",
+            "case",
+            "sla",
+            "queue",
+            "case-activity"
+        };
+
+        var actions = new[] { "read", "create", "update", "delete" };
+
+        var permissions = new List<Permission>();
+        foreach (var resource in resources)
+        {
+            foreach (var action in actions)
+            {
+                var code = $"crm.{resource}.{action}";
+                permissions.Add(new Permission
+                {
+                    Code = code,
+                    Name = code,
+                    Description = $"CRM {resource} {action}",
+                    IsSystem = true,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = 0
+                });
+            }
+        }
+
+        await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
+        {
+            await context.Permissions.AddRangeAsync(permissions, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        });
+    }
+
+    private static async Task SeedRoles(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var roles = new List<Role>
+        {
+            new()
+            {
+                Code = "crm.readonly",
+                Name = "CRM Readonly",
+                Description = "Read-only access to CRM",
+                IsSystem = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            },
+            new()
+            {
+                Code = "crm.editor",
+                Name = "CRM Editor",
+                Description = "Create and update CRM data",
+                IsSystem = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            },
+            new()
+            {
+                Code = "crm.admin",
+                Name = "CRM Admin",
+                Description = "Full access to CRM data",
+                IsSystem = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            }
+        };
+
+        await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
+        {
+            await context.Roles.AddRangeAsync(roles, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        });
+    }
+
+    private static async Task SeedRolePermissions(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var permissions = await context.Permissions
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        var roles = await context.Roles
+            .ToListAsync(cancellationToken);
+
+        var readonlyRole = roles.Single(r => r.Code == "crm.readonly");
+        var editorRole = roles.Single(r => r.Code == "crm.editor");
+        var adminRole = roles.Single(r => r.Code == "crm.admin");
+
+        var readPermissions = permissions.Where(p => p.Code.EndsWith(".read", StringComparison.OrdinalIgnoreCase));
+        var writePermissions = permissions.Where(p =>
+            p.Code.EndsWith(".create", StringComparison.OrdinalIgnoreCase) ||
+            p.Code.EndsWith(".update", StringComparison.OrdinalIgnoreCase));
+
+        var rolePermissions = new List<RolePermission>();
+
+        foreach (var permission in readPermissions)
+        {
+            rolePermissions.Add(new RolePermission
+            {
+                RoleId = readonlyRole.Id,
+                PermissionId = permission.Id,
+                AssignedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            });
+        }
+
+        foreach (var permission in readPermissions.Concat(writePermissions))
+        {
+            rolePermissions.Add(new RolePermission
+            {
+                RoleId = editorRole.Id,
+                PermissionId = permission.Id,
+                AssignedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            });
+        }
+
+        foreach (var permission in permissions)
+        {
+            rolePermissions.Add(new RolePermission
+            {
+                RoleId = adminRole.Id,
+                PermissionId = permission.Id,
+                AssignedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 0
+            });
+        }
+
+        await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
+        {
+            await context.RolePermissions.AddRangeAsync(rolePermissions, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
         });
     }
@@ -1183,6 +1362,37 @@ public static class CrmDbContextSeed
         });
     }
 
+    private static async Task SeedOpportunityStages(CrmDbContext context, CancellationToken cancellationToken)
+    {
+        var stages = new List<OpportunityStage>
+        {
+            new() { TenantId = 0, Name = "Prospección", Order = 1, DefaultProbability = 0.1m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Calificado", Order = 2, DefaultProbability = 0.3m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Propuesta", Order = 3, DefaultProbability = 0.5m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Negociación", Order = 4, DefaultProbability = 0.7m, IsClosed = false, IsWon = false },
+            new() { TenantId = 0, Name = "Cerrado Ganado", Order = 5, DefaultProbability = 1.0m, IsClosed = true, IsWon = true },
+            new() { TenantId = 0, Name = "Cerrado Perdido", Order = 6, DefaultProbability = 0.0m, IsClosed = true, IsWon = false }
+        };
+
+        var invalid = stages
+            .Select((s, i) => new { Index = i, Stage = s })
+            .Where(x =>
+                string.IsNullOrWhiteSpace(x.Stage.Name) ||
+                x.Stage.DefaultProbability < 0 ||
+                x.Stage.DefaultProbability > 1)
+            .ToList();
+        if (invalid.Count != 0)
+        {
+            throw new InvalidOperationException("Seed data contains invalid OpportunityStages entries. Please validate the seed source.");
+        }
+
+        await SaveChangesWithOptionalTransactionAsync(context, cancellationToken, async () =>
+        {
+            await context.AddRangeAsync(stages, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        });
+    }
+
     private static async Task SaveChangesWithOptionalTransactionAsync(CrmDbContext context,
         CancellationToken cancellationToken, Func<Task> action)
     {
@@ -1205,4 +1415,5 @@ public static class CrmDbContextSeed
         }
     }
 }
+
 

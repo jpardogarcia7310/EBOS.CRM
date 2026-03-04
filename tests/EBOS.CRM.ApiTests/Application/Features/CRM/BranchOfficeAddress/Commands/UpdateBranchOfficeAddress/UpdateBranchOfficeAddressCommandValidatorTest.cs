@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Contracts.Requests.CRM.BranchOfficeAddress;
+using EBOS.CRM.Contracts.Requests.CRM.BranchOfficeAddress;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.UpdateBranchOfficeAddress;
 using FluentValidation.TestHelper;
 
@@ -9,16 +9,17 @@ public class UpdateBranchOfficeAddressCommandValidatorTest
     private readonly UpdateBranchOfficeAddressCommandValidator _validator = new();
 
     [Fact]
-    public void Validate_InvalidId_Fails()
+    public async Task Validate_InvalidId_Fails()
     {
         var command = new UpdateBranchOfficeAddressCommand(0, BuildUpdateRequest());
 
-        var result = _validator.TestValidate(command);
+        var result = await _validator.TestValidateAsync(command);
 
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     private static UpdateBranchOfficeAddressRequest BuildUpdateRequest() => new(
+            TenantId: 1,
             BranchOfficeId: 1,
             AddressId: 1,
             IsPrimary: true,
@@ -27,5 +28,7 @@ public class UpdateBranchOfficeAddressCommandValidatorTest
             IsCurrent: true
         );
 }
+
+
 
 

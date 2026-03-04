@@ -4,14 +4,9 @@ namespace EBOS.CRM.ApiTests.Fixtures.EntitiesFactories.CRM;
 
 public class CorporateCustomerEntityFactoryTest
 {
-    public static CorporateCustomer CreateValidCorporateCustomer(
-        string code = "CORP-001",
-        string email = "corp@example.com",
-        string phone = "123",
-        DateTime? createdAt = null,
-        long statusId = 1,
-        string legalName = "Corp SA",
-        string taxIdentification = "TAX123")
+    private static CorporateCustomer CreateValidCorporateCustomer(string code = "CORP-001",
+        string email = "corp@example.com", string phone = "123", DateTime? createdAt = null, long statusId = 1,
+        string legalName = "Corp SA", string taxIdentification = "TAX123")
     {
         return new CorporateCustomer
         {

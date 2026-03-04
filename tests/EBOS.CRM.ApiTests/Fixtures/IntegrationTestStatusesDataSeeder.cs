@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities;
+using EBOS.CRM.Domain.Entities.EBOS;
 using EBOS.CRM.Infrastructure.Persistence;
 
 namespace EBOS.CRM.ApiTests.Fixtures;
@@ -27,5 +28,6 @@ public static class IntegrationTestStatusesDataSeeder
         context.SaveChanges();
     }
 }
+
 
 
