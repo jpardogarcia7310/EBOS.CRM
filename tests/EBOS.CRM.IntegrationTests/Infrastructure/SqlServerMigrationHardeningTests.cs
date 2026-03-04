@@ -138,6 +138,10 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
         await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
 
+        var statusId = await EnsureStatusAsync("Retry-Active");
+        var customerA = await InsertCustomerAsync(statusId, tenantId: 1, codePrefix: "RTA");
+        var customerB = await InsertCustomerAsync(statusId, tenantId: 1, codePrefix: "RTB");
+
         var strategy = db.Database.CreateExecutionStrategy();
         strategy.RetriesOnFailure.Should().BeTrue();
 
@@ -151,9 +155,8 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
 
             if (attempts == 1)
             {
-                cmd.CommandTimeout = 1;
-                cmd.CommandText = "WAITFOR DELAY '00:00:03'; SELECT 1;";
-                return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                await CauseDeadlockOnceAsync(customerA, customerB);
+                return 0;
             }
 
             cmd.CommandText = "SELECT 1;";
@@ -287,6 +290,76 @@ public sealed class SqlServerMigrationHardeningTests : IAsyncLifetime
                 await Task.Delay(delayMs);
             }
         }
+    }
+
+    private async Task CauseDeadlockOnceAsync(long customerA, long customerB)
+    {
+        await using var conn1 = new SqlConnection(_connectionString);
+        await using var conn2 = new SqlConnection(_connectionString);
+        await conn1.OpenAsync();
+        await conn2.OpenAsync();
+
+        await using var tx1 = (SqlTransaction)await conn1.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+        await using var tx2 = (SqlTransaction)await conn2.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+        await using var lock1 = conn1.CreateCommand();
+        lock1.Transaction = tx1;
+        lock1.CommandText = "UPDATE [CRM].[Customers] SET [Phone] = [Phone] WHERE [Id] = @id;";
+        lock1.Parameters.AddWithValue("@id", customerA);
+        await lock1.ExecuteNonQueryAsync();
+
+        await using var lock2 = conn2.CreateCommand();
+        lock2.Transaction = tx2;
+        lock2.CommandText = "UPDATE [CRM].[Customers] SET [Phone] = [Phone] WHERE [Id] = @id;";
+        lock2.Parameters.AddWithValue("@id", customerB);
+        await lock2.ExecuteNonQueryAsync();
+
+        var t1 = Task.Run(async () =>
+        {
+            await using var cmd = conn1.CreateCommand();
+            cmd.Transaction = tx1;
+            cmd.CommandText = """
+                              WAITFOR DELAY '00:00:01';
+                              UPDATE [CRM].[Customers] SET [Phone] = [Phone] WHERE [Id] = @id;
+                              """;
+            cmd.Parameters.AddWithValue("@id", customerB);
+            return await cmd.ExecuteNonQueryAsync();
+        });
+
+        var t2 = Task.Run(async () =>
+        {
+            await using var cmd = conn2.CreateCommand();
+            cmd.Transaction = tx2;
+            cmd.CommandText = """
+                              WAITFOR DELAY '00:00:01';
+                              UPDATE [CRM].[Customers] SET [Phone] = [Phone] WHERE [Id] = @id;
+                              """;
+            cmd.Parameters.AddWithValue("@id", customerA);
+            return await cmd.ExecuteNonQueryAsync();
+        });
+
+        SqlException? deadlock = null;
+        try
+        {
+            await Task.WhenAll(t1, t2);
+        }
+        catch (SqlException ex)
+        {
+            deadlock = ex;
+        }
+
+        if (tx1.Connection is not null)
+        {
+            await tx1.RollbackAsync();
+        }
+
+        if (tx2.Connection is not null)
+        {
+            await tx2.RollbackAsync();
+        }
+
+        deadlock.Should().NotBeNull("one branch must be deadlock victim on first attempt");
+        deadlock!.Number.Should().Be(1205, "the transient failure must be SQL Server deadlock victim");
     }
 
     private static bool UseTestcontainersEnabled() =>
