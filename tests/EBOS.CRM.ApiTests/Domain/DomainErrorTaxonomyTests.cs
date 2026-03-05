@@ -9,6 +9,7 @@ public class DomainErrorTaxonomyTests
     {
         var ex = new DomainValidationException("invalid value");
 
+        Assert.Equal(DomainErrorTaxonomyType.DomainValidation, ex.TaxonomyType);
         Assert.Equal("DOMAIN_VALIDATION", ex.Code);
         Assert.False(ex.Retryable);
     }
@@ -18,6 +19,7 @@ public class DomainErrorTaxonomyTests
     {
         var ex = new DomainConflictException("state collision");
 
+        Assert.Equal(DomainErrorTaxonomyType.DomainConflict, ex.TaxonomyType);
         Assert.Equal("DOMAIN_CONFLICT", ex.Code);
         Assert.False(ex.Retryable);
     }
@@ -27,6 +29,7 @@ public class DomainErrorTaxonomyTests
     {
         var ex = new DomainRuleViolationException("business invariant broken");
 
+        Assert.Equal(DomainErrorTaxonomyType.DomainRuleViolation, ex.TaxonomyType);
         Assert.Equal("DOMAIN_RULE_VIOLATION", ex.Code);
         Assert.False(ex.Retryable);
     }
@@ -36,6 +39,7 @@ public class DomainErrorTaxonomyTests
     {
         var ex = new TransientDomainFailureException("temporary domain infrastructure issue");
 
+        Assert.Equal(DomainErrorTaxonomyType.TransientDomainFailure, ex.TaxonomyType);
         Assert.Equal("TRANSIENT_DOMAIN_FAILURE", ex.Code);
         Assert.True(ex.Retryable);
     }
