@@ -23,7 +23,17 @@ public static class DomainOperationalEventCatalog
             "DomainInvariantBreachDetected",
             DomainOperationalEventCategory.Anomaly,
             "Unexpected invariant breach observed during domain execution.",
-            "Trigger anomaly triage and reliability investigations.")
+            "Trigger anomaly triage and reliability investigations."),
+        new(
+            "CustomerPrivacyRequestCompensationTriggered",
+            DomainOperationalEventCategory.Technical,
+            "A failed privacy request was explicitly compensated back to pending for retry.",
+            "Track compensation rate and validate reversible-domain behavior."),
+        new(
+            "CustomerPrivacyRequestCompleted",
+            DomainOperationalEventCategory.Business,
+            "A privacy request completed successfully.",
+            "Track business completion outcomes for privacy workflows.")
     ];
 
     public static DomainOperationalEventCategory Classify(string eventName)

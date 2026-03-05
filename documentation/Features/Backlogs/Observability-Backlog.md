@@ -214,6 +214,11 @@ It also defines test coverage for:
 - Definition and operational criteria:
   - Enterprise domain extends MVP taxonomy with compensations, reliability invariants, and event governance.
   - Duplicate-business-action prevention is mandatory under retries and distributed retries.
+  - Compensation operational criterion: every reversible operation must define an explicit compensating command, execution preconditions, and auditable outcome evidence.
+  - Invariant operational criterion: regressive or ambiguous transitions are not allowed in long-running workflows; each transition must be monotonic and validated against expected prior state.
+  - Deduplication operational criterion: repeated commands with the same business intent must be handled idempotently (no additional side effects), including concurrent retries and distributed redelivery.
+  - Event governance operational criterion: every domain event must be emitted with stable event name and deterministic category (`Business`/`Technical`/`Anomaly`) to preserve analytics continuity across releases.
+  - Minimum compliance evidence: unit tests for invariants/compensation, concurrency tests for retry duplicate prevention, and validation of the event classification catalog.
 - Unit-test expectations:
   - Verify compensating actions preserve invariants after partial failure.
   - Verify monotonic transitions in long-running workflows.

@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 {
+    private readonly List<DomainOperationalEvent> _operationalEvents = [];
+
     public const string TypeForget = "FORGET";
     public const string TypeAnonymize = "ANONYMIZE";
     public const string TypeRetentionReview = "RETENTION_REVIEW";
@@ -40,6 +43,16 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
     }
 
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.AsReadOnly();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+    {
+        var snapshot = _operationalEvents.ToArray();
+        _operationalEvents.Clear();
+        return snapshot;
+    }
+
     public static CustomerPrivacyRequest Create(long tenantId, long customerId, string requestType, long requestedBy,
         string? reason, string? correlationId, DateTime? requestedAt = null)
     {
@@ -50,7 +63,7 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("RequestedBy must be a positive value.", "DOMAIN_VALIDATION_REQUESTED_BY_POSITIVE");
         }
 
-        return new CustomerPrivacyRequest
+        var request = new CustomerPrivacyRequest
         {
             TenantId = tenantId,
             CustomerId = customerId,
@@ -61,6 +74,17 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
             RequestedAt = requestedAt ?? DateTime.UtcNow,
             CorrelationId = NormalizeOrNull(correlationId)
         };
+
+        request.EmitOperationalEvent(
+            "CustomerPrivacyRequestRegistered",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["tenantId"] = request.TenantId.ToString(),
+                ["customerId"] = request.CustomerId.ToString(),
+                ["requestType"] = request.RequestType
+            });
+
+        return request;
     }
 
     public void MarkInProgress(long processedBy)
@@ -68,13 +92,21 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         if (string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
             // Idempotent retry guard: duplicated execution start must not duplicate side effects.
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CustomerPrivacyRequest),
+                    ["command"] = nameof(MarkInProgress),
+                    ["status"] = StatusInProgress
+                });
             return;
         }
 
-        if (!string.Equals(Status, StatusPending, StringComparison.Ordinal))
-        {
-            throw new DomainRuleViolationException("Only pending requests can transition to in-progress.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_IN_PROGRESS");
-        }
+        EnsureMonotonicTransition(
+            StatusInProgress,
+            "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_IN_PROGRESS",
+            "Only pending requests can transition to in-progress.");
 
         if (processedBy <= 0)
         {
@@ -93,13 +125,21 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         if (string.Equals(Status, StatusCompleted, StringComparison.Ordinal))
         {
             // Idempotent retry guard: repeated completion does not mutate state.
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CustomerPrivacyRequest),
+                    ["command"] = nameof(MarkCompleted),
+                    ["status"] = StatusCompleted
+                });
             return;
         }
 
-        if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
-        {
-            throw new DomainRuleViolationException("Only in-progress requests can be completed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_COMPLETED");
-        }
+        EnsureMonotonicTransition(
+            StatusCompleted,
+            "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_COMPLETED",
+            "Only in-progress requests can be completed.");
 
         if (processedBy <= 0)
         {
@@ -111,6 +151,14 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         ProcessedAt = DateTime.UtcNow;
         FailureCode = null;
         FailureReason = null;
+        EmitOperationalEvent(
+            "CustomerPrivacyRequestCompleted",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["tenantId"] = TenantId.ToString(),
+                ["customerId"] = CustomerId.ToString(),
+                ["requestType"] = RequestType
+            });
     }
 
     public void MarkFailed(long processedBy, string failureCode, string? failureReason)
@@ -121,13 +169,21 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
             string.Equals(FailureCode, normalizedCode, StringComparison.Ordinal))
         {
             // Idempotent retry guard: same failure classification already applied.
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CustomerPrivacyRequest),
+                    ["command"] = nameof(MarkFailed),
+                    ["status"] = StatusFailed
+                });
             return;
         }
 
-        if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
-        {
-            throw new DomainRuleViolationException("Only in-progress requests can be marked as failed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_FAILED");
-        }
+        EnsureMonotonicTransition(
+            StatusFailed,
+            "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_FAILED",
+            "Only in-progress requests can be marked as failed.");
 
         if (processedBy <= 0)
         {
@@ -151,14 +207,21 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         if (string.Equals(Status, StatusCanceled, StringComparison.Ordinal))
         {
             // Idempotent retry guard: repeated cancellation is a no-op.
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CustomerPrivacyRequest),
+                    ["command"] = nameof(Cancel),
+                    ["status"] = StatusCanceled
+                });
             return;
         }
 
-        if (!string.Equals(Status, StatusPending, StringComparison.Ordinal) &&
-            !string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
-        {
-            throw new DomainRuleViolationException("Only pending or in-progress requests can be canceled.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_CANCELED");
-        }
+        EnsureMonotonicTransition(
+            StatusCanceled,
+            "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_CANCELED",
+            "Only pending or in-progress requests can be canceled.");
 
         if (processedBy <= 0)
         {
@@ -181,6 +244,15 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (!string.Equals(Status, StatusFailed, StringComparison.Ordinal))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CustomerPrivacyRequest),
+                    ["command"] = nameof(CompensateToPendingForRetry),
+                    ["currentStatus"] = Status,
+                    ["requiredStatus"] = StatusFailed
+                });
             throw new DomainRuleViolationException(
                 "Only failed requests can be compensated back to pending for retry.",
                 "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_COMPENSATE_RETRY");
@@ -201,6 +273,17 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         {
             Reason = NormalizeOrNull(reason);
         }
+
+        EmitOperationalEvent(
+            "CustomerPrivacyRequestCompensationTriggered",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["tenantId"] = TenantId.ToString(),
+                ["customerId"] = CustomerId.ToString(),
+                ["requestType"] = RequestType,
+                ["fromStatus"] = StatusFailed,
+                ["toStatus"] = StatusPending
+            });
     }
 
     public bool MatchesRegistrationIntent(string requestType, string? reason, long requestedBy)
@@ -239,5 +322,47 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     private static string? NormalizeOrNull(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    private void EnsureMonotonicTransition(string targetStatus, string errorCode, string errorMessage)
+    {
+        if (IsAllowedMonotonicTransition(Status, targetStatus))
+        {
+            return;
+        }
+
+        EmitOperationalEvent(
+            "DomainInvariantBreachDetected",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(CustomerPrivacyRequest),
+                ["currentStatus"] = Status,
+                ["targetStatus"] = targetStatus,
+                ["invariant"] = "MONOTONIC_STATUS_TRANSITION"
+            });
+
+        throw new DomainRuleViolationException(errorMessage, errorCode);
+    }
+
+    private static bool IsAllowedMonotonicTransition(string currentStatus, string targetStatus)
+        => (currentStatus, targetStatus) switch
+        {
+            (StatusPending, StatusInProgress) => true,
+            (StatusPending, StatusCanceled) => true,
+            (StatusInProgress, StatusCompleted) => true,
+            (StatusInProgress, StatusFailed) => true,
+            (StatusInProgress, StatusCanceled) => true,
+            (StatusFailed, StatusPending) => true,
+            _ => false
+        };
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+    {
+        var category = DomainOperationalEventCatalog.Classify(eventName);
+        _operationalEvents.Add(new DomainOperationalEvent(
+            Name: eventName,
+            Category: category,
+            OccurredAtUtc: DateTime.UtcNow,
+            Evidence: evidence ?? new Dictionary<string, string>(StringComparer.Ordinal)));
     }
 }

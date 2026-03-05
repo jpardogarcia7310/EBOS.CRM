@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
@@ -21,6 +22,9 @@ public class CustomerPrivacyRequestTests
         Assert.Equal(CustomerPrivacyRequest.StatusPending, entity.Status);
         Assert.Equal("reason", entity.Reason);
         Assert.Equal("corr", entity.CorrelationId);
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "CustomerPrivacyRequestRegistered" &&
+            x.Category == DomainOperationalEventCategory.Business);
     }
 
     [Fact]
@@ -66,6 +70,9 @@ public class CustomerPrivacyRequestTests
         Assert.Null(entity.FailureCode);
         Assert.Null(entity.FailureReason);
         Assert.Equal("retry-compensation", entity.Reason);
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "CustomerPrivacyRequestCompensationTriggered" &&
+            x.Category == DomainOperationalEventCategory.Technical);
     }
 
     [Fact]
@@ -80,6 +87,9 @@ public class CustomerPrivacyRequestTests
 
         Assert.Equal(CustomerPrivacyRequest.StatusInProgress, entity.Status);
         Assert.Equal(firstProcessedAt, secondProcessedAt);
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "DomainCommandDeduplicated" &&
+            x.Category == DomainOperationalEventCategory.Technical);
     }
 
     [Fact]
@@ -89,6 +99,22 @@ public class CustomerPrivacyRequestTests
 
         var ex = Assert.ThrowsAny<DomainException>(() => entity.MarkCompleted(10));
         Assert.IsType<DomainRuleViolationException>(ex);
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "DomainInvariantBreachDetected" &&
+            x.Category == DomainOperationalEventCategory.Anomaly);
+    }
+
+    [Fact]
+    public void DequeueOperationalEvents_ReturnsSnapshot_AndClearsBuffer()
+    {
+        var entity = CustomerPrivacyRequest.Create(1, 2, CustomerPrivacyRequest.TypeAnonymize, 3, null, null);
+        entity.MarkInProgress(10);
+        entity.MarkInProgress(10);
+
+        var drained = entity.DequeueOperationalEvents();
+
+        Assert.NotEmpty(drained);
+        Assert.Empty(entity.PeekOperationalEvents());
     }
 }
 
