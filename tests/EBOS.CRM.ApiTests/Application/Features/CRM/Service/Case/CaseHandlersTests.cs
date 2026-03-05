@@ -12,6 +12,7 @@ using EBOS.CRM.Contracts.Requests.CRM.Service.Case;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using FluentAssertions;
@@ -781,7 +782,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new CloseCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainRuleViolationException>()
             .WithMessage("Case is already closed.");
     }
 
@@ -875,7 +876,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new ReopenCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainRuleViolationException>()
             .WithMessage("Case is not closed.");
     }
 

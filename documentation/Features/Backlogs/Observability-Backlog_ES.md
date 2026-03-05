@@ -176,7 +176,7 @@ También define la cobertura de pruebas para:
   - La recarga dinámica de políticas debe ser auditable y reversible.
 - Expectativas de pruebas unitarias:
   - Verificar orden de ejecución de compensaciones y recuperación idempotente.
-  - Verificar que cambios de política en caliente no rompan operaciones en vuelo.
+  - Verificar que cambios de política en caliente no romºpan operaciones en vuelo.
 - Referencias de runbook para Application:
   - Procedimiento de recuperación de workflow con fallo parcial.
   - Playbook de rollback de políticas ante comportamiento inestable en runtime.

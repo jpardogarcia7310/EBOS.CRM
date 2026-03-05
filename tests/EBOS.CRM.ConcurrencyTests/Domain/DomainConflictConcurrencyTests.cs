@@ -9,9 +9,19 @@ public class DomainConflictConcurrencyTests
     public async Task VersionClash_ConcurrentCommands_ProducesRetryableDomainConflict()
     {
         var gate = new VersionedCommandGate(initialVersion: 1);
-        DomainConflictException? captured = null;
+        var captured = new ConcurrentBag<DomainConflictException>();
 
-        var t1 = Task.Run(() => gate.Execute("cmd-a", expectedVersion: 1));
+        var t1 = Task.Run(() =>
+        {
+            try
+            {
+                gate.Execute("cmd-a", expectedVersion: 1);
+            }
+            catch (DomainConflictException ex)
+            {
+                captured.Add(ex);
+            }
+        });
         var t2 = Task.Run(() =>
         {
             try
@@ -20,16 +30,15 @@ public class DomainConflictConcurrencyTests
             }
             catch (DomainConflictException ex)
             {
-                captured = ex;
+                captured.Add(ex);
             }
         });
 
         await Task.WhenAll(t1, t2);
 
-        Assert.NotNull(captured);
-        Assert.Equal(DomainErrorTaxonomyType.DomainConflict, captured!.TaxonomyType);
-        Assert.Equal("DOMAIN_CONFLICT_VERSION_MISMATCH", captured.Code);
-        Assert.True(captured.Retryable);
+        var mismatch = captured.Single(ex => ex.Code == "DOMAIN_CONFLICT_VERSION_MISMATCH");
+        Assert.Equal(DomainErrorTaxonomyType.DomainConflict, mismatch.TaxonomyType);
+        Assert.True(mismatch.Retryable);
     }
 
     [Fact]

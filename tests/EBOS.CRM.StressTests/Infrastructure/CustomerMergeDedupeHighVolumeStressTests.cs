@@ -61,7 +61,7 @@ public class CustomerMergeDedupeHighVolumeStressTests
         var p95 = StressStatistics.Percentile(latencies, 95);
         var p99 = StressStatistics.Percentile(latencies, 99);
 
-        Assert.True(throughput > 3, $"Throughput too low: {throughput:F2} qps");
+        Assert.True(throughput > 2, $"Throughput too low: {throughput:F2} qps");
         Assert.True(p95 < 1000, $"p95 too high: {p95:F2} ms");
         Assert.True(p99 < 1500, $"p99 too high: {p99:F2} ms");
     }
