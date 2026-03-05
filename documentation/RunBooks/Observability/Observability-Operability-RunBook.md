@@ -123,6 +123,40 @@
    - timeline (detection, mitigation, recovery)
    - root cause and prevention actions.
 
+## Domain Classification and Recovery (MVP)
+
+Classification decision tree (`DomainValidation` vs `DomainConflict` vs `DomainRuleViolation` vs `TransientDomainFailure`):
+1. Is the input or aggregate state shape invalid before business invariants execute?
+   - Yes -> classify as `DomainValidation`.
+   - No -> continue.
+2. Does the request collide with persisted/current state (version mismatch, duplicate/replayed command, competing writer)?
+   - Yes -> classify as `DomainConflict`.
+   - No -> continue.
+3. Is a business invariant violated with otherwise valid input (illegal transition, append-only breach, forbidden business action)?
+   - Yes -> classify as `DomainRuleViolation`.
+   - No -> continue.
+4. Is the failure caused by temporary, short-lived conditions at domain execution boundary (transient lock/availability/stale-read barrier)?
+   - Yes -> classify as `TransientDomainFailure`.
+   - No -> classify as unknown domain fault and escalate for taxonomy gap analysis.
+
+Recovery action matrix:
+- `DomainValidation`:
+  - Primary action: client correction.
+  - Retry policy: no automatic retry.
+  - Operator action: confirm deterministic code/message and provide caller fix guidance.
+- `DomainConflict`:
+  - Primary action: safe retry only for concurrency/version conflicts.
+  - Retry policy: bounded retry with jitter only when operation is idempotent.
+  - Operator action: identify conflict subtype (`version_mismatch`, `command_replay`, `already_processed`) and verify idempotency key/command identity.
+- `DomainRuleViolation`:
+  - Primary action: business remediation.
+  - Retry policy: do not retry until business preconditions change.
+  - Operator action: route to business owner with invariant code and impacted entity id.
+- `TransientDomainFailure`:
+  - Primary action: safe retry.
+  - Retry policy: bounded retry with backoff+jitter, then degrade/fail fast if threshold exceeded.
+  - Operator action: validate dependency/transient indicators and clear alerts once stability is restored.
+
 ## Migration Procedure
 1. Backup DB and export current resilience/observability config.
 2. Deploy API and infrastructure changes.

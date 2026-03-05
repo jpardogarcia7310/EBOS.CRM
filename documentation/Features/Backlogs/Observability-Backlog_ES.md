@@ -117,6 +117,8 @@ También define la cobertura de pruebas para:
 - Referencias de runbook para Domain:
   - Árbol de decisión de clasificación: validation vs conflict vs rule violation vs transient.
   - Matriz de acción de recuperación: corrección de cliente, retry seguro o remediación de negocio.
+  - Sección fuente del runbook:
+    - `documentation/RunBooks/Observability/Observability-Operability-RunBook_ES.md` -> `Clasificacion de Dominio y Recuperacion (MVP)`.
 
 ### Infrastructure
 

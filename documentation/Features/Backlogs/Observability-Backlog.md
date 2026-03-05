@@ -117,6 +117,8 @@ It also defines test coverage for:
 - Runbook references for Domain:
   - Classification decision tree: validation vs conflict vs rule violation vs transient.
   - Recovery action matrix: client fix, safe retry, or business remediation.
+  - Source runbook section:
+    - `documentation/RunBooks/Observability/Observability-Operability-RunBook.md` -> `Domain Classification and Recovery (MVP)`.
 
 ### Infrastructure
 

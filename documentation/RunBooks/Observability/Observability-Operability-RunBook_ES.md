@@ -123,6 +123,40 @@
    - linea de tiempo (deteccion, mitigacion, recuperacion)
    - causa raiz y acciones preventivas.
 
+## Clasificacion de Dominio y Recuperacion (MVP)
+
+Arbol de decision de clasificacion (`DomainValidation` vs `DomainConflict` vs `DomainRuleViolation` vs `TransientDomainFailure`):
+1. El input o la forma del estado del agregado es invalida antes de ejecutar invariantes de negocio?
+   - Si -> clasificar como `DomainValidation`.
+   - No -> continuar.
+2. La solicitud colisiona con el estado persistido/actual (mismatch de version, comando duplicado/repetido, escritor concurrente)?
+   - Si -> clasificar como `DomainConflict`.
+   - No -> continuar.
+3. Se viola una invariante de negocio con input por lo demas valido (transicion ilegal, violacion append-only, accion de negocio no permitida)?
+   - Si -> clasificar como `DomainRuleViolation`.
+   - No -> continuar.
+4. El fallo esta causado por condiciones temporales y de corta duracion en el limite de ejecucion de dominio (bloqueo transitorio/indisponibilidad/barrera de lectura obsoleta)?
+   - Si -> clasificar como `TransientDomainFailure`.
+   - No -> clasificar como fallo de dominio desconocido y escalar para analisis de gap de taxonomia.
+
+Matriz de accion de recuperacion:
+- `DomainValidation`:
+  - Accion primaria: correccion de cliente.
+  - Politica de retry: sin retry automatico.
+  - Accion operativa: confirmar code/message determinista y guiar correccion al consumidor.
+- `DomainConflict`:
+  - Accion primaria: retry seguro solo para conflictos de concurrencia/version.
+  - Politica de retry: retry acotado con jitter solo si la operacion es idempotente.
+  - Accion operativa: identificar subtipo de conflicto (`version_mismatch`, `command_replay`, `already_processed`) y verificar clave de idempotencia/identidad del comando.
+- `DomainRuleViolation`:
+  - Accion primaria: remediacion de negocio.
+  - Politica de retry: no reintentar hasta que cambien las precondiciones de negocio.
+  - Accion operativa: escalar a owner funcional con codigo de invariante y id de entidad impactada.
+- `TransientDomainFailure`:
+  - Accion primaria: retry seguro.
+  - Politica de retry: retry acotado con backoff+jitter, luego degradar/fail-fast si se supera el umbral.
+  - Accion operativa: validar indicadores transitorios/dependencias y limpiar alertas tras recuperar estabilidad.
+
 ## Procedimiento de Migracion
 1. Respaldar DB y exportar configuracion vigente de resiliencia/observabilidad.
 2. Desplegar cambios de API e infraestructura.
