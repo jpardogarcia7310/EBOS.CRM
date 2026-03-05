@@ -41,7 +41,7 @@ public sealed class RetryCustomerPrivacyRequestCommandHandler(
         {
             if (entity.Status == CustomerPrivacyRequest.StatusFailed)
             {
-                entity.MarkPendingForRetry(currentUser.UserId, request.Reason);
+                entity.CompensateToPendingForRetry(currentUser.UserId, request.Reason);
                 await privacyRequestRepository.UpdateAsync(entity, cancellationToken);
                 await privacyRequestRepository.SaveChangesAsync(cancellationToken);
             }

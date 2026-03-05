@@ -65,6 +65,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 
     public void MarkInProgress(long processedBy)
     {
+        if (string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
+        {
+            // Idempotent retry guard: duplicated execution start must not duplicate side effects.
+            return;
+        }
+
         if (!string.Equals(Status, StatusPending, StringComparison.Ordinal))
         {
             throw new DomainRuleViolationException("Only pending requests can transition to in-progress.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_IN_PROGRESS");
@@ -84,6 +90,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 
     public void MarkCompleted(long processedBy)
     {
+        if (string.Equals(Status, StatusCompleted, StringComparison.Ordinal))
+        {
+            // Idempotent retry guard: repeated completion does not mutate state.
+            return;
+        }
+
         if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
             throw new DomainRuleViolationException("Only in-progress requests can be completed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_COMPLETED");
@@ -103,6 +115,15 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 
     public void MarkFailed(long processedBy, string failureCode, string? failureReason)
     {
+        var normalizedCode = failureCode?.Trim().ToUpperInvariant();
+        if (string.Equals(Status, StatusFailed, StringComparison.Ordinal) &&
+            !string.IsNullOrWhiteSpace(normalizedCode) &&
+            string.Equals(FailureCode, normalizedCode, StringComparison.Ordinal))
+        {
+            // Idempotent retry guard: same failure classification already applied.
+            return;
+        }
+
         if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
             throw new DomainRuleViolationException("Only in-progress requests can be marked as failed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_FAILED");
@@ -121,12 +142,18 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         Status = StatusFailed;
         ProcessedBy = processedBy;
         ProcessedAt = DateTime.UtcNow;
-        FailureCode = failureCode.Trim().ToUpperInvariant();
+        FailureCode = normalizedCode!;
         FailureReason = NormalizeOrNull(failureReason);
     }
 
     public void Cancel(long processedBy, string? reason)
     {
+        if (string.Equals(Status, StatusCanceled, StringComparison.Ordinal))
+        {
+            // Idempotent retry guard: repeated cancellation is a no-op.
+            return;
+        }
+
         if (!string.Equals(Status, StatusPending, StringComparison.Ordinal) &&
             !string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
@@ -147,9 +174,16 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 
     public void MarkPendingForRetry(long processedBy, string? reason = null)
     {
+        CompensateToPendingForRetry(processedBy, reason);
+    }
+
+    public void CompensateToPendingForRetry(long processedBy, string? reason = null)
+    {
         if (!string.Equals(Status, StatusFailed, StringComparison.Ordinal))
         {
-            throw new DomainRuleViolationException("Only failed requests can be retried.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_RETRY");
+            throw new DomainRuleViolationException(
+                "Only failed requests can be compensated back to pending for retry.",
+                "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_COMPENSATE_RETRY");
         }
 
         if (processedBy <= 0)
@@ -157,6 +191,7 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
+        // Explicit compensating action for reversible execution workflow.
         Status = StatusPending;
         ProcessedBy = processedBy;
         ProcessedAt = DateTime.UtcNow;
