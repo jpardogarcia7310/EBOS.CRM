@@ -214,6 +214,11 @@ También define la cobertura de pruebas para:
 - Definición y criterios operativos:
   - Domain Empresarial extiende la taxonomía MVP con compensaciones, invariantes de confiabilidad y gobierno de eventos.
   - La prevención de acción de negocio duplicada es obligatoria bajo retries y retries distribuidos.
+  - Criterio operativo de compensación: toda operación reversible debe definir comando compensatorio explícito, precondiciones de ejecución y evidencia auditable del resultado.
+  - Criterio operativo de invariantes: no se aceptan transiciones regresivas o ambiguas en workflows largos; cada transición debe ser monotónica y validada por estado previo esperado.
+  - Criterio operativo de deduplicación: comandos repetidos con misma intención de negocio deben resolverse de forma idempotente (sin efecto adicional) aun con reintentos concurrentes o reentrega distribuida.
+  - Criterio operativo de gobernanza de eventos: cada evento de dominio debe publicarse con nombre estable y categoría determinística (`Business`/`Technical`/`Anomaly`) para mantener continuidad analítica entre versiones.
+  - Evidencia mínima de cumplimiento: tests unitarios de invariantes/compensación, pruebas de concurrencia para duplicados bajo retry y validación del catálogo de clasificación de eventos.
 - Expectativas de pruebas unitarias:
   - Verificar que acciones compensatorias preserven invariantes tras fallo parcial.
   - Verificar transiciones monotónicas en workflows de larga duración.
