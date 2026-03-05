@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
@@ -22,7 +23,7 @@ public class CustomerConsentTests
             expiresAt: expiresAt);
 
         var act = () => consent.Revoke(revokedAt);
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainRuleViolationException>()
             .WithMessage("*append-only*");
     }
 

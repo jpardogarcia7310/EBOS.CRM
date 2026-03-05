@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -10,7 +11,7 @@ public class SlaAdvancedTests
         var entity = BuildSla(30);
         entity.WarningMinutes = -1;
 
-        Assert.Throws<InvalidOperationException>(() => entity.ValidateWarningMinutes());
+        Assert.ThrowsAny<DomainException>(() => entity.ValidateWarningMinutes());
     }
 
     [Fact]
@@ -43,3 +44,5 @@ public class SlaAdvancedTests
         IsActive = true
     };
 }
+
+

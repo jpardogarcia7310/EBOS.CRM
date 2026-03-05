@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Domain;
@@ -22,7 +23,7 @@ public class CaseActivityDomainTests
 
         var act = () => activity.SetStatus("BadStatus");
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("Status value is invalid.");
     }
 
@@ -35,7 +36,7 @@ public class CaseActivityDomainTests
         act.Should().NotThrow();
 
         var actAfter = () => activity.SetStatus(CaseActivity.StatusInProgress);
-        actAfter.Should().Throw<InvalidOperationException>()
+        actAfter.Should().Throw<DomainRuleViolationException>()
             .WithMessage("Status transition is not allowed.");
     }
 

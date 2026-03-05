@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -21,7 +22,7 @@ public class AccountContactTests
     [Fact]
     public void Create_WithInvalidTenant_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() => AccountContact.Create(0, 10, 20, false, DateTime.UtcNow, null, 1));
+        Assert.ThrowsAny<DomainException>(() => AccountContact.Create(0, 10, 20, false, DateTime.UtcNow, null, 1));
     }
 
     [Fact]
@@ -30,7 +31,7 @@ public class AccountContactTests
         var start = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
         var entity = AccountContact.Create(1, 10, 20, false, start, null, 1);
 
-        Assert.Throws<InvalidOperationException>(() => entity.Unassign(start.AddDays(-1)));
+        Assert.ThrowsAny<DomainException>(() => entity.Unassign(start.AddDays(-1)));
     }
 
     [Fact]
@@ -40,7 +41,7 @@ public class AccountContactTests
         var entity = AccountContact.Create(1, 10, 20, false, start, null, 1);
         entity.Unassign(start.AddDays(1));
 
-        Assert.Throws<InvalidOperationException>(() => entity.SetPrimary(true));
+        Assert.ThrowsAny<DomainException>(() => entity.SetPrimary(true));
     }
 
     [Fact]
@@ -50,6 +51,8 @@ public class AccountContactTests
         var entity = AccountContact.Create(1, 10, 20, false, start, null, 1);
         entity.Unassign(start.AddDays(1));
 
-        Assert.Throws<InvalidOperationException>(() => entity.ReassignCustomers(11, 21));
+        Assert.ThrowsAny<DomainException>(() => entity.ReassignCustomers(11, 21));
     }
 }
+
+

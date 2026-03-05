@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -27,27 +28,27 @@ public class CustomerMergeHistory : ErasableEntity, ITenantScopedEntity
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (winnerCustomerId <= 0 || mergedCustomerId <= 0)
         {
-            throw new InvalidOperationException("Customer ids must be positive values.");
+            throw new DomainValidationException("Customer ids must be positive values.", "DOMAIN_VALIDATION_CUSTOMER_IDS_POSITIVE");
         }
 
         if (winnerCustomerId == mergedCustomerId)
         {
-            throw new InvalidOperationException("WinnerCustomerId and MergedCustomerId must be different.");
+            throw new DomainRuleViolationException("WinnerCustomerId and MergedCustomerId must be different.", "DOMAIN_RULE_VIOLATION_MERGE_SAME_CUSTOMER");
         }
 
         if (string.IsNullOrWhiteSpace(reason))
         {
-            throw new InvalidOperationException("Reason is required.");
+            throw new DomainValidationException("Reason is required.", "DOMAIN_VALIDATION_MERGE_REASON_REQUIRED");
         }
 
         if (createdBy <= 0)
         {
-            throw new InvalidOperationException("CreatedBy must be a positive value.");
+            throw new DomainValidationException("CreatedBy must be a positive value.", "DOMAIN_VALIDATION_CREATED_BY_POSITIVE");
         }
 
         return new CustomerMergeHistory

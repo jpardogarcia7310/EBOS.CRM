@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -17,7 +18,7 @@ public class AccountContactRoleTests
     [Fact]
     public void Create_WithInvalidRoleCode_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             AccountContactRole.Create(1, 2, "   ", true, DateTime.UtcNow, null));
     }
 
@@ -27,7 +28,7 @@ public class AccountContactRoleTests
         var validFrom = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
         var entity = AccountContactRole.Create(1, 2, "LEGAL_REP", false, validFrom, null);
 
-        Assert.Throws<InvalidOperationException>(() => entity.Deactivate(validFrom.AddMinutes(-1)));
+        Assert.ThrowsAny<DomainException>(() => entity.Deactivate(validFrom.AddMinutes(-1)));
     }
 
     [Fact]
@@ -36,6 +37,8 @@ public class AccountContactRoleTests
         var validFrom = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
         var entity = AccountContactRole.Create(1, 2, "LEGAL_REP", false, validFrom, validFrom.AddDays(1));
 
-        Assert.Throws<InvalidOperationException>(() => entity.SetPrimary(true));
+        Assert.ThrowsAny<DomainException>(() => entity.SetPrimary(true));
     }
 }
+
+

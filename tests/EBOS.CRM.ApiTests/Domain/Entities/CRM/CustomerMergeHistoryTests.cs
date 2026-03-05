@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -7,14 +8,14 @@ public class CustomerMergeHistoryTests
     [Fact]
     public void Create_WithSameWinnerAndMerged_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerMergeHistory.Create(1, 10, 10, "dedupe", 99));
     }
 
     [Fact]
     public void Create_WithBlankReason_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerMergeHistory.Create(1, 10, 20, "   ", 99));
     }
 
@@ -32,3 +33,5 @@ public class CustomerMergeHistoryTests
         Assert.Equal(at, entity.CreatedAt);
     }
 }
+
+

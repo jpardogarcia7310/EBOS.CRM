@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -9,7 +10,7 @@ public class CaseActivityAdvancedTests
     {
         var activity = BuildActivity(string.Empty);
 
-        Assert.Throws<InvalidOperationException>(() => activity.SetStatus(CaseActivity.StatusInProgress));
+        Assert.ThrowsAny<DomainException>(() => activity.SetStatus(CaseActivity.StatusInProgress));
 
         activity.SetStatus(CaseActivity.StatusOpen);
         Assert.Equal(CaseActivity.StatusOpen, activity.Status);
@@ -19,7 +20,7 @@ public class CaseActivityAdvancedTests
     public void SetStatus_FromCompleted_RejectsAnyFurtherTransition()
     {
         var activity = BuildActivity(CaseActivity.StatusCompleted);
-        Assert.Throws<InvalidOperationException>(() => activity.SetStatus(CaseActivity.StatusCancelled));
+        Assert.ThrowsAny<DomainException>(() => activity.SetStatus(CaseActivity.StatusCancelled));
     }
 
     private static CaseActivity BuildActivity(string status) => new()
@@ -32,3 +33,5 @@ public class CaseActivityAdvancedTests
         CreatedBy = 1
     };
 }
+
+

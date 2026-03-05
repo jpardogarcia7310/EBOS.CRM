@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Domain;
@@ -23,7 +24,7 @@ public class SlaDomainTests
 
         var act = () => entity.CalculateDueAt(DateTime.UtcNow);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("TargetMinutes must be greater than zero.");
     }
 
@@ -35,7 +36,7 @@ public class SlaDomainTests
 
         var act = () => entity.ValidateWarningMinutes();
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("WarningMinutes cannot exceed TargetMinutes.");
     }
 
@@ -48,7 +49,7 @@ public class SlaDomainTests
 
         var act = () => entity.ValidateActiveRange();
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("ActiveFrom cannot be later than ActiveTo.");
     }
 

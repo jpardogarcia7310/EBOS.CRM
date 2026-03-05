@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -46,7 +47,7 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         ValidateRequestType(requestType);
         if (requestedBy <= 0)
         {
-            throw new InvalidOperationException("RequestedBy must be a positive value.");
+            throw new DomainValidationException("RequestedBy must be a positive value.", "DOMAIN_VALIDATION_REQUESTED_BY_POSITIVE");
         }
 
         return new CustomerPrivacyRequest
@@ -66,12 +67,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (!string.Equals(Status, StatusPending, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Only pending requests can transition to in-progress.");
+            throw new DomainRuleViolationException("Only pending requests can transition to in-progress.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_IN_PROGRESS");
         }
 
         if (processedBy <= 0)
         {
-            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+            throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
         Status = StatusInProgress;
@@ -85,12 +86,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Only in-progress requests can be completed.");
+            throw new DomainRuleViolationException("Only in-progress requests can be completed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_COMPLETED");
         }
 
         if (processedBy <= 0)
         {
-            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+            throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
         Status = StatusCompleted;
@@ -104,17 +105,17 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (!string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Only in-progress requests can be marked as failed.");
+            throw new DomainRuleViolationException("Only in-progress requests can be marked as failed.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_FAILED");
         }
 
         if (processedBy <= 0)
         {
-            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+            throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
         if (string.IsNullOrWhiteSpace(failureCode))
         {
-            throw new InvalidOperationException("FailureCode is required.");
+            throw new DomainValidationException("FailureCode is required.", "DOMAIN_VALIDATION_FAILURE_CODE_REQUIRED");
         }
 
         Status = StatusFailed;
@@ -129,12 +130,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         if (!string.Equals(Status, StatusPending, StringComparison.Ordinal) &&
             !string.Equals(Status, StatusInProgress, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Only pending or in-progress requests can be canceled.");
+            throw new DomainRuleViolationException("Only pending or in-progress requests can be canceled.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_CANCELED");
         }
 
         if (processedBy <= 0)
         {
-            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+            throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
         Status = StatusCanceled;
@@ -148,12 +149,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (!string.Equals(Status, StatusFailed, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Only failed requests can be retried.");
+            throw new DomainRuleViolationException("Only failed requests can be retried.", "DOMAIN_RULE_VIOLATION_PRIVACY_REQUEST_TRANSITION_RETRY");
         }
 
         if (processedBy <= 0)
         {
-            throw new InvalidOperationException("ProcessedBy must be a positive value.");
+            throw new DomainValidationException("ProcessedBy must be a positive value.", "DOMAIN_VALIDATION_PROCESSED_BY_POSITIVE");
         }
 
         Status = StatusPending;
@@ -171,12 +172,12 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (customerId <= 0)
         {
-            throw new InvalidOperationException("CustomerId must be a positive value.");
+            throw new DomainValidationException("CustomerId must be a positive value.", "DOMAIN_VALIDATION_CUSTOMER_ID_POSITIVE");
         }
     }
 
@@ -185,7 +186,7 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         var normalized = requestType?.Trim().ToUpperInvariant();
         if (normalized is not (TypeForget or TypeAnonymize or TypeRetentionReview))
         {
-            throw new InvalidOperationException("RequestType is invalid.");
+            throw new DomainValidationException("RequestType is invalid.", "DOMAIN_VALIDATION_REQUEST_TYPE_INVALID");
         }
     }
 

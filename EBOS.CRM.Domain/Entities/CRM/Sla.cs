@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -43,7 +44,7 @@ public class Sla : ErasableEntity, ITenantScopedEntity
     {
         if (TargetMinutes <= 0)
         {
-            throw new InvalidOperationException("TargetMinutes must be greater than zero.");
+            throw new DomainValidationException("TargetMinutes must be greater than zero.", "DOMAIN_VALIDATION_TARGET_MINUTES_POSITIVE");
         }
 
         return start.AddMinutes(TargetMinutes);
@@ -53,12 +54,12 @@ public class Sla : ErasableEntity, ITenantScopedEntity
     {
         if (WarningMinutes.HasValue && WarningMinutes.Value < 0)
         {
-            throw new InvalidOperationException("WarningMinutes cannot be negative.");
+            throw new DomainValidationException("WarningMinutes cannot be negative.", "DOMAIN_VALIDATION_WARNING_MINUTES_NON_NEGATIVE");
         }
 
         if (WarningMinutes.HasValue && WarningMinutes.Value > TargetMinutes)
         {
-            throw new InvalidOperationException("WarningMinutes cannot exceed TargetMinutes.");
+            throw new DomainValidationException("WarningMinutes cannot exceed TargetMinutes.", "DOMAIN_VALIDATION_WARNING_MINUTES_RANGE");
         }
     }
 
@@ -66,7 +67,7 @@ public class Sla : ErasableEntity, ITenantScopedEntity
     {
         if (ActiveFrom.HasValue && ActiveTo.HasValue && ActiveFrom.Value > ActiveTo.Value)
         {
-            throw new InvalidOperationException("ActiveFrom cannot be later than ActiveTo.");
+            throw new DomainValidationException("ActiveFrom cannot be later than ActiveTo.", "DOMAIN_VALIDATION_ACTIVE_RANGE");
         }
     }
 

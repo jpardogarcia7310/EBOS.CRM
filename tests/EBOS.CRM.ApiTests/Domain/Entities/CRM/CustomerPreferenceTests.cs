@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -7,11 +8,11 @@ public class CustomerPreferenceTests
     [Fact]
     public void Create_WithInvalidIds_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerPreference.Create(0, 1, 1, true, DateTime.UtcNow, 1));
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerPreference.Create(1, 0, 1, true, DateTime.UtcNow, 1));
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerPreference.Create(1, 1, 0, true, DateTime.UtcNow, 1));
     }
 
@@ -19,7 +20,7 @@ public class CustomerPreferenceTests
     public void UpdatePreference_WithInvalidUpdatedBy_Throws()
     {
         var entity = CustomerPreference.Create(1, 10, 20, true, DateTime.UtcNow, 1);
-        Assert.Throws<InvalidOperationException>(() => entity.UpdatePreference(false, DateTime.UtcNow, 0));
+        Assert.ThrowsAny<DomainException>(() => entity.UpdatePreference(false, DateTime.UtcNow, 0));
     }
 
     [Fact]
@@ -37,3 +38,5 @@ public class CustomerPreferenceTests
         Assert.Throws<ArgumentNullException>(() => entity.MergeFrom(null!));
     }
 }
+
+

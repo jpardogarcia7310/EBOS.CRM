@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Domain;
@@ -22,7 +23,7 @@ public class CaseDomainTests
 
         var act = () => entity.SetStatus(Case.StatusReopened);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainRuleViolationException>()
             .WithMessage("Status transition is not allowed.");
     }
 
@@ -45,7 +46,7 @@ public class CaseDomainTests
 
         var act = () => entity.Reopen();
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainRuleViolationException>()
             .WithMessage("Case is not closed.");
     }
 
@@ -56,7 +57,7 @@ public class CaseDomainTests
 
         var act = () => entity.AssignQueue(0);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("QueueId must be a positive value.");
     }
 
@@ -77,7 +78,7 @@ public class CaseDomainTests
 
         var act = () => entity.Open();
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainRuleViolationException>()
             .WithMessage("Case is already initialized.");
     }
 
@@ -99,7 +100,7 @@ public class CaseDomainTests
 
         var act = () => entity.UpdateDetails(" ", "Updated");
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<DomainValidationException>()
             .WithMessage("Title is required.");
     }
 

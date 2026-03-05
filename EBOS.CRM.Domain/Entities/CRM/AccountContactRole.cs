@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -70,7 +71,7 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     {
         if (validTo < ValidFrom)
         {
-            throw new InvalidOperationException("ValidTo cannot be earlier than ValidFrom.");
+            throw new DomainValidationException("ValidTo cannot be earlier than ValidFrom.", "DOMAIN_VALIDATION_VALID_TO_RANGE");
         }
 
         ValidTo = validTo;
@@ -81,7 +82,7 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     {
         if (isPrimary && ValidTo.HasValue)
         {
-            throw new InvalidOperationException("Cannot set primary role when role is not active.");
+            throw new DomainRuleViolationException("Cannot set primary role when role is not active.", "DOMAIN_RULE_VIOLATION_ROLE_PRIMARY_INACTIVE");
         }
 
         IsPrimary = isPrimary;
@@ -91,7 +92,7 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     {
         if (accountContactId <= 0)
         {
-            throw new InvalidOperationException("AccountContactId must be a positive value.");
+            throw new DomainValidationException("AccountContactId must be a positive value.", "DOMAIN_VALIDATION_ACCOUNT_CONTACT_ID_POSITIVE");
         }
 
         AccountContactId = accountContactId;
@@ -101,17 +102,17 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (accountContactId <= 0)
         {
-            throw new InvalidOperationException("AccountContactId must be a positive value.");
+            throw new DomainValidationException("AccountContactId must be a positive value.", "DOMAIN_VALIDATION_ACCOUNT_CONTACT_ID_POSITIVE");
         }
 
         if (string.IsNullOrWhiteSpace(roleCode))
         {
-            throw new InvalidOperationException("RoleCode is required.");
+            throw new DomainValidationException("RoleCode is required.", "DOMAIN_VALIDATION_ROLE_CODE_REQUIRED");
         }
     }
 }

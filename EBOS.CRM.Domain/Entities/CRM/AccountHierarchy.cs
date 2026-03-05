@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 
@@ -46,7 +47,7 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
 
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         TenantId = tenantId;
@@ -59,22 +60,22 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
     {
         if (parentCorporateCustomerId <= 0)
         {
-            throw new InvalidOperationException("ParentCorporateCustomerId must be a positive value.");
+            throw new DomainValidationException("ParentCorporateCustomerId must be a positive value.", "DOMAIN_VALIDATION_PARENT_CORPORATE_CUSTOMER_ID_POSITIVE");
         }
 
         if (childCorporateCustomerId <= 0)
         {
-            throw new InvalidOperationException("ChildCorporateCustomerId must be a positive value.");
+            throw new DomainValidationException("ChildCorporateCustomerId must be a positive value.", "DOMAIN_VALIDATION_CHILD_CORPORATE_CUSTOMER_ID_POSITIVE");
         }
 
         if (parentCorporateCustomerId == childCorporateCustomerId)
         {
-            throw new InvalidOperationException("ParentCorporateCustomerId cannot be the same as ChildCorporateCustomerId.");
+            throw new DomainRuleViolationException("ParentCorporateCustomerId cannot be the same as ChildCorporateCustomerId.", "DOMAIN_RULE_VIOLATION_HIERARCHY_SELF_REFERENCE");
         }
 
         if (string.IsNullOrWhiteSpace(relationType))
         {
-            throw new InvalidOperationException("RelationType is required.");
+            throw new DomainValidationException("RelationType is required.", "DOMAIN_VALIDATION_RELATION_TYPE_REQUIRED");
         }
 
         ParentCorporateCustomerId = parentCorporateCustomerId;
@@ -89,7 +90,7 @@ public class AccountHierarchy : ErasableEntity, ITenantScopedEntity
     {
         if (validTo < ValidFrom)
         {
-            throw new InvalidOperationException("ValidTo cannot be earlier than ValidFrom.");
+            throw new DomainValidationException("ValidTo cannot be earlier than ValidFrom.", "DOMAIN_VALIDATION_VALID_TO_RANGE");
         }
 
         ValidTo = validTo;

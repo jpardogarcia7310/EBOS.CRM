@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -8,7 +9,7 @@ public class CaseAdvancedTests
     public void AssignOwner_WithInvalidId_Throws()
     {
         var entity = BuildCase(Case.StatusOpen);
-        Assert.Throws<InvalidOperationException>(() => entity.AssignOwner(0));
+        Assert.ThrowsAny<DomainException>(() => entity.AssignOwner(0));
     }
 
     [Fact]
@@ -17,14 +18,14 @@ public class CaseAdvancedTests
         var createdAt = new DateTime(2026, 3, 4, 8, 0, 0, DateTimeKind.Utc);
         var entity = BuildCase(Case.StatusOpen, createdAt);
 
-        Assert.Throws<InvalidOperationException>(() => entity.UpdateDueAt(createdAt.AddMinutes(-1)));
+        Assert.ThrowsAny<DomainException>(() => entity.UpdateDueAt(createdAt.AddMinutes(-1)));
     }
 
     [Fact]
     public void SetPriority_WithInvalidValue_Throws()
     {
         var entity = BuildCase(Case.StatusOpen);
-        Assert.Throws<InvalidOperationException>(() => entity.SetPriority("SUPER_HIGH"));
+        Assert.ThrowsAny<DomainException>(() => entity.SetPriority("SUPER_HIGH"));
     }
 
     [Fact]
@@ -51,3 +52,5 @@ public class CaseAdvancedTests
         CreatedAt = createdAt ?? DateTime.UtcNow
     };
 }
+
+

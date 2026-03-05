@@ -1,5 +1,6 @@
 using EBOS.Core.Primitives;
 using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -31,22 +32,22 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (customerId <= 0)
         {
-            throw new InvalidOperationException("CustomerId must be a positive value.");
+            throw new DomainValidationException("CustomerId must be a positive value.", "DOMAIN_VALIDATION_CUSTOMER_ID_POSITIVE");
         }
 
         if (channelId <= 0)
         {
-            throw new InvalidOperationException("ChannelId must be a positive value.");
+            throw new DomainValidationException("ChannelId must be a positive value.", "DOMAIN_VALIDATION_CHANNEL_ID_POSITIVE");
         }
 
         if (updatedBy <= 0)
         {
-            throw new InvalidOperationException("UpdatedBy must be a positive value.");
+            throw new DomainValidationException("UpdatedBy must be a positive value.", "DOMAIN_VALIDATION_UPDATED_BY_POSITIVE");
         }
 
         return new CustomerPreference
@@ -64,7 +65,7 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
     {
         if (updatedBy <= 0)
         {
-            throw new InvalidOperationException("UpdatedBy must be a positive value.");
+            throw new DomainValidationException("UpdatedBy must be a positive value.", "DOMAIN_VALIDATION_UPDATED_BY_POSITIVE");
         }
 
         Preferred = preferred;
@@ -76,7 +77,7 @@ public class CustomerPreference : ErasableEntity, ITenantScopedEntity
     {
         if (customerId <= 0)
         {
-            throw new InvalidOperationException("CustomerId must be a positive value.");
+            throw new DomainValidationException("CustomerId must be a positive value.", "DOMAIN_VALIDATION_CUSTOMER_ID_POSITIVE");
         }
 
         if (customerId == CustomerId)

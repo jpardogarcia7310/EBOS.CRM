@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -36,12 +37,12 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (createdBy <= 0)
         {
-            throw new InvalidOperationException("CreatedBy must be a positive value.");
+            throw new DomainValidationException("CreatedBy must be a positive value.", "DOMAIN_VALIDATION_CREATED_BY_POSITIVE");
         }
 
         var entity = new AccountContact
@@ -65,12 +66,12 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (corporateCustomerId <= 0)
         {
-            throw new InvalidOperationException("CorporateCustomerId must be a positive value.");
+            throw new DomainValidationException("CorporateCustomerId must be a positive value.", "DOMAIN_VALIDATION_CORPORATE_CUSTOMER_ID_POSITIVE");
         }
 
         if (individualCustomerId <= 0)
         {
-            throw new InvalidOperationException("IndividualCustomerId must be a positive value.");
+            throw new DomainValidationException("IndividualCustomerId must be a positive value.", "DOMAIN_VALIDATION_INDIVIDUAL_CUSTOMER_ID_POSITIVE");
         }
 
         CorporateCustomerId = corporateCustomerId;
@@ -83,12 +84,12 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (corporateCustomerId <= 0 || individualCustomerId <= 0)
         {
-            throw new InvalidOperationException("Customer ids must be positive values.");
+            throw new DomainValidationException("Customer ids must be positive values.", "DOMAIN_VALIDATION_CUSTOMER_IDS_POSITIVE");
         }
 
         if (EndAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot reassign an unassigned account contact. Assign it first.");
+            throw new DomainRuleViolationException("Cannot reassign an unassigned account contact. Assign it first.", "DOMAIN_RULE_VIOLATION_CONTACT_REASSIGN_UNASSIGNED");
         }
 
         CorporateCustomerId = corporateCustomerId;
@@ -99,7 +100,7 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (endAt < StartAt)
         {
-            throw new InvalidOperationException("EndAt cannot be earlier than StartAt.");
+            throw new DomainValidationException("EndAt cannot be earlier than StartAt.", "DOMAIN_VALIDATION_END_AT_RANGE");
         }
 
         EndAt = endAt;
@@ -110,7 +111,7 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (isPrimary && EndAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot set as primary when account contact is unassigned.");
+            throw new DomainRuleViolationException("Cannot set as primary when account contact is unassigned.", "DOMAIN_RULE_VIOLATION_CONTACT_PRIMARY_UNASSIGNED");
         }
 
         IsPrimary = isPrimary;
@@ -120,7 +121,7 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (updatedBy <= 0)
         {
-            throw new InvalidOperationException("UpdatedBy must be a positive value.");
+            throw new DomainValidationException("UpdatedBy must be a positive value.", "DOMAIN_VALIDATION_UPDATED_BY_POSITIVE");
         }
 
         UpdatedBy = updatedBy;
@@ -131,13 +132,13 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (accountContactRoleId <= 0)
         {
-            throw new InvalidOperationException("AccountContactRoleId must be a positive value.");
+            throw new DomainValidationException("AccountContactRoleId must be a positive value.", "DOMAIN_VALIDATION_ACCOUNT_CONTACT_ROLE_ID_POSITIVE");
         }
 
         var target = Roles.FirstOrDefault(r => r.Id == accountContactRoleId);
         if (target is null)
         {
-            throw new InvalidOperationException("AccountContactRole not found.");
+            throw new DomainConflictException("AccountContactRole not found.", "DOMAIN_CONFLICT_ACCOUNT_CONTACT_ROLE_NOT_FOUND");
         }
 
         foreach (var role in Roles)

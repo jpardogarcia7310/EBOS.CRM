@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
 
@@ -7,7 +8,7 @@ public class CustomerPrivacyRequestTests
     [Fact]
     public void Create_InvalidRequestType_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             CustomerPrivacyRequest.Create(1, 2, "UNKNOWN", 3, null, null));
     }
 
@@ -26,14 +27,14 @@ public class CustomerPrivacyRequestTests
     public void MarkCompleted_WithoutInProgress_Throws()
     {
         var entity = CustomerPrivacyRequest.Create(1, 2, CustomerPrivacyRequest.TypeForget, 3, null, null);
-        Assert.Throws<InvalidOperationException>(() => entity.MarkCompleted(10));
+        Assert.ThrowsAny<DomainException>(() => entity.MarkCompleted(10));
     }
 
     [Fact]
     public void MarkFailed_WithoutInProgress_Throws()
     {
         var entity = CustomerPrivacyRequest.Create(1, 2, CustomerPrivacyRequest.TypeForget, 3, null, null);
-        Assert.Throws<InvalidOperationException>(() => entity.MarkFailed(10, "ERR", "fail"));
+        Assert.ThrowsAny<DomainException>(() => entity.MarkFailed(10, "ERR", "fail"));
     }
 
     [Fact]
@@ -52,3 +53,5 @@ public class CustomerPrivacyRequestTests
         Assert.Equal(20, entity.ProcessedBy);
     }
 }
+
+

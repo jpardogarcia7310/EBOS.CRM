@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Moq;
 
@@ -9,7 +10,7 @@ public class AccountHierarchyTests
     [Fact]
     public void Create_WithSameParentChild_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.ThrowsAny<DomainException>(() =>
             AccountHierarchy.Create(1, 10, 10, "GROUP_PARENT", DateTime.UtcNow));
     }
 
@@ -19,7 +20,7 @@ public class AccountHierarchyTests
         var validFrom = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
         var entity = AccountHierarchy.Create(1, 10, 20, "GROUP_PARENT", validFrom);
 
-        Assert.Throws<InvalidOperationException>(() => entity.EndRelation(validFrom.AddDays(-1)));
+        Assert.ThrowsAny<DomainException>(() => entity.EndRelation(validFrom.AddDays(-1)));
     }
 
     [Fact]
@@ -40,3 +41,5 @@ public class AccountHierarchyTests
         Assert.Equal(21, entity.ChildCorporateCustomerId);
     }
 }
+
+

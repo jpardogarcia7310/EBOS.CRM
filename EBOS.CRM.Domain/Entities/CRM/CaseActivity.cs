@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -25,12 +26,12 @@ public class CaseActivity : ErasableEntity, ITenantScopedEntity
     {
         if (!IsValidStatus(status))
         {
-            throw new InvalidOperationException("Status value is invalid.");
+            throw new DomainValidationException("Status value is invalid.", "DOMAIN_VALIDATION_CASE_ACTIVITY_STATUS_INVALID");
         }
 
         if (!IsValidTransition(Status, status))
         {
-            throw new InvalidOperationException("Status transition is not allowed.");
+            throw new DomainRuleViolationException("Status transition is not allowed.", "DOMAIN_RULE_VIOLATION_CASE_ACTIVITY_STATUS_TRANSITION");
         }
 
         Status = status;

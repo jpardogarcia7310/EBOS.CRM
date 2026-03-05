@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
 namespace EBOS.CRM.Domain.Entities.CRM;
@@ -40,7 +41,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (!string.IsNullOrWhiteSpace(Status))
         {
-            throw new InvalidOperationException("Case is already initialized.");
+            throw new DomainRuleViolationException("Case is already initialized.", "DOMAIN_RULE_VIOLATION_CASE_ALREADY_INITIALIZED");
         }
 
         Status = StatusOpen;
@@ -50,7 +51,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new InvalidOperationException("Title is required.");
+            throw new DomainValidationException("Title is required.", "DOMAIN_VALIDATION_CASE_TITLE_REQUIRED");
         }
 
         Title = title;
@@ -61,7 +62,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (queueId <= 0)
         {
-            throw new InvalidOperationException("QueueId must be a positive value.");
+            throw new DomainValidationException("QueueId must be a positive value.", "DOMAIN_VALIDATION_QUEUE_ID_POSITIVE");
         }
 
         QueueId = queueId;
@@ -71,7 +72,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (ownerUserId <= 0)
         {
-            throw new InvalidOperationException("OwnerUserId must be a positive value.");
+            throw new DomainValidationException("OwnerUserId must be a positive value.", "DOMAIN_VALIDATION_OWNER_USER_ID_POSITIVE");
         }
 
         OwnerUserId = ownerUserId;
@@ -81,7 +82,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (ClosedAt.HasValue || string.Equals(Status, StatusClosed, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("Case is already closed.");
+            throw new DomainRuleViolationException("Case is already closed.", "DOMAIN_RULE_VIOLATION_CASE_ALREADY_CLOSED");
         }
 
         SetStatus(StatusClosed);
@@ -92,7 +93,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (!ClosedAt.HasValue && !string.Equals(Status, StatusClosed, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("Case is not closed.");
+            throw new DomainRuleViolationException("Case is not closed.", "DOMAIN_RULE_VIOLATION_CASE_NOT_CLOSED");
         }
 
         SetStatus(StatusReopened);
@@ -103,7 +104,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (dueAt.HasValue && dueAt.Value < CreatedAt)
         {
-            throw new InvalidOperationException("DueAt cannot be earlier than CreatedAt.");
+            throw new DomainValidationException("DueAt cannot be earlier than CreatedAt.", "DOMAIN_VALIDATION_DUE_AT_RANGE");
         }
 
         DueAt = dueAt;
@@ -113,7 +114,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (!IsValidPriority(priority))
         {
-            throw new InvalidOperationException("Priority value is invalid.");
+            throw new DomainValidationException("Priority value is invalid.", "DOMAIN_VALIDATION_CASE_PRIORITY_INVALID");
         }
 
         Priority = priority;
@@ -123,12 +124,12 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (!IsValidStatus(status))
         {
-            throw new InvalidOperationException("Status value is invalid.");
+            throw new DomainValidationException("Status value is invalid.", "DOMAIN_VALIDATION_CASE_STATUS_INVALID");
         }
 
         if (!IsValidTransition(Status, status))
         {
-            throw new InvalidOperationException("Status transition is not allowed.");
+            throw new DomainRuleViolationException("Status transition is not allowed.", "DOMAIN_RULE_VIOLATION_CASE_STATUS_TRANSITION");
         }
 
         Status = status;
