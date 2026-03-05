@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using EBOS.CRM.Domain.Exceptions;
 using FluentValidation;
 
 namespace EBOS.CRM.Api.Middleware;
@@ -73,6 +74,38 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(problem);
         }
+        catch (DomainValidationException dex)
+        {
+            await WriteDomainProblem(
+                context,
+                dex,
+                StatusCodes.Status400BadRequest,
+                "Domain validation failed");
+        }
+        catch (DomainConflictException dex)
+        {
+            await WriteDomainProblem(
+                context,
+                dex,
+                StatusCodes.Status409Conflict,
+                "Domain conflict detected");
+        }
+        catch (DomainRuleViolationException dex)
+        {
+            await WriteDomainProblem(
+                context,
+                dex,
+                StatusCodes.Status422UnprocessableEntity,
+                "Domain rule violation");
+        }
+        catch (TransientDomainFailureException dex)
+        {
+            await WriteDomainProblem(
+                context,
+                dex,
+                StatusCodes.Status503ServiceUnavailable,
+                "Transient domain failure");
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unhandled exception");
@@ -96,6 +129,28 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         var hash = SHA256.HashData(bytes);
         var hex = Convert.ToHexString(hash);
         return $"VAL_{hex.Substring(0, 12)}";
+    }
+
+    private static async Task WriteDomainProblem(
+        HttpContext context,
+        DomainException exception,
+        int statusCode,
+        string title)
+    {
+        var problem = new ProblemDetails
+        {
+            Title = title,
+            Detail = exception.Message,
+            Status = statusCode,
+            Extensions =
+            {
+                ["code"] = exception.Code,
+                ["retryable"] = exception.Retryable
+            }
+        };
+
+        context.Response.StatusCode = statusCode;
+        await context.Response.WriteAsJsonAsync(problem);
     }
 }
 
