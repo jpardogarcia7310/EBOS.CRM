@@ -3,6 +3,7 @@ using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
@@ -35,7 +36,14 @@ public sealed class RegisterCustomerPrivacyRequestCommandHandler(
             request.TenantId, request.CustomerId, normalizedType, cancellationToken);
         if (active is not null)
         {
-            throw new InvalidOperationException("An active request already exists for this customer and request type.");
+            if (active.MatchesRegistrationIntent(normalizedType, request.Reason, currentUser.UserId))
+            {
+                return active.ToResponse();
+            }
+
+            throw new DomainConflictException(
+                "An active request already exists for this customer and request type.",
+                "DOMAIN_CONFLICT_PRIVACY_ACTIVE_REQUEST");
         }
 
         var entity = CustomerPrivacyRequest.Create(

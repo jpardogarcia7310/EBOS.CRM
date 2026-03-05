@@ -5,6 +5,8 @@ namespace EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 
 public interface ICustomerMergeHistoryRepository : IPagedRepository<CustomerMergeHistory>, IUnitOfWork
 {
+    Task<CustomerMergeHistory?> GetLatestByMergedAsync(long tenantId, long mergedCustomerId,
+        CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<CustomerMergeHistory>> GetByWinnerPagedAsync(long tenantId, long winnerCustomerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<int> CountByWinnerAsync(long tenantId, long winnerCustomerId, CancellationToken cancellationToken = default);

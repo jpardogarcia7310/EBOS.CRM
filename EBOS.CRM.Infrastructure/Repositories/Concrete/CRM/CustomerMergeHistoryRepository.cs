@@ -6,6 +6,16 @@ namespace EBOS.CRM.Infrastructure.Repositories.Concrete.CRM;
 public class CustomerMergeHistoryRepository(CrmDbContext context)
     : BaseRepository<CustomerMergeHistory>(context), ICustomerMergeHistoryRepository
 {
+    public Task<CustomerMergeHistory?> GetLatestByMergedAsync(long tenantId, long mergedCustomerId,
+        CancellationToken cancellationToken = default)
+    {
+        return AsQueryable()
+            .Where(x => x.TenantId == tenantId && x.MergedCustomerId == mergedCustomerId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<CustomerMergeHistory>> GetByWinnerPagedAsync(long tenantId, long winnerCustomerId,
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {

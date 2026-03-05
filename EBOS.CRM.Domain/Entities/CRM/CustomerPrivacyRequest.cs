@@ -168,6 +168,17 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         }
     }
 
+    public bool MatchesRegistrationIntent(string requestType, string? reason, long requestedBy)
+    {
+        var normalizedType = requestType?.Trim().ToUpperInvariant() ?? string.Empty;
+        var normalizedReason = NormalizeOrNull(reason);
+        return TenantId > 0
+               && requestedBy > 0
+               && RequestedBy == requestedBy
+               && string.Equals(RequestType, normalizedType, StringComparison.Ordinal)
+               && string.Equals(Reason, normalizedReason, StringComparison.Ordinal);
+    }
+
     private static void ValidateTenantAndCustomer(long tenantId, long customerId)
     {
         if (tenantId <= 0)

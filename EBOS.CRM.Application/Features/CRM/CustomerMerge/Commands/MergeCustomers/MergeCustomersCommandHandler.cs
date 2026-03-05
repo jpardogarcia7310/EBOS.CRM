@@ -3,6 +3,7 @@ using EBOS.CRM.Contracts.Requests.CRM.CustomerMerge;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Application.Options;
@@ -110,6 +111,23 @@ public class MergeCustomersCommandHandler(
 
             foreach (var mergeId in mergeIds)
             {
+                var existingMerge = await customerMergeHistoryRepository.GetLatestByMergedAsync(
+                    mergeRequest.TenantId,
+                    mergeId,
+                    cancellationToken);
+                if (existingMerge is not null)
+                {
+                    if (!existingMerge.MatchesMergeIntent(mergeRequest.TenantId, winner.Id, mergeId))
+                    {
+                        throw new DomainConflictException(
+                            "Merged customer is already linked to a different winner.",
+                            "DOMAIN_CONFLICT_MERGE_ALREADY_PROCESSED");
+                    }
+
+                    merged.Add(mergeId);
+                    continue;
+                }
+
                 var entity = await customerRepository.GetByIdAsync(mergeId, cancellationToken);
                 if (entity is null)
                 {

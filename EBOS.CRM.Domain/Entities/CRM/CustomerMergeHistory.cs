@@ -61,4 +61,11 @@ public class CustomerMergeHistory : ErasableEntity, ITenantScopedEntity
             CreatedAt = createdAt ?? DateTime.UtcNow
         };
     }
+
+    public bool MatchesMergeIntent(long tenantId, long winnerCustomerId, long mergedCustomerId)
+    {
+        return TenantId == tenantId
+               && WinnerCustomerId == winnerCustomerId
+               && MergedCustomerId == mergedCustomerId;
+    }
 }
