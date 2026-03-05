@@ -206,6 +206,11 @@ También define la cobertura de pruebas para:
   - Forzar transiciones de estado monotónicas en workflows largos.
 - Agregar clasificación de eventos de dominio para analítica operacional:
   - Evento de negocio vs técnico vs anomalía.
+  - Aclaración: esta taxonomía es un modelo de clasificación para analítica operacional, no entidades de dominio.
+  - `Business`: eventos que representan progreso real de negocio (solicitud aceptada, paso de workflow completado, acción de cliente exitosa).
+  - `Technical`: eventos de mecánica de confiabilidad/control sin significado directo de negocio (deduplicación aplicada, intento de retry, guarda por timeout, disparo de compensación).
+  - `Anomaly`: eventos que señalan comportamiento de dominio anómalo o sospechoso que requiere triage (brecha inesperada de invariante, combinación de estado imposible, patrón repetido de violación de reglas).
+  - La clasificación debe ser determinística por nombre de evento para que los consumidores analíticos reciban dimensiones estables entre versiones.
 - Definición y criterios operativos:
   - Domain Empresarial extiende la taxonomía MVP con compensaciones, invariantes de confiabilidad y gobierno de eventos.
   - La prevención de acción de negocio duplicada es obligatoria bajo retries y retries distribuidos.

@@ -206,6 +206,11 @@ It also defines test coverage for:
   - Enforce monotonic state transitions in long-running workflows.
 - Add domain event classification for operational analytics:
   - Business event vs technical event vs anomaly event.
+  - Clarification: this taxonomy is an operational analytics classification model, not domain entities.
+  - `Business`: events that represent meaningful business progress (accepted request, completed workflow step, successful customer action).
+  - `Technical`: events that describe reliability/control mechanics without direct business meaning (dedup hit, retry attempt, timeout guard, compensation trigger).
+  - `Anomaly`: events that indicate abnormal or suspicious domain behavior requiring triage (unexpected invariant breach, impossible state combination, repeated rule-violation pattern).
+  - Classification must be deterministic per event name so analytics consumers receive stable dimensions across releases.
 - Definition and operational criteria:
   - Enterprise domain extends MVP taxonomy with compensations, reliability invariants, and event governance.
   - Duplicate-business-action prevention is mandatory under retries and distributed retries.
