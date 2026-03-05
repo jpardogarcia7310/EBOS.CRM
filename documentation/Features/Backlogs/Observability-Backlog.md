@@ -226,6 +226,8 @@ It also defines test coverage for:
 - Runbook references for Domain:
   - Business remediation path for non-retriable rule violations.
   - Compensation replay and audit evidence procedure.
+  - Source runbook sections:
+    - `documentation/RunBooks/Observability/Observability-Operability-RunBook.md` -> `Domain Enterprise Runbook References`.
 
 ### Infrastructure
 

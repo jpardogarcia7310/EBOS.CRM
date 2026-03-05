@@ -226,6 +226,8 @@ También define la cobertura de pruebas para:
 - Referencias de runbook para Domain:
   - Ruta de remediación de negocio para violaciones no reintentables.
   - Procedimiento de replay de compensaciones y evidencia de auditoría.
+  - Sección fuente del runbook:
+    - `documentation/RunBooks/Observability/Observability-Operability-RunBook_ES.md` -> `Referencias de Runbook Domain Empresarial`.
 
 ### Infrastructure
 

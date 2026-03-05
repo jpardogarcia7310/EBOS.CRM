@@ -157,6 +157,49 @@ Recovery action matrix:
   - Retry policy: bounded retry with backoff+jitter, then degrade/fail fast if threshold exceeded.
   - Operator action: validate dependency/transient indicators and clear alerts once stability is restored.
 
+## Domain Enterprise Runbook References
+
+### Business Remediation Path for Non-Retriable Rule Violations
+1. Identify violation from deterministic domain code (`DOMAIN_RULE_VIOLATION_*`) and capture `correlationId` + `traceId`.
+2. Confirm non-retriable classification:
+   - taxonomy is `DomainRuleViolation`
+   - business preconditions are still unsatisfied.
+3. Open business remediation ticket with:
+   - invariant code
+   - impacted entity ids/tenant
+   - first-seen and last-seen UTC timestamps
+   - operational impact.
+4. Apply approved business remediation action (data correction, state unlock, policy override, or business approval flow).
+5. Re-run operation once remediation is complete and verify:
+   - invariant no longer fails
+   - no duplicate business side effects
+   - expected domain event category remains stable.
+6. Attach audit evidence:
+   - ticket id and approver
+   - before/after state evidence
+   - trace/log samples tied to remediation.
+
+### Compensation Replay and Audit Evidence Procedure
+1. Select failed reversible workflow instances eligible for compensation replay.
+2. Validate replay preconditions:
+   - current status is replay-eligible (`FAILED` for privacy request flow)
+   - compensating command is available and deterministic
+   - idempotency guard is active.
+3. Execute compensating command replay in controlled batches with correlation tracking.
+4. Verify post-replay invariants:
+   - state transitioned to expected compensated state
+   - failure markers were cleared where required
+   - monotonic transition rules remained valid.
+5. Verify emitted operational events:
+   - technical compensation event emitted
+   - no category drift against event catalog.
+6. Store audit evidence:
+   - replay batch id and UTC execution window
+   - list of affected entity ids
+   - count of replayed/skipped/failed operations
+   - sample `correlationId`/`traceId`
+   - operator and approver.
+
 ## Migration Procedure
 1. Backup DB and export current resilience/observability config.
 2. Deploy API and infrastructure changes.

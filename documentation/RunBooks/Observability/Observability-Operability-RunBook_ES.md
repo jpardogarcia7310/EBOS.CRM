@@ -157,6 +157,49 @@ Matriz de accion de recuperacion:
   - Politica de retry: retry acotado con backoff+jitter, luego degradar/fail-fast si se supera el umbral.
   - Accion operativa: validar indicadores transitorios/dependencias y limpiar alertas tras recuperar estabilidad.
 
+## Referencias de Runbook Domain Empresarial
+
+### Ruta de Remediacion de Negocio para Violaciones No Reintentables
+1. Identificar la violacion por codigo de dominio determinista (`DOMAIN_RULE_VIOLATION_*`) y capturar `correlationId` + `traceId`.
+2. Confirmar clasificacion no reintentable:
+   - taxonomia `DomainRuleViolation`
+   - precondiciones de negocio aun no satisfechas.
+3. Abrir ticket de remediacion de negocio con:
+   - codigo de invariante
+   - ids de entidad/tenant impactados
+   - marcas de tiempo UTC (primera/ultima ocurrencia)
+   - impacto operativo.
+4. Ejecutar accion de remediacion aprobada (correccion de datos, desbloqueo de estado, override de politica o flujo de aprobacion).
+5. Reintentar operacion una vez aplicada la remediacion y verificar:
+   - la invariante deja de fallar
+   - no hay efectos de negocio duplicados
+   - la categoria de evento de dominio esperada se mantiene estable.
+6. Adjuntar evidencia de auditoria:
+   - id de ticket y aprobador
+   - evidencia de estado antes/despues
+   - muestras de trazas/logs ligadas a la remediacion.
+
+### Procedimiento de Replay de Compensaciones y Evidencia de Auditoria
+1. Seleccionar instancias fallidas de workflow reversible elegibles para replay de compensacion.
+2. Validar precondiciones de replay:
+   - estado actual elegible (`FAILED` en flujo de privacidad)
+   - comando compensatorio disponible y determinista
+   - guarda de idempotencia activa.
+3. Ejecutar replay del comando compensatorio en lotes controlados con tracking de correlacion.
+4. Verificar invariantes post-replay:
+   - estado transicionado al estado compensado esperado
+   - marcadores de fallo limpiados cuando aplique
+   - reglas de transicion monotónica respetadas.
+5. Verificar eventos operacionales emitidos:
+   - evento tecnico de compensacion emitido
+   - sin deriva de categoria frente al catalogo de eventos.
+6. Guardar evidencia de auditoria:
+   - id de lote de replay y ventana UTC de ejecucion
+   - lista de ids de entidades afectadas
+   - conteo de operaciones replayed/skipped/failed
+   - muestras de `correlationId`/`traceId`
+   - operador y aprobador.
+
 ## Procedimiento de Migracion
 1. Respaldar DB y exportar configuracion vigente de resiliencia/observabilidad.
 2. Desplegar cambios de API e infraestructura.
