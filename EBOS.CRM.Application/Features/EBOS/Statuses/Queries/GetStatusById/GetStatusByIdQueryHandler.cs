@@ -1,11 +1,12 @@
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.EBOS.Statuses.Queries.GetStatusById;
 
-public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper mapper)
+public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetStatusByIdQuery, StatusResponse?>
 {
     public async Task<StatusResponse?> Handle(GetStatusByIdQuery request, CancellationToken cancellationToken)
@@ -13,7 +14,9 @@ public class GetStatusByIdQueryHandler(IStatusRepository repository, IMapper map
         // 👇 It throws OperationCancelledException if the token has already been canceled
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = referenceLookupService is null
+            ? await repository.GetByIdAsync(request.Id, cancellationToken)
+            : await referenceLookupService.GetStatusByIdAsync(request.Id, cancellationToken);
         return entity is null ? null : mapper.Map<StatusResponse>(entity);
     }
 }

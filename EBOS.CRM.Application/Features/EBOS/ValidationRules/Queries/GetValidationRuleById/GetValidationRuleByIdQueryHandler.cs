@@ -2,10 +2,11 @@ using MapsterMapper;
 using MediatR;
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 
 namespace EBOS.CRM.Application.Features.EBOS.ValidationRules.Queries.GetValidationRuleById;
 
-public class GetValidationRuleByIdQueryHandler(IValidationRuleRepository repository, IMapper mapper)
+public class GetValidationRuleByIdQueryHandler(IValidationRuleRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetValidationRuleByIdQuery, ValidationRuleResponse>
 {
     private readonly IValidationRuleRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -16,8 +17,13 @@ public class GetValidationRuleByIdQueryHandler(IValidationRuleRepository reposit
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entity = await _repository.GetByIdAsync(request.Id, cancellationToken)
-            ?? throw new KeyNotFoundException("ValidationRule not found.");
+        var entity = referenceLookupService is null
+            ? await _repository.GetByIdAsync(request.Id, cancellationToken)
+            : await referenceLookupService.GetValidationRuleByIdOrThrowAsync(request.Id, cancellationToken);
+        if (entity is null)
+        {
+            throw new KeyNotFoundException("ValidationRule not found.");
+        }
 
         return _mapper.Map<ValidationRuleResponse>(entity);
     }

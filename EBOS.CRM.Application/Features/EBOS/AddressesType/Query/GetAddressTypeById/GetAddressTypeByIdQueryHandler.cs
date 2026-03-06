@@ -1,11 +1,12 @@
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.EBOS.AddressesType.Query.GetAddressTypeById;
 
-public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, IMapper mapper)
+public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetAddressTypeByIdQuery, AddressTypeResponse?>
 {
     private readonly IAddressTypeRepository _repository = repository ??
@@ -17,7 +18,9 @@ public class GetAddressTypeByIdQueryHandler(IAddressTypeRepository repository, I
         // 👇 Throws OperationCancelledException if the token is already canceled
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = referenceLookupService is null
+            ? await _repository.GetByIdAsync(request.Id, cancellationToken)
+            : await referenceLookupService.GetAddressTypeByIdAsync(request.Id, cancellationToken);
         return entity is null ? null : _mapper.Map<AddressTypeResponse>(entity);
     }
 }

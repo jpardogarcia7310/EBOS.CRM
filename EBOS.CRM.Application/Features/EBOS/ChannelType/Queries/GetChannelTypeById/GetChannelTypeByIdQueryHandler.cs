@@ -1,11 +1,12 @@
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.EBOS.ChannelType.Queries.GetChannelTypeById;
 
-public class GetChannelTypeByIdQueryHandler(IChannelTypeRepository repository, IMapper mapper)
+public class GetChannelTypeByIdQueryHandler(IChannelTypeRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetChannelTypeByIdQuery, ChannelTypeResponse?>
 {
     private readonly IChannelTypeRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -15,7 +16,9 @@ public class GetChannelTypeByIdQueryHandler(IChannelTypeRepository repository, I
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = referenceLookupService is null
+            ? await _repository.GetByIdAsync(request.Id, cancellationToken)
+            : await referenceLookupService.GetChannelTypeByIdAsync(request.Id, cancellationToken);
         return entity is null ? null : _mapper.Map<ChannelTypeResponse>(entity);
     }
 }

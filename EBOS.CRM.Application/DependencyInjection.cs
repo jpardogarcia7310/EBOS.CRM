@@ -20,10 +20,12 @@ using EBOS.CRM.Application.Features.CRM.CustomerPreference.Services;
 using EBOS.CRM.Application.Features.CRM.Service.Case.Services;
 using EBOS.CRM.Application.Features.CRM.Service.Queue.Services;
 using EBOS.CRM.Application.Features.CRM.Service.Sla.Services;
+using EBOS.CRM.Application.Features.EBOS.Services;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 
 namespace EBOS.CRM.Application;
 
@@ -60,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<ICaseReferenceValidationService, CaseReferenceValidationService>();
         services.AddScoped<IQueueOperationalValidationService, QueueOperationalValidationService>();
         services.AddScoped<ISlaOperationalValidationService, SlaOperationalValidationService>();
+        services.AddScoped<IEbosReferenceLookupService, EbosReferenceLookupService>();
 
         return services;
     }
