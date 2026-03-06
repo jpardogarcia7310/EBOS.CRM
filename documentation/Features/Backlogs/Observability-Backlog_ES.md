@@ -65,7 +65,7 @@ También define la cobertura de pruebas para:
 - Definición y criterios operativos:
   - Application define los límites de orquestación de resiliencia; los reintentos son por política, no ad hoc en handlers.
   - Comandos con efectos secundarios no son reintentables por defecto salvo idempotencia explícitamente garantizada.
-  - Los pipeline behaviors deben emitir eventos estructurados de validación, reintentos y resultado final.
+  - Los pipelines behaviors deben emitir eventos estructurados de validación, reintentos y resultado final.
 - Expectativas de pruebas unitarias:
   - Validar selección de políticas por tipo de handler (query vs command).
   - Validar límite de reintentos y ventana de jitter ante fallos transitorios.
@@ -104,7 +104,7 @@ También define la cobertura de pruebas para:
   - Estos tipos son categorías de error (normalmente representadas como tipos de excepción o códigos de error) para estandarizar comportamiento, logging y mapeo en API.
   - Objetivo de la taxonomía: manejo determinístico de fallos, evitar excepciones genéricas, mejorar observabilidad y habilitar retries/fallbacks consistentes.
 - Definir cada tipo de la taxonomía de error de dominio:
-  - `DomainValidation`: La forma del input/estado es inválida antes de aplicar reglas de negocio (valor obligatorio ausente, formato inválido, valor fuera de rango). Usualmente se mapea a corrección del cliente sin reintento.
+  - `DomainValidation`: La forma del input/estado es inválida antes de aplicar reglas de negocio (valor obligatorio ausente, formato inválido, valor fuera de rango). Usualmente, se mapea a corrección del cliente sin reintento.
   - `DomainConflict`: La operación solicitada colisiona con el estado actual persistido/de dominio (clave duplicada, mismatch de versión, comando ya procesado). Puede ser reintentable solo cuando el conflicto es de concurrencia y el cliente puede reintentar de forma segura.
   - `DomainRuleViolation`: Se rompe una invariante estricta de negocio aun con input sintácticamente válido (límite de crédito excedido, transición de estado ilegal). No reintentable hasta que cambien las condiciones de negocio.
   - `TransientDomainFailure`: Barrera temporal de ejecución a nivel de dominio causada por condiciones de corta duración (servicio de dominio temporalmente no disponible, timeout de bloqueo, lectura obsoleta transitoria). Reintentable con backoff/jitter acotado.
@@ -213,7 +213,7 @@ También define la cobertura de pruebas para:
   - La clasificación debe ser determinística por nombre de evento para que los consumidores analíticos reciban dimensiones estables entre versiones.
 - Definición y criterios operativos:
   - Domain Empresarial extiende la taxonomía MVP con compensaciones, invariantes de confiabilidad y gobierno de eventos.
-  - La prevención de acción de negocio duplicada es obligatoria bajo retries y retries distribuidos.
+  - La prevención de acción de negocio duplicada es obligatoria baja retries y retries distribuidos.
   - Criterio operativo de compensación: toda operación reversible debe definir comando compensatorio explícito, precondiciones de ejecución y evidencia auditable del resultado.
   - Criterio operativo de invariantes: no se aceptan transiciones regresivas o ambiguas en workflows largos; cada transición debe ser monotónica y validada por estado previo esperado.
   - Criterio operativo de deduplicación: comandos repetidos con misma intención de negocio deben resolverse de forma idempotente (sin efecto adicional) aun con reintentos concurrentes o reentrega distribuida.

@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -13,7 +14,8 @@ public class AssignCaseSlaCommandHandler(
     ISlaRepository slaRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<AssignCaseSlaCommand, CaseResponse?>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AssignCaseSlaCommand, CaseResponse?>
 {
     public async Task<CaseResponse?> Handle(AssignCaseSlaCommand request, CancellationToken cancellationToken)
     {
@@ -39,8 +41,7 @@ public class AssignCaseSlaCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        entity.SlaId = entityRequest.SlaId;
-        entity.UpdateDueAt(sla.CalculateDueAt(DateTime.UtcNow));
+        entity.AssignSla(entityRequest.SlaId, sla.CalculateDueAt(DateTime.UtcNow));
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -60,6 +61,14 @@ public class AssignCaseSlaCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Case),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class AccountContact : ErasableEntity, ITenantScopedEntity
 {
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
+
     public long TenantId { get; private set; }
     public long CorporateCustomerId { get; private set; }
     public CorporateCustomer CorporateCustomer { get; private set; } = null!;
@@ -21,6 +24,12 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     public ICollection<AccountContactRole> Roles { get; private set; } = new List<AccountContactRole>();
+
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.Peek();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+        => _operationalEvents.Dequeue();
 
     long ITenantScopedEntity.TenantId
     {
@@ -78,6 +87,14 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
         IndividualCustomerId = individualCustomerId;
         StartAt = startAt;
         EndAt = null;
+        EmitOperationalEvent(
+            "AccountContactAssigned",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(AccountContact),
+                ["corporateCustomerId"] = CorporateCustomerId.ToString(),
+                ["individualCustomerId"] = IndividualCustomerId.ToString()
+            });
     }
 
     public void ReassignCustomers(long corporateCustomerId, long individualCustomerId)
@@ -89,6 +106,14 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
 
         if (EndAt.HasValue)
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(AccountContact),
+                    ["command"] = nameof(ReassignCustomers),
+                    ["invariant"] = "CONTACT_REASSIGN_UNASSIGNED"
+                });
             throw new DomainRuleViolationException("Cannot reassign an unassigned account contact. Assign it first.", "DOMAIN_RULE_VIOLATION_CONTACT_REASSIGN_UNASSIGNED");
         }
 
@@ -111,7 +136,28 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
     {
         if (isPrimary && EndAt.HasValue)
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(AccountContact),
+                    ["command"] = nameof(SetPrimary),
+                    ["invariant"] = "CONTACT_PRIMARY_UNASSIGNED"
+                });
             throw new DomainRuleViolationException("Cannot set as primary when account contact is unassigned.", "DOMAIN_RULE_VIOLATION_CONTACT_PRIMARY_UNASSIGNED");
+        }
+
+        if (IsPrimary == isPrimary)
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(AccountContact),
+                    ["command"] = nameof(SetPrimary),
+                    ["isPrimary"] = isPrimary.ToString()
+                });
+            return;
         }
 
         IsPrimary = isPrimary;
@@ -146,4 +192,7 @@ public class AccountContact : ErasableEntity, ITenantScopedEntity
             role.SetPrimary(role.Id == accountContactRoleId);
         }
     }
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+        => _operationalEvents.Emit(eventName, evidence);
 }

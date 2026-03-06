@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -16,7 +17,8 @@ public class UpdateAccountContactCommandHandler(
     IAccountContactPrimaryGuard primaryGuard,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper)
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<UpdateAccountContactCommand, AccountContactResponse?>
 {
     public async Task<AccountContactResponse?> Handle(UpdateAccountContactCommand request, CancellationToken cancellationToken)
@@ -66,6 +68,14 @@ public class UpdateAccountContactCommandHandler(
                     contact.SetPrimary(false);
                     contact.Touch(currentUser.UserId);
                     await repository.UpdateAsync(contact, cancellationToken);
+                    if (domainOperationalEventPublisher is not null)
+                    {
+                        await domainOperationalEventPublisher.PublishAsync(
+                            nameof(Domain.Entities.CRM.AccountContact),
+                            contact.Id,
+                            contact.DequeueOperationalEvents(),
+                            cancellationToken);
+                    }
                 }
             }
 
@@ -83,6 +93,14 @@ public class UpdateAccountContactCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.AccountContact),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

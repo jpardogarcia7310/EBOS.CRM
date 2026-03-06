@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class CaseActivity : ErasableEntity, ITenantScopedEntity
 {
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
+
     public const string StatusOpen = "Open";
     public const string StatusInProgress = "InProgress";
     public const string StatusCompleted = "Completed";
@@ -22,6 +25,12 @@ public class CaseActivity : ErasableEntity, ITenantScopedEntity
     public DateTime? UpdatedAt { get; set; }
     public long? UpdatedBy { get; set; }
 
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.Peek();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+        => _operationalEvents.Dequeue();
+
     public void SetStatus(string status)
     {
         if (!IsValidStatus(status))
@@ -29,12 +38,43 @@ public class CaseActivity : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("Status value is invalid.", "DOMAIN_VALIDATION_CASE_ACTIVITY_STATUS_INVALID");
         }
 
+        if (string.Equals(Status, status, StringComparison.Ordinal))
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CaseActivity),
+                    ["command"] = nameof(SetStatus),
+                    ["status"] = status
+                });
+            return;
+        }
+
         if (!IsValidTransition(Status, status))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(CaseActivity),
+                    ["command"] = nameof(SetStatus),
+                    ["currentStatus"] = Status,
+                    ["targetStatus"] = status
+                });
             throw new DomainRuleViolationException("Status transition is not allowed.", "DOMAIN_RULE_VIOLATION_CASE_ACTIVITY_STATUS_TRANSITION");
         }
 
+        var previousStatus = string.IsNullOrWhiteSpace(Status) ? "<UNINITIALIZED>" : Status;
         Status = status;
+        EmitOperationalEvent(
+            "CaseActivityStatusChanged",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(CaseActivity),
+                ["fromStatus"] = previousStatus,
+                ["toStatus"] = status
+            });
     }
 
     public static bool IsValidStatus(string status)
@@ -58,4 +98,7 @@ public class CaseActivity : ErasableEntity, ITenantScopedEntity
             _ => false
         };
     }
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+        => _operationalEvents.Emit(eventName, evidence);
 }

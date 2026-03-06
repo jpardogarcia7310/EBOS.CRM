@@ -33,7 +33,77 @@ public static class DomainOperationalEventCatalog
             "CustomerPrivacyRequestCompleted",
             DomainOperationalEventCategory.Business,
             "A privacy request completed successfully.",
-            "Track business completion outcomes for privacy workflows.")
+            "Track business completion outcomes for privacy workflows."),
+        new(
+            "CaseStatusChanged",
+            DomainOperationalEventCategory.Business,
+            "Case status changed through a valid domain transition.",
+            "Track case workflow progression and business throughput."),
+        new(
+            "CaseOwnerAssigned",
+            DomainOperationalEventCategory.Business,
+            "A case owner assignment was applied.",
+            "Track ownership changes and routing outcomes."),
+        new(
+            "CaseQueueAssigned",
+            DomainOperationalEventCategory.Business,
+            "A case queue assignment was applied.",
+            "Track queue routing and work distribution."),
+        new(
+            "CaseSlaAssigned",
+            DomainOperationalEventCategory.Business,
+            "A case SLA assignment was applied.",
+            "Track SLA governance and due-date recalculation."),
+        new(
+            "CaseActivityStatusChanged",
+            DomainOperationalEventCategory.Business,
+            "Case activity status changed through a valid transition.",
+            "Track service workflow execution progress."),
+        new(
+            "CustomerConsentGranted",
+            DomainOperationalEventCategory.Business,
+            "A customer consent grant event was registered.",
+            "Track consent acceptance rates and channel permissions."),
+        new(
+            "CustomerConsentRevoked",
+            DomainOperationalEventCategory.Business,
+            "A customer consent revocation event was registered.",
+            "Track consent withdrawals and compliance impacts."),
+        new(
+            "AccountContactAssigned",
+            DomainOperationalEventCategory.Business,
+            "An account contact assignment was applied.",
+            "Track account-contact relationship updates."),
+        new(
+            "AccountContactRoleChanged",
+            DomainOperationalEventCategory.Business,
+            "An account contact role state changed.",
+            "Track role lifecycle and primary role changes."),
+        new(
+            "LeadStatusChanged",
+            DomainOperationalEventCategory.Business,
+            "Lead status changed through a valid domain transition.",
+            "Track lead funnel progression and conversion readiness."),
+        new(
+            "LeadConverted",
+            DomainOperationalEventCategory.Business,
+            "Lead conversion to opportunity completed.",
+            "Track conversion rate and conversion latency."),
+        new(
+            "OpportunityStageChanged",
+            DomainOperationalEventCategory.Business,
+            "Opportunity stage changed.",
+            "Track pipeline movement and stage throughput."),
+        new(
+            "OpportunityClosed",
+            DomainOperationalEventCategory.Business,
+            "Opportunity closed as won or lost.",
+            "Track close outcomes and forecast realization."),
+        new(
+            "QuoteStatusChanged",
+            DomainOperationalEventCategory.Business,
+            "Quote status changed.",
+            "Track quote lifecycle and acceptance outcomes.")
     ];
 
     public static DomainOperationalEventCategory Classify(string eventName)

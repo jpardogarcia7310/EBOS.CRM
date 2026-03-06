@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -14,7 +15,8 @@ public class RevokeCustomerConsentCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     ICustomer360Metrics metrics,
-    IMapper mapper)
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<RevokeCustomerConsentCommand, CustomerConsentResponse?>
 {
     public async Task<CustomerConsentResponse?> Handle(RevokeCustomerConsentCommand request, CancellationToken cancellationToken)
@@ -59,6 +61,14 @@ public class RevokeCustomerConsentCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.CustomerConsent),
+                    newEvent.Id,
+                    newEvent.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
             metrics.RecordConsentEvent(newEvent.TenantId, newEvent.ConsentType, newEvent.Granted);
         }

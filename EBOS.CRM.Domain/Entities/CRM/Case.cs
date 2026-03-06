@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class Case : ErasableEntity, ITenantScopedEntity
 {
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
+
     public const string StatusOpen = "Open";
     public const string StatusInProgress = "InProgress";
     public const string StatusOnHold = "OnHold";
@@ -37,14 +40,28 @@ public class Case : ErasableEntity, ITenantScopedEntity
 
     public ICollection<CaseActivity> Activities { get; set; } = new List<CaseActivity>();
 
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.Peek();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+        => _operationalEvents.Dequeue();
+
     public void Open()
     {
         if (!string.IsNullOrWhiteSpace(Status))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(Open),
+                    ["invariant"] = "CASE_ALREADY_INITIALIZED"
+                });
             throw new DomainRuleViolationException("Case is already initialized.", "DOMAIN_RULE_VIOLATION_CASE_ALREADY_INITIALIZED");
         }
 
-        Status = StatusOpen;
+        SetStatus(StatusOpen);
     }
 
     public void UpdateDetails(string title, string? description)
@@ -65,7 +82,27 @@ public class Case : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("QueueId must be a positive value.", "DOMAIN_VALIDATION_QUEUE_ID_POSITIVE");
         }
 
+        if (QueueId == queueId)
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(AssignQueue),
+                    ["queueId"] = queueId.ToString()
+                });
+            return;
+        }
+
         QueueId = queueId;
+        EmitOperationalEvent(
+            "CaseQueueAssigned",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(Case),
+                ["queueId"] = QueueId.ToString()
+            });
     }
 
     public void AssignOwner(long ownerUserId)
@@ -75,13 +112,72 @@ public class Case : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("OwnerUserId must be a positive value.", "DOMAIN_VALIDATION_OWNER_USER_ID_POSITIVE");
         }
 
+        if (OwnerUserId == ownerUserId)
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(AssignOwner),
+                    ["ownerUserId"] = ownerUserId.ToString()
+                });
+            return;
+        }
+
         OwnerUserId = ownerUserId;
+        EmitOperationalEvent(
+            "CaseOwnerAssigned",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(Case),
+                ["ownerUserId"] = OwnerUserId.ToString()
+            });
+    }
+
+    public void AssignSla(long slaId, DateTime dueAt)
+    {
+        if (slaId <= 0)
+        {
+            throw new DomainValidationException("SlaId must be a positive value.", "DOMAIN_VALIDATION_SLA_ID_POSITIVE");
+        }
+
+        if (SlaId == slaId)
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(AssignSla),
+                    ["slaId"] = slaId.ToString()
+                });
+            return;
+        }
+
+        SlaId = slaId;
+        UpdateDueAt(dueAt);
+        EmitOperationalEvent(
+            "CaseSlaAssigned",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(Case),
+                ["slaId"] = SlaId.ToString()
+            });
     }
 
     public void Close(DateTime closedAt)
     {
         if (ClosedAt.HasValue || string.Equals(Status, StatusClosed, StringComparison.OrdinalIgnoreCase))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(Close),
+                    ["invariant"] = "CASE_ALREADY_CLOSED"
+                });
             throw new DomainRuleViolationException("Case is already closed.", "DOMAIN_RULE_VIOLATION_CASE_ALREADY_CLOSED");
         }
 
@@ -93,6 +189,14 @@ public class Case : ErasableEntity, ITenantScopedEntity
     {
         if (!ClosedAt.HasValue && !string.Equals(Status, StatusClosed, StringComparison.OrdinalIgnoreCase))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(Reopen),
+                    ["invariant"] = "CASE_NOT_CLOSED"
+                });
             throw new DomainRuleViolationException("Case is not closed.", "DOMAIN_RULE_VIOLATION_CASE_NOT_CLOSED");
         }
 
@@ -127,12 +231,44 @@ public class Case : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("Status value is invalid.", "DOMAIN_VALIDATION_CASE_STATUS_INVALID");
         }
 
+        if (string.Equals(Status, status, StringComparison.Ordinal))
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(SetStatus),
+                    ["status"] = status
+                });
+            return;
+        }
+
         if (!IsValidTransition(Status, status))
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(Case),
+                    ["command"] = nameof(SetStatus),
+                    ["currentStatus"] = Status,
+                    ["targetStatus"] = status,
+                    ["invariant"] = "CASE_STATUS_TRANSITION"
+                });
             throw new DomainRuleViolationException("Status transition is not allowed.", "DOMAIN_RULE_VIOLATION_CASE_STATUS_TRANSITION");
         }
 
+        var previousStatus = string.IsNullOrWhiteSpace(Status) ? "<UNINITIALIZED>" : Status;
         Status = status;
+        EmitOperationalEvent(
+            "CaseStatusChanged",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(Case),
+                ["fromStatus"] = previousStatus,
+                ["toStatus"] = status
+            });
     }
 
     public static bool IsValidStatus(string status)
@@ -163,4 +299,7 @@ public class Case : ErasableEntity, ITenantScopedEntity
             _ => false
         };
     }
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+        => _operationalEvents.Emit(eventName, evidence);
 }

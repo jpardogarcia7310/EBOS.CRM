@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
@@ -14,6 +15,9 @@ public class CaseDomainTests
         entity.SetStatus(Case.StatusInProgress);
 
         entity.Status.Should().Be(Case.StatusInProgress);
+        entity.PeekOperationalEvents().Should().Contain(x =>
+            x.Name == "CaseStatusChanged" &&
+            x.Category == DomainOperationalEventCategory.Business);
     }
 
     [Fact]
@@ -25,6 +29,22 @@ public class CaseDomainTests
 
         act.Should().Throw<DomainRuleViolationException>()
             .WithMessage("Status transition is not allowed.");
+        entity.PeekOperationalEvents().Should().Contain(x =>
+            x.Name == "DomainInvariantBreachDetected" &&
+            x.Category == DomainOperationalEventCategory.Anomaly);
+    }
+
+    [Fact]
+    public void SetStatus_SameStatus_IsIdempotentAndEmitsTechnicalDedupEvent()
+    {
+        var entity = BuildCase(Case.StatusOpen);
+
+        entity.SetStatus(Case.StatusOpen);
+
+        entity.Status.Should().Be(Case.StatusOpen);
+        entity.PeekOperationalEvents().Should().Contain(x =>
+            x.Name == "DomainCommandDeduplicated" &&
+            x.Category == DomainOperationalEventCategory.Technical);
     }
 
     [Fact]

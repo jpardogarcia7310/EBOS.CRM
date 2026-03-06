@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -14,7 +15,8 @@ public class AddCaseCommandHandler(
     ISlaRepository slaRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<AddCaseCommand, CaseResponse>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddCaseCommand, CaseResponse>
 {
     public async Task<CaseResponse> Handle(AddCaseCommand request, CancellationToken cancellationToken)
     {
@@ -40,6 +42,12 @@ public class AddCaseCommandHandler(
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Case>(entityRequest);
+        if (!string.IsNullOrWhiteSpace(entity.Status))
+        {
+            var targetStatus = entity.Status;
+            entity.Status = string.Empty;
+            entity.SetStatus(targetStatus);
+        }
         entity.SetPriority(entityRequest.Priority);
 
         var dueAt = entityRequest.DueAt ?? sla.CalculateDueAt(DateTime.UtcNow);
@@ -63,6 +71,14 @@ public class AddCaseCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Case),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

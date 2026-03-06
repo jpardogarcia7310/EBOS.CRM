@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class CustomerConsent : ErasableEntity, ITenantScopedEntity
 {
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
+
     public long TenantId { get; set; }
     public long CustomerId { get; private set; }
     public Customer Customer { get; private set; } = null!;
@@ -21,13 +24,19 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
     {
     }
 
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.Peek();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+        => _operationalEvents.Dequeue();
+
     public static CustomerConsent Create(long tenantId, long customerId, string consentType, bool granted,
         DateTime grantedAt, string source, DateTime? expiresAt)
     {
         ValidateCommonInputs(tenantId, customerId, consentType, source);
         ValidateGrantEvent(granted, grantedAt, expiresAt);
 
-        return new CustomerConsent
+        var consent = new CustomerConsent
         {
             TenantId = tenantId,
             CustomerId = customerId,
@@ -38,6 +47,17 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
             ExpiresAt = expiresAt,
             RevokedAt = null
         };
+
+        consent.EmitOperationalEvent(
+            "CustomerConsentGranted",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["tenantId"] = consent.TenantId.ToString(),
+                ["customerId"] = consent.CustomerId.ToString(),
+                ["consentType"] = consent.ConsentType
+            });
+
+        return consent;
     }
 
     public static CustomerConsent CreateRevoked(long tenantId, long customerId, string consentType, DateTime revokedAt,
@@ -46,7 +66,7 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
         ValidateCommonInputs(tenantId, customerId, consentType, source);
         ValidateRevocationEvent(revokedAt, expiresAt);
 
-        return new CustomerConsent
+        var consent = new CustomerConsent
         {
             TenantId = tenantId,
             CustomerId = customerId,
@@ -57,10 +77,29 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
             ExpiresAt = expiresAt,
             RevokedAt = revokedAt
         };
+
+        consent.EmitOperationalEvent(
+            "CustomerConsentRevoked",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["tenantId"] = consent.TenantId.ToString(),
+                ["customerId"] = consent.CustomerId.ToString(),
+                ["consentType"] = consent.ConsentType
+            });
+
+        return consent;
     }
 
     public void Revoke(DateTime revokedAt)
     {
+        EmitOperationalEvent(
+            "DomainInvariantBreachDetected",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(CustomerConsent),
+                ["command"] = nameof(Revoke),
+                ["invariant"] = "CUSTOMER_CONSENT_APPEND_ONLY"
+            });
         throw new DomainRuleViolationException(
             "CustomerConsent is append-only. Use CreateRevoked to register a revocation event.",
             "DOMAIN_RULE_VIOLATION_CUSTOMER_CONSENT_APPEND_ONLY");
@@ -132,5 +171,8 @@ public class CustomerConsent : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("ExpiresAt must match RevokedAt for revocation events.", "DOMAIN_VALIDATION_EXPIRES_AT_MATCH_REVOKED_AT");
         }
     }
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+        => _operationalEvents.Emit(eventName, evidence);
 }
 

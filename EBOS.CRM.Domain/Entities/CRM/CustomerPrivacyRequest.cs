@@ -7,7 +7,7 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
 {
-    private readonly List<DomainOperationalEvent> _operationalEvents = [];
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
 
     public const string TypeForget = "FORGET";
     public const string TypeAnonymize = "ANONYMIZE";
@@ -44,14 +44,10 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
     }
 
     public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
-        => _operationalEvents.AsReadOnly();
+        => _operationalEvents.Peek();
 
     public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
-    {
-        var snapshot = _operationalEvents.ToArray();
-        _operationalEvents.Clear();
-        return snapshot;
-    }
+        => _operationalEvents.Dequeue();
 
     public static CustomerPrivacyRequest Create(long tenantId, long customerId, string requestType, long requestedBy,
         string? reason, string? correlationId, DateTime? requestedAt = null)
@@ -357,12 +353,5 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         };
 
     private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
-    {
-        var category = DomainOperationalEventCatalog.Classify(eventName);
-        _operationalEvents.Add(new DomainOperationalEvent(
-            Name: eventName,
-            Category: category,
-            OccurredAtUtc: DateTime.UtcNow,
-            Evidence: evidence ?? new Dictionary<string, string>(StringComparer.Ordinal)));
-    }
+        => _operationalEvents.Emit(eventName, evidence);
 }

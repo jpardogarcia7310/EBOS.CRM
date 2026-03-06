@@ -3,6 +3,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Application.Shared.Observability;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RetryCustomerPrivacyRequest;
@@ -10,7 +11,8 @@ namespace EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RetryCustom
 public sealed class RetryCustomerPrivacyRequestCommandHandler(
     ICustomerPrivacyRequestRepository privacyRequestRepository,
     CustomerPrivacyExecutionService executionService,
-    ICurrentUserContext currentUser)
+    ICurrentUserContext currentUser,
+    IDomainOperationalEventPublisher domainOperationalEventPublisher)
     : IRequestHandler<RetryCustomerPrivacyRequestCommand, CustomerPrivacyRequestResponse?>
 {
     public async Task<CustomerPrivacyRequestResponse?> Handle(RetryCustomerPrivacyRequestCommand command,
@@ -50,6 +52,12 @@ public sealed class RetryCustomerPrivacyRequestCommandHandler(
             {
                 await executionService.ExecuteAsync(entity, cancellationToken);
             }
+
+            await domainOperationalEventPublisher.PublishAsync(
+                nameof(CustomerPrivacyRequest),
+                entity.Id,
+                entity.DequeueOperationalEvents(),
+                cancellationToken);
 
             await privacyRequestRepository.CommitAsync(cancellationToken);
         }

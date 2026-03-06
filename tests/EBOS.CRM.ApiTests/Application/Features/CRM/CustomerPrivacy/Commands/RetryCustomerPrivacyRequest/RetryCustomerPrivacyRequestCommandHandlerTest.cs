@@ -1,5 +1,6 @@
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RetryCustomerPrivacyRequest;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -22,7 +23,8 @@ public class RetryCustomerPrivacyRequestCommandHandlerTest
         var handler = new RetryCustomerPrivacyRequestCommandHandler(
             repo.Object,
             CustomerPrivacyTestHelper.BuildExecutionService(),
-            CustomerPrivacyTestHelper.BuildCurrentUser().Object);
+            CustomerPrivacyTestHelper.BuildCurrentUser().Object,
+            new Mock<IDomainOperationalEventPublisher>().Object);
 
         var result = await handler.Handle(new RetryCustomerPrivacyRequestCommand(7, new RetryCustomerPrivacyRequestRequest(1, "retry")), CancellationToken.None);
 

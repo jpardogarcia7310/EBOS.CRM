@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Application.Shared.Observability;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RegisterCustomerPrivacyRequest;
@@ -15,7 +16,8 @@ public sealed class RegisterCustomerPrivacyRequestCommandHandler(
     ICustomerRepository customerRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    CustomerPrivacyExecutionService executionService)
+    CustomerPrivacyExecutionService executionService,
+    IDomainOperationalEventPublisher domainOperationalEventPublisher)
     : IRequestHandler<RegisterCustomerPrivacyRequestCommand, CustomerPrivacyRequestResponse>
 {
     public async Task<CustomerPrivacyRequestResponse> Handle(RegisterCustomerPrivacyRequestCommand command,
@@ -75,6 +77,12 @@ public sealed class RegisterCustomerPrivacyRequestCommandHandler(
             {
                 await executionService.ExecuteAsync(entity, cancellationToken);
             }
+
+            await domainOperationalEventPublisher.PublishAsync(
+                nameof(CustomerPrivacyRequest),
+                entity.Id,
+                entity.DequeueOperationalEvents(),
+                cancellationToken);
 
             await privacyRequestRepository.CommitAsync(cancellationToken);
         }

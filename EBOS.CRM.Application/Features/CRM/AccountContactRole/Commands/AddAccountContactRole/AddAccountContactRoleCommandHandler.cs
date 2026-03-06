@@ -1,4 +1,5 @@
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -15,7 +16,8 @@ public class AddAccountContactRoleCommandHandler(
     IAccountContactRolePrimaryGuard primaryGuard,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper)
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<AddAccountContactRoleCommand, AccountContactRoleResponse>
 {
     public async Task<AccountContactRoleResponse> Handle(AddAccountContactRoleCommand request, CancellationToken cancellationToken)
@@ -52,6 +54,14 @@ public class AddAccountContactRoleCommandHandler(
                 {
                     role.SetPrimary(false);
                     await repository.UpdateAsync(role, cancellationToken);
+                    if (domainOperationalEventPublisher is not null)
+                    {
+                        await domainOperationalEventPublisher.PublishAsync(
+                            nameof(Domain.Entities.CRM.AccountContactRole),
+                            role.Id,
+                            role.DequeueOperationalEvents(),
+                            cancellationToken);
+                    }
                 }
             }
 
@@ -69,6 +79,14 @@ public class AddAccountContactRoleCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.AccountContactRole),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

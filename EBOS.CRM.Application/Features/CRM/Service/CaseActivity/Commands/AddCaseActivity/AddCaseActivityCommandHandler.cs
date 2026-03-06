@@ -1,6 +1,7 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -13,7 +14,8 @@ public class AddCaseActivityCommandHandler(
     ICaseRepository caseRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<AddCaseActivityCommand, CaseActivityResponse>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddCaseActivityCommand, CaseActivityResponse>
 {
     public async Task<CaseActivityResponse> Handle(AddCaseActivityCommand request, CancellationToken cancellationToken)
     {
@@ -32,6 +34,9 @@ public class AddCaseActivityCommandHandler(
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CaseActivity>(entityRequest);
+        var initialStatus = entity.Status;
+        entity.Status = string.Empty;
+        entity.SetStatus(initialStatus);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -51,6 +56,14 @@ public class AddCaseActivityCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.CaseActivity),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

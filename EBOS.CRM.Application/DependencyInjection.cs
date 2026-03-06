@@ -7,6 +7,7 @@ using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Application.Behavior;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Options;
+using EBOS.CRM.Application.Shared.Observability;
 
 namespace EBOS.CRM.Application;
 
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddOptions<CommandExecutionOptions>();
         services.AddOptions<CaseWorkflowOptions>();
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
+        services.AddScoped<IDomainOperationalEventPublisher, DomainOperationalEventPublisher>();
         services.AddScoped<CustomerPrivacyExecutionService>();
         services.AddScoped<CustomerPrivacyRetentionService>();
 

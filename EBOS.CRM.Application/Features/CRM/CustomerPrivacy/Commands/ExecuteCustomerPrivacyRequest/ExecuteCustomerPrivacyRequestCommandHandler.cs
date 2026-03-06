@@ -2,13 +2,15 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
+using EBOS.CRM.Application.Shared.Observability;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.ExecuteCustomerPrivacyRequest;
 
 public sealed class ExecuteCustomerPrivacyRequestCommandHandler(
     ICustomerPrivacyRequestRepository privacyRequestRepository,
-    CustomerPrivacyExecutionService executionService)
+    CustomerPrivacyExecutionService executionService,
+    IDomainOperationalEventPublisher domainOperationalEventPublisher)
     : IRequestHandler<ExecuteCustomerPrivacyRequestCommand, CustomerPrivacyRequestResponse?>
 {
     public async Task<CustomerPrivacyRequestResponse?> Handle(ExecuteCustomerPrivacyRequestCommand command,
@@ -38,6 +40,11 @@ public sealed class ExecuteCustomerPrivacyRequestCommandHandler(
         try
         {
             await executionService.ExecuteAsync(entity, cancellationToken);
+            await domainOperationalEventPublisher.PublishAsync(
+                nameof(CustomerPrivacyRequest),
+                entity.Id,
+                entity.DequeueOperationalEvents(),
+                cancellationToken);
             await privacyRequestRepository.CommitAsync(cancellationToken);
         }
         catch

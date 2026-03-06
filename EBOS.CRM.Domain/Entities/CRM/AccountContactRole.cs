@@ -1,4 +1,5 @@
 using EBOS.Core.Primitives;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 
@@ -6,6 +7,8 @@ namespace EBOS.CRM.Domain.Entities.CRM;
 
 public class AccountContactRole : ErasableEntity, ITenantScopedEntity
 {
+    private readonly DomainOperationalEventBuffer _operationalEvents = new();
+
     public long TenantId { get; private set; }
     public long AccountContactId { get; private set; }
     public AccountContact AccountContact { get; private set; } = null!;
@@ -15,6 +18,12 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     public DateTime? ValidTo { get; private set; }
     public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
     long ITenantScopedEntity.TenantId { get => TenantId; set => TenantId = value; }
+
+    public IReadOnlyCollection<DomainOperationalEvent> PeekOperationalEvents()
+        => _operationalEvents.Peek();
+
+    public IReadOnlyCollection<DomainOperationalEvent> DequeueOperationalEvents()
+        => _operationalEvents.Dequeue();
 
     private AccountContactRole()
     {
@@ -65,6 +74,13 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
     {
         ValidFrom = validFrom;
         ValidTo = null;
+        EmitOperationalEvent(
+            "AccountContactRoleChanged",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(AccountContactRole),
+                ["action"] = nameof(Activate)
+            });
     }
 
     public void Deactivate(DateTime validTo)
@@ -76,16 +92,52 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
 
         ValidTo = validTo;
         IsPrimary = false;
+        EmitOperationalEvent(
+            "AccountContactRoleChanged",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(AccountContactRole),
+                ["action"] = nameof(Deactivate)
+            });
     }
 
     public void SetPrimary(bool isPrimary)
     {
         if (isPrimary && ValidTo.HasValue)
         {
+            EmitOperationalEvent(
+                "DomainInvariantBreachDetected",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(AccountContactRole),
+                    ["command"] = nameof(SetPrimary),
+                    ["invariant"] = "ROLE_PRIMARY_INACTIVE"
+                });
             throw new DomainRuleViolationException("Cannot set primary role when role is not active.", "DOMAIN_RULE_VIOLATION_ROLE_PRIMARY_INACTIVE");
         }
 
+        if (IsPrimary == isPrimary)
+        {
+            EmitOperationalEvent(
+                "DomainCommandDeduplicated",
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["aggregate"] = nameof(AccountContactRole),
+                    ["command"] = nameof(SetPrimary),
+                    ["isPrimary"] = isPrimary.ToString()
+                });
+            return;
+        }
+
         IsPrimary = isPrimary;
+        EmitOperationalEvent(
+            "AccountContactRoleChanged",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(AccountContactRole),
+                ["action"] = nameof(SetPrimary),
+                ["isPrimary"] = isPrimary.ToString()
+            });
     }
 
     public void ReassignAccountContact(long accountContactId)
@@ -115,5 +167,8 @@ public class AccountContactRole : ErasableEntity, ITenantScopedEntity
             throw new DomainValidationException("RoleCode is required.", "DOMAIN_VALIDATION_ROLE_CODE_REQUIRED");
         }
     }
+
+    private void EmitOperationalEvent(string eventName, IReadOnlyDictionary<string, string>? evidence = null)
+        => _operationalEvents.Emit(eventName, evidence);
 }
 

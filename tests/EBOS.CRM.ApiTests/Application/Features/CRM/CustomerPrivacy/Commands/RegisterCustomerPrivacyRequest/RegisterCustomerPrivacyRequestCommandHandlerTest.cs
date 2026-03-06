@@ -1,5 +1,6 @@
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy.Commands.RegisterCustomerPrivacyRequest;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerPrivacy;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Exceptions;
@@ -23,7 +24,8 @@ public class RegisterCustomerPrivacyRequestCommandHandlerTest
             customerRepo.Object,
             new Mock<IAuditService>().Object,
             CustomerPrivacyTestHelper.BuildCurrentUser().Object,
-            CustomerPrivacyTestHelper.BuildExecutionService());
+            CustomerPrivacyTestHelper.BuildExecutionService(),
+            new Mock<IDomainOperationalEventPublisher>().Object);
 
         var act = () => handler.Handle(new RegisterCustomerPrivacyRequestCommand(
             new RegisterCustomerPrivacyRequestRequest(1, 10, "ANONYMIZE", null, false)), CancellationToken.None);
@@ -54,7 +56,8 @@ public class RegisterCustomerPrivacyRequestCommandHandlerTest
             customerRepo.Object,
             new Mock<IAuditService>().Object,
             CustomerPrivacyTestHelper.BuildCurrentUser().Object,
-            CustomerPrivacyTestHelper.BuildExecutionService());
+            CustomerPrivacyTestHelper.BuildExecutionService(),
+            new Mock<IDomainOperationalEventPublisher>().Object);
 
         var response = await handler.Handle(
             new RegisterCustomerPrivacyRequestCommand(
@@ -88,7 +91,8 @@ public class RegisterCustomerPrivacyRequestCommandHandlerTest
             customerRepo.Object,
             new Mock<IAuditService>().Object,
             CustomerPrivacyTestHelper.BuildCurrentUser().Object,
-            CustomerPrivacyTestHelper.BuildExecutionService());
+            CustomerPrivacyTestHelper.BuildExecutionService(),
+            new Mock<IDomainOperationalEventPublisher>().Object);
 
         var act = () => handler.Handle(
             new RegisterCustomerPrivacyRequestCommand(

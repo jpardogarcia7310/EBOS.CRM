@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Domain.Entities.CRM;
@@ -17,6 +18,9 @@ public class AccountContactTests
         Assert.True(entity.IsPrimary);
         Assert.Equal(start, entity.StartAt);
         Assert.Null(entity.EndAt);
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "AccountContactAssigned" &&
+            x.Category == DomainOperationalEventCategory.Business);
     }
 
     [Fact]
@@ -42,6 +46,9 @@ public class AccountContactTests
         entity.Unassign(start.AddDays(1));
 
         Assert.ThrowsAny<DomainException>(() => entity.SetPrimary(true));
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "DomainInvariantBreachDetected" &&
+            x.Category == DomainOperationalEventCategory.Anomaly);
     }
 
     [Fact]
@@ -52,6 +59,22 @@ public class AccountContactTests
         entity.Unassign(start.AddDays(1));
 
         Assert.ThrowsAny<DomainException>(() => entity.ReassignCustomers(11, 21));
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "DomainInvariantBreachDetected" &&
+            x.Category == DomainOperationalEventCategory.Anomaly);
+    }
+
+    [Fact]
+    public void SetPrimary_SameValue_IsIdempotentAndEmitsTechnicalDedupEvent()
+    {
+        var start = new DateTime(2026, 1, 10, 0, 0, 0, DateTimeKind.Utc);
+        var entity = AccountContact.Create(1, 10, 20, false, start, null, 1);
+
+        entity.SetPrimary(false);
+
+        Assert.Contains(entity.PeekOperationalEvents(), x =>
+            x.Name == "DomainCommandDeduplicated" &&
+            x.Category == DomainOperationalEventCategory.Technical);
     }
 }
 
