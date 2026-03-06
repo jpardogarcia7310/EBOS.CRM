@@ -5,6 +5,7 @@ using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -16,6 +17,7 @@ public class AddCaseActivityCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    ICaseReferenceValidationService? caseReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddCaseActivityCommand, CaseActivityResponse>
 {
     public async Task<CaseActivityResponse> Handle(AddCaseActivityCommand request, CancellationToken cancellationToken)
@@ -23,15 +25,25 @@ public class AddCaseActivityCommandHandler(
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.ActivityRequest ?? throw new ArgumentNullException(nameof(request.ActivityRequest));
-        var caseEntity = await caseRepository.GetByIdAsync(entityRequest.CaseId, cancellationToken)
-            ?? throw new DomainValidationException("Case not found.", "DOMAIN_VALIDATION_CASE_NOT_FOUND");
-        if (caseEntity.TenantId != entityRequest.TenantId)
+        if (caseReferenceValidationService is not null)
         {
-            throw new DomainConflictException("Case tenant mismatch.", "DOMAIN_CONFLICT_CASE_TENANT_MISMATCH");
+            _ = await caseReferenceValidationService.EnsureCaseAvailableForActivityAsync(
+                entityRequest.TenantId,
+                entityRequest.CaseId,
+                cancellationToken);
         }
-        if (caseEntity.ClosedAt.HasValue)
+        else
         {
-            throw new DomainRuleViolationException("Cannot add activities to a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_ACTIVITY_ADD");
+            var caseEntity = await caseRepository.GetByIdAsync(entityRequest.CaseId, cancellationToken)
+                ?? throw new DomainValidationException("Case not found.", "DOMAIN_VALIDATION_CASE_NOT_FOUND");
+            if (caseEntity.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Case tenant mismatch.", "DOMAIN_CONFLICT_CASE_TENANT_MISMATCH");
+            }
+            if (caseEntity.ClosedAt.HasValue)
+            {
+                throw new DomainRuleViolationException("Cannot add activities to a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_ACTIVITY_ADD");
+            }
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CaseActivity>(entityRequest);
@@ -67,12 +79,19 @@ public class AddCaseActivityCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CaseActivityResponse>(entity);
     }
 }
+

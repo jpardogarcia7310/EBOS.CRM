@@ -2,8 +2,10 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -15,6 +17,7 @@ public class UpdateQueueCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    IQueueOperationalValidationService? queueOperationalValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateQueueCommand, QueueResponse?>
 {
     public async Task<QueueResponse?> Handle(UpdateQueueCommand request, CancellationToken cancellationToken)
@@ -34,9 +37,12 @@ public class UpdateQueueCommandHandler(
         mapper.Map(entityRequest, entity);
         entity.IsActive = previousIsActive;
         entity.DefaultOwnerUserId = previousDefaultOwnerUserId;
-        var openCount = entityRequest.IsActive
-            ? 0
-            : await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken);
+        var openCount = queueOperationalValidationService is null
+            ? (entityRequest.IsActive ? 0 : await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken))
+            : await queueOperationalValidationService.CountOpenCasesForQueueDeactivationAsync(
+                entity.Id,
+                entityRequest.IsActive,
+                cancellationToken);
         entity.ToggleActive(entityRequest.IsActive, openCount > 0);
         entity.AssignDefaultOwner(entityRequest.DefaultOwnerUserId);
 
@@ -68,9 +74,15 @@ public class UpdateQueueCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

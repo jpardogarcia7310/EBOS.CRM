@@ -16,7 +16,8 @@ public class RevokeCustomerConsentCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     ICustomer360Metrics metrics,
-    IMapper mapper,
+    IMapper? mapper = null,
+    ICustomerConsentValidationService? customerConsentValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<RevokeCustomerConsentCommand, CustomerConsentResponse?>
 {
@@ -34,6 +35,13 @@ public class RevokeCustomerConsentCommandHandler(
         if (existing.TenantId != entityRequest.TenantId)
         {
             throw new DomainConflictException("Customer consent tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_CONSENT_TENANT_MISMATCH");
+        }
+        if (customerConsentValidationService is not null)
+        {
+            await customerConsentValidationService.EnsureCustomerAvailableAsync(
+                existing.TenantId,
+                existing.CustomerId,
+                cancellationToken);
         }
 
         var newEvent = global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.CreateRevoked(
@@ -85,7 +93,19 @@ public class RevokeCustomerConsentCommandHandler(
             throw;
         }
 
-        return mapper.Map<CustomerConsentResponse>(newEvent);
+        return mapper is null
+            ? new CustomerConsentResponse(
+                newEvent.Id,
+                newEvent.TenantId,
+                newEvent.CustomerId,
+                newEvent.ConsentType,
+                newEvent.Granted,
+                newEvent.GrantedAt,
+                newEvent.Source,
+                newEvent.ExpiresAt,
+                newEvent.RevokedAt,
+                !newEvent.Erased)
+            : mapper.Map<CustomerConsentResponse>(newEvent);
     }
 }
 

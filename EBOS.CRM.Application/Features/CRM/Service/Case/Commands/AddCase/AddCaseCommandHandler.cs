@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -17,6 +18,7 @@ public class AddCaseCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    ICaseReferenceValidationService? caseReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddCaseCommand, CaseResponse>
 {
     public async Task<CaseResponse> Handle(AddCaseCommand request, CancellationToken cancellationToken)
@@ -24,22 +26,31 @@ public class AddCaseCommandHandler(
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.CaseRequest ?? throw new ArgumentNullException(nameof(request.CaseRequest));
-        var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
-            ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
-        if (!queue.IsActive)
+        global::EBOS.CRM.Domain.Entities.CRM.Sla sla;
+        if (caseReferenceValidationService is not null)
         {
-            throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
+            _ = await caseReferenceValidationService.EnsureQueueAvailableAsync(entityRequest.TenantId, entityRequest.QueueId, cancellationToken);
+            sla = await caseReferenceValidationService.EnsureSlaAvailableAsync(entityRequest.TenantId, entityRequest.SlaId, cancellationToken);
         }
-        if (queue.TenantId != entityRequest.TenantId)
+        else
         {
-            throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
-        }
+            var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
+                ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
+            if (!queue.IsActive)
+            {
+                throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
+            }
+            if (queue.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
+            }
 
-        var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
-            ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
-        if (sla.TenantId != entityRequest.TenantId)
-        {
-            throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
+            sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
+                ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
+            if (sla.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
+            }
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Case>(entityRequest);
@@ -82,12 +93,20 @@ public class AddCaseCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CaseResponse>(entity);
     }
 }
+
+

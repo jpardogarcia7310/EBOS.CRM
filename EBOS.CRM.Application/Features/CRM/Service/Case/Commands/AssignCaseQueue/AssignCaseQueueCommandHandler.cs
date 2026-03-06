@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -16,6 +17,7 @@ public class AssignCaseQueueCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    ICaseReferenceValidationService? caseReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AssignCaseQueueCommand, CaseResponse?>
 {
     public async Task<CaseResponse?> Handle(AssignCaseQueueCommand request, CancellationToken cancellationToken)
@@ -34,15 +36,22 @@ public class AssignCaseQueueCommandHandler(
             throw new DomainRuleViolationException("Cannot change queue for a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_QUEUE_CHANGE");
         }
 
-        var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
-            ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
-        if (!queue.IsActive)
+        if (caseReferenceValidationService is not null)
         {
-            throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
+            _ = await caseReferenceValidationService.EnsureQueueAvailableAsync(entity.TenantId, entityRequest.QueueId, cancellationToken);
         }
-        if (queue.TenantId != entity.TenantId)
+        else
         {
-            throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
+            var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
+                ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
+            if (!queue.IsActive)
+            {
+                throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
+            }
+            if (queue.TenantId != entity.TenantId)
+            {
+                throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
+            }
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
@@ -76,12 +85,20 @@ public class AssignCaseQueueCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CaseResponse>(entity);
     }
 }
+
+

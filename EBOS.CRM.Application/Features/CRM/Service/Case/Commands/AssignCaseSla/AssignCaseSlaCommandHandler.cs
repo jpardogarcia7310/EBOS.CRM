@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -16,6 +17,7 @@ public class AssignCaseSlaCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    ICaseReferenceValidationService? caseReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AssignCaseSlaCommand, CaseResponse?>
 {
     public async Task<CaseResponse?> Handle(AssignCaseSlaCommand request, CancellationToken cancellationToken)
@@ -34,11 +36,19 @@ public class AssignCaseSlaCommandHandler(
             throw new DomainRuleViolationException("Cannot change SLA for a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_SLA_CHANGE");
         }
 
-        var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
-            ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
-        if (sla.TenantId != entity.TenantId)
+        global::EBOS.CRM.Domain.Entities.CRM.Sla sla;
+        if (caseReferenceValidationService is not null)
         {
-            throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
+            sla = await caseReferenceValidationService.EnsureSlaAvailableAsync(entity.TenantId, entityRequest.SlaId, cancellationToken);
+        }
+        else
+        {
+            sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
+                ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
+            if (sla.TenantId != entity.TenantId)
+            {
+                throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
+            }
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
@@ -72,12 +82,20 @@ public class AssignCaseSlaCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CaseResponse>(entity);
     }
 }
+
+

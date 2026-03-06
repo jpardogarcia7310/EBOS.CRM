@@ -18,6 +18,7 @@ public class AddCustomerConsentCommandHandler(
     ICurrentUserContext currentUser,
     ICustomer360Metrics metrics,
     IMapper mapper,
+    ICustomerConsentValidationService? customerConsentValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<AddCustomerConsentCommand, CustomerConsentResponse>
 {
@@ -28,11 +29,21 @@ public class AddCustomerConsentCommandHandler(
         var entityRequest = request.ConsentRequest ??
                             throw new ArgumentNullException(nameof(request.ConsentRequest));
 
-        var customer = await customerRepository.GetByIdAsync(entityRequest.CustomerId, cancellationToken)
-            ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
-        if (customer.TenantId != entityRequest.TenantId)
+        if (customerConsentValidationService is not null)
         {
-            throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
+            await customerConsentValidationService.EnsureCustomerAvailableAsync(
+                entityRequest.TenantId,
+                entityRequest.CustomerId,
+                cancellationToken);
+        }
+        else
+        {
+            var customer = await customerRepository.GetByIdAsync(entityRequest.CustomerId, cancellationToken)
+                ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
+            if (customer.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
+            }
         }
 
         var entity = entityRequest.Granted

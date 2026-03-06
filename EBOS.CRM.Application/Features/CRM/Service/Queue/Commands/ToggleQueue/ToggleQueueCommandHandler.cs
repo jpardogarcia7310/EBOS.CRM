@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -16,6 +17,7 @@ public class ToggleQueueCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    IQueueOperationalValidationService? queueOperationalValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<ToggleQueueCommand, QueueResponse?>
 {
     public async Task<QueueResponse?> Handle(ToggleQueueCommand request, CancellationToken cancellationToken)
@@ -30,9 +32,12 @@ public class ToggleQueueCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        var openCount = entityRequest.IsActive
-            ? 0
-            : await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken);
+        var openCount = queueOperationalValidationService is null
+            ? (entityRequest.IsActive ? 0 : await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken))
+            : await queueOperationalValidationService.CountOpenCasesForQueueDeactivationAsync(
+                entity.Id,
+                entityRequest.IsActive,
+                cancellationToken);
         entity.ToggleActive(entityRequest.IsActive, openCount > 0);
 
         await repository.BeginTransactionAsync(cancellationToken);
@@ -63,9 +68,15 @@ public class ToggleQueueCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

@@ -2,8 +2,10 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
@@ -15,6 +17,7 @@ public class ToggleSlaCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    ISlaOperationalValidationService? slaOperationalValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<ToggleSlaCommand, SlaResponse?>
 {
     public async Task<SlaResponse?> Handle(ToggleSlaCommand request, CancellationToken cancellationToken)
@@ -29,9 +32,12 @@ public class ToggleSlaCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        var openCount = entityRequest.IsActive
-            ? 0
-            : await caseRepository.CountOpenBySlaIdAsync(entity.Id, cancellationToken);
+        var openCount = slaOperationalValidationService is null
+            ? (entityRequest.IsActive ? 0 : await caseRepository.CountOpenBySlaIdAsync(entity.Id, cancellationToken))
+            : await slaOperationalValidationService.CountOpenCasesForSlaDeactivationAsync(
+                entity.Id,
+                entityRequest.IsActive,
+                cancellationToken);
         entity.ToggleActive(entityRequest.IsActive, openCount > 0);
 
         await repository.BeginTransactionAsync(cancellationToken);
@@ -62,9 +68,15 @@ public class ToggleSlaCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
