@@ -3,10 +3,11 @@ using MediatR;
 using EBOS.CRM.Contracts.Responses.Common;
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 
 namespace EBOS.CRM.Application.Features.EBOS.ValidationRules.Queries.GetAllValidationRules;
 
-public class GetAllValidationRulesQueryHandler(IValidationRuleRepository repository, IMapper mapper)
+public class GetAllValidationRulesQueryHandler(IValidationRuleRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetAllValidationRulesQuery, PagedResult<ValidationRuleResponse>>
 {
     private readonly IValidationRuleRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -17,9 +18,13 @@ public class GetAllValidationRulesQueryHandler(IValidationRuleRepository reposit
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var entities = referenceLookupService is null
+            ? await _repository.GetAllPagedAsync(request.PageNumber, request.PageSize, cancellationToken)
+            : await referenceLookupService.GetValidationRulesPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<ValidationRuleResponse>>(entities);
-        var total = await _repository.CountAsync(cancellationToken);
+        var total = referenceLookupService is null
+            ? await _repository.CountAsync(cancellationToken)
+            : await referenceLookupService.CountValidationRulesAsync(cancellationToken);
         return new PagedResult<ValidationRuleResponse>(items, total);
     }
 }

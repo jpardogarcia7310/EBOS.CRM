@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.Text.Json;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using EBOS.CRM.Infrastructure.Observability;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +17,8 @@ public sealed class AuditOutboxService(
     IHttpClientFactory httpClientFactory,
     IOptions<AuditOutboxOptions> outboxOptions,
     ILogger<AuditOutboxService> logger,
-    ICustomer360Metrics metrics) : IAuditOutboxService
+    ICustomer360Metrics metrics,
+    IAuditOutboxValidationService? validationService = null) : IAuditOutboxService
 {
     private static readonly ActivitySource ActivitySource = new(TelemetryNames.AuditActivitySource);
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -26,6 +29,15 @@ public sealed class AuditOutboxService(
     public async Task EnqueueAsync(string operation, AuditInsertRequest request, string? error,
         CancellationToken cancellationToken = default)
     {
+        if (validationService is null)
+        {
+            EnsureEnqueueRequestIsValid(operation, request);
+        }
+        else
+        {
+            validationService.EnsureEnqueueRequestIsValid(operation, request);
+        }
+
         using var activity = ActivitySource.StartActivity("audit.outbox.enqueue", ActivityKind.Internal);
         activity?.SetTag("audit.operation", operation);
         activity?.SetTag("audit.correlation_id", request.CorrelationId);
@@ -51,7 +63,19 @@ public sealed class AuditOutboxService(
             LastError = error
         });
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex) when (
+            ex is not DomainException &&
+            DomainTransientFailureClassifier.TryClassify(ex, nameof(EnqueueAsync), out _))
+        {
+            throw new TransientDomainFailureException(
+                "Transient failure while enqueueing audit outbox message.",
+                "DOMAIN_TRANSIENT_AUDIT_OUTBOX_ENQUEUE",
+                ex);
+        }
         metrics.RecordAuditOutboxEnqueue(operation);
     }
 
@@ -87,11 +111,9 @@ public sealed class AuditOutboxService(
 
             try
             {
-                var request = JsonSerializer.Deserialize<AuditInsertRequest>(message.Payload, JsonOptions);
-                if (request is null)
-                {
-                    throw new InvalidOperationException("Invalid outbox payload.");
-                }
+                var request = validationService is null
+                    ? EnsureDispatchPayloadIsValid(message)
+                    : validationService.EnsureDispatchPayloadIsValid(message);
 
                 activity?.SetTag("audit.correlation_id", request.CorrelationId);
                 activity?.SetTag("user.id", request.UserId);
@@ -132,7 +154,19 @@ public sealed class AuditOutboxService(
             }
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex) when (
+            ex is not DomainException &&
+            DomainTransientFailureClassifier.TryClassify(ex, nameof(DispatchPendingAsync), out _))
+        {
+            throw new TransientDomainFailureException(
+                "Transient failure while persisting audit outbox dispatch results.",
+                "DOMAIN_TRANSIENT_AUDIT_OUTBOX_DISPATCH_PERSIST",
+                ex);
+        }
         return sent;
     }
 
@@ -150,5 +184,35 @@ public sealed class AuditOutboxService(
 
         var delaySeconds = Math.Min(300, (int)Math.Pow(2, message.AttemptCount));
         message.NextAttemptAt = DateTime.UtcNow.AddSeconds(delaySeconds);
+    }
+
+    private static void EnsureEnqueueRequestIsValid(string operation, AuditInsertRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(operation))
+        {
+            throw new DomainValidationException("Operation is required.", "DOMAIN_VALIDATION_AUDIT_OPERATION_REQUIRED");
+        }
+
+        if (request.UserId <= 0)
+        {
+            throw new DomainValidationException("Audit user id must be positive.", "DOMAIN_VALIDATION_AUDIT_USER_ID_POSITIVE");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.CorrelationId))
+        {
+            throw new DomainValidationException("CorrelationId is required.", "DOMAIN_VALIDATION_AUDIT_CORRELATION_REQUIRED");
+        }
+    }
+
+    private static AuditInsertRequest EnsureDispatchPayloadIsValid(AuditOutboxMessage message)
+    {
+        var request = JsonSerializer.Deserialize<AuditInsertRequest>(message.Payload, JsonOptions);
+        if (request is null)
+        {
+            throw new DomainValidationException("Invalid outbox payload.", "DOMAIN_VALIDATION_AUDIT_OUTBOX_PAYLOAD_INVALID");
+        }
+
+        EnsureEnqueueRequestIsValid(message.Operation, request);
+        return request;
     }
 }

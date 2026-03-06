@@ -54,11 +54,85 @@ public sealed class EbosReferenceLookupService(
         return entity ?? throw new DomainValidationException("ValidationRule not found.", "DOMAIN_VALIDATION_EBOS_VALIDATION_RULE_NOT_FOUND");
     }
 
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration>> GetTenantConfigurationsPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantConfigurationRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken),
+            nameof(GetTenantConfigurationsPagedAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_CONFIGURATION_LIST");
+
+    public Task<int> CountTenantConfigurationsAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantConfigurationRepository.CountAsync(cancellationToken),
+            nameof(CountTenantConfigurationsAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_CONFIGURATION_COUNT");
+
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.TenantQuota>> GetTenantQuotasPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantQuotaRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken),
+            nameof(GetTenantQuotasPagedAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_QUOTA_LIST");
+
+    public Task<int> CountTenantQuotasAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantQuotaRepository.CountAsync(cancellationToken),
+            nameof(CountTenantQuotasAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_QUOTA_COUNT");
+
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.TenantUsageMetric>> GetTenantUsageMetricsPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantUsageMetricRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken),
+            nameof(GetTenantUsageMetricsPagedAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_USAGE_METRIC_LIST");
+
+    public Task<int> CountTenantUsageMetricsAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantUsageMetricRepository.CountAsync(cancellationToken),
+            nameof(CountTenantUsageMetricsAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_USAGE_METRIC_COUNT");
+
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.ValidationRule>> GetValidationRulesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => validationRuleRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken),
+            nameof(GetValidationRulesPagedAsync),
+            "DOMAIN_TRANSIENT_EBOS_VALIDATION_RULE_LIST");
+
+    public Task<int> CountValidationRulesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => validationRuleRepository.CountAsync(cancellationToken),
+            nameof(CountValidationRulesAsync),
+            "DOMAIN_TRANSIENT_EBOS_VALIDATION_RULE_COUNT");
+
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration>> GetTenantConfigurationsAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(
+            () => tenantConfigurationRepository.GetAllAsync(cancellationToken),
+            nameof(GetTenantConfigurationsAsync),
+            "DOMAIN_TRANSIENT_EBOS_TENANT_CONFIGURATION_LIST");
+
     private static async Task<T?> RunLookupAsync<T>(
         Func<Task<T?>> operation,
         string operationName,
         string transientCode)
         where T : class
+    {
+        try
+        {
+            return await operation();
+        }
+        catch (Exception ex) when (
+            ex is not DomainException &&
+            DomainTransientFailureClassifier.TryClassify(ex, operationName, out _))
+        {
+            throw new TransientDomainFailureException(
+                $"Transient failure while resolving EBOS reference in {operationName}.",
+                transientCode,
+                ex);
+        }
+    }
+
+    private static async Task<T> RunValueLookupAsync<T>(
+        Func<Task<T>> operation,
+        string operationName,
+        string transientCode)
     {
         try
         {

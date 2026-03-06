@@ -1,12 +1,13 @@
 using EBOS.CRM.Contracts.Responses.Common;
 using EBOS.CRM.Contracts.Responses.EBOS;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.EBOS.TenantUsageMetric.Queries.GetAllTenantUsageMetrics;
 
-public class GetAllTenantUsageMetricsQueryHandler(ITenantUsageMetricRepository repository, IMapper mapper)
+public class GetAllTenantUsageMetricsQueryHandler(ITenantUsageMetricRepository repository, IMapper mapper, IEbosReferenceLookupService? referenceLookupService = null)
     : IRequestHandler<GetAllTenantUsageMetricsQuery, PagedResult<TenantUsageMetricResponse>>
 {
     private readonly ITenantUsageMetricRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -17,9 +18,13 @@ public class GetAllTenantUsageMetricsQueryHandler(ITenantUsageMetricRepository r
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entities = await _repository.GetAllPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var entities = referenceLookupService is null
+            ? await _repository.GetAllPagedAsync(request.PageNumber, request.PageSize, cancellationToken)
+            : await referenceLookupService.GetTenantUsageMetricsPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
         var items = _mapper.Map<IReadOnlyCollection<TenantUsageMetricResponse>>(entities);
-        var total = await _repository.CountAsync(cancellationToken);
+        var total = referenceLookupService is null
+            ? await _repository.CountAsync(cancellationToken)
+            : await referenceLookupService.CountTenantUsageMetricsAsync(cancellationToken);
         return new PagedResult<TenantUsageMetricResponse>(items, total);
     }
 }

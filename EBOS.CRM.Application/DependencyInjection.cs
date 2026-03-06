@@ -63,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<IQueueOperationalValidationService, QueueOperationalValidationService>();
         services.AddScoped<ISlaOperationalValidationService, SlaOperationalValidationService>();
         services.AddScoped<IEbosReferenceLookupService, EbosReferenceLookupService>();
+        services.AddScoped<ITenantOperationalValidationService, TenantOperationalValidationService>();
 
         return services;
     }

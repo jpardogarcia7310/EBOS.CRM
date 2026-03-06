@@ -117,6 +117,7 @@ public static class DependencyInjection
         services.AddScoped<ITenantUsageMetricRepository, TenantUsageMetricRepository>();
         services.AddScoped<IValidationCatalogService, ValidationCatalogService>();
         services.AddScoped<IValidationRuleRepository, ValidationRuleRepository>();
+        services.AddScoped<IAuditOutboxValidationService, AuditOutboxValidationService>();
         services.AddScoped<IAuditOutboxService, AuditOutboxService>();
         services.AddHostedService<AuditOutboxDispatcher>();
 

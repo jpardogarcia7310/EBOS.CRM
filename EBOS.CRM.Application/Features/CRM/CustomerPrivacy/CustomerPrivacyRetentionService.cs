@@ -7,27 +7,38 @@ using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.EBOS;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 
 public sealed class CustomerPrivacyRetentionService(
     ICustomerPrivacyRequestRepository privacyRequestRepository,
     ITenantConfigurationRepository tenantConfigurationRepository,
-    IAuditService auditService)
+    IAuditService auditService,
+    ITenantOperationalValidationService? tenantValidationService = null,
+    IEbosReferenceLookupService? ebosReferenceLookupService = null)
 {
     private const string RetentionDaysConfigKey = "customer360.privacy.retention.days";
 
     public async Task<CustomerPrivacyRetentionRunResponse> RunAsync(long tenantId, bool dryRun, int? retentionDays,
         int? batchSize, long actorUserId, string? correlationId, CancellationToken cancellationToken)
     {
-        if (tenantId <= 0)
+        if (tenantValidationService is null)
         {
-            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
-        }
+            if (tenantId <= 0)
+            {
+                throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
+            }
 
-        if (actorUserId <= 0)
+            if (actorUserId <= 0)
+            {
+                throw new DomainValidationException("Actor user id must be a positive value.", "DOMAIN_VALIDATION_ACTOR_USER_ID_POSITIVE");
+            }
+        }
+        else
         {
-            throw new DomainValidationException("Actor user id must be a positive value.", "DOMAIN_VALIDATION_ACTOR_USER_ID_POSITIVE");
+            tenantValidationService.EnsureTenantIdIsPositive(tenantId);
+            tenantValidationService.EnsureActorUserIdIsPositive(actorUserId);
         }
         try
         {
@@ -104,7 +115,11 @@ public sealed class CustomerPrivacyRetentionService(
 
     private async Task<int> ResolveRetentionDaysAsync(long tenantId, CancellationToken cancellationToken)
     {
-        var config = (await tenantConfigurationRepository.GetAllAsync(cancellationToken))
+        var allConfigurations = ebosReferenceLookupService is null
+            ? await tenantConfigurationRepository.GetAllAsync(cancellationToken)
+            : await ebosReferenceLookupService.GetTenantConfigurationsAsync(cancellationToken);
+
+        var config = allConfigurations
             .Where(x => x.TenantId == tenantId && x.Key == RetentionDaysConfigKey)
             .OrderByDescending(x => x.UpdatedAt)
             .FirstOrDefault();
