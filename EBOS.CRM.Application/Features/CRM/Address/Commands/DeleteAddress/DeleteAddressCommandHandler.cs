@@ -1,3 +1,4 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
@@ -40,15 +41,22 @@ public class DeleteAddressCommandHandler(IAddressRepository repository, IAuditSe
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return true;
     }
 }
+
 
 
 

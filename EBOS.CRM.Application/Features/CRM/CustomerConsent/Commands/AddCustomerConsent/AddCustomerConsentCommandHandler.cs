@@ -81,12 +81,19 @@ public class AddCustomerConsentCommandHandler(
             await repository.CommitAsync(cancellationToken);
             metrics.RecordConsentEvent(entity.TenantId, entity.ConsentType, entity.Granted);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CustomerConsentResponse>(entity);
     }
 }
+

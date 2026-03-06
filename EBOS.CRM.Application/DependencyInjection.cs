@@ -10,6 +10,11 @@ using EBOS.CRM.Application.Features.CRM.Lead.Services;
 using EBOS.CRM.Application.Features.CRM.Quote.Services;
 using EBOS.CRM.Application.Features.CRM.Customer.Services;
 using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Services;
+using EBOS.CRM.Application.Features.CRM.Address.Services;
+using EBOS.CRM.Application.Features.CRM.BankInformation.Services;
+using EBOS.CRM.Application.Features.CRM.BranchOffice.Services;
+using EBOS.CRM.Application.Features.CRM.CustomerAddress.Services;
+using EBOS.CRM.Application.Features.CRM.IndividualCustomer.Services;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Shared.Observability;
@@ -40,6 +45,11 @@ public static class DependencyInjection
         services.AddScoped<IQuoteOpportunityValidationService, QuoteOpportunityValidationService>();
         services.AddScoped<ICustomerReferenceValidationService, CustomerReferenceValidationService>();
         services.AddScoped<IBranchOfficeAddressReferenceValidationService, BranchOfficeAddressReferenceValidationService>();
+        services.AddScoped<IAddressReferenceValidationService, AddressReferenceValidationService>();
+        services.AddScoped<IBankInformationReferenceValidationService, BankInformationReferenceValidationService>();
+        services.AddScoped<IBranchOfficeReferenceValidationService, BranchOfficeReferenceValidationService>();
+        services.AddScoped<ICustomerAddressReferenceValidationService, CustomerAddressReferenceValidationService>();
+        services.AddScoped<IIndividualCustomerReferenceValidationService, IndividualCustomerReferenceValidationService>();
 
         return services;
     }

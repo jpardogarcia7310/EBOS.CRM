@@ -1,15 +1,17 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.AddCustomerAddress;
 
 public class AddCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) :
+    ICurrentUserContext currentUser, IMapper mapper, ICustomerAddressReferenceValidationService referenceValidationService) :
     IRequestHandler<AddCustomerAddressCommand, CustomerAddressResponse>
 {
     public async Task<CustomerAddressResponse> Handle(AddCustomerAddressCommand request,
@@ -19,6 +21,11 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
 
         var entityRequest = request.CustomerAddressRequest ??
                             throw new ArgumentNullException(nameof(request.CustomerAddressRequest));
+        await referenceValidationService.EnsureDependenciesAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.CustomerId,
+            entityRequest.AddressId,
+            cancellationToken);
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CustomerAddress>(entityRequest);
 
         await repository.BeginTransactionAsync(cancellationToken);
@@ -41,15 +48,22 @@ public class AddCustomerAddressCommandHandler(ICustomerAddressRepository reposit
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CustomerAddressResponse>(entity);
     }
 }
+
 
 
 

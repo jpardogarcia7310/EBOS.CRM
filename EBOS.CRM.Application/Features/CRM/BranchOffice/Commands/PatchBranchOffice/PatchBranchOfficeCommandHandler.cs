@@ -1,14 +1,17 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.PatchBranchOffice;
 
 public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<PatchBranchOfficeCommand, BranchOfficeResponse?>
+    ICurrentUserContext currentUser, IBranchOfficeReferenceValidationService referenceValidationService)
+    : IRequestHandler<PatchBranchOfficeCommand, BranchOfficeResponse?>
 {
     public async Task<BranchOfficeResponse?> Handle(PatchBranchOfficeCommand request,
         CancellationToken cancellationToken)
@@ -22,6 +25,13 @@ public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository,
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        if (request.BranchOfficeRequest.CorporateCustomerId.HasValue)
+        {
+            await referenceValidationService.EnsureCorporateCustomerAvailableAsync(
+                request.BranchOfficeRequest.TenantId,
+                request.BranchOfficeRequest.CorporateCustomerId.Value,
+                cancellationToken);
+        }
 
         if (request.BranchOfficeRequest.Name != null)
             entity.Name = request.BranchOfficeRequest.Name;
@@ -51,9 +61,15 @@ public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository,
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
@@ -66,6 +82,7 @@ public class PatchBranchOfficeCommandHandler(IBranchOfficeRepository repository,
             !entity.Erased);
     }
 }
+
 
 
 

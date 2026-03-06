@@ -7,6 +7,7 @@ using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.Models;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using Moq;
 using CRMIndividualCustomer = EBOS.CRM.Domain.Entities.CRM.IndividualCustomer;
@@ -26,6 +27,10 @@ public class AddIndividualCustomerCommandHandlerTest
         _auditServiceMock = new Mock<IAuditService>();
         var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
+        var referenceValidationMock = new Mock<IIndividualCustomerReferenceValidationService>();
+        referenceValidationMock
+            .Setup(x => x.EnsureReferencesAvailableAsync(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         currentUserMock.SetupGet(x => x.UserId).Returns(1);
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
@@ -39,7 +44,8 @@ public class AddIndividualCustomerCommandHandlerTest
             _repositoryMock.Object,
             _auditServiceMock.Object,
             currentUserMock.Object,
-            _mapperMock.Object);
+            _mapperMock.Object,
+            referenceValidationMock.Object);
     }
 
     [Fact]

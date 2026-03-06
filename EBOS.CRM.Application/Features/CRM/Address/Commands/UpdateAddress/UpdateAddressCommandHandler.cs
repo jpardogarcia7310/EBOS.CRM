@@ -1,15 +1,18 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.UpdateAddress;
 
 public class UpdateAddressCommandHandler(IAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateAddressCommand, AddressResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, IAddressReferenceValidationService referenceValidationService)
+    : IRequestHandler<UpdateAddressCommand, AddressResponse?>
 {
     public async Task<AddressResponse?> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
     {
@@ -21,6 +24,10 @@ public class UpdateAddressCommandHandler(IAddressRepository repository, IAuditSe
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+        await referenceValidationService.EnsureReferencesAvailableAsync(
+            addressRequest.CountryId,
+            addressRequest.AddressTypeId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
 
@@ -47,15 +54,22 @@ public class UpdateAddressCommandHandler(IAddressRepository repository, IAuditSe
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<AddressResponse>(entity);
     }
 }
+
 
 
 

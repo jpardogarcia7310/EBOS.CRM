@@ -1,15 +1,17 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CustomerAddress.Commands.UpdateCustomerAddress;
 
 public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) :
+    ICurrentUserContext currentUser, IMapper mapper, ICustomerAddressReferenceValidationService referenceValidationService) :
     IRequestHandler<UpdateCustomerAddressCommand, CustomerAddressResponse?>
 {
     public async Task<CustomerAddressResponse?> Handle(UpdateCustomerAddressCommand request,
@@ -22,6 +24,11 @@ public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repo
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+        await referenceValidationService.EnsureDependenciesAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.CustomerId,
+            entityRequest.AddressId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);
@@ -46,15 +53,22 @@ public class UpdateCustomerAddressCommandHandler(ICustomerAddressRepository repo
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CustomerAddressResponse>(entity);
     }
 }
+
 
 
 

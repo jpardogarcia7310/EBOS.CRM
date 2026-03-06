@@ -6,6 +6,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using Moq;
 using CRMCustomerAddress = EBOS.CRM.Domain.Entities.CRM.CustomerAddress;
@@ -26,6 +27,10 @@ public class AddCustomerAddressCommandHandlerTest
         _auditServiceMock = new Mock<IAuditService>();
         _currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
+        var referenceValidationMock = new Mock<ICustomerAddressReferenceValidationService>();
+        referenceValidationMock
+            .Setup(x => x.EnsureDependenciesAvailableAsync(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         _currentUserMock.SetupGet(x => x.UserId).Returns(1);
         _currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
@@ -39,7 +44,8 @@ public class AddCustomerAddressCommandHandlerTest
             _repositoryMock.Object,
             _auditServiceMock.Object,
             _currentUserMock.Object,
-            _mapperMock.Object);
+            _mapperMock.Object,
+            referenceValidationMock.Object);
     }
 
     [Fact]

@@ -1,15 +1,18 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Address.Commands.AddAddress;
 
 public class AddAddressCommandHandler(IAddressRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddAddressCommand, AddressResponse>
+    ICurrentUserContext currentUser, IMapper mapper, IAddressReferenceValidationService referenceValidationService)
+    : IRequestHandler<AddAddressCommand, AddressResponse>
 {
     public async Task<AddressResponse> Handle(AddAddressCommand request, CancellationToken cancellationToken)
     {
@@ -17,6 +20,10 @@ public class AddAddressCommandHandler(IAddressRepository repository, IAuditServi
 
         var addressRequest = request.AddressRequest
                              ?? throw new ArgumentNullException(nameof(request.AddressRequest));
+        await referenceValidationService.EnsureReferencesAvailableAsync(
+            addressRequest.CountryId,
+            addressRequest.AddressTypeId,
+            cancellationToken);
         // Mapster creates the complete entity
         var entity = mapper.Map<Domain.Entities.CRM.Address>(addressRequest);
 
@@ -41,14 +48,21 @@ public class AddAddressCommandHandler(IAddressRepository repository, IAuditServi
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
         return mapper.Map<AddressResponse>(entity);
     }
 }
+
 
 
 

@@ -1,15 +1,18 @@
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOffice.Commands.UpdateBranchOffice;
 
 public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, IBranchOfficeReferenceValidationService referenceValidationService)
+    : IRequestHandler<UpdateBranchOfficeCommand, BranchOfficeResponse?>
 {
     public async Task<BranchOfficeResponse?> Handle(UpdateBranchOfficeCommand request,
         CancellationToken cancellationToken)
@@ -21,6 +24,10 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+        await referenceValidationService.EnsureCorporateCustomerAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.CorporateCustomerId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);
@@ -45,15 +52,22 @@ public class UpdateBranchOfficeCommandHandler(IBranchOfficeRepository repository
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<BranchOfficeResponse>(entity);
     }
 }
+
 
 
 

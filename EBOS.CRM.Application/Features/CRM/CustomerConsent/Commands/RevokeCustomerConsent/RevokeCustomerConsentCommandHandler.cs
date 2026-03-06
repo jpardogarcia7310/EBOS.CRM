@@ -73,12 +73,19 @@ public class RevokeCustomerConsentCommandHandler(
             await repository.CommitAsync(cancellationToken);
             metrics.RecordConsentEvent(newEvent.TenantId, newEvent.ConsentType, newEvent.Granted);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<CustomerConsentResponse>(newEvent);
     }
 }
+
