@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -32,7 +33,7 @@ public class SetPrimaryAccountContactCommandHandler(
 
         if (entity.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Account contact tenant mismatch.");
+            throw new DomainConflictException("Account contact tenant mismatch.", "DOMAIN_CONFLICT_ACCOUNT_CONTACT_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

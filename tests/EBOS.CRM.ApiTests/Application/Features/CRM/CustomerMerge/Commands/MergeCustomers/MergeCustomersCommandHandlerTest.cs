@@ -6,6 +6,7 @@ using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Microsoft.Extensions.Options;
 using Moq;
+using EBOS.CRM.Domain.Exceptions;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.CustomerMerge.Commands.MergeCustomers;
 
@@ -19,7 +20,7 @@ public class MergeCustomersCommandHandlerTest
 
         var act = () => handler.Handle(command, CancellationToken.None);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(act);
+        await Assert.ThrowsAsync<DomainValidationException>(act);
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class MergeCustomersCommandHandlerTest
 
         var act = () => handler.Handle(command, CancellationToken.None);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(act);
+        await Assert.ThrowsAsync<DomainValidationException>(act);
     }
 
     private static MergeCustomersCommandHandler BuildHandler(
@@ -70,3 +71,4 @@ public class MergeCustomersCommandHandlerTest
             options);
     }
 }
+

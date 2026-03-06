@@ -27,10 +27,10 @@ public sealed class RegisterCustomerPrivacyRequestCommandHandler(
         var request = command.Request ?? throw new ArgumentNullException(nameof(command.Request));
 
         var customer = await customerRepository.GetByIdAsync(request.CustomerId, cancellationToken)
-                       ?? throw new InvalidOperationException("Customer not found.");
+                       ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
         if (customer.TenantId != request.TenantId)
         {
-            throw new InvalidOperationException("Customer tenant mismatch.");
+            throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
         }
 
         var normalizedType = request.RequestType.Trim().ToUpperInvariant();

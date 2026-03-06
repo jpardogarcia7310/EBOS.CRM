@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Application.Shared.Observability;
@@ -29,7 +30,7 @@ public sealed class RetryCustomerPrivacyRequestCommandHandler(
 
         if (entity.TenantId != request.TenantId)
         {
-            throw new InvalidOperationException("Privacy request tenant mismatch.");
+            throw new DomainConflictException("Privacy request tenant mismatch.", "DOMAIN_CONFLICT_PRIVACY_REQUEST_TENANT_MISMATCH");
         }
 
         if (entity.Status is CustomerPrivacyRequest.StatusCompleted or CustomerPrivacyRequest.StatusCanceled)

@@ -80,7 +80,7 @@ public class CaseActivityControllerTest(CaseActivityControllerTest.CaseActivityT
             CaseActivityEntity.StatusOpen);
         var response = await _client.PostAsJsonAsync($"/api/v{_version}/CaseActivity", addRequest);
 
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
     [Fact]
@@ -244,3 +244,4 @@ public class CaseActivityControllerTest(CaseActivityControllerTest.CaseActivityT
         }
     }
 }
+

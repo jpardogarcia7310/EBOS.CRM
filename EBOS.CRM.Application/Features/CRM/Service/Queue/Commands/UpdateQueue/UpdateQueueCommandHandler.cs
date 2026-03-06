@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -13,7 +14,8 @@ public class UpdateQueueCommandHandler(
     ICaseRepository caseRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<UpdateQueueCommand, QueueResponse?>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateQueueCommand, QueueResponse?>
 {
     public async Task<QueueResponse?> Handle(UpdateQueueCommand request, CancellationToken cancellationToken)
     {
@@ -27,16 +29,16 @@ public class UpdateQueueCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        if (!entityRequest.IsActive)
-        {
-            var openCount = await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken);
-            if (openCount > 0)
-            {
-                throw new InvalidOperationException("Queue has open cases and cannot be deactivated.");
-            }
-        }
-
+        var previousIsActive = entity.IsActive;
+        var previousDefaultOwnerUserId = entity.DefaultOwnerUserId;
         mapper.Map(entityRequest, entity);
+        entity.IsActive = previousIsActive;
+        entity.DefaultOwnerUserId = previousDefaultOwnerUserId;
+        var openCount = entityRequest.IsActive
+            ? 0
+            : await caseRepository.CountOpenByQueueIdAsync(entity.Id, cancellationToken);
+        entity.ToggleActive(entityRequest.IsActive, openCount > 0);
+        entity.AssignDefaultOwner(entityRequest.DefaultOwnerUserId);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -56,6 +58,14 @@ public class UpdateQueueCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Queue),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
@@ -31,7 +32,7 @@ public sealed class RouteCaseCommandHandler(
 
         if (entity.ClosedAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot route a closed case.");
+            throw new DomainRuleViolationException("Cannot route a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_ROUTE");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

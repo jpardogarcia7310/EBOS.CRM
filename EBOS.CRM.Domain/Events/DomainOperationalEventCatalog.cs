@@ -103,7 +103,27 @@ public static class DomainOperationalEventCatalog
             "QuoteStatusChanged",
             DomainOperationalEventCategory.Business,
             "Quote status changed.",
-            "Track quote lifecycle and acceptance outcomes.")
+            "Track quote lifecycle and acceptance outcomes."),
+        new(
+            "QueueActivationChanged",
+            DomainOperationalEventCategory.Business,
+            "Queue active/inactive status changed.",
+            "Track routing-capacity changes in service operations."),
+        new(
+            "QueueDefaultOwnerAssigned",
+            DomainOperationalEventCategory.Business,
+            "Queue default owner assignment changed.",
+            "Track ownership strategy changes for queue intake."),
+        new(
+            "SlaActivationChanged",
+            DomainOperationalEventCategory.Business,
+            "SLA active/inactive status changed.",
+            "Track SLA governance status changes."),
+        new(
+            "CustomerMergeCompensationTriggered",
+            DomainOperationalEventCategory.Technical,
+            "Customer merge compensation triggered after partial execution failure.",
+            "Track rollback/remediation frequency for merge workflows.")
     ];
 
     public static DomainOperationalEventCategory Classify(string eventName)

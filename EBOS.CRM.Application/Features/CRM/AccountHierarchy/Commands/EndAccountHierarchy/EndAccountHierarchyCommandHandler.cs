@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -28,7 +29,7 @@ public class EndAccountHierarchyCommandHandler(
 
         if (entity.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Account hierarchy tenant mismatch.");
+            throw new DomainConflictException("Account hierarchy tenant mismatch.", "DOMAIN_CONFLICT_ACCOUNT_HIERARCHY_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

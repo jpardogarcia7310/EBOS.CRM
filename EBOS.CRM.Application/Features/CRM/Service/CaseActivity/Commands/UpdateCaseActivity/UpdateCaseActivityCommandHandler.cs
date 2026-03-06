@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Application.Shared.Observability;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -29,14 +30,14 @@ public class UpdateCaseActivityCommandHandler(
         }
 
         var caseEntity = await caseRepository.GetByIdAsync(entity.CaseId, cancellationToken)
-            ?? throw new InvalidOperationException("Case not found.");
+            ?? throw new DomainValidationException("Case not found.", "DOMAIN_VALIDATION_CASE_NOT_FOUND");
         if (caseEntity.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Case tenant mismatch.");
+            throw new DomainConflictException("Case tenant mismatch.", "DOMAIN_CONFLICT_CASE_TENANT_MISMATCH");
         }
         if (entityRequest.CaseId != entity.CaseId)
         {
-            throw new InvalidOperationException("CaseId cannot be changed for an activity.");
+            throw new DomainRuleViolationException("CaseId cannot be changed for an activity.", "DOMAIN_RULE_VIOLATION_CASE_ACTIVITY_CASE_IMMUTABLE");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

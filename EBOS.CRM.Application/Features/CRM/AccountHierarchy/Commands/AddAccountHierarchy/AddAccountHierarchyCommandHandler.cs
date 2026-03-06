@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -22,17 +23,17 @@ public class AddAccountHierarchyCommandHandler(IAccountHierarchyRepository repos
                             throw new ArgumentNullException(nameof(request.AccountHierarchyRequest));
 
         var parent = await corporateCustomerRepository.GetByIdAsync(entityRequest.ParentCorporateCustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Parent corporate customer not found.");
+            ?? throw new DomainValidationException("Parent corporate customer not found.", "DOMAIN_VALIDATION_PARENT_CORPORATE_CUSTOMER_NOT_FOUND");
         if (parent.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Parent corporate customer tenant mismatch.");
+            throw new DomainConflictException("Parent corporate customer tenant mismatch.", "DOMAIN_CONFLICT_PARENT_CORPORATE_CUSTOMER_TENANT_MISMATCH");
         }
 
         var child = await corporateCustomerRepository.GetByIdAsync(entityRequest.ChildCorporateCustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Child corporate customer not found.");
+            ?? throw new DomainValidationException("Child corporate customer not found.", "DOMAIN_VALIDATION_CHILD_CORPORATE_CUSTOMER_NOT_FOUND");
         if (child.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Child corporate customer tenant mismatch.");
+            throw new DomainConflictException("Child corporate customer tenant mismatch.", "DOMAIN_CONFLICT_CHILD_CORPORATE_CUSTOMER_TENANT_MISMATCH");
         }
 
         var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountHierarchy.Create(

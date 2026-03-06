@@ -8,6 +8,7 @@ using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using Moq;
+using EBOS.CRM.Domain.Exceptions;
 using CaseEntity = EBOS.CRM.Domain.Entities.CRM.Case;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Service.Case.Commands.RouteCase;
@@ -99,9 +100,10 @@ public class RouteCaseCommandHandlerTest
         _repositoryMock.Setup(r => r.GetByIdAsync(entity.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(entity);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        await Assert.ThrowsAsync<DomainRuleViolationException>(() =>
             _handler.Handle(new RouteCaseCommand(entity.Id, new RouteCaseRequest(1)), CancellationToken.None));
 
         _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CaseEntity>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
+

@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Observability;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -29,17 +30,17 @@ public class AddAccountContactCommandHandler(
                             throw new ArgumentNullException(nameof(request.AccountContactRequest));
 
         var corporateCustomer = await corporateCustomerRepository.GetByIdAsync(entityRequest.CorporateCustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Corporate customer not found.");
+            ?? throw new DomainValidationException("Corporate customer not found.", "DOMAIN_VALIDATION_CORPORATE_CUSTOMER_NOT_FOUND");
         if (corporateCustomer.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Corporate customer tenant mismatch.");
+            throw new DomainConflictException("Corporate customer tenant mismatch.", "DOMAIN_CONFLICT_CORPORATE_CUSTOMER_TENANT_MISMATCH");
         }
 
         var individualCustomer = await individualCustomerRepository.GetByIdAsync(entityRequest.IndividualCustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Individual customer not found.");
+            ?? throw new DomainValidationException("Individual customer not found.", "DOMAIN_VALIDATION_INDIVIDUAL_CUSTOMER_NOT_FOUND");
         if (individualCustomer.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Individual customer tenant mismatch.");
+            throw new DomainConflictException("Individual customer tenant mismatch.", "DOMAIN_CONFLICT_INDIVIDUAL_CUSTOMER_TENANT_MISMATCH");
         }
 
         var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountContact.Create(
@@ -108,3 +109,4 @@ public class AddAccountContactCommandHandler(
         return mapper.Map<AccountContactResponse>(entity);
     }
 }
+

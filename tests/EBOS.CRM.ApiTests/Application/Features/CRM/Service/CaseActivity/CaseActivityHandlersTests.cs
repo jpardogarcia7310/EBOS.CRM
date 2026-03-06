@@ -8,6 +8,7 @@ using EBOS.CRM.Contracts.Requests.CRM.Service.CaseActivity;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using FluentAssertions;
@@ -97,7 +98,7 @@ public class CaseActivityHandlersTests
 
         var act = () => handler.Handle(new AddCaseActivityCommand(request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Case not found.");
     }
 
@@ -132,7 +133,7 @@ public class CaseActivityHandlersTests
 
         var act = () => handler.Handle(new AddCaseActivityCommand(request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Case tenant mismatch.");
     }
 
@@ -168,7 +169,7 @@ public class CaseActivityHandlersTests
 
         var act = () => handler.Handle(new AddCaseActivityCommand(request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Cannot add activities to a closed case.");
     }
 
@@ -224,7 +225,7 @@ public class CaseActivityHandlersTests
             CaseActivityEntity.StatusOpen);
 
         var act = () => handler.Handle(new UpdateCaseActivityCommand(entity.Id, request), CancellationToken.None);
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Case not found.");
     }
 
@@ -269,7 +270,7 @@ public class CaseActivityHandlersTests
             CaseActivityEntity.StatusOpen);
 
         var act = () => handler.Handle(new UpdateCaseActivityCommand(entity.Id, request), CancellationToken.None);
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Case tenant mismatch.");
     }
 
@@ -314,7 +315,7 @@ public class CaseActivityHandlersTests
             CaseActivityEntity.StatusOpen);
 
         var act = () => handler.Handle(new UpdateCaseActivityCommand(entity.Id, request), CancellationToken.None);
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("CaseId cannot be changed for an activity.");
     }
 
@@ -509,3 +510,4 @@ public class CaseActivityHandlersTests
         Assert.Single(result.Items);
     }
 }
+

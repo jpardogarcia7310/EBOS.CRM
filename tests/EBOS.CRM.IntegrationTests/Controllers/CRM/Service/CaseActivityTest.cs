@@ -68,7 +68,7 @@ public class CaseActivityTest : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task AddCaseActivity_WhenCaseClosed_ReturnsServerError()
+    public async Task AddCaseActivity_WhenCaseClosed_ReturnsUnprocessableEntity()
     {
         var caseId = await CreateCaseAsync();
         await CloseCaseAsync(caseId);
@@ -77,7 +77,7 @@ public class CaseActivityTest : IClassFixture<CustomWebApplicationFactory>
             CaseActivityEntity.StatusOpen);
         var response = await _client.PostAsJsonAsync($"/api/v{_version}/CaseActivity", addRequest);
 
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
     [Fact]

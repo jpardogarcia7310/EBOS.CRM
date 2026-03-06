@@ -1,6 +1,8 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -9,7 +11,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 
 public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportunityRepository opportunityRepository,
-    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper)
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<ConvertLeadCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(ConvertLeadCommand request, CancellationToken cancellationToken)
@@ -20,6 +22,10 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
         if (lead is null)
         {
             return null;
+        }
+        if (lead.TenantId != request.LeadRequest.TenantId)
+        {
+            throw new DomainConflictException("Lead tenant mismatch.", "DOMAIN_CONFLICT_LEAD_TENANT_MISMATCH");
         }
 
         if (lead.ConvertedOpportunityId.HasValue)
@@ -33,23 +39,19 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
 
         var opportunity = new Domain.Entities.CRM.Opportunity
         {
-            TenantId = request.LeadRequest.TenantId,
-            Name = request.LeadRequest.OpportunityName,
-            StageId = request.LeadRequest.StageId,
-            OwnerUserId = lead.OwnerUserId,
-            CustomerId = request.LeadRequest.CustomerId,
-            ExpectedCloseDate = request.LeadRequest.ExpectedCloseDate,
-            Amount = request.LeadRequest.Amount,
-            Probability = request.LeadRequest.Probability,
-            Source = lead.Source,
-            SourceLeadId = lead.Id
+            TenantId = request.LeadRequest.TenantId
         };
-
-        lead.Status = "Converted";
-        if (!string.IsNullOrWhiteSpace(request.LeadRequest.Notes))
-        {
-            lead.Notes = request.LeadRequest.Notes;
-        }
+        opportunity.ApplyUpdate(
+            request.LeadRequest.OpportunityName,
+            request.LeadRequest.StageId,
+            lead.OwnerUserId,
+            request.LeadRequest.CustomerId,
+            request.LeadRequest.ExpectedCloseDate,
+            request.LeadRequest.Amount,
+            request.LeadRequest.Probability,
+            lead.Source,
+            lead.Id,
+            closeReason: null);
 
         await leadRepository.BeginTransactionAsync(cancellationToken);
 
@@ -58,7 +60,7 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
             await opportunityRepository.AddAsync(opportunity, cancellationToken);
             await opportunityRepository.SaveChangesAsync(cancellationToken);
 
-            lead.ConvertedOpportunityId = opportunity.Id;
+            lead.MarkConverted(opportunity.Id, request.LeadRequest.Notes);
             await leadRepository.UpdateAsync(lead, cancellationToken);
             await leadRepository.SaveChangesAsync(cancellationToken);
 
@@ -84,6 +86,19 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
 
             await auditService.InsertAuditAsync(opportunityAuditRequest, cancellationToken);
             await auditService.InsertAuditAsync(leadAuditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Opportunity),
+                    opportunity.Id,
+                    opportunity.DequeueOperationalEvents(),
+                    cancellationToken);
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Lead),
+                    lead.Id,
+                    lead.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
 
             await leadRepository.CommitAsync(cancellationToken);
         }

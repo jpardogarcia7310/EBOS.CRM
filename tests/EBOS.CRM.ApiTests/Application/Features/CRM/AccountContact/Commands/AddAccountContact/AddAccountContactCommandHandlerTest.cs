@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
@@ -80,6 +81,6 @@ public class AddAccountContactCommandHandlerTest
             auditService.Object, currentUser.Object, mapper.Object);
 
         var command = new AddAccountContactCommand(new AddAccountContactRequest(1, 20, 30, false, DateTime.UtcNow, null));
-        await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(command, CancellationToken.None));
+        await Assert.ThrowsAsync<DomainConflictException>(() => handler.Handle(command, CancellationToken.None));
     }
 }

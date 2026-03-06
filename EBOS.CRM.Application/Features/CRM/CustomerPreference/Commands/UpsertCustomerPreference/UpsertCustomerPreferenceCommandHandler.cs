@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -26,17 +27,17 @@ public class UpsertCustomerPreferenceCommandHandler(
                             throw new ArgumentNullException(nameof(request.PreferenceRequest));
 
         var customer = await customerRepository.GetByIdAsync(entityRequest.CustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Customer not found.");
+            ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
         if (customer.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Customer tenant mismatch.");
+            throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
         }
 
         var channelType = await channelTypeRepository.GetByIdAsync(entityRequest.ChannelId, cancellationToken)
-            ?? throw new InvalidOperationException("Channel type not found.");
+            ?? throw new DomainValidationException("Channel type not found.", "DOMAIN_VALIDATION_CHANNEL_TYPE_NOT_FOUND");
         if (!channelType.IsActive)
         {
-            throw new InvalidOperationException("Channel type is not active.");
+            throw new DomainRuleViolationException("Channel type is not active.", "DOMAIN_RULE_VIOLATION_CHANNEL_TYPE_INACTIVE");
         }
 
         var existing = await repository.GetByCustomerAndChannelAsync(

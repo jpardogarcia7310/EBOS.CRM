@@ -60,7 +60,7 @@ public class QuoteControllerTest(CustomWebApplicationFactory<Program> factory) :
 
         var dto = await response.Content.ReadFromJsonAsync<QuoteResponse>();
         Assert.NotNull(dto);
-        Assert.Equal("Approved", dto.Status);
+        Assert.Equal("APPROVED", dto.Status);
     }
 
     [Fact]
@@ -75,6 +75,6 @@ public class QuoteControllerTest(CustomWebApplicationFactory<Program> factory) :
 
         var dto = await response.Content.ReadFromJsonAsync<QuoteResponse>();
         Assert.NotNull(dto);
-        Assert.Equal("Rejected", dto.Status);
+        Assert.Equal("REJECTED", dto.Status);
     }
 }

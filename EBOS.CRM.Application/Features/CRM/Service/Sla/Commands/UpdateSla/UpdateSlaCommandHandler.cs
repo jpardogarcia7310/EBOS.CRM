@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -13,7 +14,8 @@ public class UpdateSlaCommandHandler(
     ICaseRepository caseRepository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<UpdateSlaCommand, SlaResponse?>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateSlaCommand, SlaResponse?>
 {
     public async Task<SlaResponse?> Handle(UpdateSlaCommand request, CancellationToken cancellationToken)
     {
@@ -27,16 +29,13 @@ public class UpdateSlaCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        if (!entityRequest.IsActive)
-        {
-            var openCount = await caseRepository.CountOpenBySlaIdAsync(entity.Id, cancellationToken);
-            if (openCount > 0)
-            {
-                throw new InvalidOperationException("SLA has open cases and cannot be deactivated.");
-            }
-        }
-
+        var previousIsActive = entity.IsActive;
         mapper.Map(entityRequest, entity);
+        entity.IsActive = previousIsActive;
+        var openCount = entityRequest.IsActive
+            ? 0
+            : await caseRepository.CountOpenBySlaIdAsync(entity.Id, cancellationToken);
+        entity.ToggleActive(entityRequest.IsActive, openCount > 0);
 
         entity.ValidateWarningMinutes();
         entity.ValidateActiveRange();
@@ -59,6 +58,14 @@ public class UpdateSlaCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Sla),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

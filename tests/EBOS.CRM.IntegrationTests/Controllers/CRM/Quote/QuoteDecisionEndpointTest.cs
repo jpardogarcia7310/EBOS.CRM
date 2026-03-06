@@ -27,7 +27,7 @@ public class QuoteDecisionEndpointTest(CustomWebApplicationFactory factory)
 
         var dto = await rejectResponse.Content.ReadFromJsonAsync<QuoteResponse>();
         Assert.NotNull(dto);
-        Assert.Equal("Rejected", dto.Status);
+        Assert.Equal("REJECTED", dto.Status);
     }
 
     private static long SeedQuote(CustomWebApplicationFactory factory)

@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -12,7 +13,8 @@ public class AddSlaCommandHandler(
     ISlaRepository repository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<AddSlaCommand, SlaResponse>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddSlaCommand, SlaResponse>
 {
     public async Task<SlaResponse> Handle(AddSlaCommand request, CancellationToken cancellationToken)
     {
@@ -21,6 +23,8 @@ public class AddSlaCommandHandler(
         var entityRequest = request.SlaRequest ?? throw new ArgumentNullException(nameof(request.SlaRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Sla>(entityRequest);
 
+        entity.IsActive = !entityRequest.IsActive;
+        entity.ToggleActive(entityRequest.IsActive, false);
         entity.ValidateWarningMinutes();
         entity.ValidateActiveRange();
 
@@ -42,6 +46,14 @@ public class AddSlaCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Sla),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

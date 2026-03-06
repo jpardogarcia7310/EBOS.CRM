@@ -1,6 +1,8 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -9,7 +11,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Quote.Commands.UpdateQuote;
 
 public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateQuoteCommand, QuoteResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateQuoteCommand, QuoteResponse?>
 {
     public async Task<QuoteResponse?> Handle(UpdateQuoteCommand request, CancellationToken cancellationToken)
     {
@@ -21,9 +23,21 @@ public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditServic
         {
             return null;
         }
+        if (entity.TenantId != entityRequest.TenantId)
+        {
+            throw new DomainConflictException("Quote tenant mismatch.", "DOMAIN_CONFLICT_QUOTE_TENANT_MISMATCH");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        mapper.Map(entityRequest, entity);
+        entity.ApplyUpdate(
+            entityRequest.OpportunityId,
+            entityRequest.Status,
+            entityRequest.ReferenceNumber,
+            entityRequest.SubtotalAmount,
+            entityRequest.DiscountAmount,
+            entityRequest.TotalAmount,
+            entityRequest.ValidUntil,
+            entityRequest.Notes);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -43,6 +57,14 @@ public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditServic
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Quote),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

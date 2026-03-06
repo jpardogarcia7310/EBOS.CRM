@@ -1,5 +1,6 @@
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
@@ -25,7 +26,7 @@ public class DeleteAccountContactRoleCommandHandler(
 
         if (entity.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Account contact role tenant mismatch.");
+            throw new DomainConflictException("Account contact role tenant mismatch.", "DOMAIN_CONFLICT_ACCOUNT_CONTACT_ROLE_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

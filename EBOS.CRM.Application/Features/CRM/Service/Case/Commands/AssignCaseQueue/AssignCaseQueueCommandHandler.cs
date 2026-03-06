@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -30,18 +31,18 @@ public class AssignCaseQueueCommandHandler(
 
         if (entity.ClosedAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot change queue for a closed case.");
+            throw new DomainRuleViolationException("Cannot change queue for a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_QUEUE_CHANGE");
         }
 
         var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
-            ?? throw new InvalidOperationException("Queue not found.");
+            ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
         if (!queue.IsActive)
         {
-            throw new InvalidOperationException("Queue is not active.");
+            throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
         }
         if (queue.TenantId != entity.TenantId)
         {
-            throw new InvalidOperationException("Queue tenant mismatch.");
+            throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

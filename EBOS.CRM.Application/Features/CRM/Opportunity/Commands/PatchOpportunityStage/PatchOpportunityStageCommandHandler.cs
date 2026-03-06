@@ -1,6 +1,8 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
@@ -8,7 +10,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.PatchOpportunityStage;
 
 public class PatchOpportunityStageCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<PatchOpportunityStageCommand, OpportunityResponse?>
+    ICurrentUserContext currentUser, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<PatchOpportunityStageCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(PatchOpportunityStageCommand request,
         CancellationToken cancellationToken)
@@ -20,14 +22,14 @@ public class PatchOpportunityStageCommandHandler(IOpportunityRepository reposito
         {
             return null;
         }
+        if (entity.TenantId != request.OpportunityRequest.TenantId)
+        {
+            throw new DomainConflictException("Opportunity tenant mismatch.", "DOMAIN_CONFLICT_OPPORTUNITY_TENANT_MISMATCH");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
 
-        entity.StageId = request.OpportunityRequest.StageId;
-        if (request.OpportunityRequest.Probability.HasValue)
-        {
-            entity.Probability = request.OpportunityRequest.Probability.Value;
-        }
+        entity.SetStage(request.OpportunityRequest.StageId, request.OpportunityRequest.Probability);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -47,6 +49,14 @@ public class PatchOpportunityStageCommandHandler(IOpportunityRepository reposito
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Opportunity),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

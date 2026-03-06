@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -9,7 +10,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.AddOpportunity;
 
 public class AddOpportunityCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<AddOpportunityCommand, OpportunityResponse>
+    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddOpportunityCommand, OpportunityResponse>
 {
     public async Task<OpportunityResponse> Handle(AddOpportunityCommand request, CancellationToken cancellationToken)
     {
@@ -18,6 +19,17 @@ public class AddOpportunityCommandHandler(IOpportunityRepository repository, IAu
         var entityRequest = request.OpportunityRequest ??
                             throw new ArgumentNullException(nameof(request.OpportunityRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Opportunity>(entityRequest);
+        entity.ApplyUpdate(
+            entityRequest.Name,
+            entityRequest.StageId,
+            entityRequest.OwnerUserId,
+            entityRequest.CustomerId,
+            entityRequest.ExpectedCloseDate,
+            entityRequest.Amount,
+            entityRequest.Probability,
+            entityRequest.Source,
+            entityRequest.SourceLeadId,
+            closeReason: null);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -37,6 +49,14 @@ public class AddOpportunityCommandHandler(IOpportunityRepository repository, IAu
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Opportunity),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

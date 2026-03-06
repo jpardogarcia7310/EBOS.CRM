@@ -30,7 +30,7 @@ public class RegisterCustomerPrivacyRequestCommandHandlerTest
         var act = () => handler.Handle(new RegisterCustomerPrivacyRequestCommand(
             new RegisterCustomerPrivacyRequestRequest(1, 10, "ANONYMIZE", null, false)), CancellationToken.None);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(act);
+        await Assert.ThrowsAsync<DomainValidationException>(act);
     }
 
     [Fact]

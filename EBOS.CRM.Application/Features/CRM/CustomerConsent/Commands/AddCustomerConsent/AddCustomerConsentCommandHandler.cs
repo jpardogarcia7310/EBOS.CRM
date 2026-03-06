@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
@@ -28,10 +29,10 @@ public class AddCustomerConsentCommandHandler(
                             throw new ArgumentNullException(nameof(request.ConsentRequest));
 
         var customer = await customerRepository.GetByIdAsync(entityRequest.CustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Customer not found.");
+            ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
         if (customer.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Customer tenant mismatch.");
+            throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
         }
 
         var entity = entityRequest.Granted

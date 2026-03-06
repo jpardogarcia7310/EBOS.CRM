@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -30,14 +31,14 @@ public class AssignCaseSlaCommandHandler(
 
         if (entity.ClosedAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot change SLA for a closed case.");
+            throw new DomainRuleViolationException("Cannot change SLA for a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_SLA_CHANGE");
         }
 
         var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
-            ?? throw new InvalidOperationException("SLA not found.");
+            ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
         if (sla.TenantId != entity.TenantId)
         {
-            throw new InvalidOperationException("SLA tenant mismatch.");
+            throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

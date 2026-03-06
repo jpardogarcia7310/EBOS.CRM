@@ -1,6 +1,8 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MediatR;
@@ -8,7 +10,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Lead.Commands.DisqualifyLead;
 
 public class DisqualifyLeadCommandHandler(ILeadRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<DisqualifyLeadCommand, LeadResponse?>
+    ICurrentUserContext currentUser, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<DisqualifyLeadCommand, LeadResponse?>
 {
     public async Task<LeadResponse?> Handle(DisqualifyLeadCommand request, CancellationToken cancellationToken)
     {
@@ -19,11 +21,13 @@ public class DisqualifyLeadCommandHandler(ILeadRepository repository, IAuditServ
         {
             return null;
         }
+        if (entity.TenantId != request.LeadRequest.TenantId)
+        {
+            throw new DomainConflictException("Lead tenant mismatch.", "DOMAIN_CONFLICT_LEAD_TENANT_MISMATCH");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-
-        entity.Status = "Disqualified";
-        entity.Notes = request.LeadRequest.Reason;
+        entity.Disqualify(request.LeadRequest.Reason);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -43,6 +47,14 @@ public class DisqualifyLeadCommandHandler(ILeadRepository repository, IAuditServ
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Lead),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

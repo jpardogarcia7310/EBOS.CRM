@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Application.Shared.Observability;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -30,21 +31,21 @@ public class UpdateCaseCommandHandler(
         }
 
         var queue = await queueRepository.GetByIdAsync(entityRequest.QueueId, cancellationToken)
-            ?? throw new InvalidOperationException("Queue not found.");
+            ?? throw new DomainValidationException("Queue not found.", "DOMAIN_VALIDATION_QUEUE_NOT_FOUND");
         if (!queue.IsActive)
         {
-            throw new InvalidOperationException("Queue is not active.");
+            throw new DomainRuleViolationException("Queue is not active.", "DOMAIN_RULE_VIOLATION_QUEUE_INACTIVE");
         }
         if (queue.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Queue tenant mismatch.");
+            throw new DomainConflictException("Queue tenant mismatch.", "DOMAIN_CONFLICT_QUEUE_TENANT_MISMATCH");
         }
 
         var sla = await slaRepository.GetByIdAsync(entityRequest.SlaId, cancellationToken)
-            ?? throw new InvalidOperationException("SLA not found.");
+            ?? throw new DomainValidationException("SLA not found.", "DOMAIN_VALIDATION_SLA_NOT_FOUND");
         if (sla.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("SLA tenant mismatch.");
+            throw new DomainConflictException("SLA tenant mismatch.", "DOMAIN_CONFLICT_SLA_TENANT_MISMATCH");
         }
 
         var oldValues = AuditSerialization.Serialize(entity);

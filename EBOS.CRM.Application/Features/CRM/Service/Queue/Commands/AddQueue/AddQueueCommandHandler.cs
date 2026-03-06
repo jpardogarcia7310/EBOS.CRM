@@ -1,5 +1,6 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -12,7 +13,8 @@ public class AddQueueCommandHandler(
     IQueueRepository repository,
     IAuditService auditService,
     ICurrentUserContext currentUser,
-    IMapper mapper) : IRequestHandler<AddQueueCommand, QueueResponse>
+    IMapper mapper,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddQueueCommand, QueueResponse>
 {
     public async Task<QueueResponse> Handle(AddQueueCommand request, CancellationToken cancellationToken)
     {
@@ -20,6 +22,9 @@ public class AddQueueCommandHandler(
 
         var entityRequest = request.QueueRequest ?? throw new ArgumentNullException(nameof(request.QueueRequest));
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Queue>(entityRequest);
+        entity.IsActive = !entityRequest.IsActive;
+        entity.ToggleActive(entityRequest.IsActive, false);
+        entity.AssignDefaultOwner(entityRequest.DefaultOwnerUserId);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -39,6 +44,14 @@ public class AddQueueCommandHandler(
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Queue),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch

@@ -2,6 +2,7 @@ using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.CRM;
@@ -32,7 +33,7 @@ public class RevokeCustomerConsentCommandHandler(
 
         if (existing.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Customer consent tenant mismatch.");
+            throw new DomainConflictException("Customer consent tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_CONSENT_TENANT_MISMATCH");
         }
 
         var newEvent = global::EBOS.CRM.Domain.Entities.CRM.CustomerConsent.CreateRevoked(

@@ -1,7 +1,9 @@
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.CRM.CustomerMerge;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
+using EBOS.CRM.Domain.Events;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -25,7 +27,8 @@ public class MergeCustomersCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     ICustomer360Metrics metrics,
-    IOptions<CustomerMergeOptions> mergeOptions)
+    IOptions<CustomerMergeOptions> mergeOptions,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<MergeCustomersCommand, CustomerMergeResultResponse>
 {
     private enum CustomerType
@@ -41,14 +44,14 @@ public class MergeCustomersCommandHandler(
         var mergeRequest = request.Request ?? throw new ArgumentNullException(nameof(request.Request));
         if (string.IsNullOrWhiteSpace(mergeRequest.Reason))
         {
-            throw new InvalidOperationException("Merge reason is required.");
+            throw new DomainValidationException("Merge reason is required.", "DOMAIN_VALIDATION_MERGE_REASON_REQUIRED");
         }
 
         var winner = await customerRepository.GetByIdAsync(mergeRequest.WinnerCustomerId, cancellationToken)
-            ?? throw new InvalidOperationException("Winner customer not found.");
+            ?? throw new DomainValidationException("Winner customer not found.", "DOMAIN_VALIDATION_MERGE_WINNER_NOT_FOUND");
         if (winner.TenantId != mergeRequest.TenantId)
         {
-            throw new InvalidOperationException("Winner customer tenant mismatch.");
+            throw new DomainConflictException("Winner customer tenant mismatch.", "DOMAIN_CONFLICT_MERGE_WINNER_TENANT_MISMATCH");
         }
 
         var winnerType = await ResolveCustomerTypeAsync(winner.Id, cancellationToken);
@@ -77,7 +80,7 @@ public class MergeCustomersCommandHandler(
                 var type = await ResolveCustomerTypeAsync(mergeId, cancellationToken);
                 if (type != winnerType)
                 {
-                    throw new InvalidOperationException("Customer type mismatch in merge list.");
+                    throw new DomainRuleViolationException("Customer type mismatch in merge list.", "DOMAIN_RULE_VIOLATION_MERGE_TYPE_MISMATCH");
                 }
 
                 mergeTypeById[mergeId] = type;
@@ -136,7 +139,7 @@ public class MergeCustomersCommandHandler(
 
                 if (entity.TenantId != mergeRequest.TenantId)
                 {
-                    throw new InvalidOperationException("Customer tenant mismatch in merge list.");
+                    throw new DomainConflictException("Customer tenant mismatch in merge list.", "DOMAIN_CONFLICT_MERGE_LIST_TENANT_MISMATCH");
                 }
 
                 entity.Erased = true;
@@ -178,6 +181,26 @@ public class MergeCustomersCommandHandler(
         catch
         {
             await customerRepository.RollbackAsync(cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Customer),
+                    mergeRequest.WinnerCustomerId,
+                    new[]
+                    {
+                        new DomainOperationalEvent(
+                            "CustomerMergeCompensationTriggered",
+                            DomainOperationalEventCatalog.Classify("CustomerMergeCompensationTriggered"),
+                            DateTime.UtcNow,
+                            new Dictionary<string, string>(StringComparer.Ordinal)
+                            {
+                                ["tenantId"] = mergeRequest.TenantId.ToString(),
+                                ["winnerCustomerId"] = mergeRequest.WinnerCustomerId.ToString(),
+                                ["mergeCount"] = mergeIds.Count.ToString()
+                            })
+                    },
+                    cancellationToken);
+            }
             metrics.RecordMerge(mergeRequest.TenantId, 0, false);
             throw;
         }
@@ -199,7 +222,7 @@ public class MergeCustomersCommandHandler(
             return CustomerType.Individual;
         }
 
-        throw new InvalidOperationException("Customer type could not be resolved.");
+        throw new DomainValidationException("Customer type could not be resolved.", "DOMAIN_VALIDATION_MERGE_CUSTOMER_TYPE_UNRESOLVED");
     }
 
     private async Task MergeCustomerAddressesAsync(long winnerId, IReadOnlyCollection<long> mergeIds,

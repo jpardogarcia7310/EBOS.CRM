@@ -2,6 +2,7 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Application.Shared.Observability;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -23,14 +24,14 @@ public class AddCaseActivityCommandHandler(
 
         var entityRequest = request.ActivityRequest ?? throw new ArgumentNullException(nameof(request.ActivityRequest));
         var caseEntity = await caseRepository.GetByIdAsync(entityRequest.CaseId, cancellationToken)
-            ?? throw new InvalidOperationException("Case not found.");
+            ?? throw new DomainValidationException("Case not found.", "DOMAIN_VALIDATION_CASE_NOT_FOUND");
         if (caseEntity.TenantId != entityRequest.TenantId)
         {
-            throw new InvalidOperationException("Case tenant mismatch.");
+            throw new DomainConflictException("Case tenant mismatch.", "DOMAIN_CONFLICT_CASE_TENANT_MISMATCH");
         }
         if (caseEntity.ClosedAt.HasValue)
         {
-            throw new InvalidOperationException("Cannot add activities to a closed case.");
+            throw new DomainRuleViolationException("Cannot add activities to a closed case.", "DOMAIN_RULE_VIOLATION_CASE_CLOSED_ACTIVITY_ADD");
         }
 
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.CaseActivity>(entityRequest);

@@ -1,4 +1,5 @@
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using FluentAssertions;
 
 namespace EBOS.CRM.ApiTests.Domain;
@@ -6,22 +7,32 @@ namespace EBOS.CRM.ApiTests.Domain;
 public class QueueDomainTests
 {
     [Fact]
-    public void Activate_Sets_IsActive_True()
+    public void ToggleActive_Sets_IsActive_True()
     {
         var entity = new Queue { IsActive = false };
 
-        entity.Activate();
+        entity.ToggleActive(true, hasOpenCases: false);
 
         entity.IsActive.Should().BeTrue();
     }
 
     [Fact]
-    public void Deactivate_Sets_IsActive_False()
+    public void ToggleActive_Throws_When_Deactivating_With_OpenCases()
     {
         var entity = new Queue { IsActive = true };
 
-        entity.Deactivate();
+        var act = () => entity.ToggleActive(false, hasOpenCases: true);
 
-        entity.IsActive.Should().BeFalse();
+        act.Should().Throw<DomainRuleViolationException>();
+    }
+
+    [Fact]
+    public void AssignDefaultOwner_Throws_When_Invalid()
+    {
+        var entity = new Queue();
+
+        var act = () => entity.AssignDefaultOwner(0);
+
+        act.Should().Throw<DomainValidationException>();
     }
 }

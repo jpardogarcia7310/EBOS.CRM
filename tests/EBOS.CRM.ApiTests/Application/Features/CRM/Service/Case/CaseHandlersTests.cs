@@ -112,7 +112,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new AddCaseCommand(request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue tenant mismatch.");
     }
 
@@ -138,7 +138,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new AddCaseCommand(request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("SLA tenant mismatch.");
     }
 
@@ -194,7 +194,7 @@ public class CaseHandlersTests
         var request = new AssignCaseQueueRequest(1, 5);
         var act = () => handler.Handle(new AssignCaseQueueCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue not found.");
     }
 
@@ -230,7 +230,7 @@ public class CaseHandlersTests
         var request = new AssignCaseQueueRequest(1, 5);
         var act = () => handler.Handle(new AssignCaseQueueCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue is not active.");
     }
 
@@ -266,7 +266,7 @@ public class CaseHandlersTests
         var request = new AssignCaseQueueRequest(1, 5);
         var act = () => handler.Handle(new AssignCaseQueueCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue tenant mismatch.");
     }
 
@@ -348,7 +348,7 @@ public class CaseHandlersTests
         var request = new AssignCaseSlaRequest(1, 6);
         var act = () => handler.Handle(new AssignCaseSlaCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("SLA tenant mismatch.");
     }
 
@@ -475,7 +475,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new UpdateCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue is not active.");
     }
 
@@ -525,7 +525,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new UpdateCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("Queue tenant mismatch.");
     }
 
@@ -575,7 +575,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new UpdateCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("SLA not found.");
     }
 
@@ -625,7 +625,7 @@ public class CaseHandlersTests
 
         var act = () => handler.Handle(new UpdateCaseCommand(entity.Id, request), CancellationToken.None);
 
-        await FluentActions.Awaiting(act).Should().ThrowAsync<InvalidOperationException>()
+        await FluentActions.Awaiting(act).Should().ThrowAsync<DomainException>()
             .WithMessage("SLA tenant mismatch.");
     }
 
@@ -963,4 +963,5 @@ public class CaseHandlersTests
         Assert.Single(result.Items);
     }
 }
+
 

@@ -1,6 +1,8 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
+using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 using MapsterMapper;
@@ -9,7 +11,7 @@ using MediatR;
 namespace EBOS.CRM.Application.Features.CRM.Lead.Commands.UpdateLead;
 
 public class UpdateLeadCommandHandler(ILeadRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateLeadCommand, LeadResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateLeadCommand, LeadResponse?>
 {
     public async Task<LeadResponse?> Handle(UpdateLeadCommand request, CancellationToken cancellationToken)
     {
@@ -21,9 +23,22 @@ public class UpdateLeadCommandHandler(ILeadRepository repository, IAuditService 
         {
             return null;
         }
+        if (entity.TenantId != entityRequest.TenantId)
+        {
+            throw new DomainConflictException("Lead tenant mismatch.", "DOMAIN_CONFLICT_LEAD_TENANT_MISMATCH");
+        }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        mapper.Map(entityRequest, entity);
+        entity.ApplyUpdate(
+            entityRequest.Source,
+            entityRequest.Status,
+            entityRequest.OwnerUserId,
+            entityRequest.CompanyName,
+            entityRequest.ContactName,
+            entityRequest.Email,
+            entityRequest.Phone,
+            entityRequest.EstimatedValue,
+            entityRequest.Notes);
 
         await repository.BeginTransactionAsync(cancellationToken);
 
@@ -43,6 +58,14 @@ public class UpdateLeadCommandHandler(ILeadRepository repository, IAuditService 
                 CorrelationId: currentUser.CorrelationId);
 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
+            if (domainOperationalEventPublisher is not null)
+            {
+                await domainOperationalEventPublisher.PublishAsync(
+                    nameof(Domain.Entities.CRM.Lead),
+                    entity.Id,
+                    entity.DequeueOperationalEvents(),
+                    cancellationToken);
+            }
             await repository.CommitAsync(cancellationToken);
         }
         catch
