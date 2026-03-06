@@ -1,4 +1,4 @@
-using EBOS.CRM.Application.Shared.Audit;
+﻿using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Observability;
@@ -100,13 +100,20 @@ public class AddAccountContactCommandHandler(
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
         return mapper.Map<AccountContactResponse>(entity);
     }
 }
+
 

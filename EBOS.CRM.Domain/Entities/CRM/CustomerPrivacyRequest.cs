@@ -236,6 +236,30 @@ public class CustomerPrivacyRequest : ErasableEntity, ITenantScopedEntity
         CompensateToPendingForRetry(processedBy, reason);
     }
 
+    public void RecordTransientFailure(string transientCode, string operation)
+    {
+        if (string.IsNullOrWhiteSpace(transientCode))
+        {
+            throw new DomainValidationException("Transient failure code is required.", "DOMAIN_VALIDATION_TRANSIENT_CODE_REQUIRED");
+        }
+
+        if (string.IsNullOrWhiteSpace(operation))
+        {
+            throw new DomainValidationException("Operation is required.", "DOMAIN_VALIDATION_TRANSIENT_OPERATION_REQUIRED");
+        }
+
+        EmitOperationalEvent(
+            "DomainTransientFailureDetected",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["aggregate"] = nameof(CustomerPrivacyRequest),
+                ["operation"] = operation.Trim(),
+                ["code"] = transientCode.Trim().ToUpperInvariant(),
+                ["tenantId"] = TenantId.ToString(),
+                ["customerId"] = CustomerId.ToString()
+            });
+    }
+
     public void CompensateToPendingForRetry(long processedBy, string? reason = null)
     {
         if (!string.Equals(Status, StatusFailed, StringComparison.Ordinal))

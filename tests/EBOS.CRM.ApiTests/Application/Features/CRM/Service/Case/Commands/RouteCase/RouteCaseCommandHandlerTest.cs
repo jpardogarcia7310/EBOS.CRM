@@ -105,5 +105,30 @@ public class RouteCaseCommandHandlerTest
 
         _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<CaseEntity>(), It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_WhenRoutingTimesOut_ThrowsTransientDomainFailure()
+    {
+        var entity = new CaseEntity
+        {
+            Id = 7,
+            TenantId = 1,
+            Title = "Case",
+            Status = CaseEntity.StatusOpen,
+            Priority = CaseEntity.PriorityLow,
+            QueueId = 1,
+            OwnerUserId = 1
+        };
+
+        _repositoryMock.Setup(r => r.GetByIdAsync(entity.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entity);
+        _routingServiceMock.Setup(r => r.RouteAsync(entity, false, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TimeoutException("routing timeout"));
+
+        var ex = await Assert.ThrowsAsync<TransientDomainFailureException>(() =>
+            _handler.Handle(new RouteCaseCommand(entity.Id, new RouteCaseRequest(1)), CancellationToken.None));
+
+        Assert.Equal("DOMAIN_TRANSIENT_TIMEOUT", ex.Code);
+    }
 }
 

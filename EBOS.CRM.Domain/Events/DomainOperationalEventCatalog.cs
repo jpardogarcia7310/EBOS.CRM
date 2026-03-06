@@ -25,6 +25,11 @@ public static class DomainOperationalEventCatalog
             "Unexpected invariant breach observed during domain execution.",
             "Trigger anomaly triage and reliability investigations."),
         new(
+            "DomainTransientFailureDetected",
+            DomainOperationalEventCategory.Technical,
+            "A transient domain failure was classified deterministically for retry handling.",
+            "Track transient-domain failure pressure and retry triggers."),
+        new(
             "CustomerPrivacyRequestCompensationTriggered",
             DomainOperationalEventCategory.Technical,
             "A failed privacy request was explicitly compensated back to pending for retry.",

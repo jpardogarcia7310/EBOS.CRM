@@ -3,6 +3,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Domain.Entities.CRM;
 using EBOS.CRM.Domain.Entities.EBOS;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Repositories.EBOS;
 using EBOS.CRM.Domain.Interfaces.Services;
@@ -21,78 +22,84 @@ public sealed class CustomerPrivacyRetentionService(
     {
         if (tenantId <= 0)
         {
-            throw new InvalidOperationException("TenantId must be a positive value.");
+            throw new DomainValidationException("TenantId must be a positive value.", "DOMAIN_VALIDATION_TENANT_ID_POSITIVE");
         }
 
         if (actorUserId <= 0)
         {
-            throw new InvalidOperationException("Actor user id must be a positive value.");
+            throw new DomainValidationException("Actor user id must be a positive value.", "DOMAIN_VALIDATION_ACTOR_USER_ID_POSITIVE");
         }
-
-        var resolvedDays = retentionDays ?? await ResolveRetentionDaysAsync(tenantId, cancellationToken);
-        var resolvedBatchSize = batchSize.GetValueOrDefault(500);
-        resolvedBatchSize = Math.Clamp(resolvedBatchSize, 1, 5000);
-        var cutoff = DateTime.UtcNow.AddDays(-resolvedDays);
-
-        var all = await privacyRequestRepository.GetAllAsync(cancellationToken);
-        var candidates = all
-            .Where(x => x.TenantId == tenantId)
-            .Where(x =>
-                x.Status == CustomerPrivacyRequest.StatusCompleted ||
-                x.Status == CustomerPrivacyRequest.StatusFailed ||
-                x.Status == CustomerPrivacyRequest.StatusCanceled)
-            .Where(x => (x.ProcessedAt ?? x.RequestedAt) <= cutoff)
-            .OrderBy(x => x.Id)
-            .Take(resolvedBatchSize)
-            .ToList();
-
-        if (dryRun)
+        try
         {
+            var resolvedDays = retentionDays ?? await ResolveRetentionDaysAsync(tenantId, cancellationToken);
+            var resolvedBatchSize = batchSize.GetValueOrDefault(500);
+            resolvedBatchSize = Math.Clamp(resolvedBatchSize, 1, 5000);
+            var cutoff = DateTime.UtcNow.AddDays(-resolvedDays);
+
+            var all = await privacyRequestRepository.GetAllAsync(cancellationToken);
+            var candidates = all
+                .Where(x => x.TenantId == tenantId)
+                .Where(x =>
+                    x.Status == CustomerPrivacyRequest.StatusCompleted ||
+                    x.Status == CustomerPrivacyRequest.StatusFailed ||
+                    x.Status == CustomerPrivacyRequest.StatusCanceled)
+                .Where(x => (x.ProcessedAt ?? x.RequestedAt) <= cutoff)
+                .OrderBy(x => x.Id)
+                .Take(resolvedBatchSize)
+                .ToList();
+
+            if (dryRun)
+            {
+                return new CustomerPrivacyRetentionRunResponse(
+                    tenantId,
+                    true,
+                    resolvedDays,
+                    resolvedBatchSize,
+                    cutoff,
+                    candidates.Count,
+                    0);
+            }
+
+            foreach (var candidate in candidates)
+            {
+                candidate.Erased = true;
+                await privacyRequestRepository.UpdateAsync(candidate, cancellationToken);
+            }
+
+            await privacyRequestRepository.SaveChangesAsync(cancellationToken);
+
+            var summary = new
+            {
+                tenantId,
+                retentionDays = resolvedDays,
+                batchSize = resolvedBatchSize,
+                cutoffUtc = cutoff,
+                affected = candidates.Count
+            };
+
+            await auditService.InsertAuditAsync(new AuditInsertRequest(
+                UserId: actorUserId,
+                TimeStamp: DateTimeOffset.UtcNow,
+                Action: AuditActions.Delete,
+                Entity: nameof(CustomerPrivacyRequest),
+                RegisterId: tenantId,
+                OldValues: null,
+                NewValues: AuditSerialization.Serialize(summary),
+                CorrelationId: correlationId ?? $"retention-{Guid.NewGuid():N}"), cancellationToken);
+
             return new CustomerPrivacyRetentionRunResponse(
                 tenantId,
-                true,
+                false,
                 resolvedDays,
                 resolvedBatchSize,
                 cutoff,
                 candidates.Count,
-                0);
+                candidates.Count);
         }
-
-        foreach (var candidate in candidates)
+        catch (Exception ex) when (DomainTransientFailureClassifier.TryClassify(ex, nameof(RunAsync), out var transient))
         {
-            candidate.Erased = true;
-            await privacyRequestRepository.UpdateAsync(candidate, cancellationToken);
+            throw transient;
         }
-
-        await privacyRequestRepository.SaveChangesAsync(cancellationToken);
-
-        var summary = new
-        {
-            tenantId,
-            retentionDays = resolvedDays,
-            batchSize = resolvedBatchSize,
-            cutoffUtc = cutoff,
-            affected = candidates.Count
-        };
-
-        await auditService.InsertAuditAsync(new AuditInsertRequest(
-            UserId: actorUserId,
-            TimeStamp: DateTimeOffset.UtcNow,
-            Action: AuditActions.Delete,
-            Entity: nameof(CustomerPrivacyRequest),
-            RegisterId: tenantId,
-            OldValues: null,
-            NewValues: AuditSerialization.Serialize(summary),
-            CorrelationId: correlationId ?? $"retention-{Guid.NewGuid():N}"), cancellationToken);
-
-        return new CustomerPrivacyRetentionRunResponse(
-            tenantId,
-            false,
-            resolvedDays,
-            resolvedBatchSize,
-            cutoff,
-            candidates.Count,
-            candidates.Count);
     }
 
     private async Task<int> ResolveRetentionDaysAsync(long tenantId, CancellationToken cancellationToken)

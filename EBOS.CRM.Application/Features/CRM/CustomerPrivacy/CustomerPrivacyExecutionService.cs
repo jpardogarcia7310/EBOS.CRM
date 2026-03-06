@@ -1,6 +1,7 @@
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Entities.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
 
@@ -16,22 +17,22 @@ public sealed class CustomerPrivacyExecutionService(
 {
     public async Task ExecuteAsync(CustomerPrivacyRequest request, CancellationToken cancellationToken)
     {
-        var customer = await customerRepository.GetByIdAsync(request.CustomerId, cancellationToken)
-                       ?? throw new InvalidOperationException("Customer not found.");
-        if (customer.TenantId != request.TenantId)
-        {
-            throw new InvalidOperationException("Customer tenant mismatch.");
-        }
-
-        request.MarkInProgress(currentUser.UserId);
-        await privacyRequestRepository.UpdateAsync(request, cancellationToken);
-        await privacyRequestRepository.SaveChangesAsync(cancellationToken);
-
-        var requestOldValues = AuditSerialization.Serialize(request);
-        var customerOldValues = AuditSerialization.Serialize(customer);
-
         try
         {
+            request.MarkInProgress(currentUser.UserId);
+            await privacyRequestRepository.UpdateAsync(request, cancellationToken);
+            await privacyRequestRepository.SaveChangesAsync(cancellationToken);
+
+            var customer = await customerRepository.GetByIdAsync(request.CustomerId, cancellationToken)
+                           ?? throw new DomainValidationException("Customer not found.", "DOMAIN_VALIDATION_CUSTOMER_NOT_FOUND");
+            if (customer.TenantId != request.TenantId)
+            {
+                throw new DomainConflictException("Customer tenant mismatch.", "DOMAIN_CONFLICT_CUSTOMER_TENANT_MISMATCH");
+            }
+
+            var requestOldValues = AuditSerialization.Serialize(request);
+            var customerOldValues = AuditSerialization.Serialize(customer);
+
             if (request.RequestType is CustomerPrivacyRequest.TypeForget or CustomerPrivacyRequest.TypeAnonymize)
             {
                 await AnonymizeCustomerAsync(customer, request, cancellationToken);
@@ -63,6 +64,12 @@ public sealed class CustomerPrivacyExecutionService(
             request.MarkFailed(currentUser.UserId, "EXECUTION_ERROR", ex.Message);
             await privacyRequestRepository.UpdateAsync(request, cancellationToken);
             await privacyRequestRepository.SaveChangesAsync(cancellationToken);
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(ExecuteAsync), out var transient))
+            {
+                request.RecordTransientFailure(transient.Code, nameof(ExecuteAsync));
+                throw transient;
+            }
+
             throw;
         }
     }

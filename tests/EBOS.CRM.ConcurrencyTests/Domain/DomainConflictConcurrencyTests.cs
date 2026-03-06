@@ -47,8 +47,9 @@ public class DomainConflictConcurrencyTests
         var gate = new VersionedCommandGate(initialVersion: 1);
         DomainConflictException? captured = null;
 
-        var t1 = Task.Run(() => gate.Execute("same-command", expectedVersion: 1));
-        var t2 = Task.Run(() =>
+        // Ensure first execution is committed before replay attempt, so failure is deterministically COMMAND_REPLAY.
+        await Task.Run(() => gate.Execute("same-command", expectedVersion: 1));
+        await Task.Run(() =>
         {
             try
             {
@@ -59,8 +60,6 @@ public class DomainConflictConcurrencyTests
                 captured = ex;
             }
         });
-
-        await Task.WhenAll(t1, t2);
 
         Assert.NotNull(captured);
         Assert.Equal(DomainErrorTaxonomyType.DomainConflict, captured!.TaxonomyType);

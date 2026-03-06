@@ -1,3 +1,4 @@
+﻿using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
@@ -51,9 +52,15 @@ public class PatchTaxInformationCommandHandler(ITaxInformationRepository reposit
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 
@@ -66,6 +73,7 @@ public class PatchTaxInformationCommandHandler(ITaxInformationRepository reposit
             !entity.Erased);
     }
 }
+
 
 
 

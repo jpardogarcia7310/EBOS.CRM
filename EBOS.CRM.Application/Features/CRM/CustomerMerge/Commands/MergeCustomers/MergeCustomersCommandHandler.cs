@@ -178,7 +178,7 @@ public class MergeCustomersCommandHandler(
             await customerRepository.CommitAsync(cancellationToken);
             metrics.RecordMerge(mergeRequest.TenantId, merged.Count, true);
         }
-        catch
+        catch (Exception ex)
         {
             await customerRepository.RollbackAsync(cancellationToken);
             if (domainOperationalEventPublisher is not null)
@@ -202,6 +202,11 @@ public class MergeCustomersCommandHandler(
                     cancellationToken);
             }
             metrics.RecordMerge(mergeRequest.TenantId, 0, false);
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

@@ -36,7 +36,15 @@ public sealed class RouteCaseCommandHandler(
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
-        var route = await routingService.RouteAsync(entity, entityRequest.Force, cancellationToken);
+        RouteCaseResult route;
+        try
+        {
+            route = await routingService.RouteAsync(entity, entityRequest.Force, cancellationToken);
+        }
+        catch (Exception ex) when (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+        {
+            throw transient;
+        }
 
         if (route.QueueId != entity.QueueId)
         {
