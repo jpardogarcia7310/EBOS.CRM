@@ -5,6 +5,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Moq;
 
 namespace EBOS.CRM.ApiTests.Application.Features.CRM.Opportunity.Commands.PatchOpportunityStage;
@@ -17,10 +18,11 @@ public class PatchOpportunityStageCommandHandlerTest
         var repository = new Mock<IOpportunityRepository>();
         var audit = new Mock<IAuditService>();
         var currentUser = new Mock<ICurrentUserContext>();
+        var stageValidation = new Mock<IOpportunityStageValidationService>();
         repository.Setup(x => x.GetByIdAsync(404, It.IsAny<CancellationToken>()))
             .ReturnsAsync((global::EBOS.CRM.Domain.Entities.CRM.Opportunity?)null);
 
-        var handler = new PatchOpportunityStageCommandHandler(repository.Object, audit.Object, currentUser.Object);
+        var handler = new PatchOpportunityStageCommandHandler(repository.Object, audit.Object, currentUser.Object, stageValidation.Object);
         var result = await handler.Handle(new PatchOpportunityStageCommand(404, new PatchOpportunityStageRequest(1, 2, 0.5m)), CancellationToken.None);
         Assert.Null(result);
     }
@@ -31,6 +33,7 @@ public class PatchOpportunityStageCommandHandlerTest
         var repository = new Mock<IOpportunityRepository>();
         var audit = new Mock<IAuditService>();
         var currentUser = new Mock<ICurrentUserContext>();
+        var stageValidation = new Mock<IOpportunityStageValidationService>();
         currentUser.SetupGet(x => x.UserId).Returns(1);
         currentUser.SetupGet(x => x.CorrelationId).Returns("corr-1");
         audit.Setup(x => x.InsertAuditAsync(It.IsAny<AuditInsertRequest>(), It.IsAny<CancellationToken>()))
@@ -38,8 +41,10 @@ public class PatchOpportunityStageCommandHandlerTest
 
         var entity = new global::EBOS.CRM.Domain.Entities.CRM.Opportunity { Id = 1, TenantId = 1, Name = "Opp", StageId = 1, OwnerUserId = 2, CustomerId = 3, Amount = 100m, Probability = 0.3m };
         repository.Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
+        stageValidation.Setup(x => x.EnsureStageAvailableAsync(1, 8, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new global::EBOS.CRM.Domain.Entities.CRM.OpportunityStage { Id = 8, TenantId = 1, Name = "Proposal" });
 
-        var handler = new PatchOpportunityStageCommandHandler(repository.Object, audit.Object, currentUser.Object);
+        var handler = new PatchOpportunityStageCommandHandler(repository.Object, audit.Object, currentUser.Object, stageValidation.Object);
         var result = await handler.Handle(new PatchOpportunityStageCommand(1, new PatchOpportunityStageRequest(1, 8, 0.7m)), CancellationToken.None);
 
         Assert.NotNull(result);

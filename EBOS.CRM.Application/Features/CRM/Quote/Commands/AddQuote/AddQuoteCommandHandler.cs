@@ -2,21 +2,28 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Application.Shared.Observability;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Quote.Commands.AddQuote;
 
 public class AddQuoteCommandHandler(IQuoteRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddQuoteCommand, QuoteResponse>
+    ICurrentUserContext currentUser, IMapper mapper, IQuoteOpportunityValidationService quoteOpportunityValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<AddQuoteCommand, QuoteResponse>
 {
     public async Task<QuoteResponse> Handle(AddQuoteCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         var entityRequest = request.QuoteRequest ?? throw new ArgumentNullException(nameof(request.QuoteRequest));
+        await quoteOpportunityValidationService.EnsureOpportunityAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.OpportunityId,
+            cancellationToken);
         var entity = mapper.Map<global::EBOS.CRM.Domain.Entities.CRM.Quote>(entityRequest);
         entity.ApplyUpdate(
             entityRequest.OpportunityId,
@@ -56,9 +63,15 @@ public class AddQuoteCommandHandler(IQuoteRepository repository, IAuditService a
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

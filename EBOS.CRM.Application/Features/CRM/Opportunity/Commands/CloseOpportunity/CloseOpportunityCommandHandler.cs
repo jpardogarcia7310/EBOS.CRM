@@ -5,12 +5,14 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.CloseOpportunity;
 
 public class CloseOpportunityCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<CloseOpportunityCommand, OpportunityResponse?>
+    ICurrentUserContext currentUser, IOpportunityStageValidationService stageValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<CloseOpportunityCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(CloseOpportunityCommand request, CancellationToken cancellationToken)
     {
@@ -27,6 +29,10 @@ public class CloseOpportunityCommandHandler(IOpportunityRepository repository, I
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        await stageValidationService.EnsureStageAvailableAsync(
+            request.OpportunityRequest.TenantId,
+            request.OpportunityRequest.StageId,
+            cancellationToken);
         entity.Close(
             request.OpportunityRequest.StageId,
             request.OpportunityRequest.IsWon,
@@ -60,9 +66,15 @@ public class CloseOpportunityCommandHandler(IOpportunityRepository repository, I
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

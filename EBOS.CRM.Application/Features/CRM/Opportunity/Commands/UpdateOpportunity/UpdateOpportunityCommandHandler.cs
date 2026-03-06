@@ -5,13 +5,15 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.UpdateOpportunity;
 
 public class UpdateOpportunityCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
+    ICurrentUserContext currentUser, IMapper mapper, IOpportunityStageValidationService stageValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<UpdateOpportunityCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(UpdateOpportunityCommand request,
@@ -32,6 +34,10 @@ public class UpdateOpportunityCommandHandler(IOpportunityRepository repository, 
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        await stageValidationService.EnsureStageAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.StageId,
+            cancellationToken);
         entity.ApplyUpdate(
             entityRequest.Name,
             entityRequest.StageId,
@@ -72,9 +78,15 @@ public class UpdateOpportunityCommandHandler(IOpportunityRepository repository, 
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

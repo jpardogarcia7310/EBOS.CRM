@@ -1,14 +1,17 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.PatchCustomer;
 
 public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser) : IRequestHandler<PatchCustomerCommand, CustomerResponse?>
+    ICurrentUserContext currentUser, ICustomerReferenceValidationService referenceValidationService)
+    : IRequestHandler<PatchCustomerCommand, CustomerResponse?>
 {
     public async Task<CustomerResponse?> Handle(PatchCustomerCommand request, CancellationToken cancellationToken)
     {
@@ -21,6 +24,13 @@ public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditS
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        if (request.CustomerRequest.StatusId.HasValue)
+        {
+            await referenceValidationService.EnsureStatusAndCountryAvailableAsync(
+                request.CustomerRequest.StatusId.Value,
+                request.CustomerRequest.CountryId,
+                cancellationToken);
+        }
 
         if (request.CustomerRequest.Code != null)
             entity.Code = request.CustomerRequest.Code;
@@ -52,9 +62,15 @@ public class PatchCustomerCommandHandler(ICustomerRepository repository, IAuditS
 
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

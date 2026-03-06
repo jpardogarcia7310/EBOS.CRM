@@ -5,6 +5,8 @@ using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
+using EBOS.CRM.Domain.Exceptions;
 using MapsterMapper;
 using Moq;
 
@@ -19,6 +21,7 @@ public class AddOpportunityCommandHandlerTest
         var auditService = new Mock<IAuditService>();
         var currentUser = new Mock<ICurrentUserContext>();
         var mapper = new Mock<IMapper>();
+        var stageValidation = new Mock<IOpportunityStageValidationService>();
 
         currentUser.SetupGet(x => x.UserId).Returns(1);
         currentUser.SetupGet(x => x.CorrelationId).Returns("corr-1");
@@ -28,12 +31,40 @@ public class AddOpportunityCommandHandlerTest
             .Returns(new global::EBOS.CRM.Domain.Entities.CRM.Opportunity { Id = 1, TenantId = 1, Name = "Opp A", StageId = 2, OwnerUserId = 3, CustomerId = 4, Amount = 100m, Probability = 0.5m });
         mapper.Setup(x => x.Map<OpportunityResponse>(It.IsAny<global::EBOS.CRM.Domain.Entities.CRM.Opportunity>()))
             .Returns(new OpportunityResponse(1, 1, "Opp A", 2, 3, 4, null, 100m, 0.5m, null, null, null, true));
+        stageValidation.Setup(x => x.EnsureStageAvailableAsync(1, 2, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new global::EBOS.CRM.Domain.Entities.CRM.OpportunityStage { Id = 2, TenantId = 1, Name = "Qualified" });
 
-        var handler = new AddOpportunityCommandHandler(repository.Object, auditService.Object, currentUser.Object, mapper.Object);
+        var handler = new AddOpportunityCommandHandler(repository.Object, auditService.Object, currentUser.Object, mapper.Object, stageValidation.Object);
         var result = await handler.Handle(new AddOpportunityCommand(new AddOpportunityRequest(1, "Opp A", 2, 3, 4, null, 100m, 0.5m, null, null)), CancellationToken.None);
 
         Assert.NotNull(result);
         repository.Verify(x => x.AddAsync(It.IsAny<global::EBOS.CRM.Domain.Entities.CRM.Opportunity>(), It.IsAny<CancellationToken>()), Times.Once);
         repository.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WhenStageResolutionIsTransient_ThrowsTransientDomainFailure()
+    {
+        var repository = new Mock<IOpportunityRepository>();
+        var auditService = new Mock<IAuditService>();
+        var currentUser = new Mock<ICurrentUserContext>();
+        var mapper = new Mock<IMapper>();
+        var stageValidation = new Mock<IOpportunityStageValidationService>();
+
+        mapper.Setup(x => x.Map<global::EBOS.CRM.Domain.Entities.CRM.Opportunity>(It.IsAny<AddOpportunityRequest>()))
+            .Returns(new global::EBOS.CRM.Domain.Entities.CRM.Opportunity { Id = 1, TenantId = 1, Name = "Opp A", StageId = 2, OwnerUserId = 3, CustomerId = 4, Amount = 100m, Probability = 0.5m });
+
+        stageValidation.Setup(x => x.EnsureStageAvailableAsync(1, 2, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TransientDomainFailureException(
+                "Transient failure while resolving opportunity stage.",
+                "DOMAIN_TRANSIENT_OPPORTUNITY_STAGE_RESOLUTION"));
+
+        var handler = new AddOpportunityCommandHandler(repository.Object, auditService.Object, currentUser.Object, mapper.Object, stageValidation.Object);
+        var command = new AddOpportunityCommand(new AddOpportunityRequest(1, "Opp A", 2, 3, 4, null, 100m, 0.5m, null, null));
+
+        var ex = await Assert.ThrowsAsync<TransientDomainFailureException>(() =>
+            handler.Handle(command, CancellationToken.None));
+
+        Assert.Equal("DOMAIN_TRANSIENT_OPPORTUNITY_STAGE_RESOLUTION", ex.Code);
     }
 }

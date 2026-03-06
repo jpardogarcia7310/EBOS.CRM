@@ -1,15 +1,17 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.CorporateCustomer.Commands.UpdateCorporateCustomer;
 
 public class UpdateCorporateCustomerCommandHandler(ICorporateCustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) :
+    ICurrentUserContext currentUser, IMapper mapper, ICustomerReferenceValidationService referenceValidationService) :
     IRequestHandler<UpdateCorporateCustomerCommand, CorporateCustomerResponse?>
 {
     public async Task<CorporateCustomerResponse?> Handle(UpdateCorporateCustomerCommand request,
@@ -22,6 +24,11 @@ public class UpdateCorporateCustomerCommandHandler(ICorporateCustomerRepository 
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+
+        await referenceValidationService.EnsureStatusAndCountryAvailableAsync(
+            entityRequest.StatusId,
+            entityRequest.CountryId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);
@@ -46,9 +53,15 @@ public class UpdateCorporateCustomerCommandHandler(ICorporateCustomerRepository 
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

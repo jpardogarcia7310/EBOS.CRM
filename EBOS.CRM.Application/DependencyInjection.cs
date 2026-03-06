@@ -5,9 +5,15 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using EBOS.CRM.Application.Shared.Commands;
 using EBOS.CRM.Application.Behavior;
+using EBOS.CRM.Application.Features.CRM.Opportunity.Services;
+using EBOS.CRM.Application.Features.CRM.Lead.Services;
+using EBOS.CRM.Application.Features.CRM.Quote.Services;
+using EBOS.CRM.Application.Features.CRM.Customer.Services;
+using EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Services;
 using EBOS.CRM.Application.Features.CRM.CustomerPrivacy;
 using EBOS.CRM.Application.Options;
 using EBOS.CRM.Application.Shared.Observability;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 
 namespace EBOS.CRM.Application;
 
@@ -25,10 +31,15 @@ public static class DependencyInjection
 
         services.AddOptions<CommandExecutionOptions>();
         services.AddOptions<CaseWorkflowOptions>();
-        services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
-        services.AddScoped<IDomainOperationalEventPublisher, DomainOperationalEventPublisher>();
         services.AddScoped<CustomerPrivacyExecutionService>();
         services.AddScoped<CustomerPrivacyRetentionService>();
+        services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
+        services.AddScoped<IDomainOperationalEventPublisher, DomainOperationalEventPublisher>();
+        services.AddScoped<IOpportunityStageValidationService, OpportunityStageValidationService>();
+        services.AddScoped<ILeadConversionValidationService, LeadConversionValidationService>();
+        services.AddScoped<IQuoteOpportunityValidationService, QuoteOpportunityValidationService>();
+        services.AddScoped<ICustomerReferenceValidationService, CustomerReferenceValidationService>();
+        services.AddScoped<IBranchOfficeAddressReferenceValidationService, BranchOfficeAddressReferenceValidationService>();
 
         return services;
     }

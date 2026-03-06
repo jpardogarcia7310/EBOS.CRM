@@ -5,13 +5,15 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Quote.Commands.UpdateQuote;
 
 public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateQuoteCommand, QuoteResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, IQuoteOpportunityValidationService quoteOpportunityValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<UpdateQuoteCommand, QuoteResponse?>
 {
     public async Task<QuoteResponse?> Handle(UpdateQuoteCommand request, CancellationToken cancellationToken)
     {
@@ -29,6 +31,10 @@ public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditServic
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        await quoteOpportunityValidationService.EnsureOpportunityAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.OpportunityId,
+            cancellationToken);
         entity.ApplyUpdate(
             entityRequest.OpportunityId,
             entityRequest.Status,
@@ -67,9 +73,15 @@ public class UpdateQuoteCommandHandler(IQuoteRepository repository, IAuditServic
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

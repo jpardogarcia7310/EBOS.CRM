@@ -1,15 +1,18 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Customer.Commands.UpdateCustomer;
 
 public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IMapper mapper) : IRequestHandler<UpdateCustomerCommand, CustomerResponse?>
+    ICurrentUserContext currentUser, IMapper mapper, ICustomerReferenceValidationService referenceValidationService)
+    : IRequestHandler<UpdateCustomerCommand, CustomerResponse?>
 {
     public async Task<CustomerResponse?> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
@@ -19,6 +22,11 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAudit
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+
+        await referenceValidationService.EnsureStatusAndCountryAvailableAsync(
+            entityRequest.StatusId,
+            entityRequest.CountryId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);
@@ -43,9 +51,15 @@ public class UpdateCustomerCommandHandler(ICustomerRepository repository, IAudit
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

@@ -5,13 +5,16 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Lead.Commands.ConvertLead;
 
 public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportunityRepository opportunityRepository,
-    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper,
+    ILeadConversionValidationService leadConversionValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<ConvertLeadCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(ConvertLeadCommand request, CancellationToken cancellationToken)
@@ -36,6 +39,11 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
         }
 
         var oldValues = AuditSerialization.Serialize(lead);
+        await leadConversionValidationService.EnsureDependenciesAvailableAsync(
+            request.LeadRequest.TenantId,
+            request.LeadRequest.CustomerId,
+            request.LeadRequest.StageId,
+            cancellationToken);
 
         var opportunity = new Domain.Entities.CRM.Opportunity
         {
@@ -102,9 +110,15 @@ public class ConvertLeadCommandHandler(ILeadRepository leadRepository, IOpportun
 
             await leadRepository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await leadRepository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

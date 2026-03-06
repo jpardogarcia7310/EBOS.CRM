@@ -5,12 +5,14 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.Opportunity.Commands.PatchOpportunityStage;
 
 public class PatchOpportunityStageCommandHandler(IOpportunityRepository repository, IAuditService auditService,
-    ICurrentUserContext currentUser, IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<PatchOpportunityStageCommand, OpportunityResponse?>
+    ICurrentUserContext currentUser, IOpportunityStageValidationService stageValidationService,
+    IDomainOperationalEventPublisher? domainOperationalEventPublisher = null) : IRequestHandler<PatchOpportunityStageCommand, OpportunityResponse?>
 {
     public async Task<OpportunityResponse?> Handle(PatchOpportunityStageCommand request,
         CancellationToken cancellationToken)
@@ -28,6 +30,10 @@ public class PatchOpportunityStageCommandHandler(IOpportunityRepository reposito
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
+        await stageValidationService.EnsureStageAvailableAsync(
+            request.OpportunityRequest.TenantId,
+            request.OpportunityRequest.StageId,
+            cancellationToken);
 
         entity.SetStage(request.OpportunityRequest.StageId, request.OpportunityRequest.Probability);
 
@@ -59,9 +65,15 @@ public class PatchOpportunityStageCommandHandler(IOpportunityRepository reposito
             }
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

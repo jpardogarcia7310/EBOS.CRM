@@ -1,15 +1,18 @@
 using EBOS.CRM.Contracts.Responses.CRM;
 using EBOS.CRM.Application.Shared.Audit;
 using EBOS.CRM.Contracts.Requests.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using MediatR;
 
 namespace EBOS.CRM.Application.Features.CRM.BranchOfficeAddress.Commands.UpdateBranchOfficeAddress;
 
 public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressRepository repository,
-    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper) :
+    IAuditService auditService, ICurrentUserContext currentUser, IMapper mapper,
+    IBranchOfficeAddressReferenceValidationService referenceValidationService) :
     IRequestHandler<UpdateBranchOfficeAddressCommand, BranchOfficeAddressResponse?>
 {
     public async Task<BranchOfficeAddressResponse?> Handle(UpdateBranchOfficeAddressCommand request,
@@ -22,6 +25,12 @@ public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressReposit
         var entity = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
             return null;
+
+        await referenceValidationService.EnsureDependenciesAvailableAsync(
+            entityRequest.TenantId,
+            entityRequest.BranchOfficeId,
+            entityRequest.AddressId,
+            cancellationToken);
 
         var oldValues = AuditSerialization.Serialize(entity);
         mapper.Map(entityRequest, entity);
@@ -46,9 +55,15 @@ public class UpdateBranchOfficeAddressCommandHandler(IBranchOfficeAddressReposit
             await auditService.InsertAuditAsync(auditRequest, cancellationToken);
             await repository.CommitAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
             await repository.RollbackAsync(cancellationToken);
+
+            if (DomainTransientFailureClassifier.TryClassify(ex, nameof(Handle), out var transient))
+            {
+                throw transient;
+            }
+
             throw;
         }
 

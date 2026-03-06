@@ -4,6 +4,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using Moq;
 using CRMCustomer = EBOS.CRM.Domain.Entities.CRM.Customer;
 
@@ -19,6 +20,7 @@ public class PatchCustomerCommandHandlerTest
         _repositoryMock = new Mock<ICustomerRepository>();
         var auditServiceMock = new Mock<IAuditService>();
         var currentUserMock = new Mock<ICurrentUserContext>();
+        var referenceValidationMock = new Mock<ICustomerReferenceValidationService>();
 
         currentUserMock.SetupGet(x => x.UserId).Returns(1);
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
@@ -31,7 +33,8 @@ public class PatchCustomerCommandHandlerTest
         _handler = new PatchCustomerCommandHandler(
             _repositoryMock.Object,
             auditServiceMock.Object,
-            currentUserMock.Object);
+            currentUserMock.Object,
+            referenceValidationMock.Object);
     }
 
     [Fact]

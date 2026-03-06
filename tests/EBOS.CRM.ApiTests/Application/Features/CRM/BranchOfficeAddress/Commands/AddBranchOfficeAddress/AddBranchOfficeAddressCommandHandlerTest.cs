@@ -6,6 +6,7 @@ using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
 using EBOS.CRM.Domain.Interfaces.Repositories.CRM;
 using EBOS.CRM.Domain.Interfaces.Services;
+using EBOS.CRM.Domain.Interfaces.Services.CRM;
 using MapsterMapper;
 using Moq;
 using CRMBranchOfficeAddress = EBOS.CRM.Domain.Entities.CRM.BranchOfficeAddress;
@@ -17,6 +18,7 @@ public class AddBranchOfficeAddressCommandHandlerTest
     private readonly Mock<IBranchOfficeAddressRepository> _repositoryMock;
     private readonly Mock<IAuditService> _auditServiceMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IBranchOfficeAddressReferenceValidationService> _referenceValidationMock;
     private readonly AddBranchOfficeAddressCommandHandler _handler;
 
     public AddBranchOfficeAddressCommandHandlerTest()
@@ -25,6 +27,7 @@ public class AddBranchOfficeAddressCommandHandlerTest
         _auditServiceMock = new Mock<IAuditService>();
         var currentUserMock = new Mock<ICurrentUserContext>();
         _mapperMock = new Mock<IMapper>();
+        _referenceValidationMock = new Mock<IBranchOfficeAddressReferenceValidationService>();
 
         currentUserMock.SetupGet(x => x.UserId).Returns(1);
         currentUserMock.SetupGet(x => x.CorrelationId).Returns("corr-1");
@@ -38,7 +41,8 @@ public class AddBranchOfficeAddressCommandHandlerTest
             _repositoryMock.Object,
             _auditServiceMock.Object,
             currentUserMock.Object,
-            _mapperMock.Object);
+            _mapperMock.Object,
+            _referenceValidationMock.Object);
     }
 
     [Fact]
@@ -46,6 +50,9 @@ public class AddBranchOfficeAddressCommandHandlerTest
     {
         var request = BuildAddRequest();
         var entity = new CRMBranchOfficeAddress();
+        _referenceValidationMock
+            .Setup(x => x.EnsureDependenciesAvailableAsync(request.TenantId, request.BranchOfficeId, request.AddressId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         _mapperMock.Setup(m => m.Map<CRMBranchOfficeAddress>(request)).Returns(entity);
         _mapperMock.Setup(m => m.Map<BranchOfficeAddressResponse>(entity)).Returns(TestResponseFactory.Create<BranchOfficeAddressResponse>());
@@ -67,6 +74,9 @@ public class AddBranchOfficeAddressCommandHandlerTest
     {
         var request = BuildAddRequest();
         var entity = new CRMBranchOfficeAddress();
+        _referenceValidationMock
+            .Setup(x => x.EnsureDependenciesAvailableAsync(request.TenantId, request.BranchOfficeId, request.AddressId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         _mapperMock.Setup(m => m.Map<CRMBranchOfficeAddress>(request)).Returns(entity);
         _repositoryMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()))
