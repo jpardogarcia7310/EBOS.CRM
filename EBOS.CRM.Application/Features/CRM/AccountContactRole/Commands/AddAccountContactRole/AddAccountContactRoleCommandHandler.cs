@@ -18,6 +18,7 @@ public class AddAccountContactRoleCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    IAccountContactRoleReferenceValidationService? accountContactRoleReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<AddAccountContactRoleCommand, AccountContactRoleResponse>
 {
@@ -28,11 +29,18 @@ public class AddAccountContactRoleCommandHandler(
         var entityRequest = request.AccountContactRoleRequest ??
                             throw new ArgumentNullException(nameof(request.AccountContactRoleRequest));
 
-        var accountContact = await accountContactRepository.GetByIdAsync(entityRequest.AccountContactId, cancellationToken)
-            ?? throw new DomainValidationException("Account contact not found.", "DOMAIN_VALIDATION_ACCOUNT_CONTACT_NOT_FOUND");
-        if (accountContact.TenantId != entityRequest.TenantId)
+        if (accountContactRoleReferenceValidationService is null)
         {
-            throw new DomainConflictException("Account contact tenant mismatch.", "DOMAIN_CONFLICT_ACCOUNT_CONTACT_TENANT_MISMATCH");
+            var accountContact = await accountContactRepository.GetByIdAsync(entityRequest.AccountContactId, cancellationToken)
+                ?? throw new DomainValidationException("Account contact not found.", "DOMAIN_VALIDATION_ACCOUNT_CONTACT_NOT_FOUND");
+            if (accountContact.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Account contact tenant mismatch.", "DOMAIN_CONFLICT_ACCOUNT_CONTACT_TENANT_MISMATCH");
+            }
+        }
+        else
+        {
+            _ = await accountContactRoleReferenceValidationService.EnsureAccountContactAvailableAsync(entityRequest.TenantId, entityRequest.AccountContactId, cancellationToken);
         }
 
         var entity = global::EBOS.CRM.Domain.Entities.CRM.AccountContactRole.Create(

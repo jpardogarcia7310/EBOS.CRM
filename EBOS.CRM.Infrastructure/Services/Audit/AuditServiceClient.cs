@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using EBOS.CRM.Contracts.Requests.Services;
 using EBOS.CRM.Contracts.Responses.Services;
+using EBOS.CRM.Domain.Exceptions;
 using EBOS.CRM.Domain.Interfaces.Services;
 using EBOS.CRM.Domain.Interfaces.Services.Models;
 using EBOS.CRM.Infrastructure.Observability;
@@ -155,7 +156,7 @@ public sealed class AuditServiceClient(
                     return await onSuccess(response);
                 }
             }
-            catch (Exception ex) when (ex is not AuditServiceUnavailableException)
+            catch (Exception ex) when (ex is not AuditServiceUnavailableException && ex is not DomainException)
             {
                 lastException = ex;
             }
@@ -167,6 +168,15 @@ public sealed class AuditServiceClient(
         }
 
         activity?.SetStatus(ActivityStatusCode.Error, lastException?.Message);
+        if (lastException is not null &&
+            DomainTransientFailureClassifier.TryClassify(lastException, operationName, out _))
+        {
+            throw new TransientDomainFailureException(
+                $"Transient failure while calling audit service in {operationName}.",
+                $"DOMAIN_TRANSIENT_AUDIT_SERVICE_{operationName.ToUpperInvariant()}",
+                lastException);
+        }
+
         throw lastException is AuditServiceUnavailableException
             ? lastException
             : new AuditServiceUnavailableException(

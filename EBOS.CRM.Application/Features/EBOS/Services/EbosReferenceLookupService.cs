@@ -19,21 +19,45 @@ public sealed class EbosReferenceLookupService(
 {
     public Task<global::EBOS.CRM.Domain.Entities.EBOS.AddressType?> GetAddressTypeByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => addressTypeRepository.GetByIdAsync(id, cancellationToken), "GetAddressTypeByIdAsync", "DOMAIN_TRANSIENT_EBOS_ADDRESS_TYPE_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.AddressType>> GetAddressTypesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => addressTypeRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetAddressTypesPagedAsync), "DOMAIN_TRANSIENT_EBOS_ADDRESS_TYPE_LIST");
+    public Task<int> CountAddressTypesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => addressTypeRepository.CountAsync(cancellationToken), nameof(CountAddressTypesAsync), "DOMAIN_TRANSIENT_EBOS_ADDRESS_TYPE_COUNT");
 
     public Task<global::EBOS.CRM.Domain.Entities.EBOS.ChannelCountry?> GetChannelCountryByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => channelCountryRepository.GetByIdAsync(id, cancellationToken), "GetChannelCountryByIdAsync", "DOMAIN_TRANSIENT_EBOS_CHANNEL_COUNTRY_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.ChannelCountry>> GetChannelCountriesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => channelCountryRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetChannelCountriesPagedAsync), "DOMAIN_TRANSIENT_EBOS_CHANNEL_COUNTRY_LIST");
+    public Task<int> CountChannelCountriesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => channelCountryRepository.CountAsync(cancellationToken), nameof(CountChannelCountriesAsync), "DOMAIN_TRANSIENT_EBOS_CHANNEL_COUNTRY_COUNT");
 
     public Task<global::EBOS.CRM.Domain.Entities.EBOS.ChannelType?> GetChannelTypeByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => channelTypeRepository.GetByIdAsync(id, cancellationToken), "GetChannelTypeByIdAsync", "DOMAIN_TRANSIENT_EBOS_CHANNEL_TYPE_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.ChannelType>> GetChannelTypesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => channelTypeRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetChannelTypesPagedAsync), "DOMAIN_TRANSIENT_EBOS_CHANNEL_TYPE_LIST");
+    public Task<int> CountChannelTypesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => channelTypeRepository.CountAsync(cancellationToken), nameof(CountChannelTypesAsync), "DOMAIN_TRANSIENT_EBOS_CHANNEL_TYPE_COUNT");
 
     public Task<Country?> GetCountryByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => countryRepository.GetByIdAsync(id, cancellationToken), "GetCountryByIdAsync", "DOMAIN_TRANSIENT_EBOS_COUNTRY_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.Country>> GetCountriesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => countryRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetCountriesPagedAsync), "DOMAIN_TRANSIENT_EBOS_COUNTRY_LIST");
+    public Task<int> CountCountriesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => countryRepository.CountAsync(cancellationToken), nameof(CountCountriesAsync), "DOMAIN_TRANSIENT_EBOS_COUNTRY_COUNT");
 
     public Task<global::EBOS.CRM.Domain.Entities.EBOS.IdentificationType?> GetIdentificationTypeByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => identificationTypeRepository.GetByIdAsync(id, cancellationToken), "GetIdentificationTypeByIdAsync", "DOMAIN_TRANSIENT_EBOS_IDENTIFICATION_TYPE_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.IdentificationType>> GetIdentificationTypesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => identificationTypeRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetIdentificationTypesPagedAsync), "DOMAIN_TRANSIENT_EBOS_IDENTIFICATION_TYPE_LIST");
+    public Task<int> CountIdentificationTypesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => identificationTypeRepository.CountAsync(cancellationToken), nameof(CountIdentificationTypesAsync), "DOMAIN_TRANSIENT_EBOS_IDENTIFICATION_TYPE_COUNT");
 
     public Task<Status?> GetStatusByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => statusRepository.GetByIdAsync(id, cancellationToken), "GetStatusByIdAsync", "DOMAIN_TRANSIENT_EBOS_STATUS_LOOKUP");
+    public Task<IReadOnlyCollection<global::EBOS.CRM.Domain.Entities.EBOS.Status>> GetStatusesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => statusRepository.GetAllPagedAsync(pageNumber, pageSize, cancellationToken), nameof(GetStatusesPagedAsync), "DOMAIN_TRANSIENT_EBOS_STATUS_LIST");
+    public Task<int> CountStatusesAsync(CancellationToken cancellationToken = default)
+        => RunValueLookupAsync(() => statusRepository.CountAsync(cancellationToken), nameof(CountStatusesAsync), "DOMAIN_TRANSIENT_EBOS_STATUS_COUNT");
 
     public Task<global::EBOS.CRM.Domain.Entities.EBOS.TenantConfiguration?> GetTenantConfigurationByIdAsync(long id, CancellationToken cancellationToken = default)
         => RunLookupAsync(() => tenantConfigurationRepository.GetByIdAsync(id, cancellationToken), "GetTenantConfigurationByIdAsync", "DOMAIN_TRANSIENT_EBOS_TENANT_CONFIGURATION_LOOKUP");

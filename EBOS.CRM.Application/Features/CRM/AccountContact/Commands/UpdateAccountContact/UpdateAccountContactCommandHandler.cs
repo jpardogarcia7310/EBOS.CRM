@@ -19,6 +19,7 @@ public class UpdateAccountContactCommandHandler(
     IAuditService auditService,
     ICurrentUserContext currentUser,
     IMapper mapper,
+    IAccountContactReferenceValidationService? accountContactReferenceValidationService = null,
     IDomainOperationalEventPublisher? domainOperationalEventPublisher = null)
     : IRequestHandler<UpdateAccountContactCommand, AccountContactResponse?>
 {
@@ -33,18 +34,26 @@ public class UpdateAccountContactCommandHandler(
         if (entity is null)
             return null;
 
-        var corporateCustomer = await corporateCustomerRepository.GetByIdAsync(entityRequest.CorporateCustomerId, cancellationToken)
-            ?? throw new DomainValidationException("Corporate customer not found.", "DOMAIN_VALIDATION_CORPORATE_CUSTOMER_NOT_FOUND");
-        if (corporateCustomer.TenantId != entityRequest.TenantId)
+        if (accountContactReferenceValidationService is null)
         {
-            throw new DomainConflictException("Corporate customer tenant mismatch.", "DOMAIN_CONFLICT_CORPORATE_CUSTOMER_TENANT_MISMATCH");
-        }
+            var corporateCustomer = await corporateCustomerRepository.GetByIdAsync(entityRequest.CorporateCustomerId, cancellationToken)
+                ?? throw new DomainValidationException("Corporate customer not found.", "DOMAIN_VALIDATION_CORPORATE_CUSTOMER_NOT_FOUND");
+            if (corporateCustomer.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Corporate customer tenant mismatch.", "DOMAIN_CONFLICT_CORPORATE_CUSTOMER_TENANT_MISMATCH");
+            }
 
-        var individualCustomer = await individualCustomerRepository.GetByIdAsync(entityRequest.IndividualCustomerId, cancellationToken)
-            ?? throw new DomainValidationException("Individual customer not found.", "DOMAIN_VALIDATION_INDIVIDUAL_CUSTOMER_NOT_FOUND");
-        if (individualCustomer.TenantId != entityRequest.TenantId)
+            var individualCustomer = await individualCustomerRepository.GetByIdAsync(entityRequest.IndividualCustomerId, cancellationToken)
+                ?? throw new DomainValidationException("Individual customer not found.", "DOMAIN_VALIDATION_INDIVIDUAL_CUSTOMER_NOT_FOUND");
+            if (individualCustomer.TenantId != entityRequest.TenantId)
+            {
+                throw new DomainConflictException("Individual customer tenant mismatch.", "DOMAIN_CONFLICT_INDIVIDUAL_CUSTOMER_TENANT_MISMATCH");
+            }
+        }
+        else
         {
-            throw new DomainConflictException("Individual customer tenant mismatch.", "DOMAIN_CONFLICT_INDIVIDUAL_CUSTOMER_TENANT_MISMATCH");
+            _ = await accountContactReferenceValidationService.EnsureCorporateCustomerAvailableAsync(entityRequest.TenantId, entityRequest.CorporateCustomerId, cancellationToken);
+            _ = await accountContactReferenceValidationService.EnsureIndividualCustomerAvailableAsync(entityRequest.TenantId, entityRequest.IndividualCustomerId, cancellationToken);
         }
 
         var oldValues = AuditSerialization.Serialize(entity);
